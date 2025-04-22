@@ -6,18 +6,25 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\PermissionController;
 use App\pagegeneral\controller\SliderController;
+use App\bussinespage\controller\DocenteController;
+use App\jorge\controller\EstudianteController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\DashboardController;
+use App\municipalidad\Controller\MunicipalidadController;
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::prefix('sliders')->group(function () {
-    Route::get('/', [SliderController::class, 'index']);
-    Route::get('/{id}', [SliderController::class, 'show']);
-    Route::post('/', [SliderController::class, 'store']);
-    Route::put('/{id}', [SliderController::class, 'update']);
-    Route::delete('/{id}', [SliderController::class, 'destroy']);
+
+Route::prefix('municipalidades')->group(function () {
+    Route::get('/', [MunicipalidadController::class, 'index']);
+    Route::post('/', [MunicipalidadController::class, 'store']);
+    Route::get('{id}', [MunicipalidadController::class, 'show']);
+    Route::put('{id}', [MunicipalidadController::class, 'update']);
+    Route::delete('{id}', [MunicipalidadController::class, 'destroy']);
 });
+
 
 // Rutas protegidas
 Route::middleware('auth:sanctum')->group(function () {
@@ -34,6 +41,21 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Permisos
     Route::middleware('permission:permission_read')->get('/permissions', [PermissionController::class, 'index']);
-    Route::middleware('permission:permission_assign')->post('/permissions/assign', [PermissionController::class, 'assignPermissionsToUser']);
+    Route::middleware('permission:permission_assign')->post('/permissions/assign-to-user', [PermissionController::class, 'assignPermissionsToUser']);
+    Route::middleware('permission:permission_read')->get('/users/{id}/permissions', [PermissionController::class, 'getUserPermissions']);
+    Route::middleware('permission:permission_assign')->post('/permissions/assign-to-role', [PermissionController::class, 'assignPermissionsToRole']);
+    
+    // Users Management (requiere permiso)
+    Route::middleware('permission:user_read')->get('/users', [UserController::class, 'index']);
+    Route::middleware('permission:user_read')->get('/users/{id}', [UserController::class, 'show']);
+    Route::middleware('permission:user_create')->post('/users', [UserController::class, 'store']);
+    Route::middleware('permission:user_update')->put('/users/{id}', [UserController::class, 'update']);
+    Route::middleware('permission:user_delete')->delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::middleware('permission:user_update')->put('/users/{id}/activate', [UserController::class, 'activate']);
+    Route::middleware('permission:user_update')->put('/users/{id}/deactivate', [UserController::class, 'deactivate']);
+    Route::middleware('permission:user_update')->put('/users/{id}/roles', [UserController::class, 'assignRoles']);
+
+    // Dashboard
+    Route::middleware('permission:user_read')->get('/dashboard/summary', [DashboardController::class, 'summary']);
 
 });
