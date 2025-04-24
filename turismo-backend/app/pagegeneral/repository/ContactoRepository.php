@@ -1,16 +1,15 @@
 <?php
 namespace App\pagegeneral\repository;
 
-use App\pagegeneral\models\Slider;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\pagegeneral\Models\Contacto;
 
-class SliderRepository
+class ContactoRepository
 {
     protected $model;
 
-    public function __construct(Slider $slider)
+    public function __construct(Contacto $contacto)
     {
-        $this->model = $slider;
+        $this->model = $contacto;
     }
 
     public function getAll()
@@ -35,19 +34,14 @@ class SliderRepository
 
     public function update($id, array $data)
     {
-        $slider = $this->getById($id);
-        $slider->update($data);
-        return $slider;
+        $contacto = $this->getById($id);
+        $contacto->update($data);
+        return $contacto;
     }
 
     public function delete($id)
     {
-        $slider = $this->getById($id);
-        return $slider->delete();
-    }
-
-    public function getWithDescripciones($id)
-    {
-        return $this->model->with('descripciones')->findOrFail($id);
+        $contacto = $this->getById($id);
+        return $contacto->delete();
     }
 }

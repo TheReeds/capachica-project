@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('emprendedores', function (Blueprint $table) {
+        Schema::create('reserva_detalle', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('email')->unique();
-            $table->string('telefono')->nullable();
-            $table->text('descripcion')->nullable();
-            $table->boolean('estado')->default(true);
+            $table->foreignId('reserva_id')->constrained()->onDelete('cascade');
+            $table->foreignId('emprendedor_id')->constrained('emprendedores')->onDelete('cascade');
+            $table->string('descripcion')->nullable();
+            $table->integer('cantidad')->nullable();
             $table->timestamps();
         });
-
     }
 
     /**
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('emprendedores');
+        Schema::dropIfExists('reserva_detalle');
     }
 };

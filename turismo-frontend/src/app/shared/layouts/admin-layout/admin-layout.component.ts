@@ -104,7 +104,6 @@ import { AuthService } from '../../../core/services/auth.service';
             </li>
 
 
-
             <li>
               <a 
                 routerLink="/categorias" 
@@ -117,7 +116,6 @@ import { AuthService } from '../../../core/services/auth.service';
                 <span class="ml-3">Categorias</span>
               </a>
             </li>
-
 
 
             <li class="border-t border-primary-700 pt-4 mt-4">

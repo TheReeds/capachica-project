@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('municipalidades', function (Blueprint $table) {
+        Schema::create('reservas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->string('direccion')->nullable();
-            $table->string('telefono')->nullable();
-            $table->string('correo')->nullable();
+            $table->date('fecha');
+            $table->text('descripcion')->nullable();
+            $table->string('redes_url')->nullable();
+            $table->string('tipo');
             $table->timestamps();
         });
-        //
     }
 
     /**
@@ -27,7 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
-        Schema::dropIfExists('municipalidades');
+        Schema::dropIfExists('reservas');
     }
 };
