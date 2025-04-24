@@ -11,6 +11,10 @@ use App\jorge\controller\EstudianteController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DashboardController;
 use App\municipalidad\Controller\MunicipalidadController;
+use App\Servicios\Controllers\ServicioController;
+use App\Servicios\Controllers\EmprendedorController;
+use App\Servicios\Controllers\CategoriaController;
+
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -24,6 +28,18 @@ Route::prefix('municipalidades')->group(function () {
     Route::put('{id}', [MunicipalidadController::class, 'update']);
     Route::delete('{id}', [MunicipalidadController::class, 'destroy']);
 });
+
+Route::apiResource('emprendedores', EmprendedorController::class);
+    
+    // Rutas para Categorías
+Route::apiResource('categorias', CategoriaController::class);
+    
+    // Rutas para Servicios
+Route::apiResource('servicios', ServicioController::class);
+Route::get('servicios/emprendedor/{emprendedor_id}', [ServicioController::class, 'byEmprendedor']);
+Route::get('servicios/categoria/{categoria_id}', [ServicioController::class, 'byCategoria']);
+
+
 
 
 // Rutas protegidas
