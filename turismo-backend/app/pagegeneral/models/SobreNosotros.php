@@ -5,28 +5,32 @@ namespace App\pagegeneral\models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Slider extends Model
+class SobreNosotros extends Model
 {
     use HasFactory;
 
+    protected $table = 'sobre_nosotros';
+
     protected $fillable = [
-        'ruta_url',
-        'nombre',
-        'coordenadas',
-        'coordenada_y',
-        'campo',
+        'mision',
+        'vision',
+        'valores',
+        'historia',
+        'objetivos',
+        'imagen_historia_url',
+        'comite_distrital_turismo',
+        'imagen_comite_url',
         'municipalidad_id',
+        'fecha_actualizacion',
+    ];
+
+    protected $casts = [
+        'fecha_actualizacion' => 'date',
     ];
 
     public function municipalidad(): BelongsTo
     {
         return $this->belongsTo(Municipalidad::class);
-    }
-
-    public function descripciones(): HasMany
-    {
-        return $this->hasMany(Descripcion::class);
     }
 }

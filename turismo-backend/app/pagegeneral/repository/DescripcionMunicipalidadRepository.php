@@ -1,16 +1,15 @@
 <?php
 namespace App\pagegeneral\repository;
 
-use App\pagegeneral\models\Slider;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Models\DescripcionMunicipalidad;
 
-class SliderRepository
+class DescripcionMunicipalidadRepository
 {
     protected $model;
 
-    public function __construct(Slider $slider)
+    public function __construct(DescripcionMunicipalidad $descripcionMunicipalidad)
     {
-        $this->model = $slider;
+        $this->model = $descripcionMunicipalidad;
     }
 
     public function getAll()
@@ -28,6 +27,11 @@ class SliderRepository
         return $this->model->where('municipalidad_id', $municipalidadId)->get();
     }
 
+    public function getByTipo($tipo)
+    {
+        return $this->model->where('tipo', $tipo)->get();
+    }
+
     public function create(array $data)
     {
         return $this->model->create($data);
@@ -35,19 +39,14 @@ class SliderRepository
 
     public function update($id, array $data)
     {
-        $slider = $this->getById($id);
-        $slider->update($data);
-        return $slider;
+        $descripcion = $this->getById($id);
+        $descripcion->update($data);
+        return $descripcion;
     }
 
     public function delete($id)
     {
-        $slider = $this->getById($id);
-        return $slider->delete();
-    }
-
-    public function getWithDescripciones($id)
-    {
-        return $this->model->with('descripciones')->findOrFail($id);
+        $descripcion = $this->getById($id);
+        return $descripcion->delete();
     }
 }
