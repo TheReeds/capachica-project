@@ -11,19 +11,66 @@ use App\jorge\controller\EstudianteController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DashboardController;
 
-
 use App\pagegeneral\Controller\MunicipalidadController;
 use App\pagegeneral\Controller\DescripcionMunicipalidadController;
 use App\pagegeneral\Controller\DescripcionController;
 use App\pagegeneral\Controller\FotoDescripcionController;
 use App\pagegeneral\Controller\SobreNosotrosController;
 use App\pagegeneral\Controller\ContactoController;
+use App\municipalidad\Controller\MunicipalidadController;
+use App\reservas\reservadetalle\Controller\ReservaDetalleController;
+use App\reservas\reserva\Controller\ReservaController;
+use App\reservas\Emprendedores\Http\Controllers\EmprendedorController;
+use App\Servicios\Controllers\ServicioController;
+//use App\Servicios\Controllers\EmprendedorController;
+use App\Servicios\Controllers\CategoriaController;
 
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+
+
+
+// neonCode
+Route::prefix('reservas')->group(function () {
+    Route::get('/', [ReservaController::class, 'index']);
+    Route::post('/', [ReservaController::class, 'store']);
+    Route::get('/{id}', [ReservaController::class, 'show']);
+    Route::put('/{id}', [ReservaController::class, 'update']);
+    Route::delete('/{id}', [ReservaController::class, 'destroy']);
+});
+
+Route::prefix('emprendedores')->group(function () {
+    Route::get('/', [EmprendedorController::class, 'index']);
+    Route::post('/', [EmprendedorController::class, 'store']);
+    Route::get('/{id}', [EmprendedorController::class, 'show']);
+    Route::put('/{id}', [EmprendedorController::class, 'update']);
+    Route::delete('/{id}', [EmprendedorController::class, 'destroy']);
+
+    // Rutas adicionales
+    Route::get('/categoria/{categoria}', [EmprendedorController::class, 'byCategory']);
+    Route::get('/search', [EmprendedorController::class, 'search']);
+});
+
+Route::prefix('reserva-detalle')->group(function () {
+    Route::get('/', [ReservaDetalleController::class, 'index']);
+    Route::post('/', [ReservaDetalleController::class, 'store']);
+    Route::get('/{id}', [ReservaDetalleController::class, 'show']);
+    Route::put('/{id}', [ReservaDetalleController::class, 'update']);
+    Route::delete('/{id}', [ReservaDetalleController::class, 'destroy']);
+});
+// Eberth emprendedores
+Route::apiResource('emprendedores', EmprendedorController::class);
+    
+    // Rutas para Categorías
+Route::apiResource('categorias', CategoriaController::class);
+    
+    // Rutas para Servicios
+Route::apiResource('servicios', ServicioController::class);
+Route::get('servicios/emprendedor/{emprendedor_id}', [ServicioController::class, 'byEmprendedor']);
+Route::get('servicios/categoria/{categoria_id}', [ServicioController::class, 'byCategoria']);
 
 
 
