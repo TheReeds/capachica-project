@@ -1,0 +1,41 @@
+.container {
+    width: 80%;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  .add-slider {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .add-slider input {
+    padding: 10px;
+    margin-right: 10px;
+  }
+  
+  .add-slider button {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .slider-list {
+    margin-top: 20px;
+  }
+  
+  .slider-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+  }
+  
+  .slider-item button {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  

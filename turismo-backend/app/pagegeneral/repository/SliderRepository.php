@@ -6,35 +6,48 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SliderRepository
 {
-    // ✅ Listar todos los sliders
-    public static function listar()
+    protected $model;
+
+    public function __construct(Slider $slider)
     {
-        return Slider::all(); // O puedes usar ->get()
+        $this->model = $slider;
     }
 
-    // ✅ Obtener un slider por ID
-    public static function obtenerPorId($id)
+    public function getAll()
     {
-        return Slider::findOrFail($id);
+        return $this->model->all();
     }
 
-    // ✅ Crear un nuevo slider
-    public static function crear(array $data)
+    public function getById($id)
     {
-        return Slider::create($data);
+        return $this->model->findOrFail($id);
     }
 
-    public static function actualizar($id, array $data)
+    public function getByMunicipalidadId($municipalidadId)
     {
-        $slider = Slider::findOrFail($id);
+        return $this->model->where('municipalidad_id', $municipalidadId)->get();
+    }
+
+    public function create(array $data)
+    {
+        return $this->model->create($data);
+    }
+
+    public function update($id, array $data)
+    {
+        $slider = $this->getById($id);
         $slider->update($data);
         return $slider;
     }
 
-    // ✅ Eliminar un slider
-    public static function eliminar($id)
+    public function delete($id)
     {
-        $slider = Slider::findOrFail($id);
+        $slider = $this->getById($id);
         return $slider->delete();
+    }
+
+    public function getWithDescripciones($id)
+    {
+        return $this->model->with('descripciones')->findOrFail($id);
     }
 }

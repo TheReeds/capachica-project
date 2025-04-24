@@ -210,6 +210,7 @@ import { AdminLayoutComponent } from '../../shared/layouts/admin-layout/admin-la
       </div>
   `,
 })
+
 export class DashboardComponent implements OnInit {
   private adminService = inject(AdminService);
   
