@@ -14,6 +14,10 @@ use App\municipalidad\Controller\MunicipalidadController;
 use App\reservas\reservadetalle\Controller\ReservaDetalleController;
 use App\reservas\reserva\Controller\ReservaController;
 use App\reservas\Emprendedores\Http\Controllers\EmprendedorController;
+use App\Servicios\Controllers\ServicioController;
+use App\Servicios\Controllers\EmprendedorController;
+use App\Servicios\Controllers\CategoriaController;
+
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -28,6 +32,7 @@ Route::prefix('municipalidades')->group(function () {
     Route::delete('{id}', [MunicipalidadController::class, 'destroy']);
 });
 
+// neonCode
 Route::prefix('reservas')->group(function () {
     Route::get('/', [ReservaController::class, 'index']);
     Route::post('/', [ReservaController::class, 'store']);
@@ -55,6 +60,19 @@ Route::prefix('reserva-detalle')->group(function () {
     Route::put('/{id}', [ReservaDetalleController::class, 'update']);
     Route::delete('/{id}', [ReservaDetalleController::class, 'destroy']);
 });
+// Eberth emprendedores
+Route::apiResource('emprendedores', EmprendedorController::class);
+    
+    // Rutas para Categorías
+Route::apiResource('categorias', CategoriaController::class);
+    
+    // Rutas para Servicios
+Route::apiResource('servicios', ServicioController::class);
+Route::get('servicios/emprendedor/{emprendedor_id}', [ServicioController::class, 'byEmprendedor']);
+Route::get('servicios/categoria/{categoria_id}', [ServicioController::class, 'byCategoria']);
+
+
+
 
 // Rutas protegidas
 Route::middleware('auth:sanctum')->group(function () {

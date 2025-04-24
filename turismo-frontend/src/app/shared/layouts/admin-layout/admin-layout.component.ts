@@ -90,6 +90,18 @@ import { AuthService } from '../../../core/services/auth.service';
                 <span class="ml-3">Mi Perfil</span>
               </a>
             </li>
+            <li>
+              <a 
+                routerLink="/emprendedores" 
+                routerLinkActive="bg-primary-700"
+                class="flex items-center rounded-lg px-4 py-2 text-base font-normal text-white hover:bg-primary-700"
+              >
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="ml-3">Emprendedores</span>
+              </a>
+            </li>
             <li class="border-t border-primary-700 pt-4 mt-4">
               <button 
                 (click)="logout()" 
@@ -150,7 +162,6 @@ export class AdminLayoutComponent implements OnInit{
   user = this.authService.currentUser();
   sidebarOpen = signal(true);
   ngOnInit() {
-    // Intentamos cargar el perfil del usuario explícitamente
     if (this.authService.isLoggedIn()) {
       console.log('AdminLayout: Intentando cargar perfil de usuario...');
       this.authService.loadUserProfile().subscribe({

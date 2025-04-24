@@ -29,7 +29,11 @@ export const routes: Routes = [
             {
                 path: 'profile',
                 loadChildren: () => import('./features/profile/profile.routes').then(m => m.PROFILE_ROUTES)
-            }
+            },
+            {
+                path: 'emprendedores',
+                loadChildren: () => import('./features/emprendedores/emprendedores.routes').then(m => m.EMPRENDEDORES_ROUTES)
+            },      
         ]
     },
     {
