@@ -35,8 +35,11 @@ class RoleController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        
-        $role = Role::create(['name' => $request->name]);
+
+        $role = Role::create([
+            'name' => $request->name,
+            'guard_name' => 'web'
+        ]);
         $role->syncPermissions($request->permissions);
         
         return response()->json([
@@ -45,6 +48,7 @@ class RoleController extends Controller
             'data' => $role->load('permissions')
         ], 201);
     }
+
     
     public function show($id)
     {

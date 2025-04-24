@@ -150,7 +150,6 @@ export class AdminLayoutComponent implements OnInit{
   user = this.authService.currentUser();
   sidebarOpen = signal(true);
   ngOnInit() {
-    // Intentamos cargar el perfil del usuario explícitamente
     if (this.authService.isLoggedIn()) {
       console.log('AdminLayout: Intentando cargar perfil de usuario...');
       this.authService.loadUserProfile().subscribe({
