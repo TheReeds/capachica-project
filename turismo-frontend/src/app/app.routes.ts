@@ -14,6 +14,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
     },
     {
+        path: 'pageemprendedores',
+        canActivate: [nonAuthGuard],
+        loadChildren: () => import('./features/pagegeneral/emprendedores/pageemprendedores.routes').then(m => m.PAGEEMPRENDEDORES_ROUTES)
+    },
+    {
         path: '',  // Ruta raíz para todas las secciones que necesitan el AdminLayout
         component: AdminLayoutComponent,  // AdminLayout como componente padre
         canActivate: [authGuard],

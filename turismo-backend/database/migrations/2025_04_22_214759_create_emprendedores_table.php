@@ -29,6 +29,7 @@ class CreateEmprendedoresTable extends Migration
             $table->string('idiomas_hablados')->nullable();
             $table->string('opciones_acceso')->nullable();
             $table->boolean('facilidades_discapacidad')->default(false);
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

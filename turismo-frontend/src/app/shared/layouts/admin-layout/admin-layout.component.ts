@@ -102,6 +102,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 <span class="ml-3">Emprendedores</span>
               </a>
             </li>
+            
             <li class="border-t border-primary-700 pt-4 mt-4">
               <button 
                 (click)="logout()" 
