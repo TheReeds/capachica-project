@@ -33,7 +33,14 @@ export const routes: Routes = [
             {
                 path: 'emprendedores',
                 loadChildren: () => import('./features/emprendedores/emprendedores.routes').then(m => m.EMPRENDEDORES_ROUTES)
-            },      
+            },  
+            {
+                path: 'categorias',
+                loadChildren: () => import('./features/categorias/categorias.routes').then(m => m.CATEGORIAS_ROUTES)
+            },
+              
+           
+                
         ]
     },
     {

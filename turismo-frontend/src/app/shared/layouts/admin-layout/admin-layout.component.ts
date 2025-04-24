@@ -102,6 +102,24 @@ import { AuthService } from '../../../core/services/auth.service';
                 <span class="ml-3">Emprendedores</span>
               </a>
             </li>
+
+
+
+            <li>
+              <a 
+                routerLink="/categorias" 
+                routerLinkActive="bg-primary-700"
+                class="flex items-center rounded-lg px-4 py-2 text-base font-normal text-white hover:bg-primary-700"
+              >
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                </svg>
+                <span class="ml-3">Categorias</span>
+              </a>
+            </li>
+
+
+
             <li class="border-t border-primary-700 pt-4 mt-4">
               <button 
                 (click)="logout()" 
