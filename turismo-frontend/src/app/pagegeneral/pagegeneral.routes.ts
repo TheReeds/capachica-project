@@ -9,58 +9,64 @@ import { GastronomiaComponent } from './servicio/gastronomia/gastronomia.compone
 import { ArteytextiComponent } from './servicio/arteytexti/arteytexti.component';
 import { AlojamientoComponent } from './servicio/alojamiento/alojamiento.component';
 import { ActividadesComponent } from './servicio/actividades/actividades.component';
+import { GeneralLayoutComponent } from '../shared/layouts/general-layout/general-layout.component';
 
 export const PAGEGENERAL_ROUTES: Routes = [
   {
-    path: 'home',
-    component: HomeComponent,
-    title: 'Home'
-  },
-  {
-    path: 'sobrenosotros',
-    component: SobrenosotrosComponent,
-    title: 'Sobre Nosotros'
-  },
-  {
-    path: 'contactos',
-    component: ContactosComponent,
-    title: 'Contactos'
-  },
-  {
-    path: 'servicios',
-    component: ServiciosComponent,
-    title: 'Servicios'
-  },
-  {
-    path: 'servicios/actividades',
-    component: ActividadesComponent,
-    title: 'Actividades'
-  },
-  {
-    path: 'servicios/alojamiento',
-    component: AlojamientoComponent,
-    title: 'Alojamiento'
-  },
-  {
-    path: 'servicios/artesaniaytextileria',
-    component: ArteytextiComponent,
-    title: 'Artesanía y Textilería'
-  },
-  {
-    path: 'servicios/gastronomia',
-    component: GastronomiaComponent,
-    title: 'Gastronomía'
-  },
-  {
-    path: 'familias',
-    component: FamiliasComponent,
-    title: 'Familias'
-  },
-  {
-    path: 'detallefamilias',
-    component: DetallefamiliasComponent,
-    title: 'Detalle de Familias'
-  }
+    path: '',
+    component: GeneralLayoutComponent,
+    children: [
+    {
+      path: 'home',
+      component: HomeComponent,
+      title: 'Home'
+    },
+    {
+      path: 'sobrenosotros',
+      component: SobrenosotrosComponent,
+      title: 'Sobre Nosotros'
+    },
+    {
+      path: 'contactos',
+      component: ContactosComponent,
+      title: 'Contactos'
+    },
+    {
+      path: 'servicios',
+      component: ServiciosComponent,
+      title: 'Servicios'
+    },
+    {
+      path: 'servicios/actividades',
+      component: ActividadesComponent,
+      title: 'Actividades'
+    },
+    {
+      path: 'servicios/alojamiento',
+      component: AlojamientoComponent,
+      title: 'Alojamiento'
+    },
+    {
+      path: 'servicios/artesaniaytextileria',
+      component: ArteytextiComponent,
+      title: 'Artesanía y Textilería'
+    },
+    {
+      path: 'servicios/gastronomia',
+      component: GastronomiaComponent,
+      title: 'Gastronomía'
+    },
+    {
+      path: 'familias',
+      component: FamiliasComponent,
+      title: 'Familias'
+    },
+    {
+      path: 'detallefamilias',
+      component: DetallefamiliasComponent,
+      title: 'Detalle de Familias'
+    }]
+   }
 ];
 
 // Para exportación fácil de los componentes

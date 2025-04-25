@@ -108,6 +108,45 @@ Route::post('/login', [AuthController::class, 'login']);
         Route::get('/reserva/{reservaId}', [ReservaDetalleController::class, 'getByReserva']);
         Route::get('/emprendedor/{emprendedorId}', [ReservaDetalleController::class, 'getByEmprendedor']);
     });
+    Route::prefix('sobre-nosotros')->group(function () {
+        Route::get('/', [SobreNosotrosController::class, 'index']);
+        Route::post('/', [SobreNosotrosController::class, 'store']);
+        Route::get('/{id}', [SobreNosotrosController::class, 'show']);
+        Route::put('/{id}', [SobreNosotrosController::class, 'update']);
+        Route::delete('/{id}', [SobreNosotrosController::class, 'destroy']);
+        Route::get('/municipalidad/{municipalidadId}', [SobreNosotrosController::class, 'getByMunicipalidadId']);
+    });
+
+    // Rutas para Contactos
+    Route::prefix('contactos')->group(function () {
+        Route::get('/', [ContactoController::class, 'index']);
+        Route::post('/', [ContactoController::class, 'store']);
+        Route::get('/{id}', [ContactoController::class, 'show']);
+        Route::put('/{id}', [ContactoController::class, 'update']);
+        Route::delete('/{id}', [ContactoController::class, 'destroy']);
+        Route::get('/municipalidad/{municipalidadId}', [ContactoController::class, 'getByMunicipalidadId']);
+    });
+    Route::prefix('sliders')->group(function () {
+        Route::get('/', [SliderController::class, 'index']);
+        Route::post('/', [SliderController::class, 'store']);
+        Route::get('/{id}', [SliderController::class, 'show']);
+        Route::put('/{id}', [SliderController::class, 'update']);
+        Route::delete('/{id}', [SliderController::class, 'destroy']);
+        Route::get('/municipalidad/{municipalidadId}', [SliderController::class, 'getByMunicipalidadId']);
+        Route::get('/{id}/with-descripciones', [SliderController::class, 'getWithDescripciones']);
+        Route::get('/sliders/{id}/image', [SliderController::class, 'getImage']);
+    });
+
+    // Rutas para Descripción Municipalidad
+    Route::prefix('descripcion-municipalidad')->group(function () {
+        Route::get('/', [DescripcionMunicipalidadController::class, 'index']);
+        Route::post('/', [DescripcionMunicipalidadController::class, 'store']);
+        Route::get('/{id}', [DescripcionMunicipalidadController::class, 'show']);
+        Route::put('/{id}', [DescripcionMunicipalidadController::class, 'update']);
+        Route::delete('/{id}', [DescripcionMunicipalidadController::class, 'destroy']);
+        Route::get('/municipalidad/{municipalidadId}', [DescripcionMunicipalidadController::class, 'getByMunicipalidadId']);
+        Route::get('/tipo/{tipo}', [DescripcionMunicipalidadController::class, 'getByTipo']);
+    });
 // Rutas protegidas
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
@@ -141,27 +180,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('permission:user_read')->get('/dashboard/summary', [DashboardController::class, 'summary']);
 
     // Rutas para Sliders
-    Route::prefix('sliders')->group(function () {
-        Route::get('/', [SliderController::class, 'index']);
-        Route::post('/', [SliderController::class, 'store']);
-        Route::get('/{id}', [SliderController::class, 'show']);
-        Route::put('/{id}', [SliderController::class, 'update']);
-        Route::delete('/{id}', [SliderController::class, 'destroy']);
-        Route::get('/municipalidad/{municipalidadId}', [SliderController::class, 'getByMunicipalidadId']);
-        Route::get('/{id}/with-descripciones', [SliderController::class, 'getWithDescripciones']);
-        Route::get('/sliders/{id}/image', [SliderController::class, 'getImage']);
-    });
-
-    // Rutas para Descripción Municipalidad
-    Route::prefix('descripcion-municipalidad')->group(function () {
-        Route::get('/', [DescripcionMunicipalidadController::class, 'index']);
-        Route::post('/', [DescripcionMunicipalidadController::class, 'store']);
-        Route::get('/{id}', [DescripcionMunicipalidadController::class, 'show']);
-        Route::put('/{id}', [DescripcionMunicipalidadController::class, 'update']);
-        Route::delete('/{id}', [DescripcionMunicipalidadController::class, 'destroy']);
-        Route::get('/municipalidad/{municipalidadId}', [DescripcionMunicipalidadController::class, 'getByMunicipalidadId']);
-        Route::get('/tipo/{tipo}', [DescripcionMunicipalidadController::class, 'getByTipo']);
-    });
+    
 
     // Rutas para Descripciones
     Route::prefix('descripciones')->group(function () {
@@ -185,22 +204,5 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Rutas para Sobre Nosotros
-    Route::prefix('sobre-nosotros')->group(function () {
-        Route::get('/', [SobreNosotrosController::class, 'index']);
-        Route::post('/', [SobreNosotrosController::class, 'store']);
-        Route::get('/{id}', [SobreNosotrosController::class, 'show']);
-        Route::put('/{id}', [SobreNosotrosController::class, 'update']);
-        Route::delete('/{id}', [SobreNosotrosController::class, 'destroy']);
-        Route::get('/municipalidad/{municipalidadId}', [SobreNosotrosController::class, 'getByMunicipalidadId']);
-    });
-
-    // Rutas para Contactos
-    Route::prefix('contactos')->group(function () {
-        Route::get('/', [ContactoController::class, 'index']);
-        Route::post('/', [ContactoController::class, 'store']);
-        Route::get('/{id}', [ContactoController::class, 'show']);
-        Route::put('/{id}', [ContactoController::class, 'update']);
-        Route::delete('/{id}', [ContactoController::class, 'destroy']);
-        Route::get('/municipalidad/{municipalidadId}', [ContactoController::class, 'getByMunicipalidadId']);
-    });
+    
 });
