@@ -10,7 +10,7 @@ import { PaginatedResponse } from '../../core/services/admin.service';
 @Component({
   selector: 'app-categorias',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './categorias.component.html',
   styleUrls: ['./categoria.component.css']
 })

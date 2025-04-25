@@ -49,4 +49,22 @@ class MunicipalidadRepository
             'contactos'
         ])->findOrFail($id);
     }
+
+    public function getWithAsociaciones($id)
+    {
+        return $this->model->with('asociaciones')->findOrFail($id);
+    }
+
+    public function getWithAsociacionesAndEmprendedores($id)
+    {
+        return $this->model->with('asociaciones.emprendedores')->findOrFail($id);
+    }
+
+    // Nuevo método para obtener solo asociaciones sin emprendedores
+    public function getWithAsociacionesBasic($id)
+    {
+        return $this->model->with(['asociaciones' => function($query) {
+            $query->select('id', 'nombre', 'descripcion', 'municipalidad_id');
+        }])->findOrFail($id);
+    }
 }

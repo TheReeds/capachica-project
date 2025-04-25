@@ -21,19 +21,52 @@ class ReservaController extends Controller
         $this->repository = $repository;
     }
 
+    /**
+     * Obtener todas las reservas
+     */
     public function index()
     {
-        return response()->json($this->repository->all());
+        try {
+            $reservas = $this->repository->all();
+            return response()->json([
+                'success' => true,
+                'data' => $reservas
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            Log::error('Error al obtener reservas: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+    /**
+     * Obtener una reserva específica
+     */
     public function show($id)
     {
-        return response()->json($this->repository->find($id));
+        try {
+            $reserva = $this->repository->find($id);
+            return response()->json([
+                'success' => true,
+                'data' => $reserva
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            Log::error('Error al obtener reserva: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Reserva no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }
     }
 
+    /**
+     * Crear una nueva reserva
+     */
     public function store(Request $request)
     {
-        Try{
+        try {
             $data = $request->validate([
                 'nombre' => 'required|string|max:255',
                 'fecha' => 'required|date',
@@ -42,7 +75,6 @@ class ReservaController extends Controller
                 'tipo' => 'required|string',
             ]);
         
-
             DB::beginTransaction();
 
             $reserva = new Reserva();
@@ -56,99 +88,112 @@ class ReservaController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Registro creado exitosamente',
+                'message' => 'Reserva creada exitosamente',
                 'data' => $reserva
-            ], Response::HTTP_CREATED); // 201 Created
+            ], Response::HTTP_CREATED);
         
-        }catch (ValidationException $e) {
-            // Si hay errores de validación, revertir la transacción
+        } catch (ValidationException $e) {
             DB::rollBack();
-
-            // Retornar errores de validación
             return response()->json([
                 'success' => false,
                 'message' => 'Error de validación',
                 'errors' => $e->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422 Unprocessable Entity
-
-        }catch (\Exception $e) {
-            // Si hay otras excepciones, revertir la transacción
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
             DB::rollBack();
-
-            // Registrar el error
-            Log::error('Error al guardar datos: ' . $e->getMessage());
-
-            // Retornar respuesta de error
+            Log::error('Error al guardar reserva: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR); // 500 Internal Server Error
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
     }
 
+    /**
+     * Actualizar una reserva existente
+     */
     public function update(Request $request, $id)
     {
-
-        Try{
+        try {
             $data = $request->validate([
-                'nombre' => 'required|string|max:255',
-                'fecha' => 'required|date',
+                'nombre' => 'sometimes|required|string|max:255',
+                'fecha' => 'sometimes|required|date',
                 'descripcion' => 'nullable|string',
                 'redes_url' => 'nullable|url',
-                'tipo' => 'required|string',
+                'tipo' => 'sometimes|required|string',
             ]);
 
-            
-
-            $reserva = reserva::findOrFail($id);
+            $reserva = Reserva::findOrFail($id);
             DB::beginTransaction();
             
             $reserva->fill($data);
     
-            if(!$reserva->save()){
-                throw new \Exception('Error al guardar en la base de datos');
+            if (!$reserva->save()) {
+                throw new \Exception('Error al actualizar en la base de datos');
             }
     
             DB::commit();
     
             return response()->json([
                 'success' => true,
-                'message' => 'Registro actualizado exitosamente',
+                'message' => 'Reserva actualizada exitosamente',
                 'data' => $reserva
-            ], Response::HTTP_CREATED); // 201 Created
+            ], Response::HTTP_OK);
             
-        }catch (ValidationException $e) {
-            // Si hay errores de validación, revertir la transacción
+        } catch (ValidationException $e) {
             DB::rollBack();
-
-            // Retornar errores de validación
             return response()->json([
                 'success' => false,
                 'message' => 'Error de validación',
                 'errors' => $e->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422 Unprocessable Entity
-
-        }catch (\Exception $e) {
-            // Si hay otras excepciones, revertir la transacción
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
             DB::rollBack();
-
-            // Registrar el error
-            Log::error('Error al guardar datos: ' . $e->getMessage());
-
-            // Retornar respuesta de error
+            Log::error('Error al actualizar reserva: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR); // 500 Internal Server Error
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-            /*$this->repository->update($id, $data);
-            return response()->json(['message' => 'Reserva actualizada correctamente']);*/
     }
 
+    /**
+     * Eliminar una reserva
+     */
     public function destroy($id)
     {
-        $this->repository->delete($id);
-        return response()->json(['message' => 'Reserva eliminada correctamente']);
+        try {
+            $this->repository->delete($id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Reserva eliminada correctamente'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar reserva: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar la reserva: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Obtener los emprendedores de una reserva
+     */
+    public function getEmprendedores($id)
+    {
+        try {
+            $reserva = $this->repository->findWithEmprendedores($id);
+            return response()->json([
+                'success' => true,
+                'data' => $reserva->emprendedores
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener emprendedores de la reserva: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener datos: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

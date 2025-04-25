@@ -46,27 +46,17 @@ class EmprendedorController extends Controller
             $resultado = $this->emprendedorService->create($data);
             return response()->json([
                 'success' => true,
-                'message' => 'Registro creado exitosamente',
+                'message' => 'Emprendedor creado exitosamente',
                 'data' => $resultado
             ], Response::HTTP_CREATED);
         }catch(\Exception $e){
-            Log::error('Error al crear registro: ' . $e->getMessage());
+            Log::error('Error al crear emprendedor: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,
                 'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
-        /*$data = $request->validated()
-
-        $emprendedor = $this->emprendedorService->create($request->validated());
-        
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Emprendedor creado exitosamente',
-            'data' => $emprendedor
-        ], 201);*/
     }
 
     /**
@@ -94,7 +84,6 @@ class EmprendedorController extends Controller
      */
     public function update(EmprendedorRequest $request, int $id): JsonResponse
     {
-        //$emprendedor = $this->emprendedorService->update($id, $request->validated());
         try {
             // Los datos ya están validados por el Request
             $datos = $request->validated();
@@ -105,37 +94,24 @@ class EmprendedorController extends Controller
             if (!$resultado) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Registro no encontrado'
+                    'message' => 'Emprendedor no encontrado'
                 ], Response::HTTP_NOT_FOUND);
             }
             
             return response()->json([
                 'success' => true,
-                'message' => 'Registro actualizado exitosamente',
+                'message' => 'Emprendedor actualizado exitosamente',
                 'data' => $resultado
             ], Response::HTTP_OK);
             
         } catch (\Exception $e) {
-            Log::error('Error al actualizar registro: ' . $e->getMessage());
+            Log::error('Error al actualizar emprendedor: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,
                 'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        /*if (!$emprendedor) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Emprendedor no encontrado'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Emprendedor actualizado exitosamente',
-            'data' => $emprendedor
-        ]);*/
     }
 
     /**
@@ -172,6 +148,19 @@ class EmprendedorController extends Controller
     }
 
     /**
+     * Buscar emprendedores por asociación
+     */
+    public function byAsociacion(int $asociacionId): JsonResponse
+    {
+        $emprendedores = $this->emprendedorService->findByAsociacion($asociacionId);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $emprendedores
+        ]);
+    }
+
+    /**
      * Buscar emprendedores
      */
     public function search(Request $request): JsonResponse
@@ -190,6 +179,46 @@ class EmprendedorController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $emprendedores
+        ]);
+    }
+
+    /**
+     * Obtener servicios de un emprendedor
+     */
+    public function getServicios(int $id): JsonResponse
+    {
+        $emprendedor = $this->emprendedorService->getById($id);
+        
+        if (!$emprendedor) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Emprendedor no encontrado'
+            ], 404);
+        }
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $emprendedor->servicios
+        ]);
+    }
+
+    /**
+     * Obtener reservas de un emprendedor
+     */
+    public function getReservas(int $id): JsonResponse
+    {
+        $emprendedor = $this->emprendedorService->getById($id);
+        
+        if (!$emprendedor) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Emprendedor no encontrado'
+            ], 404);
+        }
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $emprendedor->reservas
         ]);
     }
 }

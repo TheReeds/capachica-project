@@ -17,7 +17,7 @@ interface Negocio {
 @Component({
   selector: 'app-pageemprendedores',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './pageemprendedores.component.html',
   styleUrls: ['./pageemprendedores.component.css']
 })

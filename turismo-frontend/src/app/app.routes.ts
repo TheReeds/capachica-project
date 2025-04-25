@@ -97,19 +97,17 @@ export const routes: Routes = [
             {
                 path: 'municipalidad',
                 loadChildren: () => import('./features/admin/municipalidad/municipalidad.routes').then(m => m.MUNICIPALIDAD_ROUTES)
-            },      
-            },  
+            },       
             {
                 path: 'categorias',
                 loadChildren: () => import('./features/categorias/categorias.routes').then(m => m.CATEGORIAS_ROUTES)
             },
-              
            
         ]
     },
     {
         path: '**',
-        redirectTo: 'dashboard'
+        redirectTo: 'dashboard',
     }
     
 ];

@@ -3,8 +3,9 @@
 namespace App\pagegeneral\models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\reservas\Asociaciones\Models\Asociacion;
 
 class Municipalidad extends Model
 {
@@ -33,6 +34,14 @@ class Municipalidad extends Model
         'correo',
         'horariodeatencion',
     ];
+
+    /**
+     * Obtener las asociaciones de la municipalidad
+     */
+    public function asociaciones(): HasMany
+    {
+        return $this->hasMany(Asociacion::class);
+    }
 
     public function sliders(): HasMany
     {

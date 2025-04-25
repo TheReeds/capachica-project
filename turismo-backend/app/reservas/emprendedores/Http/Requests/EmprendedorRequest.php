@@ -43,6 +43,7 @@ class EmprendedorRequest extends FormRequest
             'idiomas_hablados' => 'nullable|array',
             'opciones_acceso' => 'nullable|string',
             'facilidades_discapacidad' => 'nullable|boolean',
+            'asociacion_id' => 'nullable|exists:asociaciones,id',
         ];
         
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {

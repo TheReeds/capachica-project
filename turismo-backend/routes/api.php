@@ -21,58 +21,94 @@ use App\reservas\reservadetalle\Controller\ReservaDetalleController;
 use App\reservas\reserva\Controller\ReservaController;
 use App\reservas\Emprendedores\Http\Controllers\EmprendedorController;
 use App\Servicios\Controllers\ServicioController;
-//use App\Servicios\Controllers\EmprendedorController;
 use App\Servicios\Controllers\CategoriaController;
-
+use App\reservas\Asociaciones\Http\Controllers\AsociacionController;
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-
-
-
-// neonCode
-Route::prefix('reservas')->group(function () {
-    Route::get('/', [ReservaController::class, 'index']);
-    Route::post('/', [ReservaController::class, 'store']);
-    Route::get('/{id}', [ReservaController::class, 'show']);
-    Route::put('/{id}', [ReservaController::class, 'update']);
-    Route::delete('/{id}', [ReservaController::class, 'destroy']);
-});
-
-Route::prefix('emprendedores')->group(function () {
-    Route::get('/', [EmprendedorController::class, 'index']);
-    Route::post('/', [EmprendedorController::class, 'store']);
-    Route::get('/{id}', [EmprendedorController::class, 'show']);
-    Route::put('/{id}', [EmprendedorController::class, 'update']);
-    Route::delete('/{id}', [EmprendedorController::class, 'destroy']);
-
-    // Rutas adicionales
-    Route::get('/categoria/{categoria}', [EmprendedorController::class, 'byCategory']);
-    Route::get('/search', [EmprendedorController::class, 'search']);
-});
-
-Route::prefix('reserva-detalle')->group(function () {
-    Route::get('/', [ReservaDetalleController::class, 'index']);
-    Route::post('/', [ReservaDetalleController::class, 'store']);
-    Route::get('/{id}', [ReservaDetalleController::class, 'show']);
-    Route::put('/{id}', [ReservaDetalleController::class, 'update']);
-    Route::delete('/{id}', [ReservaDetalleController::class, 'destroy']);
-});
-// Eberth emprendedores
-Route::apiResource('emprendedores', EmprendedorController::class);
+// Rutas del sistema de turismo
+Route::prefix('api')->group(function () {
     
-    // Rutas para Categorías
-Route::apiResource('categorias', CategoriaController::class);
-    
+    // Rutas para Municipalidad
+    Route::prefix('municipalidad')->group(function () {
+        Route::get('/', [MunicipalidadController::class, 'index']);
+        Route::post('/', [MunicipalidadController::class, 'store']);
+        Route::get('/{id}', [MunicipalidadController::class, 'show']);
+        Route::put('/{id}', [MunicipalidadController::class, 'update']);
+        Route::delete('/{id}', [MunicipalidadController::class, 'destroy']);
+        Route::get('/{id}/relaciones', [MunicipalidadController::class, 'getWithRelations']);
+        Route::get('/{id}/asociaciones', [MunicipalidadController::class, 'getWithAsociaciones']);
+        Route::get('/{id}/asociaciones/emprendedores', [MunicipalidadController::class, 'getWithAsociacionesAndEmprendedores']);
+    });
+
+    // Rutas para Asociaciones
+    Route::prefix('asociaciones')->group(function () {
+        Route::get('/', [AsociacionController::class, 'index']);
+        Route::get('/{id}', [AsociacionController::class, 'show']);
+        Route::post('/', [AsociacionController::class, 'store']);
+        Route::put('/{id}', [AsociacionController::class, 'update']);
+        Route::delete('/{id}', [AsociacionController::class, 'destroy']);
+        Route::get('/{id}/emprendedores', [AsociacionController::class, 'getEmprendedores']);
+        Route::get('/municipalidad/{municipalidadId}', [AsociacionController::class, 'getByMunicipalidad']);
+    });
+
+    // Rutas para Emprendedores
+    Route::prefix('emprendedores')->group(function () {
+        Route::get('/', [EmprendedorController::class, 'index']);
+        Route::get('/{id}', [EmprendedorController::class, 'show']);
+        Route::post('/', [EmprendedorController::class, 'store']);
+        Route::put('/{id}', [EmprendedorController::class, 'update']);
+        Route::delete('/{id}', [EmprendedorController::class, 'destroy']);
+        Route::get('/categoria/{categoria}', [EmprendedorController::class, 'byCategory']);
+        Route::get('/asociacion/{asociacionId}', [EmprendedorController::class, 'byAsociacion']);
+        Route::get('/search', [EmprendedorController::class, 'search']);
+        Route::get('/{id}/servicios', [EmprendedorController::class, 'getServicios']);
+        Route::get('/{id}/reservas', [EmprendedorController::class, 'getReservas']);
+    });
+
     // Rutas para Servicios
-Route::apiResource('servicios', ServicioController::class);
-Route::get('servicios/emprendedor/{emprendedor_id}', [ServicioController::class, 'byEmprendedor']);
-Route::get('servicios/categoria/{categoria_id}', [ServicioController::class, 'byCategoria']);
+    Route::prefix('servicios')->group(function () {
+        Route::get('/', [ServicioController::class, 'index']);
+        Route::get('/{id}', [ServicioController::class, 'show']);
+        Route::post('/', [ServicioController::class, 'store']);
+        Route::put('/{id}', [ServicioController::class, 'update']);
+        Route::delete('/{id}', [ServicioController::class, 'destroy']);
+        Route::get('/emprendedor/{emprendedorId}', [ServicioController::class, 'byEmprendedor']);
+        Route::get('/categoria/{categoriaId}', [ServicioController::class, 'byCategoria']);
+    });
 
+    // Rutas para Categorías
+    Route::prefix('categorias')->group(function () {
+        Route::get('/', [CategoriaController::class, 'index']);
+        Route::get('/{id}', [CategoriaController::class, 'show']);
+        Route::post('/', [CategoriaController::class, 'store']);
+        Route::put('/{id}', [CategoriaController::class, 'update']);
+        Route::delete('/{id}', [CategoriaController::class, 'destroy']);
+    });
 
+    // Rutas para Reservas
+    Route::prefix('reservas')->group(function () {
+        Route::get('/', [ReservaController::class, 'index']);
+        Route::get('/{id}', [ReservaController::class, 'show']);
+        Route::post('/', [ReservaController::class, 'store']);
+        Route::put('/{id}', [ReservaController::class, 'update']);
+        Route::delete('/{id}', [ReservaController::class, 'destroy']);
+        Route::get('/{id}/emprendedores', [ReservaController::class, 'getEmprendedores']);
+    });
 
+    // Rutas para Detalles de Reserva
+    Route::prefix('reserva-detalles')->group(function () {
+        Route::get('/', [ReservaDetalleController::class, 'index']);
+        Route::get('/{id}', [ReservaDetalleController::class, 'show']);
+        Route::post('/', [ReservaDetalleController::class, 'store']);
+        Route::put('/{id}', [ReservaDetalleController::class, 'update']);
+        Route::delete('/{id}', [ReservaDetalleController::class, 'destroy']);
+        Route::get('/reserva/{reservaId}', [ReservaDetalleController::class, 'getByReserva']);
+        Route::get('/emprendedor/{emprendedorId}', [ReservaDetalleController::class, 'getByEmprendedor']);
+    });
+});
 
 // Rutas protegidas
 Route::middleware('auth:sanctum')->group(function () {
@@ -105,18 +141,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::middleware('permission:user_read')->get('/dashboard/summary', [DashboardController::class, 'summary']);
-
-
-    /////////////////////////////////////////////////////
-    // Rutas para Municipalidad
-    Route::prefix('municipalidad')->group(function () {
-        Route::get('/', [MunicipalidadController::class, 'index']);
-        Route::post('/', [MunicipalidadController::class, 'store']);
-        Route::get('/{id}', [MunicipalidadController::class, 'show']);
-        Route::put('/{id}', [MunicipalidadController::class, 'update']);
-        Route::delete('/{id}', [MunicipalidadController::class, 'destroy']);
-        Route::get('/{id}/with-relations', [MunicipalidadController::class, 'getWithRelations']);
-    });
 
     // Rutas para Sliders
     Route::prefix('sliders')->group(function () {
@@ -181,5 +205,4 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [ContactoController::class, 'destroy']);
         Route::get('/municipalidad/{municipalidadId}', [ContactoController::class, 'getByMunicipalidadId']);
     });
-
 });

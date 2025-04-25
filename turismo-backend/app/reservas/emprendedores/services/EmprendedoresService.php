@@ -8,7 +8,6 @@ use Exception;
 use App\reservas\Emprendedores\Models\Emprendedor;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-//use Illuminate\Support\Facades\Log;
 
 class EmprendedoresService
 {
@@ -17,7 +16,7 @@ class EmprendedoresService
      */
     public function getAll(int $perPage = 15): LengthAwarePaginator
     {
-        return Emprendedor::paginate($perPage);
+        return Emprendedor::with('asociacion')->paginate($perPage);
     }
 
     /**
@@ -25,7 +24,7 @@ class EmprendedoresService
      */
     public function getById(int $id): ?Emprendedor
     {
-        return Emprendedor::find($id);
+        return Emprendedor::with(['asociacion', 'servicios'])->find($id);
     }
 
     /**
@@ -34,7 +33,6 @@ class EmprendedoresService
     public function create(array $data): Emprendedor
     {
         try {
-
             DB::beginTransaction();
 
             $emprendedor = new Emprendedor();
@@ -46,14 +44,9 @@ class EmprendedoresService
             
             DB::commit();
             return $emprendedor;
-            
-           /* Log::info('Intentando crear emprendedor:', $data);
-            return Emprendedor::create($data);*/
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
-            /*Log::error('Error al crear emprendedor: ' . $e->getMessage());
-            throw $e; // o manejarlo como prefieras*/
         }
     }
 
@@ -62,7 +55,7 @@ class EmprendedoresService
      */
     public function update(int $id, array $data): ?Emprendedor
     {
-        try{
+        try {
             DB::beginTransaction();
             
             $emprendedor = Emprendedor::find($id);
@@ -80,20 +73,10 @@ class EmprendedoresService
             
             DB::commit();
             return $emprendedor;
-        }catch(Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
             throw $e;
         }
-        
-        /*
-        $emprendedor = $this->getById($id);
-
-        if (!$emprendedor) {
-            return null;
-        }
-
-        $emprendedor->update($data);
-        return $emprendedor;*/
     }
 
     /**
@@ -116,6 +99,14 @@ class EmprendedoresService
     public function findByCategory(string $categoria): Collection
     {
         return Emprendedor::where('categoria', $categoria)->get();
+    }
+
+    /**
+     * Buscar emprendedores por asociación
+     */
+    public function findByAsociacion(int $asociacionId): Collection
+    {
+        return Emprendedor::where('asociacion_id', $asociacionId)->get();
     }
 
     /**
