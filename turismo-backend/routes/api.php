@@ -29,7 +29,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Rutas del sistema de turismo
-Route::prefix('api')->group(function () {
+
     
     // Rutas para Municipalidad
     Route::prefix('municipalidad')->group(function () {
@@ -108,8 +108,6 @@ Route::prefix('api')->group(function () {
         Route::get('/reserva/{reservaId}', [ReservaDetalleController::class, 'getByReserva']);
         Route::get('/emprendedor/{emprendedorId}', [ReservaDetalleController::class, 'getByEmprendedor']);
     });
-});
-
 // Rutas protegidas
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
