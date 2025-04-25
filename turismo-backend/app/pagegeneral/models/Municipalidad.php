@@ -14,14 +14,24 @@ class Municipalidad extends Model
     
     protected $fillable = [
         'nombre',
-        'titulo',
         'descripcion',
-        'redes_url',
         'red_facebook',
-        'red_twitter',
-        'red_whatsapp',
+        'red_instagram',
+        'red_youtube',
         'coordenadas_x',
         'coordenadas_y',
+        'frase',
+        'comunidades',
+        'historiafamilias',
+        'historiacapachica',
+        'comite',
+        'mision',
+        'vision',
+        'valores',
+        'ordenanzamunicipal',
+        'alianzas',
+        'correo',
+        'horariodeatencion',
     ];
 
     public function sliders(): HasMany

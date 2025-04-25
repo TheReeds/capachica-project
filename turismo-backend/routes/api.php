@@ -17,7 +17,6 @@ use App\pagegeneral\Controller\DescripcionController;
 use App\pagegeneral\Controller\FotoDescripcionController;
 use App\pagegeneral\Controller\SobreNosotrosController;
 use App\pagegeneral\Controller\ContactoController;
-use App\municipalidad\Controller\MunicipalidadController;
 use App\reservas\reservadetalle\Controller\ReservaDetalleController;
 use App\reservas\reserva\Controller\ReservaController;
 use App\reservas\Emprendedores\Http\Controllers\EmprendedorController;
