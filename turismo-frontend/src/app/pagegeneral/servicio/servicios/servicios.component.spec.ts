@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ServiciosComponent } from './servicios.component';
+import { ServiciosComponent } from './servicios.component';  // Asegúrate de importar el componente correctamente
 
 describe('ServiciosComponent', () => {
   let component: ServiciosComponent;
@@ -8,7 +7,7 @@ describe('ServiciosComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ServiciosComponent]
+      declarations: [ServiciosComponent]  // Asegúrate de agregar el componente aquí
     })
     .compileComponents();
 

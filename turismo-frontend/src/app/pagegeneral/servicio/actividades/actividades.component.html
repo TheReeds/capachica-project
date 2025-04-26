@@ -1,1 +1,216 @@
-<p>actividades works!</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alojamientos en Capachica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-orange-50">
+
+    <div id="default-carousel" class="relative w-full" data-carousel="slide">
+        <!-- Carousel wrapper -->
+        <div class="relative h-96 overflow-hidden rounded-lg md:h-[500px] swiper-container"> <!-- Aumentamos la altura de la imagen -->
+            <!-- Swiper Wrapper for slides -->
+            <div class="swiper-wrapper">
+                <!-- Item 1 -->
+                <div class="swiper-slide">
+                    <img src="https://images.squarespace-cdn.com/content/v1/51fbf844e4b038a8e52f5eb1/1412300152604-X2YLIMSRJ2OQJXA9137O/image-asset.jpeg" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 object-cover" alt="Imagen 1">
+                </div>
+                <!-- Item 2 -->
+                <div class="swiper-slide">
+                    <img src="https://terandes.com/wp-content/uploads/2022/10/Visita-a-Llachon-scaled.webp" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 object-cover" alt="Imagen 2">
+                </div>
+                <!-- Item 3 -->
+                <div class="swiper-slide">
+                    <img src="https://i.ytimg.com/vi/Uq3B-hZiC2k/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLC9_gaWzDG_npMsQG2KL6SQ0Mk6mA" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 object-cover" alt="Imagen 3">
+                </div>
+                <!-- Item 4 -->
+                <div class="swiper-slide">
+                    <img src="https://static1.evcdn.net/images/reduction/174270_w-3840_h-2160_q-70_m-crop.jpg" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 object-cover" alt="Imagen 4">
+                </div>
+                <!-- Item 5 -->
+                <div class="swiper-slide">
+                    <img src="https://elcomercio.pe/resizer/BMwuJlc_kCnyR3oMlvH217bUNXM=/980x528/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/4XI64NKWC5EHTJZCG3ZWK6HN3M.jpg" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 object-cover" alt="Imagen 5">
+                </div>
+            </div>
+        </div>
+    
+        <!-- Slider indicators -->
+        <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse swiper-pagination"></div>
+    
+        <!-- Slider controls (optional) -->
+        <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none swiper-button-prev">
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+                <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
+                </svg>
+                <span class="sr-only">Previous</span>
+            </span>
+        </button>
+    
+        <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none swiper-button-next">
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+                <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                </svg>
+                <span class="sr-only">Next</span>
+            </span>
+        </button>
+    </div>
+    
+
+
+    <div class="container mx-auto p-6">
+        <h2 class="text-3xl font-semibold text-center text-gray-800 mb-8">Vive Capachica al mejor precio</h2>
+        
+        <!-- Contenedor de las tarjetas -->
+        <div class="container mx-auto p-6">
+            
+            <!-- Contenedor de las tarjetas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Card 1 - Aventura -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Aventura" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Aventura</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 2 - Turismo -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Turismo" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Turismo</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 3 - Tuerquin -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Tuerquin" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Tuerquin</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 4 - Camping -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Camping" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Camping</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 5 - Callaking -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Callaking" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Callaking</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 6 - Velero -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Velero" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Velero</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 7 - Museo -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Museo" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Museo</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 8 - Actividades extra -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Actividades extra</h3>
+                    <div class="space-y-4">
+                        <!-- Baile -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-800">Baile</span>
+                            <button class="bg-blue-500 text-white py-1 px-3 rounded-md">Agregar al paquete</button>
+                        </div>
+                        <!-- Hilar lana -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-800">Hilar lana</span>
+                            <button class="bg-blue-500 text-white py-1 px-3 rounded-md">Agregar al paquete</button>
+                        </div>
+                        <!-- Tejido -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-800">Tejido</span>
+                            <button class="bg-blue-500 text-white py-1 px-3 rounded-md">Agregar al paquete</button>
+                        </div>
+                        <!-- Bordar -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-800">Bordar</span>
+                            <button class="bg-blue-500 text-white py-1 px-3 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 9 - Turismo místico -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Turismo Místico" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Turismo Místico</h3>
+                        <p class="text-gray-600 mt-2">Pago a la Mamaccota</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 10 - Caballos -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Caballos" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Caballos</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 11 - Mirador -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="https://portal.andina.pe/EDPfotografia2/Thumbnail/2008/10/06/000074610W.jpg" alt="Mirador" class="w-full h-48 object-cover rounded-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Mirador</h3>
+                        <p class="text-gray-600 mt-2">Vista al Lago Titicaca</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Agregar al paquete</button>
+                        </div>
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
