@@ -1,39 +1,43 @@
-
-
+// home.service.ts
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environments';
-import { Home, HomeDTO, Reserva } from './home.model';
+import { Home, HomeDTO, Reserva, Municipalidad } from './home.model';
 import { PaginatedResponse } from '../../core/services/admin.service';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
-
 export class HomeService {
-    private http = inject(HttpClient);
-    private readonly API_URL = environment.apiUrl;
+  private http = inject(HttpClient);
+  private readonly API_URL = environment.apiUrl;
 
+  getEmprendedores(page: number = 1, perPage: number = 10, search?: string): Observable<PaginatedResponse<Home>> {
+    return this.http.get<{success: boolean, data: PaginatedResponse<Home>}>(`${this.API_URL}/emprendedores`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
 
-    getEmprendedores(page: number = 1, perPage: number = 10, search?: string): Observable<PaginatedResponse<Home>> {
-        return this.http.get<{success: boolean, data: PaginatedResponse<Home>}>(`${this.API_URL}/emprendedores`)
-          .pipe(
-            map(response => response.data)
-          );
-    }
+  getEmprendedor(id: number): Observable<Home> {
+    return this.http.get<{success: boolean, data: Home}>(`${this.API_URL}/emprendedores/${id}`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
 
-    getEmprendedor(id: number): Observable<Home> {
-        return this.http.get<{success: boolean, data: Home}>(`${this.API_URL}/emprendedores/1`)
-          .pipe(
-            map(response => response.data)
-          );
-      }
+  getReserva(): Observable<Reserva[]> {
+    return this.http.get<{success: boolean, data: Reserva[]}>(`${this.API_URL}/reservas`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
 
-    getReserva(): Observable<Reserva[]> {
-        return this.http.get<{success: boolean, data: Reserva[]}>(`${this.API_URL}/reservas`)
-          .pipe(
-            map(response => response.data)
-          );
-    }
+  getMunicipalidad(): Observable<Municipalidad> {
+    return this.http.get<{success: boolean, data: Municipalidad}>(`${this.API_URL}/municipalidad/1`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
 }
