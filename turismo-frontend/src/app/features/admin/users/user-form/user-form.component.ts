@@ -4,7 +4,7 @@ import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../../core/services/admin.service';
 import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/admin-layout.component';
-import { Role } from '../../../../core/models/user.model';
+import { Role, User } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-user-form',
@@ -267,6 +267,7 @@ export class UserFormComponent implements OnInit {
   userForm!: FormGroup;
   availableRoles: Role[] = [];
   userId: number | null = null;
+  originalRoles: string[] = [];
   
   loading = false;
   saving = false;
@@ -278,12 +279,14 @@ export class UserFormComponent implements OnInit {
   }
   
   ngOnInit() {
-    this.initForm();
-    this.loadRoles();
-    
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.userId = +id;
+    }
+    this.initForm();
+    this.loadRoles();
+    
+    if (this.userId) {
       this.loadUser(this.userId);
     }
   }
@@ -319,29 +322,38 @@ export class UserFormComponent implements OnInit {
   loadUser(id: number) {
     this.loading = true;
     this.adminService.getUser(id).subscribe({
-      next: (user) => {
-        // Eliminar validadores de contraseña en modo edición
-        this.userForm.get('password')?.clearValidators();
-        this.userForm.get('password')?.updateValueAndValidity();
-        this.userForm.get('password_confirmation')?.clearValidators();
-        this.userForm.get('password_confirmation')?.updateValueAndValidity();
+      next: (response) => {
+        console.log('Respuesta completa:', response);
         
-        // Establecer valores del formulario
-        this.userForm.patchValue({
-          name: user.name,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          phone: user.phone,
-          active: user.active === undefined ? true : user.active,
-          roles: user.roles?.map(role => role.name) || []
-        });
-        
-        this.loading = false;
+        if (response.success && response.data && response.data.user) {
+          const userData = response.data.user;
+          
+          // Actualizar el formulario con los datos obtenidos
+          this.userForm.patchValue({
+            name: userData.name || '',
+            first_name: userData.first_name || '',
+            last_name: userData.last_name || '',
+            email: userData.email || '',
+            phone: userData.phone || '',
+            active: userData.active !== undefined ? userData.active : true
+          });
+          
+          // Actualizar roles usando response.data.roles que es un array de strings
+          if (response.data.roles && response.data.roles.length > 0) {
+            this.originalRoles = [...response.data.roles]; // Guardar roles originales
+            this.userForm.get('roles')?.setValue(response.data.roles);
+          }
+          
+          this.loading = false;
+        } else {
+          console.error('Formato de respuesta inesperado', response);
+          this.error = 'Error al cargar los datos del usuario.';
+          this.loading = false;
+        }
       },
       error: (error) => {
         console.error('Error al cargar usuario:', error);
-        this.error = 'Error al cargar los datos del usuario. Por favor, intente nuevamente.';
+        this.error = 'Error al cargar los datos del usuario.';
         this.loading = false;
       }
     });
@@ -408,6 +420,7 @@ export class UserFormComponent implements OnInit {
     }
     
     const formData = { ...this.userForm.value };
+    const newRoles = formData.roles || [];
     
     // Si estamos en modo edición y no se especificó una contraseña, eliminarla del objeto
     if (this.isEditMode && !formData.password) {
@@ -418,12 +431,20 @@ export class UserFormComponent implements OnInit {
     this.saving = true;
     
     if (this.isEditMode && this.userId) {
+      // Verificar si los roles han cambiado
+      const rolesChanged = this.haveRolesChanged(this.originalRoles, newRoles);
+      
       // Actualizar usuario existente
       this.adminService.updateUser(this.userId, formData).subscribe({
         next: () => {
-          this.saving = false;
-          alert('Usuario actualizado correctamente');
-          this.router.navigate(['/admin/users']);
+          // Si los roles han cambiado, hacer una llamada adicional al endpoint de roles
+          if (rolesChanged) {
+            this.updateUserRoles(this.userId, newRoles);
+          } else {
+            this.saving = false;
+            alert('Usuario actualizado correctamente');
+            this.router.navigate(['/admin/users']);
+          }
         },
         error: (error) => {
           console.error('Error al actualizar usuario:', error);
@@ -434,7 +455,7 @@ export class UserFormComponent implements OnInit {
     } else {
       // Crear nuevo usuario
       this.adminService.createUser(formData).subscribe({
-        next: () => {
+        next: (response) => {
           this.saving = false;
           alert('Usuario creado correctamente');
           this.router.navigate(['/admin/users']);
@@ -447,4 +468,47 @@ export class UserFormComponent implements OnInit {
       });
     }
   }
+  haveRolesChanged(originalRoles: string[], newRoles: string[]): boolean {
+    if (originalRoles.length !== newRoles.length) {
+      return true;
+    }
+    
+    // Ordenar para comparación consistente
+    const sortedOriginal = [...originalRoles].sort();
+    const sortedNew = [...newRoles].sort();
+    
+    // Comparar cada elemento
+    for (let i = 0; i < sortedOriginal.length; i++) {
+      if (sortedOriginal[i] !== sortedNew[i]) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  // Método para actualizar roles de usuario
+  updateUserRoles(userId: number | null, roles: string[]) {
+    if (userId === null) {
+      console.error('ID de usuario no válido');
+      this.error = 'Error al actualizar roles: ID de usuario no válido';
+      this.saving = false;
+      return;
+    }
+    
+    this.adminService.assignRolesToUser(userId, roles).subscribe({
+      next: () => {
+        this.saving = false;
+        this.originalRoles = [...roles]; // Actualizar roles originales
+        alert('Usuario y roles actualizados correctamente');
+        this.router.navigate(['/admin/users']);
+      },
+      error: (error) => {
+        console.error('Error al actualizar roles:', error);
+        this.error = error.error?.message || 'Error al actualizar los roles. Por favor, intente nuevamente.';
+        this.saving = false;
+      }
+    });
+  }
+  
 }

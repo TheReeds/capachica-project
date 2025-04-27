@@ -78,8 +78,8 @@ export class AdminService {
     );
   }
 
-  getUser(id: number): Observable<User> {
-    return this.http.get<User>(`${this.API_URL}/users/${id}`);
+  getUser(id: number): Observable<any> {  // Cambia el tipo de retorno a 'any' por ahora
+    return this.http.get<{success: boolean, data: any}>(`${this.API_URL}/users/${id}`);
   }
 
   createUser(user: any): Observable<User> {

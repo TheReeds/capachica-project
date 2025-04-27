@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { User } from '../../../core/models/user.model';
+
 
 @Component({
   selector: 'app-admin-layout',
@@ -9,12 +11,20 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive],
   template: `
     <div class="flex h-screen bg-gray-100">
+      <!-- Overlay de carga mientras se obtiene el perfil -->
+      <div *ngIf="authService.isLoading()" 
+           class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-4">
+          <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
+          <span>Cargando tu perfil...</span>
+        </div>
+      </div>
       <!-- Sidebar -->
       <div 
         class="fixed inset-y-0 left-0 z-30 w-64 transform bg-primary-800 transition duration-300 lg:translate-x-0"
         [ngClass]="{'translate-x-0': sidebarOpen(), '-translate-x-full': !sidebarOpen()}"
       >
-        <div class="flex h-16 items-center justify-between bg-primary-900 px-4">
+      <div class="flex h-16 items-center justify-between bg-primary-900 px-4">
           <div class="flex items-center">
             <span class="text-xl font-bold text-white">Admin Panel</span>
           </div>
@@ -213,7 +223,7 @@ import { AuthService } from '../../../core/services/auth.service';
               <div class="hidden md:flex md:items-center md:space-x-4">
                 <div class="relative">
                   <span class="text-sm font-medium text-gray-700">
-                    {{ user?.name || 'Usuario' }}
+                    {{ displayName() }}
                   </span>
                 </div>
                 <div class="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
@@ -232,31 +242,55 @@ import { AuthService } from '../../../core/services/auth.service';
     </div>
   `,
 })
-export class AdminLayoutComponent implements OnInit{
-  private authService = inject(AuthService);
+export class AdminLayoutComponent implements OnInit {
+  authService = inject(AuthService);
   
-  user = this.authService.currentUser();
   sidebarOpen = signal(true);
   
+  // Computed property para el nombre a mostrar
+  displayName = computed(() => {
+    const user = this.authService.currentUser();
+    if (!user) return 'Usuario';
+    return user.name || `${user.first_name} ${user.last_name}` || 'Usuario';
+  });
+  
   ngOnInit() {
+    console.log('AdminLayout: Iniciando componente...');
+    
+    // Verificar si el usuario está autenticado
     if (this.authService.isLoggedIn()) {
-      console.log('AdminLayout: Intentando cargar perfil de usuario...');
-      this.authService.loadUserProfile().subscribe({
-        next: user => {
-          console.log('AdminLayout: Perfil cargado correctamente:', user);
-        },
-        error: err => {
-          console.error('AdminLayout: Error al cargar perfil:', err);
-        }
-      });
+      console.log('AdminLayout: Usuario está autenticado, verificando perfil...');
+      
+      // Verificar si el perfil ya está cargado
+      if (!this.authService.currentUser()) {
+        console.log('AdminLayout: Perfil no cargado, intentando cargar...');
+        
+        this.authService.loadUserProfile(true).subscribe({
+          next: user => {
+            console.log('AdminLayout: Perfil cargado correctamente:', user);
+          },
+          error: err => {
+            console.error('AdminLayout: Error al cargar perfil:', err);
+          }
+        });
+      } else {
+        console.log('AdminLayout: Perfil ya está cargado:', this.authService.currentUser());
+      }
+    } else {
+      console.log('AdminLayout: Usuario no está autenticado');
     }
   }
   
   userInitials(): string {
-    if (!this.user) return '';
+    const user = this.authService.currentUser();
+    if (!user) return '';
     
-    const firstName = this.user.first_name || '';
-    const lastName = this.user.last_name || '';
+    const firstName = user.first_name || '';
+    const lastName = user.last_name || '';
+    
+    if (!firstName && !lastName) {
+      return user.name?.substring(0, 2).toUpperCase() || '';
+    }
     
     return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
   }

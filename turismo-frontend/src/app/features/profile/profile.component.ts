@@ -3,15 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { HeaderComponent } from '../../shared/components/header/header.component';
 import { User } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, HeaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <app-header></app-header>
     
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <h1 class="text-3xl font-bold text-gray-900">Mi Perfil</h1>

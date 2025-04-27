@@ -247,15 +247,31 @@ export class RoleFormComponent implements OnInit {
       next: (role) => {
         // Establecer valores del formulario
         this.roleForm.patchValue({
-          name: role.name,
-          permissions: this.getPermissionNames(role.permissions)
+          name: role.name
         });
+        
+        // Extraer nombres de permisos
+        let permissionNames: string[] = [];
+        if (role.permissions) {
+          if (Array.isArray(role.permissions)) {
+            if (role.permissions.length > 0) {
+              if (typeof role.permissions[0] === 'string') {
+                permissionNames = role.permissions as string[];
+              } else {
+                permissionNames = role.permissions.map((p: any) => p.name);
+              }
+            }
+          }
+        }
+        
+        // Asignar permisos al formulario
+        this.roleForm.get('permissions')?.setValue(permissionNames);
         
         this.loading = false;
       },
       error: (error) => {
         console.error('Error al cargar rol:', error);
-        this.error = 'Error al cargar los datos del rol. Por favor, intente nuevamente.';
+        this.error = 'Error al cargar los datos del rol.';
         this.loading = false;
       }
     });
@@ -263,12 +279,13 @@ export class RoleFormComponent implements OnInit {
   
   getPermissionNames(permissions: any): string[] {
     if (!permissions) return [];
+    if (!Array.isArray(permissions)) return [];
     
-    if (typeof permissions[0] === 'string') {
+    if (permissions.length > 0 && typeof permissions[0] === 'string') {
       return permissions as string[];
     }
     
-    return (permissions as any[]).map(p => p.name);
+    return (permissions as any[]).map(p => p.name || '').filter(name => name);
   }
   
   isFieldInvalid(fieldName: string): boolean {
