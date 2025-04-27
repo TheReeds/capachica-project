@@ -20,6 +20,12 @@ class ServicioController extends Controller
     public function index(): JsonResponse
     {
         $servicios = $this->repository->getPaginated();
+        
+        // Cargar sliders para cada servicio
+        foreach ($servicios as $servicio) {
+            $servicio->load(['sliders']);
+        }
+        
         return response()->json([
             'success' => true,
             'data' => $servicios
@@ -29,6 +35,7 @@ class ServicioController extends Controller
     public function show(int $id): JsonResponse
     {
         $servicio = $this->repository->findById($id);
+        $servicio->load(['sliders']);
         
         if (!$servicio) {
             return response()->json([

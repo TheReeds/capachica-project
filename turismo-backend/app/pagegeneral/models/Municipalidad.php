@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\reservas\Asociaciones\Models\Asociacion;
+use App\Pagegeneral\Models\SliderDescripcion;
 
 class Municipalidad extends Model
 {
@@ -45,21 +46,27 @@ class Municipalidad extends Model
 
     public function sliders(): HasMany
     {
-        return $this->hasMany(Slider::class);
+        return $this->hasMany(Slider::class, 'entidad_id')
+                    ->where('tipo_entidad', 'municipalidad')
+                    ->orderBy('orden');
     }
 
-    public function descripcionesMunicipalidad(): HasMany
+    // Relación para sliders principales
+    public function slidersPrincipales()
     {
-        return $this->hasMany(DescripcionMunicipalidad::class);
+        return $this->hasMany(Slider::class, 'entidad_id')
+                    ->where('tipo_entidad', 'municipalidad')
+                    ->where('es_principal', true)
+                    ->orderBy('orden');
     }
 
-    public function sobreNosotros(): HasMany
+    // Relación para sliders secundarios con descripción
+    public function slidersSecundarios()
     {
-        return $this->hasMany(SobreNosotros::class);
-    }
-
-    public function contactos(): HasMany
-    {
-        return $this->hasMany(Contacto::class);
+        return $this->hasMany(Slider::class, 'entidad_id')
+                    ->where('tipo_entidad', 'municipalidad')
+                    ->where('es_principal', false)
+                    ->with('descripcion')
+                    ->orderBy('orden');
     }
 }

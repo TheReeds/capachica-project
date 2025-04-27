@@ -27,6 +27,12 @@ class MunicipalidadController extends Controller
     {
         try {
             $municipalidades = $this->municipalidadRepository->getAll();
+            
+            // Cargar relaciones de sliders para cada municipalidad
+            $municipalidades->each(function($municipalidad) {
+                $municipalidad->load(['slidersPrincipales', 'slidersSecundarios']);
+            });
+            
             return response()->json([
                 'success' => true,
                 'data' => $municipalidades
@@ -50,6 +56,10 @@ class MunicipalidadController extends Controller
     {
         try {
             $municipalidad = $this->municipalidadRepository->getById($id);
+            
+            // Cargar relaciones de sliders
+            $municipalidad->load(['slidersPrincipales', 'slidersSecundarios']);
+            
             return response()->json([
                 'success' => true,
                 'data' => $municipalidad

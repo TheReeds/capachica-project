@@ -12,11 +12,6 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DashboardController;
 
 use App\pagegeneral\Controller\MunicipalidadController;
-use App\pagegeneral\Controller\DescripcionMunicipalidadController;
-use App\pagegeneral\Controller\DescripcionController;
-use App\pagegeneral\Controller\FotoDescripcionController;
-use App\pagegeneral\Controller\SobreNosotrosController;
-use App\pagegeneral\Controller\ContactoController;
 use App\reservas\reservadetalle\Controller\ReservaDetalleController;
 use App\reservas\reserva\Controller\ReservaController;
 use App\reservas\Emprendedores\Http\Controllers\EmprendedorController;
@@ -30,7 +25,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Rutas del sistema de turismo
 
-    
+    Route::get('/linkstorage', function () {
+        Artisan::call('storage:link');
+    });
     // Rutas para Municipalidad
     Route::prefix('municipalidad')->group(function () {
         Route::get('/', [MunicipalidadController::class, 'index']);
@@ -41,6 +38,15 @@ Route::post('/login', [AuthController::class, 'login']);
         Route::get('/{id}/relaciones', [MunicipalidadController::class, 'getWithRelations']);
         Route::get('/{id}/asociaciones', [MunicipalidadController::class, 'getWithAsociaciones']);
         Route::get('/{id}/asociaciones/emprendedores', [MunicipalidadController::class, 'getWithAsociacionesAndEmprendedores']);
+    });
+    Route::prefix('sliders')->group(function () {
+        Route::get('/', [SliderController::class, 'index']);
+        Route::post('/', [SliderController::class, 'store']);
+        Route::get('/{id}', [SliderController::class, 'show']);
+        Route::post('/multiple', [SliderController::class, 'storeMultiple']);
+        Route::put('/{id}', [SliderController::class, 'update']);
+        Route::delete('/{id}', [SliderController::class, 'destroy']);
+        Route::get('/entidad/{tipo}/{id}', [SliderController::class, 'getByEntidad']);
     });
 
     // Rutas para Asociaciones
@@ -108,24 +114,7 @@ Route::post('/login', [AuthController::class, 'login']);
         Route::get('/reserva/{reservaId}', [ReservaDetalleController::class, 'getByReserva']);
         Route::get('/emprendedor/{emprendedorId}', [ReservaDetalleController::class, 'getByEmprendedor']);
     });
-    Route::prefix('sobre-nosotros')->group(function () {
-        Route::get('/', [SobreNosotrosController::class, 'index']);
-        Route::post('/', [SobreNosotrosController::class, 'store']);
-        Route::get('/{id}', [SobreNosotrosController::class, 'show']);
-        Route::put('/{id}', [SobreNosotrosController::class, 'update']);
-        Route::delete('/{id}', [SobreNosotrosController::class, 'destroy']);
-        Route::get('/municipalidad/{municipalidadId}', [SobreNosotrosController::class, 'getByMunicipalidadId']);
-    });
 
-    // Rutas para Contactos
-    Route::prefix('contactos')->group(function () {
-        Route::get('/', [ContactoController::class, 'index']);
-        Route::post('/', [ContactoController::class, 'store']);
-        Route::get('/{id}', [ContactoController::class, 'show']);
-        Route::put('/{id}', [ContactoController::class, 'update']);
-        Route::delete('/{id}', [ContactoController::class, 'destroy']);
-        Route::get('/municipalidad/{municipalidadId}', [ContactoController::class, 'getByMunicipalidadId']);
-    });
     Route::prefix('sliders')->group(function () {
         Route::get('/', [SliderController::class, 'index']);
         Route::post('/', [SliderController::class, 'store']);
@@ -137,16 +126,6 @@ Route::post('/login', [AuthController::class, 'login']);
         Route::get('/sliders/{id}/image', [SliderController::class, 'getImage']);
     });
 
-    // Rutas para Descripción Municipalidad
-    Route::prefix('descripcion-municipalidad')->group(function () {
-        Route::get('/', [DescripcionMunicipalidadController::class, 'index']);
-        Route::post('/', [DescripcionMunicipalidadController::class, 'store']);
-        Route::get('/{id}', [DescripcionMunicipalidadController::class, 'show']);
-        Route::put('/{id}', [DescripcionMunicipalidadController::class, 'update']);
-        Route::delete('/{id}', [DescripcionMunicipalidadController::class, 'destroy']);
-        Route::get('/municipalidad/{municipalidadId}', [DescripcionMunicipalidadController::class, 'getByMunicipalidadId']);
-        Route::get('/tipo/{tipo}', [DescripcionMunicipalidadController::class, 'getByTipo']);
-    });
 // Rutas protegidas
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
@@ -178,8 +157,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::middleware('permission:user_read')->get('/dashboard/summary', [DashboardController::class, 'summary']);
-
-    // Rutas para Sliders
     
 
     // Rutas para Descripciones
@@ -191,16 +168,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [DescripcionController::class, 'destroy']);
         Route::get('/slider/{sliderId}', [DescripcionController::class, 'getBySliderId']);
         Route::get('/{id}/with-fotos', [DescripcionController::class, 'getWithFotos']);
-    });
-
-    // Rutas para Fotos Descripción
-    Route::prefix('fotos-descripcion')->group(function () {
-        Route::get('/', [FotoDescripcionController::class, 'index']);
-        Route::post('/', [FotoDescripcionController::class, 'store']);
-        Route::get('/{id}', [FotoDescripcionController::class, 'show']);
-        Route::put('/{id}', [FotoDescripcionController::class, 'update']);
-        Route::delete('/{id}', [FotoDescripcionController::class, 'destroy']);
-        Route::get('/descripcion/{descripcionId}', [FotoDescripcionController::class, 'getByDescripcionId']);
     });
 
     // Rutas para Sobre Nosotros

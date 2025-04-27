@@ -28,6 +28,11 @@ class EmprendedorController extends Controller
     {
         $perPage = $request->query('per_page', 15);
         $emprendedores = $this->emprendedorService->getAll($perPage);
+        
+        // Cargar sliders para cada emprendedor
+        foreach ($emprendedores as $emprendedor) {
+            $emprendedor->load(['slidersPrincipales', 'slidersSecundarios']);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -65,6 +70,7 @@ class EmprendedorController extends Controller
     public function show(int $id): JsonResponse
     {
         $emprendedor = $this->emprendedorService->getById($id);
+        $emprendedor->load(['slidersPrincipales', 'slidersSecundarios']);
 
         if (!$emprendedor) {
             return response()->json([

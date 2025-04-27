@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\reservas\Asociaciones\Models\Asociacion;
 use App\Servicios\Models\Servicio;
 use App\reservas\reserva\Models\Reserva;
+use App\Pagegeneral\Models\Slider;
 
 class Emprendedor extends Model
 {
@@ -55,22 +56,39 @@ class Emprendedor extends Model
     {
         return $this->belongsTo(Asociacion::class);
     }
-
-    /**
-     * Obtener los servicios del emprendedor
-     */
     public function servicios(): HasMany
     {
         return $this->hasMany(Servicio::class);
     }
-
-    /**
-     * Obtener las reservas del emprendedor
-     */
     public function reservas(): BelongsToMany
     {
         return $this->belongsToMany(Reserva::class, 'reserva_detalle')
                     ->withPivot('descripcion', 'cantidad')
                     ->withTimestamps();
+    }
+
+    // Nuevas relaciones para sliders
+    public function sliders(): HasMany
+    {
+        return $this->hasMany(Slider::class, 'entidad_id')
+                    ->where('tipo_entidad', 'emprendedor')
+                    ->orderBy('orden');
+    }
+
+    public function slidersPrincipales()
+    {
+        return $this->hasMany(Slider::class, 'entidad_id')
+                    ->where('tipo_entidad', 'emprendedor')
+                    ->where('es_principal', true)
+                    ->orderBy('orden');
+    }
+
+    public function slidersSecundarios()
+    {
+        return $this->hasMany(Slider::class, 'entidad_id')
+                    ->where('tipo_entidad', 'emprendedor')
+                    ->where('es_principal', false)
+                    ->with('descripcion')
+                    ->orderBy('orden');
     }
 }

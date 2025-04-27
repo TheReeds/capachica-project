@@ -5,6 +5,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } 
 import { AdminService } from '../../../../core/services/admin.service';
 import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/admin-layout.component';
 import { Permission } from '../../../../core/models/user.model';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-role-form',
@@ -31,7 +33,7 @@ import { Permission } from '../../../../core/models/user.model';
           @if (loading) {
             <div class="flex justify-center items-center p-8">
               <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
-              <span class="ml-4">Cargando...</span>
+              <span class="ml-4">Cargando datos del rol...</span>
             </div>
           } @else {
             <form [formGroup]="roleForm" (ngSubmit)="onSubmit()" class="space-y-6 p-6">
@@ -209,14 +211,57 @@ export class RoleFormComponent implements OnInit {
   
   ngOnInit() {
     this.initForm();
-    this.loadPermissions();
     
     const id = this.route.snapshot.paramMap.get('id');
+    this.loading = true;
+    
     if (id) {
       this.roleId = +id;
-      this.loadRole(this.roleId);
+      
+      // Cargamos tanto los permisos como los datos del rol simultáneamente
+      forkJoin({
+        permissions: this.adminService.getPermissions(),
+        roleData: this.adminService.getRole(this.roleId)
+      }).subscribe({
+        next: (result) => {
+          this.availablePermissions = result.permissions;
+          
+          // Procesar datos del rol
+          const roleData = result.roleData;
+          if (roleData) {
+            this.roleForm.patchValue({
+              name: roleData.name
+            });
+            
+            // Extraer nombres de permisos
+            const permissionNames = roleData.permissions
+              ? roleData.permissions.map((p: any) => p.name)
+              : [];
+            
+            this.roleForm.get('permissions')?.setValue(permissionNames);
+          }
+          
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error al cargar datos:', error);
+          this.error = 'Error al cargar los datos. Por favor, intente nuevamente.';
+          this.loading = false;
+        }
+      });
     } else {
-      this.loading = false;
+      // Solo cargamos permisos para el modo creación
+      this.adminService.getPermissions().subscribe({
+        next: (permissions) => {
+          this.availablePermissions = permissions;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error al cargar permisos:', error);
+          this.error = 'Error al cargar los permisos. Por favor, intente nuevamente.';
+          this.loading = false;
+        }
+      });
     }
   }
   
@@ -244,25 +289,23 @@ export class RoleFormComponent implements OnInit {
   loadRole(id: number) {
     this.loading = true;
     this.adminService.getRole(id).subscribe({
-      next: (role) => {
-        // Establecer valores del formulario
+      next: (roleData) => {
+        // Asegurar que roleData no es null/undefined
+        if (!roleData) {
+          this.error = 'No se pudieron cargar los datos del rol';
+          this.loading = false;
+          return;
+        }
+        
+        // Establecer nombre del rol
         this.roleForm.patchValue({
-          name: role.name
+          name: roleData.name
         });
         
-        // Extraer nombres de permisos
-        let permissionNames: string[] = [];
-        if (role.permissions) {
-          if (Array.isArray(role.permissions)) {
-            if (role.permissions.length > 0) {
-              if (typeof role.permissions[0] === 'string') {
-                permissionNames = role.permissions as string[];
-              } else {
-                permissionNames = role.permissions.map((p: any) => p.name);
-              }
-            }
-          }
-        }
+        // Extraer nombres de permisos, asumiendo que permissions es un array de objetos
+        const permissionNames = roleData.permissions
+          ? roleData.permissions.map((p: any) => p.name)
+          : [];
         
         // Asignar permisos al formulario
         this.roleForm.get('permissions')?.setValue(permissionNames);

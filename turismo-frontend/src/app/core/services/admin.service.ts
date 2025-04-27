@@ -118,7 +118,9 @@ export class AdminService {
   }
 
   getRole(id: number): Observable<Role> {
-    return this.http.get<Role>(`${this.API_URL}/roles/${id}`);
+    return this.http.get<{success: boolean, data: Role}>(`${this.API_URL}/roles/${id}`).pipe(
+      map(response => response.data)
+    );
   }
 
   createRole(role: { name: string, permissions: string[] }): Observable<Role> {
