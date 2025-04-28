@@ -227,4 +227,28 @@ class EmprendedorController extends Controller
             'data' => $emprendedor->reservas
         ]);
     }
+    public function getWithRelations($id)
+    {
+        try {
+            $emprendedor = $this->emprendedorService->getWithRelations($id);
+            
+            if (!$emprendedor) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Emprendedor no encontrado'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => $emprendedor
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener emprendedor con relaciones: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener datos: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

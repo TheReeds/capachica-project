@@ -25,9 +25,6 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Rutas del sistema de turismo
 
-    Route::get('/linkstorage', function () {
-        Artisan::call('storage:link');
-    });
     // Rutas para Municipalidad
     Route::prefix('municipalidad')->group(function () {
         Route::get('/', [MunicipalidadController::class, 'index']);

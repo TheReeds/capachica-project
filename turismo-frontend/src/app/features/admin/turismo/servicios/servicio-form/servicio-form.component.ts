@@ -1,13 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TurismoService, Servicio, Categoria, Emprendedor } from '../../../../../core/services/turismo.service';
+import { SliderImage, SliderUploadComponent } from '../../../../../shared/components/slider-upload/slider-upload.component';
 
 @Component({
   selector: 'app-servicio-form',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, SliderUploadComponent],
   template: `
     <div class="space-y-6">
       <div class="sm:flex sm:items-center sm:justify-between">
@@ -155,6 +156,15 @@ import { TurismoService, Servicio, Categoria, Emprendedor } from '../../../../..
                       </div>
                     </div>
                   </div>
+                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
+                  <app-slider-upload
+                    title="Imágenes del Servicio"
+                    [slidersFormArray]="slidersArray"
+                    [existingSliders]="sliders"
+                    (changeSlidersEvent)="onSlidersChange($event)"
+                    (deletedSlidersEvent)="onDeletedSlidersChange($event)"
+                  ></app-slider-upload>
+                  </div>
                 </div>
               </div>
             </div>
@@ -203,6 +213,8 @@ export class ServicioFormComponent implements OnInit {
   servicio: Servicio | null = null;
   categorias: Categoria[] = [];
   emprendedores: Emprendedor[] = [];
+  sliders: SliderImage[] = [];
+  deletedSliderIds: number[] = [];
   
   loading = true;
   isSubmitting = false;
@@ -243,8 +255,12 @@ export class ServicioFormComponent implements OnInit {
       descripcion: [''],
       precio_referencial: [0],
       emprendedor_id: ['', [Validators.required]],
-      estado: [true]
+      estado: [true],
+      sliders: this.fb.array([])
     });
+  }
+  get slidersArray(): FormArray {
+    return this.servicioForm.get('sliders') as FormArray;
   }
   
   loadCategorias() {
@@ -296,12 +312,23 @@ export class ServicioFormComponent implements OnInit {
         }
         
         this.loading = false;
+        if (servicio.sliders && servicio.sliders.length > 0) {
+          this.sliders = servicio.sliders.map(slider => ({
+            id: slider.id,
+            nombre: slider.nombre,
+            es_principal: slider.es_principal,
+            orden: slider.orden,
+            imagen: slider.url_completa || '',
+            url_completa: slider.url_completa
+          }));
+        }
       },
       error: (error) => {
         console.error('Error al cargar servicio:', error);
         this.loading = false;
       }
     });
+    
   }
   
   // Categorías
@@ -318,7 +345,12 @@ export class ServicioFormComponent implements OnInit {
       this.selectedCategorias = this.selectedCategorias.filter(id => id !== categoriaId);
     }
   }
-  
+  onSlidersChange(sliders: SliderImage[]) {
+    this.sliders = sliders;
+  }
+  onDeletedSlidersChange(deletedIds: number[]) {
+    this.deletedSliderIds = deletedIds;
+  }
   submitForm() {
     if (this.servicioForm.invalid || this.isSubmitting) return;
     
@@ -327,6 +359,22 @@ export class ServicioFormComponent implements OnInit {
     // Preparar datos para enviar
     const formData = this.servicioForm.value;
     formData.categorias = this.selectedCategorias;
+    
+    // Añadir sliders al formData
+    formData.sliders = this.sliders.map(slider => ({
+      ...slider,
+      // Mantener el ID si existe (para actualizaciones)
+      id: slider.id || undefined,
+      // Si es un archivo nuevo, mantener la referencia al archivo
+      imagen: slider.imagen instanceof File ? slider.imagen : undefined,
+      // Asegurarse de que es_principal tenga un valor
+      es_principal: slider.es_principal === undefined ? true : slider.es_principal,
+      // Si tiene orden, mantenerlo, si no asignar uno basado en la posición
+      orden: slider.orden || this.sliders.indexOf(slider) + 1
+    }));
+    
+    // Añadir los IDs de sliders eliminados
+    formData.deleted_sliders = this.deletedSliderIds;
     
     // Crear o actualizar servicio
     if (this.isEditMode && this.servicioId) {

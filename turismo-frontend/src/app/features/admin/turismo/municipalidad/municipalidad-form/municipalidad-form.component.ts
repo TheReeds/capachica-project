@@ -1,13 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TurismoService, Municipalidad } from '../../../../../core/services/turismo.service';
+import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TurismoService, Municipalidad, Slider } from '../../../../../core/services/turismo.service';
+import { SliderImage, SliderUploadComponent } from '../../../../../shared/components/slider-upload/slider-upload.component';
 
 @Component({
   selector: 'app-municipalidad-form',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, SliderUploadComponent],
   template: `
     <div class="space-y-6">
       <div class="sm:flex sm:items-center sm:justify-between">
@@ -32,10 +33,10 @@ import { TurismoService, Municipalidad } from '../../../../../core/services/turi
             <span class="ml-4">Cargando...</span>
           </div>
         } @else {
-          <form [formGroup]="municipalidadForm" (ngSubmit)="onSubmit()" class="p-6">
+          <form [formGroup]="municipalidadForm" (ngSubmit)="onSubmit()">
             <!-- Pestañas de navegación -->
             <div class="border-b border-gray-200">
-              <nav class="-mb-px flex space-x-8">
+              <nav class="-mb-px flex space-x-8 p-4">
                 <button 
                   type="button"
                   (click)="activeTab = 'informacion-general'"
@@ -80,10 +81,21 @@ import { TurismoService, Municipalidad } from '../../../../../core/services/turi
                 >
                   Ubicación
                 </button>
+                <button 
+                  type="button"
+                  (click)="activeTab = 'imagenes'"
+                  class="pb-4 px-1 border-b-2 font-medium text-sm"
+                  [ngClass]="{
+                    'border-primary-500 text-primary-600': activeTab === 'imagenes',
+                    'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'imagenes'
+                  }"
+                >
+                  Imágenes
+                </button>
               </nav>
             </div>
 
-            <div class="mt-6">
+            <div class="p-6">
               <!-- Tab: Información General -->
               @if (activeTab === 'informacion-general') {
                 <div class="space-y-6">
@@ -392,10 +404,35 @@ import { TurismoService, Municipalidad } from '../../../../../core/services/turi
                   </div>
                 </div>
               }
+              
+              <!-- Tab: Imágenes -->
+              @if (activeTab === 'imagenes') {
+                <div class="space-y-6">
+                  <!-- Sliders Principales -->
+                  <app-slider-upload
+                    title="Imágenes Principales"
+                    [slidersFormArray]="slidersPrincipalesArray"
+                    [existingSliders]="slidersPrincipales"
+                    [isSliderPrincipal]="true"
+                    (changeSlidersEvent)="onSlidersPrincipalesChange($event)"
+                    (deletedSlidersEvent)="onDeletedSlidersPrincipalesChange($event)"
+                  ></app-slider-upload>
+                  
+                  <!-- Sliders Secundarios -->
+                  <app-slider-upload
+                    title="Imágenes Secundarias (con descripción)"
+                    [slidersFormArray]="slidersSecundariosArray"
+                    [existingSliders]="slidersSecundarios"
+                    [isSliderPrincipal]="false"
+                    (changeSlidersEvent)="onSlidersSecundariosChange($event)"
+                    (deletedSlidersEvent)="onDeletedSlidersSecundariosChange($event)"
+                  ></app-slider-upload>
+                </div>
+              }
             </div>
             
             @if (error) {
-              <div class="rounded-md bg-red-50 p-4 mt-6">
+              <div class="rounded-md bg-red-50 p-4 m-6">
                 <div class="flex">
                   <div class="ml-3">
                     <h3 class="text-sm font-medium text-red-800">{{ error }}</h3>
@@ -404,7 +441,7 @@ import { TurismoService, Municipalidad } from '../../../../../core/services/turi
               </div>
             }
             
-            <div class="flex justify-end space-x-3 mt-6">
+            <div class="flex justify-end space-x-3 p-6 bg-gray-50">
               <button 
                 type="button"
                 routerLink="/admin/municipalidad"
@@ -443,13 +480,26 @@ export class MunicipalidadFormComponent implements OnInit {
   
   municipalidadForm!: FormGroup;
   municipalidadId: number | null = null;
+  deletedSlidersPrincipales: number[] = [];
+  deletedSlidersSecundarios: number[] = [];
+  // Sliders
+  slidersPrincipales: SliderImage[] = [];
+  slidersSecundarios: SliderImage[] = [];
   
-  loading = false;
+  loading = true;
   saving = false;
   submitted = false;
   error = '';
   
   activeTab = 'informacion-general';
+  
+  get slidersPrincipalesArray(): FormArray {
+    return this.municipalidadForm.get('sliders_principales') as FormArray;
+  }
+  
+  get slidersSecundariosArray(): FormArray {
+    return this.municipalidadForm.get('sliders_secundarios') as FormArray;
+  }
   
   get isEditMode(): boolean {
     return this.municipalidadId !== null;
@@ -462,6 +512,8 @@ export class MunicipalidadFormComponent implements OnInit {
     if (id) {
       this.municipalidadId = +id;
       this.loadMunicipalidad(this.municipalidadId);
+    } else {
+      this.loading = false;
     }
   }
   
@@ -492,7 +544,11 @@ export class MunicipalidadFormComponent implements OnInit {
       coordenadas_x: [''],
       coordenadas_y: [''],
       historiafamilias: [''],
-      historiacapachica: ['']
+      historiacapachica: [''],
+      
+      // Sliders - Usamos FormArray para manejar conjuntos de datos
+      sliders_principales: this.fb.array([]),
+      sliders_secundarios: this.fb.array([])
     });
   }
   
@@ -500,39 +556,109 @@ export class MunicipalidadFormComponent implements OnInit {
     this.loading = true;
     this.turismoService.getMunicipalidad(id).subscribe({
       next: (municipalidad) => {
+        console.log('Municipalidad cargada:', municipalidad); // Depuración
+        
+        // Llenar el formulario con datos básicos
         this.municipalidadForm.patchValue({
           nombre: municipalidad.nombre,
           descripcion: municipalidad.descripcion,
           frase: municipalidad.frase || '',
           comunidades: municipalidad.comunidades || '',
-          
           correo: municipalidad.correo || '',
           horariodeatencion: municipalidad.horariodeatencion || '',
           red_facebook: municipalidad.red_facebook || '',
           red_instagram: municipalidad.red_instagram || '',
           red_youtube: municipalidad.red_youtube || '',
-          
           mision: municipalidad.mision || '',
           vision: municipalidad.vision || '',
           valores: municipalidad.valores || '',
           comite: municipalidad.comite || '',
           ordenanzamunicipal: municipalidad.ordenanzamunicipal || '',
           alianzas: municipalidad.alianzas || '',
-          
           coordenadas_x: municipalidad.coordenadas_x || '',
           coordenadas_y: municipalidad.coordenadas_y || '',
           historiafamilias: municipalidad.historiafamilias || '',
           historiacapachica: municipalidad.historiacapachica || ''
         });
         
+        // Limpiar los arrays de sliders existentes
+        this.slidersPrincipales = [];
+        this.slidersSecundarios = [];
+        
+        // Manejar sliders principales
+        if (municipalidad.sliders_principales && municipalidad.sliders_principales.length > 0) {
+          console.log('Sliders principales encontrados:', municipalidad.sliders_principales.length);
+          this.slidersPrincipales = municipalidad.sliders_principales.map(slider => ({
+            id: slider.id,
+            nombre: slider.nombre,
+            es_principal: true, // Garantizar que es principal
+            orden: slider.orden || 1,
+            imagen: slider.url_completa || '',
+            url_completa: slider.url_completa
+          }));
+        }
+        
+        // Manejar sliders secundarios - Corregido para manejar la estructura anidada
+        if (municipalidad.sliders_secundarios && municipalidad.sliders_secundarios.length > 0) {
+          console.log('Sliders secundarios encontrados:', municipalidad.sliders_secundarios.length);
+          this.slidersSecundarios = municipalidad.sliders_secundarios.map(slider => {
+            // Verificar si descripcion es un objeto o un string
+            let tituloValor = '';
+            let descripcionValor = '';
+            
+            if (slider.descripcion && typeof slider.descripcion === 'object') {
+              tituloValor = (slider.descripcion as any).titulo || '';
+              descripcionValor = (slider.descripcion as any).descripcion || '';
+            }
+            
+            return {
+              id: slider.id,
+              nombre: slider.nombre,
+              es_principal: false, // Garantizar que NO es principal
+              orden: slider.orden || 1,
+              imagen: slider.url_completa || '',
+              url_completa: slider.url_completa,
+              titulo: tituloValor,
+              descripcion: descripcionValor
+            };
+          });
+        }
+        
+        // Verificar que los arrays de sliders contengan los datos esperados
+        console.log('Sliders principales procesados:', this.slidersPrincipales);
+        console.log('Sliders secundarios procesados:', this.slidersSecundarios);
+        
         this.loading = false;
       },
       error: (error) => {
         console.error('Error al cargar municipalidad:', error);
-        this.error = 'Error al cargar los datos de la municipalidad. Por favor, intente nuevamente.';
+        this.error = 'Error al cargar los datos de la municipalidad.';
         this.loading = false;
       }
     });
+  }
+  
+  onDeletedSlidersPrincipalesChange(deletedIds: number[]) {
+    this.deletedSlidersPrincipales = deletedIds;
+    console.log('Sliders principales eliminados:', deletedIds);
+  }
+  
+  onDeletedSlidersSecundariosChange(deletedIds: number[]) {
+    this.deletedSlidersSecundarios = deletedIds;
+    console.log('Sliders secundarios eliminados:', deletedIds);
+  }
+  
+  // Eventos de slider
+  onSlidersPrincipalesChange(sliders: SliderImage[]) {
+    console.log('Cambio en sliders principales:', sliders);
+    // Los sliders ya vienen marcados como principales del componente
+    this.slidersPrincipales = sliders;
+  }
+  
+  onSlidersSecundariosChange(sliders: SliderImage[]) {
+    console.log('Cambio en sliders secundarios:', sliders);
+    // Los sliders ya vienen marcados como secundarios del componente
+    this.slidersSecundarios = sliders;
   }
   
   isFieldInvalid(fieldName: string): boolean {
@@ -554,6 +680,47 @@ export class MunicipalidadFormComponent implements OnInit {
     }
     
     const formData = this.municipalidadForm.value;
+    
+    // Añadir sliders principales
+    formData.sliders_principales = this.slidersPrincipales.map(slider => {
+      const newSlider = {...slider};
+      
+      // Solo incluir 'imagen' si es un objeto File
+      if (!(newSlider.imagen instanceof File)) {
+        delete newSlider.imagen; // Eliminar si es una URL (string)
+      }
+      
+      return {
+        ...newSlider,
+        es_principal: true // Siempre es principal
+      };
+    });
+    
+    // Añadir sliders secundarios con título y descripción
+    formData.sliders_secundarios = this.slidersSecundarios.map(slider => {
+      const newSlider = {...slider};
+      
+      // Solo incluir 'imagen' si es un objeto File
+      if (!(newSlider.imagen instanceof File)) {
+        delete newSlider.imagen; // Eliminar si es una URL (string)
+      }
+      
+      // Asegurar que titulo y descripcion siempre estén definidos
+      return {
+        ...newSlider,
+        es_principal: false, // Siempre es secundario
+        titulo: newSlider.titulo || '',
+        descripcion: newSlider.descripcion || ''
+      };
+    });
+    
+    // Añadir los IDs de sliders eliminados
+    formData.deleted_sliders = [
+      ...this.deletedSlidersPrincipales,
+      ...this.deletedSlidersSecundarios
+    ];
+    
+    console.log('Datos a enviar:', formData);
     
     this.saving = true;
     

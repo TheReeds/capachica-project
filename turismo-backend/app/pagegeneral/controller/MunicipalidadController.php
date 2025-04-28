@@ -156,6 +156,8 @@ class MunicipalidadController extends Controller
                 'alianzas' => 'nullable|string',
                 'correo' => 'nullable|string|email',
                 'horariodeatencion' => 'nullable|string',
+                'deleted_sliders' => 'nullable|array',
+                'deleted_sliders.*' => 'numeric|exists:sliders,id',
             ]);
             
             if ($validator->fails()) {

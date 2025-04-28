@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\reservas\emprendedores\Models\Emprendedor;
 use App\Servicios\Models\Categoria;
 use App\Pagegeneral\Models\Slider;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Servicio extends Model
 {

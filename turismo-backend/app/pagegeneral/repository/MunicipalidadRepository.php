@@ -74,16 +74,25 @@ class MunicipalidadRepository
             
             $municipalidad = $this->getById($id);
             
-            // Extraer datos de sliders si existen
+            // Extraer datos de sliders
             $slidersPrincipales = $data['sliders_principales'] ?? [];
             $slidersSecundarios = $data['sliders_secundarios'] ?? [];
+            $deletedSliderIds = $data['deleted_sliders'] ?? [];
             
             // Eliminar datos de sliders del array principal
             unset($data['sliders_principales']);
             unset($data['sliders_secundarios']);
+            unset($data['deleted_sliders']);
             
             // Actualizar municipalidad
             $municipalidad->update($data);
+            
+            // Eliminar sliders marcados para eliminación
+            if (!empty($deletedSliderIds)) {
+                foreach ($deletedSliderIds as $sliderId) {
+                    $this->sliderRepository->delete((int)$sliderId);
+                }
+            }
             
             // Actualizar sliders principales si existen
             if (!empty($slidersPrincipales)) {

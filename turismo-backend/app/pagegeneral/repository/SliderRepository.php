@@ -290,7 +290,16 @@ class SliderRepository
 
     protected function storeImage($imagen, string $tipoEntidad): string
     {
-        $carpeta = 'public/sliders/' . $tipoEntidad;
-        return $imagen->store($carpeta);
+        // Verificar si $imagen es un string o un objeto UploadedFile
+        if (is_string($imagen)) {
+            // Si es un string, asumimos que es una URL o ruta existente
+            // Simplemente devolvemos el string tal cual
+            return $imagen;
+        }
+        
+        // Si es un objeto UploadedFile, guardamos la imagen
+        $carpeta = 'sliders/' . $tipoEntidad;
+        return $imagen->store($carpeta, 'public');
     }
+
 }

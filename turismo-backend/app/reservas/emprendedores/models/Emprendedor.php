@@ -11,6 +11,7 @@ use App\reservas\Asociaciones\Models\Asociacion;
 use App\Servicios\Models\Servicio;
 use App\reservas\reserva\Models\Reserva;
 use App\Pagegeneral\Models\Slider;
+use App\Pagegeneral\Models\SliderDescripcion;
 
 class Emprendedor extends Model
 {
@@ -46,6 +47,7 @@ class Emprendedor extends Model
         'imagenes' => 'array',
         'certificaciones' => 'array',
         'idiomas_hablados' => 'array',
+        'opciones_acceso' => 'array', 
         'facilidades_discapacidad' => 'boolean'
     ];
 
