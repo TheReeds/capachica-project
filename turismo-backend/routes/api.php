@@ -18,12 +18,16 @@ use App\reservas\Emprendedores\Http\Controllers\EmprendedorController;
 use App\Servicios\Controllers\ServicioController;
 use App\Servicios\Controllers\CategoriaController;
 use App\reservas\Asociaciones\Http\Controllers\AsociacionController;
+use App\Http\Controllers\Api\MenuController;
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Rutas del sistema de turismo
+
+// Ruta para obtener el menú dinámico
+Route::get('/menu', [MenuController::class, 'getMenu']);
 
     // Rutas para Municipalidad
     Route::prefix('municipalidad')->group(function () {
