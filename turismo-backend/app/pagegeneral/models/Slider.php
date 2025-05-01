@@ -3,30 +3,50 @@
 namespace App\pagegeneral\models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Storage;
+use App\Pagegeneral\Models\SliderDescripcion;
 
 class Slider extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'ruta_url',
+        'url',
         'nombre',
-        'coordenadas',
-        'coordenada_y',
-        'campo',
-        'municipalidad_id',
+        'es_principal',
+        'tipo_entidad',
+        'entidad_id',
+        'orden',
+        'activo'
     ];
 
-    public function municipalidad(): BelongsTo
+    protected $appends = ['url_completa'];
+
+    protected $casts = [
+        'es_principal' => 'boolean',
+        'activo' => 'boolean',
+    ];
+
+    public function descripcion(): HasOne
     {
-        return $this->belongsTo(Municipalidad::class);
+        return $this->hasOne(SliderDescripcion::class);
     }
 
-    public function descripciones(): HasMany
+    // Relación polimórfica para diferentes entidades
+    public function entidad()
     {
-        return $this->hasMany(Descripcion::class);
+        return $this->morphTo('entidad', 'tipo_entidad', 'entidad_id');
+    }
+
+    // Atributo dinámico para generar URL completa
+    public function getUrlCompletaAttribute(): string
+    {
+        if (filter_var($this->url, FILTER_VALIDATE_URL)) {
+            return $this->url; // Ya es una URL completa
+        }
+        
+        return url(Storage::url($this->url));
     }
 }

@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\reservas\emprendedores\Models\Emprendedor;
+use App\Servicios\Models\Categoria;
+use App\Pagegeneral\Models\Slider;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Servicio extends Model
 {
@@ -33,5 +37,11 @@ class Servicio extends Model
     {
         return $this->belongsToMany(Categoria::class, 'categoria_servicio')
             ->withTimestamps();
+    }
+    public function sliders(): HasMany
+    {
+        return $this->hasMany(Slider::class, 'entidad_id')
+                    ->where('tipo_entidad', 'servicio')
+                    ->orderBy('orden');
     }
 }

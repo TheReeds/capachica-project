@@ -27,6 +27,12 @@ class MunicipalidadController extends Controller
     {
         try {
             $municipalidades = $this->municipalidadRepository->getAll();
+            
+            // Cargar relaciones de sliders para cada municipalidad
+            $municipalidades->each(function($municipalidad) {
+                $municipalidad->load(['slidersPrincipales', 'slidersSecundarios']);
+            });
+            
             return response()->json([
                 'success' => true,
                 'data' => $municipalidades
@@ -50,6 +56,10 @@ class MunicipalidadController extends Controller
     {
         try {
             $municipalidad = $this->municipalidadRepository->getById($id);
+            
+            // Cargar relaciones de sliders
+            $municipalidad->load(['slidersPrincipales', 'slidersSecundarios']);
+            
             return response()->json([
                 'success' => true,
                 'data' => $municipalidad
@@ -146,6 +156,8 @@ class MunicipalidadController extends Controller
                 'alianzas' => 'nullable|string',
                 'correo' => 'nullable|string|email',
                 'horariodeatencion' => 'nullable|string',
+                'deleted_sliders' => 'nullable|array',
+                'deleted_sliders.*' => 'numeric|exists:sliders,id',
             ]);
             
             if ($validator->fails()) {

@@ -1,0 +1,251 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class MenuController extends Controller
+{
+    /**
+     * Obtiene el menú dinámico basado en los permisos del usuario autenticado
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMenu(Request $request)
+    {
+        // Obtener el usuario actual
+        $user = Auth::user();
+        
+        // Obtener todos los permisos del usuario (incluyendo los heredados a través de roles)
+        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
+        
+        // Definir la estructura del menú completo
+        $fullMenu = $this->getFullMenuStructure();
+        
+        // Filtrar el menú según los permisos del usuario
+        $filteredMenu = $this->filterMenuByPermissions($fullMenu, $permissions);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $filteredMenu
+        ]);
+    }
+    
+    /**
+     * Define la estructura completa del menú
+     *
+     * @return array
+     */
+    private function getFullMenuStructure()
+    {
+        return [
+            [
+                'id' => 'dashboard',
+                'title' => 'Dashboard',
+                'icon' => 'dashboard',
+                'path' => '/admin/dashboard',
+                'permissions' => ['user_read'], // Permisos mínimos para ver el dashboard
+            ],
+            [
+                'id' => 'users',
+                'title' => 'Usuarios',
+                'icon' => 'users',
+                'path' => '/admin/users',
+                'permissions' => ['user_read'],
+                'children' => [
+                    [
+                        'id' => 'user-list',
+                        'title' => 'Lista de Usuarios',
+                        'path' => '/admin/users',
+                        'permissions' => ['user_read'],
+                    ],
+                    [
+                        'id' => 'user-create',
+                        'title' => 'Crear Usuario',
+                        'path' => '/admin/users/create',
+                        'permissions' => ['user_create'],
+                    ],
+                    [
+                        'id' => 'roles',
+                        'title' => 'Roles',
+                        'path' => '/admin/roles',
+                        'permissions' => ['role_read'],
+                    ],
+                    [
+                        'id' => 'permissions',
+                        'title' => 'Permisos',
+                        'path' => '/admin/permissions',
+                        'permissions' => ['permission_read'],
+                    ],
+                ]
+            ],
+            [
+                'id' => 'municipalidad',
+                'title' => 'Municipalidad',
+                'icon' => 'building',
+                'path' => '/admin/municipalidad',
+                'permissions' => ['municipalidad_read'],
+            ],
+            [
+                'id' => 'asociaciones',
+                'title' => 'Asociaciones',
+                'icon' => 'users-group',
+                'path' => '/admin/asociaciones',
+                'permissions' => ['asociacion_read'],
+                'children' => [
+                    [
+                        'id' => 'asociacion-list',
+                        'title' => 'Lista de Asociaciones',
+                        'path' => '/admin/asociaciones',
+                        'permissions' => ['asociacion_read'],
+                    ],
+                    [
+                        'id' => 'asociacion-create',
+                        'title' => 'Crear Asociación',
+                        'path' => '/admin/asociaciones/create',
+                        'permissions' => ['asociacion_create'],
+                    ],
+                ]
+            ],
+            [
+                'id' => 'emprendedores',
+                'title' => 'Emprendedores',
+                'icon' => 'store',
+                'path' => '/admin/emprendedores',
+                'permissions' => ['emprendedor_read'],
+                'children' => [
+                    [
+                        'id' => 'emprendedor-list',
+                        'title' => 'Lista de Emprendedores',
+                        'path' => '/admin/emprendedores',
+                        'permissions' => ['emprendedor_read'],
+                    ],
+                    [
+                        'id' => 'emprendedor-create',
+                        'title' => 'Crear Emprendedor',
+                        'path' => '/admin/emprendedores/create',
+                        'permissions' => ['emprendedor_create'],
+                    ],
+                ]
+            ],
+            [
+                'id' => 'servicios',
+                'title' => 'Servicios',
+                'icon' => 'briefcase',
+                'path' => '/admin/servicios',
+                'permissions' => ['servicio_read'],
+                'children' => [
+                    [
+                        'id' => 'servicio-list',
+                        'title' => 'Lista de Servicios',
+                        'path' => '/admin/servicios',
+                        'permissions' => ['servicio_read'],
+                    ],
+                    [
+                        'id' => 'servicio-create',
+                        'title' => 'Crear Servicio',
+                        'path' => '/admin/servicios/create',
+                        'permissions' => ['servicio_create'],
+                    ],
+                    [
+                        'id' => 'categorias',
+                        'title' => 'Categorías',
+                        'path' => '/admin/categorias',
+                        'permissions' => ['categoria_read'],
+                    ],
+                ]
+            ],
+            [
+                'id' => 'reservas',
+                'title' => 'Reservas',
+                'icon' => 'calendar',
+                'path' => '/admin/reservas',
+                'permissions' => ['user_read'], // Asumiendo que cualquier usuario puede ver reservas
+                'children' => [
+                    [
+                        'id' => 'reserva-list',
+                        'title' => 'Lista de Reservas',
+                        'path' => '/admin/reservas',
+                        'permissions' => ['user_read'],
+                    ],
+                    [
+                        'id' => 'reserva-create',
+                        'title' => 'Crear Reserva',
+                        'path' => '/admin/reservas/create',
+                        'permissions' => ['user_read'],
+                    ],
+                ]
+            ],
+        ];
+    }
+    
+    /**
+     * Filtra el menú según los permisos del usuario
+     *
+     * @param array $menu
+     * @param array $userPermissions
+     * @return array
+     */
+    private function filterMenuByPermissions($menu, $userPermissions)
+    {
+        $filteredMenu = [];
+        
+        foreach ($menu as $item) {
+            // Verificar si el usuario tiene al menos uno de los permisos requeridos para este elemento
+            $hasPermission = false;
+            
+            foreach ($item['permissions'] as $permission) {
+                if (in_array($permission, $userPermissions)) {
+                    $hasPermission = true;
+                    break;
+                }
+            }
+            
+            // Si tiene permiso, procesar este ítem del menú
+            if ($hasPermission) {
+                $menuItem = [
+                    'id' => $item['id'],
+                    'title' => $item['title'],
+                    'icon' => $item['icon'],
+                    'path' => $item['path'],
+                ];
+                
+                // Si tiene hijos, filtrarlos también
+                if (isset($item['children']) && !empty($item['children'])) {
+                    $filteredChildren = [];
+                    
+                    foreach ($item['children'] as $child) {
+                        $hasChildPermission = false;
+                        
+                        foreach ($child['permissions'] as $permission) {
+                            if (in_array($permission, $userPermissions)) {
+                                $hasChildPermission = true;
+                                break;
+                            }
+                        }
+                        
+                        if ($hasChildPermission) {
+                            $filteredChildren[] = [
+                                'id' => $child['id'],
+                                'title' => $child['title'],
+                                'path' => $child['path'],
+                            ];
+                        }
+                    }
+                    
+                    // Solo añadir children si hay elementos
+                    if (!empty($filteredChildren)) {
+                        $menuItem['children'] = $filteredChildren;
+                    }
+                }
+                
+                $filteredMenu[] = $menuItem;
+            }
+        }
+        
+        return $filteredMenu;
+    }
+}

@@ -20,6 +20,12 @@ class ServicioController extends Controller
     public function index(): JsonResponse
     {
         $servicios = $this->repository->getPaginated();
+        
+        // Cargar sliders para cada servicio
+        foreach ($servicios as $servicio) {
+            $servicio->load(['sliders']);
+        }
+        
         return response()->json([
             'success' => true,
             'data' => $servicios
@@ -29,6 +35,7 @@ class ServicioController extends Controller
     public function show(int $id): JsonResponse
     {
         $servicio = $this->repository->findById($id);
+        $servicio->load(['sliders']);
         
         if (!$servicio) {
             return response()->json([
@@ -45,43 +52,57 @@ class ServicioController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'precio_referencial' => 'nullable|numeric|min:0',
-            'emprendedor_id' => 'required|exists:emprendedores,id',
-            'estado' => 'boolean',
-            'categorias' => 'nullable|array',
-            'categorias.*' => 'exists:categorias,id',
-        ]);
+    // Convertir explícitamente el estado a booleano antes de validar
+    if ($request->has('estado')) {
+        // Convertirá strings "true"/"false" y otros valores booleanos aceptables a true/false
+        $request->merge(['estado' => filter_var($request->estado, FILTER_VALIDATE_BOOLEAN)]);
+    }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+    $validator = Validator::make($request->all(), [
+        'nombre' => 'required|string|max:255',
+        'descripcion' => 'nullable|string',
+        'precio_referencial' => 'nullable|numeric|min:0',
+        'emprendedor_id' => 'required|exists:emprendedores,id',
+        'estado' => 'boolean',
+        'categorias' => 'nullable|array',
+        'categorias.*' => 'exists:categorias,id',
+    ]);
 
-        $categorias = $request->input('categorias', []);
-        $servicio = $this->repository->create($request->except('categorias'), $categorias);
-        
+    if ($validator->fails()) {
         return response()->json([
-            'success' => true,
-            'data' => $servicio,
-            'message' => 'Servicio creado exitosamente'
-        ], 201);
+            'success' => false,
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $categorias = $request->input('categorias', []);
+    $servicio = $this->repository->create($request->except('categorias'), $categorias);
+    
+    return response()->json([
+        'success' => true,
+        'data' => $servicio,
+        'message' => 'Servicio creado exitosamente'
+    ], 201);
     }
 
     public function update(Request $request, int $id): JsonResponse
-    {
+        {
+        // Convertir explícitamente el estado a booleano antes de validar
+        if ($request->has('estado')) {
+            // Convertirá strings "true"/"false" y otros valores booleanos aceptables a true/false
+            $request->merge(['estado' => filter_var($request->estado, FILTER_VALIDATE_BOOLEAN)]);
+        }
+        
         $validator = Validator::make($request->all(), [
             'nombre' => 'sometimes|required|string|max:255',
             'descripcion' => 'nullable|string',
             'precio_referencial' => 'nullable|numeric|min:0',
             'emprendedor_id' => 'sometimes|required|exists:emprendedores,id',
-            'estado' => 'boolean',
+            'estado' => 'sometimes|boolean',
             'categorias' => 'nullable|array',
             'categorias.*' => 'exists:categorias,id',
+            'deleted_sliders' => 'nullable|array',
+            'deleted_sliders.*' => 'numeric|exists:sliders,id',
         ]);
 
         if ($validator->fails()) {

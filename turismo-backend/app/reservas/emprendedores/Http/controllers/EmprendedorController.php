@@ -28,6 +28,11 @@ class EmprendedorController extends Controller
     {
         $perPage = $request->query('per_page', 15);
         $emprendedores = $this->emprendedorService->getAll($perPage);
+        
+        // Cargar sliders para cada emprendedor
+        foreach ($emprendedores as $emprendedor) {
+            $emprendedor->load(['slidersPrincipales', 'slidersSecundarios']);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -65,6 +70,7 @@ class EmprendedorController extends Controller
     public function show(int $id): JsonResponse
     {
         $emprendedor = $this->emprendedorService->getById($id);
+        $emprendedor->load(['slidersPrincipales', 'slidersSecundarios']);
 
         if (!$emprendedor) {
             return response()->json([
@@ -220,5 +226,29 @@ class EmprendedorController extends Controller
             'status' => 'success',
             'data' => $emprendedor->reservas
         ]);
+    }
+    public function getWithRelations($id)
+    {
+        try {
+            $emprendedor = $this->emprendedorService->getWithRelations($id);
+            
+            if (!$emprendedor) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Emprendedor no encontrado'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => $emprendedor
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener emprendedor con relaciones: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener datos: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
