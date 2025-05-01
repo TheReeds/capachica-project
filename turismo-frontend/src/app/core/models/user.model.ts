@@ -9,6 +9,7 @@ export interface User {
   created_at?: string;
   updated_at?: string;
   google_id?: string;
+  foto_perfil?: string;
   roles?: Role[];
 }
 

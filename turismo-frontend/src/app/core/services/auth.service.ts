@@ -34,6 +34,8 @@ export class AuthService {
   private readonly _isLoading = signal<boolean>(false);
   private readonly _profileLoaded = signal<boolean>(false);
   private readonly _emailVerified = signal<boolean>(false);
+  private readonly _userRoles = signal<string[]>([]);
+  private readonly _userPermissions = signal<string[]>([]);
 
   // Exponer los signals como readonly
   readonly isLoggedIn = this._isLoggedIn.asReadonly();
@@ -41,6 +43,8 @@ export class AuthService {
   readonly isLoading = this._isLoading.asReadonly();
   readonly profileLoaded = this._profileLoaded.asReadonly();
   readonly emailVerified = this._emailVerified.asReadonly();
+  readonly userRoles = this._userRoles.asReadonly();
+  readonly userPermissions = this._userPermissions.asReadonly();
 
   private userLoadAttempted = false;
   private userLoading = new BehaviorSubject<boolean>(false);
@@ -100,6 +104,17 @@ export class AuthService {
         // Actualizar estado de verificación de email
         if (response?.data?.email_verified !== undefined) {
           this._emailVerified.set(response.data.email_verified);
+        }
+        
+        // Actualizar roles y permisos si están disponibles
+        if (response?.data?.roles) {
+          console.log('Roles recibidos:', response.data.roles);
+          this._userRoles.set(response.data.roles);
+        }
+        
+        if (response?.data?.permissions) {
+          console.log('Permisos recibidos:', response.data.permissions);
+          this._userPermissions.set(response.data.permissions);
         }
       }),
       map(response => {
@@ -194,6 +209,8 @@ export class AuthService {
     this._currentUser.set(null);
     this._profileLoaded.set(false);
     this._emailVerified.set(false);
+    this._userRoles.set([]);
+    this._userPermissions.set([]);
     
     // No redirigimos automáticamente en este método para evitar redirecciones innecesarias
     // Solo redirige si estamos en una ruta protegida
@@ -348,6 +365,15 @@ export class AuthService {
               this._emailVerified.set(response.data.email_verified);
             }
             
+            // Actualizar roles y permisos si están disponibles
+            if (response.data.roles) {
+              this._userRoles.set(response.data.roles);
+            }
+            
+            if (response.data.permissions) {
+              this._userPermissions.set(response.data.permissions);
+            }
+            
             if (response.data.user) {
               return response.data.user;
             }
@@ -390,6 +416,7 @@ export class AuthService {
     
     return throwError(() => error);
   }
+  
   verifyEmailWithFullUrl(url: string): Observable<any> {
     return this.http.get<ApiResponse<any>>(url, {
       headers: {
@@ -401,5 +428,17 @@ export class AuthService {
       }),
       catchError(error => this.handleError(error))
     );
+  }
+  
+  // Método para verificar si el usuario tiene un rol específico
+  hasRole(role: string): boolean {
+    const roles = this.userRoles();
+    return roles.includes(role);
+  }
+  
+  // Método para verificar si el usuario tiene un permiso específico
+  hasPermission(permission: string): boolean {
+    const permissions = this.userPermissions();
+    return permissions.includes(permission);
   }
 }
