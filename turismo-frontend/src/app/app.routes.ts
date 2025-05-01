@@ -23,13 +23,6 @@ export const routes: Routes = [
         loadChildren: () => import('./pagegeneral/pagegeneral.routes').then(m => m.PAGEGENERAL_ROUTES)
     },
     
-    // Rutas específicas para emprendedores (públicas)
-    {
-        path: 'pageemprendedores',
-        canActivate: [nonAuthGuard],
-        loadChildren: () => import('./features/pagegeneral/emprendedores/pageemprendedores.routes').then(m => m.PAGEEMPRENDEDORES_ROUTES)
-    },
-    
     // Todas las rutas protegidas por autenticación
     {
         path: '',

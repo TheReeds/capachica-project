@@ -12,6 +12,7 @@ use App\Servicios\Models\Servicio;
 use App\reservas\reserva\Models\Reserva;
 use App\Pagegeneral\Models\Slider;
 use App\Pagegeneral\Models\SliderDescripcion;
+use App\Models\User;
 
 class Emprendedor extends Model
 {
@@ -39,7 +40,8 @@ class Emprendedor extends Model
         'idiomas_hablados',
         'opciones_acceso',
         'facilidades_discapacidad',
-        'asociacion_id'
+        'asociacion_id',
+        'estado'
     ];
 
     protected $casts = [
@@ -48,7 +50,8 @@ class Emprendedor extends Model
         'certificaciones' => 'array',
         'idiomas_hablados' => 'array',
         'opciones_acceso' => 'array', 
-        'facilidades_discapacidad' => 'boolean'
+        'facilidades_discapacidad' => 'boolean',
+        'estado' => 'boolean'
     ];
 
     /**
@@ -57,6 +60,24 @@ class Emprendedor extends Model
     public function asociacion(): BelongsTo
     {
         return $this->belongsTo(Asociacion::class);
+    }
+    /**
+     * Obtener los usuarios administradores del emprendimiento
+     */
+    public function administradores()
+    {
+        return $this->belongsToMany(User::class, 'user_emprendedor')
+                    ->withPivot('es_principal', 'rol')
+                    ->withTimestamps();
+    }
+     /**
+     * Obtener el administrador principal del emprendimiento
+     */
+    public function administradorPrincipal()
+    {
+        return $this->belongsToMany(User::class, 'user_emprendedor')
+                    ->wherePivot('es_principal', true)
+                    ->first();
     }
     public function servicios(): HasMany
     {

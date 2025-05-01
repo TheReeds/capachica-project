@@ -9,7 +9,7 @@ use App\reservas\Emprendedores\Models\Emprendedor;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Pagegeneral\Repository\SliderRepository;
-use App\Pagegeneral\Models\SliderDescripcion;
+use Illuminate\Support\Facades\Auth;
 
 class EmprendedoresService
 {
@@ -22,10 +22,21 @@ class EmprendedoresService
 
     /**
      * Obtener todos los emprendedores paginados
+     * Opcionalmente filtra por usuario actual si se especifica
      */
-    public function getAll(int $perPage = 15): LengthAwarePaginator
+    public function getAll(int $perPage = 15, bool $soloDelUsuarioActual = false): LengthAwarePaginator
     {
-        return Emprendedor::with('asociacion')->paginate($perPage);
+        $query = Emprendedor::with('asociacion');
+        
+        // Si se solicita filtrar por usuario actual
+        if ($soloDelUsuarioActual && Auth::check()) {
+            $userId = Auth::id();
+            $query->whereHas('administradores', function($q) use ($userId) {
+                $q->where('users.id', $userId);
+            });
+        }
+        
+        return $query->paginate($perPage);
     }
 
     /**
@@ -83,10 +94,13 @@ class EmprendedoresService
         }
     }
 
+    /**
+     * Actualizar un emprendedor existente
+     */
     public function update(int $id, array $data): ?Emprendedor
     {
         try {
-            DB::beginTransaction();
+            DB::beginTransaction(); 
             
             $emprendedor = Emprendedor::find($id);
             
@@ -141,6 +155,7 @@ class EmprendedoresService
             throw $e;
         }
     }
+    
     /**
      * Eliminar un emprendedor
      */
@@ -161,6 +176,9 @@ class EmprendedoresService
                 $this->sliderRepository->delete($slider->id);
             });
             
+            // Eliminar relaciones con administradores
+            $emprendedor->administradores()->detach();
+            
             // Eliminar el emprendedor
             $deleted = $emprendedor->delete();
             
@@ -171,6 +189,7 @@ class EmprendedoresService
             throw $e;
         }
     }
+    
     /**
      * Buscar emprendedores por categoría
      */
@@ -196,15 +215,60 @@ class EmprendedoresService
             ->orWhere('descripcion', 'like', "%{$query}%")
             ->get();
     }
+    
+    /**
+     * Obtener emprendedor con todas sus relaciones
+     */
     public function getWithRelations(int $id): ?Emprendedor
     {
         return Emprendedor::with([
             'asociacion',
-            'servicios',
+            'servicios.categorias',
             'slidersPrincipales',
-            'slidersSecundarios',
             'slidersSecundarios.descripcion',
-            'reservas'
+            'administradores',
+            'reservas.user'
         ])->find($id);
+    }
+    
+    /**
+     * Obtener todos los emprendimientos administrados por un usuario específico
+     */
+    public function getByUserId(int $userId): Collection
+    {
+        return Emprendedor::whereHas('administradores', function($query) use ($userId) {
+            $query->where('users.id', $userId);
+        })->with([
+            'asociacion',
+            'servicios.categorias',
+            'slidersPrincipales',
+            'slidersSecundarios.descripcion',
+            'administradores'
+        ])->get();
+    }
+    
+    /**
+     * Verificar si un usuario es administrador de un emprendimiento
+     */
+    public function esAdministrador(int $emprendedorId, int $userId): bool
+    {
+        return Emprendedor::where('id', $emprendedorId)
+            ->whereHas('administradores', function($query) use ($userId) {
+                $query->where('users.id', $userId);
+            })
+            ->exists();
+    }
+    
+    /**
+     * Verificar si un usuario es administrador principal de un emprendimiento
+     */
+    public function esAdministradorPrincipal(int $emprendedorId, int $userId): bool
+    {
+        return Emprendedor::where('id', $emprendedorId)
+            ->whereHas('administradores', function($query) use ($userId) {
+                $query->where('users.id', $userId)
+                      ->where('user_emprendedor.es_principal', true);
+            })
+            ->exists();
     }
 }

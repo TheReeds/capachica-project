@@ -6,12 +6,12 @@ use App\Models\User;
 use App\Servicios\Models\Categoria;
 use App\Pagegeneral\Models\Municipalidad;
 use App\Reservas\Asociaciones\Models\Asociacion;
-use App\Reservas\Emprendedores\Models\Emprendedor;
 use App\Servicios\Models\Servicio;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\reservas\Emprendedores\Models\Emprendedor;
 
 class DatabaseSeeder extends Seeder
 {
@@ -40,6 +40,9 @@ class DatabaseSeeder extends Seeder
         
         // Crear servicios
         $this->createServicios();
+        
+        // Ejecutar el seeder para asociar usuarios con emprendimientos
+        $this->call(UserEmprendedorSeeder::class);
     }
     
     private function createRolesAndPermissions()
@@ -242,7 +245,8 @@ class DatabaseSeeder extends Seeder
                 'idiomas_hablados' => 'Español, Inglés básico, Quechua',
                 'opciones_acceso' => 'A pie, en bote',
                 'facilidades_discapacidad' => true,
-                'asociacion_id' => 1
+                'asociacion_id' => 1,
+                'estado' => true
             ],
             [
                 'nombre' => 'Restaurante Sumaq Mijuna',
@@ -264,7 +268,8 @@ class DatabaseSeeder extends Seeder
                 'idiomas_hablados' => 'Español, Quechua',
                 'opciones_acceso' => 'A pie, transporte público, taxi',
                 'facilidades_discapacidad' => false,
-                'asociacion_id' => null
+                'asociacion_id' => null,
+                'estado' => true
             ],
             [
                 'nombre' => 'Artesanías Titicaca',
@@ -286,7 +291,8 @@ class DatabaseSeeder extends Seeder
                 'idiomas_hablados' => 'Español, Quechua, Aymara',
                 'opciones_acceso' => 'A pie',
                 'facilidades_discapacidad' => false,
-                'asociacion_id' => 2
+                'asociacion_id' => 2,
+                'estado' => true
             ],
             [
                 'nombre' => 'Transportes Lacustres Titicaca',
@@ -308,7 +314,8 @@ class DatabaseSeeder extends Seeder
                 'idiomas_hablados' => 'Español, Inglés básico',
                 'opciones_acceso' => 'A pie',
                 'facilidades_discapacidad' => true,
-                'asociacion_id' => null
+                'asociacion_id' => null,
+                'estado' => true
             ],
             [
                 'nombre' => 'Aventuras Titicaca',
@@ -330,7 +337,8 @@ class DatabaseSeeder extends Seeder
                 'idiomas_hablados' => 'Español, Inglés, Francés básico',
                 'opciones_acceso' => 'A pie, transporte público, taxi',
                 'facilidades_discapacidad' => false,
-                'asociacion_id' => null
+                'asociacion_id' => null,
+                'estado' => true
             ]
         ];
         

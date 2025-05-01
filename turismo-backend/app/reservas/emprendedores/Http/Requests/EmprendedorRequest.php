@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class EmprendedorRequest extends FormRequest
 {
@@ -39,6 +40,13 @@ class EmprendedorRequest extends FormRequest
                 'facilidades_discapacidad' => filter_var($this->facilidades_discapacidad, FILTER_VALIDATE_BOOLEAN)
             ]);
         }
+        
+        // Asegurar que estado sea booleano
+        if ($this->has('estado')) {
+            $this->merge([
+                'estado' => filter_var($this->estado, FILTER_VALIDATE_BOOLEAN)
+            ]);
+        }
     }
 
     /**
@@ -46,7 +54,29 @@ class EmprendedorRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        // Para crear un nuevo emprendedor, el usuario debe tener permiso
+        if ($this->isMethod('POST')) {
+            return Auth::check() && (
+                Auth::user()->hasPermissionTo('emprendedor_create') || 
+                Auth::user()->hasRole('admin')
+            );
+        }
+        
+        // Para actualizar un emprendedor existente
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            // Si tiene permiso general de actualización, está autorizado
+            if (Auth::user()->hasPermissionTo('emprendedor_update') || Auth::user()->hasRole('admin')) {
+                return true;
+            }
+            
+            // Si no tiene permiso general, verificar si es administrador de este emprendimiento
+            $emprendedorId = $this->route('id');
+            return Auth::user()->emprendimientos()
+                ->where('emprendedores.id', $emprendedorId)
+                ->exists();
+        }
+        
+        return false;
     }
 
     /**
@@ -75,6 +105,7 @@ class EmprendedorRequest extends FormRequest
             'opciones_acceso' => 'nullable|string',
             'facilidades_discapacidad' => 'nullable|boolean',
             'asociacion_id' => 'nullable|exists:asociaciones,id',
+            'estado' => 'nullable|boolean',
             
             // Validaciones para sliders
             'sliders_principales' => 'nullable|array',
@@ -93,6 +124,12 @@ class EmprendedorRequest extends FormRequest
             
             'deleted_sliders' => 'nullable|array',
             'deleted_sliders.*' => 'integer|exists:sliders,id',
+            
+            // Administradores (solo para creación inicial)
+            'administradores' => 'nullable|array',
+            'administradores.*.user_id' => 'required|exists:users,id',
+            'administradores.*.es_principal' => 'nullable|boolean',
+            'administradores.*.rol' => 'required|in:administrador,colaborador',
         ];
         
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
@@ -107,6 +144,28 @@ class EmprendedorRequest extends FormRequest
         return $rules;
     }
     
+    /**
+     * Get custom error messages
+     */
+    public function messages(): array
+    {
+        return [
+            'nombre.required' => 'El nombre del emprendimiento es obligatorio',
+            'tipo_servicio.required' => 'El tipo de servicio es obligatorio',
+            'descripcion.required' => 'La descripción es obligatoria',
+            'ubicacion.required' => 'La ubicación es obligatoria',
+            'telefono.required' => 'El teléfono es obligatorio',
+            'email.required' => 'El correo electrónico es obligatorio',
+            'email.email' => 'El correo electrónico debe ser una dirección válida',
+            'categoria.required' => 'La categoría es obligatoria',
+            'sliders_principales.*.nombre.required' => 'El nombre del slider principal es obligatorio',
+            'sliders_principales.*.orden.required' => 'El orden del slider principal es obligatorio',
+            'sliders_secundarios.*.nombre.required' => 'El nombre del slider secundario es obligatorio',
+            'sliders_secundarios.*.orden.required' => 'El orden del slider secundario es obligatorio',
+            'sliders_secundarios.*.titulo.required' => 'El título del slider secundario es obligatorio',
+        ];
+    }
+    
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
@@ -115,6 +174,23 @@ class EmprendedorRequest extends FormRequest
                 'message' => 'Error de validación',
                 'errors' => $validator->errors()
             ], Response::HTTP_UNPROCESSABLE_ENTITY)
+        );
+    }
+    
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'No estás autorizado para realizar esta acción'
+            ], Response::HTTP_FORBIDDEN)
         );
     }
 }

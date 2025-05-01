@@ -18,12 +18,22 @@ class MenuController extends Controller
     {
         // Obtener el usuario actual
         $user = Auth::user();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data' => []
+            ], 401);
+        }
         
         // Obtener todos los permisos del usuario (incluyendo los heredados a través de roles)
         $permissions = $user->getAllPermissions()->pluck('name')->toArray();
         
+        // Verificar si el usuario administra emprendimientos
+        $administraEmprendimientos = $user->administraEmprendimientos();
+        
         // Definir la estructura del menú completo
-        $fullMenu = $this->getFullMenuStructure();
+        $fullMenu = $this->getFullMenuStructure($administraEmprendimientos);
         
         // Filtrar el menú según los permisos del usuario
         $filteredMenu = $this->filterMenuByPermissions($fullMenu, $permissions);
@@ -37,11 +47,12 @@ class MenuController extends Controller
     /**
      * Define la estructura completa del menú
      *
+     * @param bool $incluyeMenuEmprendedor Si es true, incluye opciones específicas para emprendedores
      * @return array
      */
-    private function getFullMenuStructure()
+    private function getFullMenuStructure($incluyeMenuEmprendedor = false)
     {
-        return [
+        $menu = [
             [
                 'id' => 'dashboard',
                 'title' => 'Dashboard',
@@ -179,7 +190,62 @@ class MenuController extends Controller
                     ],
                 ]
             ],
+            [
+                'id' => 'profile',
+                'title' => 'Mi Perfil',
+                'icon' => 'user',
+                'path' => '/admin/profile',
+                'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
+            ],
         ];
+        
+        // Si el usuario administra emprendimientos, añadir esas opciones al menú
+        if ($incluyeMenuEmprendedor) {
+            $menuEmprendedor = [
+                'id' => 'mis-emprendimientos',
+                'title' => 'Mis Emprendimientos',
+                'icon' => 'shop',
+                'path' => '/admin/mis-emprendimientos',
+                'permissions' => ['user_read'], // Todos los usuarios pueden acceder a sus emprendimientos
+                'children' => [
+                    [
+                        'id' => 'emprendimiento-list',
+                        'title' => 'Lista de Emprendimientos',
+                        'path' => '/admin/mis-emprendimientos',
+                        'permissions' => ['user_read'],
+                    ],
+                    [
+                        'id' => 'emprendimiento-servicios',
+                        'title' => 'Mis Servicios',
+                        'path' => '/admin/mis-emprendimientos/servicios',
+                        'permissions' => ['user_read', 'servicio_read'],
+                    ],
+                    [
+                        'id' => 'emprendimiento-reservas',
+                        'title' => 'Mis Reservas',
+                        'path' => '/admin/mis-emprendimientos/reservas',
+                        'permissions' => ['user_read'],
+                    ],
+                    [
+                        'id' => 'emprendimiento-estadisticas',
+                        'title' => 'Estadísticas',
+                        'path' => '/admin/mis-emprendimientos/estadisticas',
+                        'permissions' => ['user_read'],
+                    ],
+                    [
+                        'id' => 'emprendimiento-administradores',
+                        'title' => 'Administradores',
+                        'path' => '/admin/mis-emprendimientos/administradores',
+                        'permissions' => ['user_read'],
+                    ],
+                ]
+            ];
+            
+            // Insertar después del dashboard
+            array_splice($menu, 1, 0, [$menuEmprendedor]);
+        }
+        
+        return $menu;
     }
     
     /**
@@ -195,14 +261,7 @@ class MenuController extends Controller
         
         foreach ($menu as $item) {
             // Verificar si el usuario tiene al menos uno de los permisos requeridos para este elemento
-            $hasPermission = false;
-            
-            foreach ($item['permissions'] as $permission) {
-                if (in_array($permission, $userPermissions)) {
-                    $hasPermission = true;
-                    break;
-                }
-            }
+            $hasPermission = count(array_intersect($item['permissions'], $userPermissions)) > 0;
             
             // Si tiene permiso, procesar este ítem del menú
             if ($hasPermission) {
@@ -218,14 +277,7 @@ class MenuController extends Controller
                     $filteredChildren = [];
                     
                     foreach ($item['children'] as $child) {
-                        $hasChildPermission = false;
-                        
-                        foreach ($child['permissions'] as $permission) {
-                            if (in_array($permission, $userPermissions)) {
-                                $hasChildPermission = true;
-                                break;
-                            }
-                        }
+                        $hasChildPermission = count(array_intersect($child['permissions'], $userPermissions)) > 0;
                         
                         if ($hasChildPermission) {
                             $filteredChildren[] = [
