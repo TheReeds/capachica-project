@@ -3,207 +3,274 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\UpdateProfileRequest;
+use App\Http\Requests\Auth\VerifyEmailRequest;
+use App\Http\Resources\UserResource;
+use App\Services\AuthService;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    use ApiResponseTrait;
+    
+    protected $authService;
+    
+    /**
+     * Constructor
+     * 
+     * @param AuthService $authService
+     */
+    public function __construct(AuthService $authService)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'first_name' => 'nullable|string|max:255',
-            'last_name' => 'nullable|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'phone' => 'nullable|string',
-            'foto_perfil' => 'nullable|image|max:5120', // 5MB máximo
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $userData = [
-            'name' => $request->name,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-        ];
-        
-        // Procesar foto de perfil si se proporciona
-        if ($request->hasFile('foto_perfil')) {
-            $path = $request->file('foto_perfil')->store('fotos_perfil', 'public');
-            $userData['foto_perfil'] = $path;
-        }
-
-        $user = User::create($userData);
-
-        // Asignar rol de usuario por defecto
-        $user->assignRole('user');
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'message' => 'User registered successfully',
-            'data' => [
-                'user' => $user,
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ]
-        ], 201);
+        $this->authService = $authService;
     }
-
-    public function login(Request $request)
+    
+    /**
+     * Register a new user
+     * 
+     * @param RegisterRequest $request
+     * @return JsonResponse
+     */
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid Credentials.',
-            ], 401);
-        }
-        
-        $user = User::where('email', $request->email)->firstOrFail();
-        
-        // Verificar si el usuario está activo
-        if (!$user->active) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User is inactive'
-            ], 403);
-        }
-
-        // Eliminar tokens anteriores
-        $user->tokens()->delete();
+        $user = $this->authService->register(
+            $request->validated(),
+            $request->hasFile('foto_perfil') ? $request->file('foto_perfil') : null
+        );
         
         $token = $user->createToken('auth_token')->plainTextToken;
         
-        // Verificar si el usuario administra emprendimientos
-        $administraEmprendimientos = $user->administraEmprendimientos();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Login successful',
-            'data' => [
-                'user' => $user,
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-                'administra_emprendimientos' => $administraEmprendimientos,
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ]
+        return $this->successResponse([
+            'user' => new UserResource($user),
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'email_verified' => $user->hasVerifiedEmail(),
+        ], 'Usuario registrado correctamente. Se ha enviado un correo de verificación.', 201);
+    }
+    
+    /**
+     * User login
+     * 
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $request): JsonResponse
+    {
+        $result = $this->authService->login(
+            $request->email,
+            $request->password
+        );
+        
+        if (!$result) {
+            return $this->errorResponse('Credenciales inválidas', 401);
+        }
+        
+        if (isset($result['error']) && $result['error'] === 'inactive_user') {
+            return $this->errorResponse('Usuario inactivo', 403);
+        }
+        // Verificar si el correo está verificado
+        if (!$result['email_verified']) {
+            return $this->errorResponse('Por favor, verifica tu correo electrónico para poder de iniciar sesión', 403, [
+                'verification_required' => true
+            ]);
+        }
+        
+        return $this->successResponse([
+            'user' => new UserResource($result['user']),
+            'roles' => $result['roles'],
+            'permissions' => $result['permissions'],
+            'administra_emprendimientos' => $result['administra_emprendimientos'],
+            'access_token' => $result['access_token'],
+            'token_type' => $result['token_type'],
+            'email_verified' => $result['email_verified'],
+        ], 'Inicio de sesión exitoso');
+    }
+    
+    /**
+     * Login with Google
+     * 
+     * @return JsonResponse
+     */
+    public function redirectToGoogle(): JsonResponse
+    {
+        $url = \Laravel\Socialite\Facades\Socialite::driver('google')
+            ->stateless()
+            ->redirect()
+            ->getTargetUrl();
+            
+        return $this->successResponse([
+            'url' => $url
         ]);
     }
-
-    public function profile()
+    
+    /**
+     * Handle Google callback
+     * 
+     * @return JsonResponse
+     */
+    public function handleGoogleCallback(): JsonResponse
+    {
+        $result = $this->authService->handleGoogleCallback();
+        
+        if (isset($result['error'])) {
+            return $this->errorResponse('Error al autenticar con Google: ' . $result['message'], 500);
+        }
+        
+        return $this->successResponse([
+            'user' => new UserResource($result['user']),
+            'roles' => $result['roles'],
+            'permissions' => $result['permissions'],
+            'administra_emprendimientos' => $result['administra_emprendimientos'],
+            'access_token' => $result['access_token'],
+            'token_type' => $result['token_type'],
+            'email_verified' => $result['email_verified'],
+        ], 'Inicio de sesión con Google exitoso');
+    }
+    
+    /**
+     * Get authenticated user profile
+     * 
+     * @return JsonResponse
+     */
+    public function profile(): JsonResponse
     {
         $user = Auth::user();
         $user->load('emprendimientos.asociacion');
         
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => $user,
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-                'administra_emprendimientos' => $user->administraEmprendimientos(),
-                'emprendimientos' => $user->emprendimientos
-            ]
+        return $this->successResponse([
+            'user' => new UserResource($user),
+            'roles' => $user->getRoleNames(),
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'administra_emprendimientos' => $user->administraEmprendimientos(),
+            'emprendimientos' => $user->emprendimientos,
+            'email_verified' => $user->hasVerifiedEmail(),
         ]);
     }
     
-    public function updateProfile(Request $request)
+    /**
+     * Update user profile
+     * 
+     * @param UpdateProfileRequest $request
+     * @return JsonResponse
+     */
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
-        \Log::info('Content-Type: ' . $request->header('Content-Type'));
-        \Log::info('Datos recibidos: ', $request->all());
-        \Log::info('Archivos recibidos: ', $request->allFiles());
+        try {
+            $user = $this->authService->updateProfile(
+                Auth::user(),
+                $request->validated(),
+                $request->hasFile('foto_perfil') ? $request->file('foto_perfil') : null
+            );
+            
+            $emailChanged = $request->has('email') && $request->email !== Auth::user()->getOriginal('email');
+            
+            return $this->successResponse(
+                new UserResource($user),
+                $emailChanged 
+                    ? 'Perfil actualizado correctamente. Se ha enviado un correo de verificación a su nueva dirección de correo.'
+                    : 'Perfil actualizado correctamente'
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(
+                'Error al actualizar el perfil: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+    
+    /**
+     * User logout
+     * 
+     * @return JsonResponse
+     */
+    public function logout(): JsonResponse
+    {
+        Auth::user()->currentAccessToken()->delete();
         
+        return $this->successResponse(null, 'Sesión cerrada correctamente');
+    }
+    
+    /**
+     * Verify email
+     * 
+     * @param VerifyEmailRequest $request
+     * @return JsonResponse
+     */
+    public function verifyEmail(VerifyEmailRequest $request): JsonResponse
+    {
+        $verified = $this->authService->verifyEmail(
+            $request->id,
+            $request->hash
+        );
+        
+        if (!$verified) {
+            return $this->errorResponse('El enlace de verificación no es válido', 400);
+        }
+        
+        return $this->successResponse(null, 'Correo electrónico verificado correctamente');
+    }
+    
+    /**
+     * Resend verification email
+     * 
+     * @return JsonResponse
+     */
+    public function resendVerificationEmail(): JsonResponse
+    {
         $user = Auth::user();
         
-        $rules = [
-            'name' => 'sometimes|string|max:255',
-            'first_name' => 'nullable|string|max:255',
-            'last_name' => 'nullable|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string',
-            'foto_perfil' => 'nullable|image|max:5120', // 5MB máximo
-            'password' => 'nullable|string|min:8|confirmed',
-        ];
-        
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de validación',
-                'errors' => $validator->errors()
-            ], 422);
+        if ($user->hasVerifiedEmail()) {
+            return $this->errorResponse('El correo electrónico ya ha sido verificado', 400);
         }
         
-        $userData = $request->only(['name', 'first_name', 'last_name', 'email', 'phone']);
-        
-        // Actualizar contraseña si se proporciona
-        if ($request->filled('password')) {
-            $userData['password'] = Hash::make($request->password);
+        try {
+            $this->authService->resendVerificationEmail($user);
+            return $this->successResponse(null, 'Se ha enviado un nuevo correo de verificación');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error al enviar el correo de verificación: ' . $e->getMessage(), 500);
         }
-        
-        // Verificar manualmente la carga de archivos
-        \Log::info('¿La solicitud tiene archivo?: ' . ($request->hasFile('foto_perfil') ? 'sí' : 'no'));
-        
-        // Procesar foto de perfil si se proporciona
-        if ($request->hasFile('foto_perfil') && $request->file('foto_perfil')->isValid()) {
-            \Log::info('Procesando foto de perfil');
-            // Eliminar foto anterior si existe
-            if ($user->foto_perfil && !filter_var($user->foto_perfil, FILTER_VALIDATE_URL)) {
-                Storage::disk('public')->delete($user->foto_perfil);
-            }
-            
-            $path = $request->file('foto_perfil')->store('fotos_perfil', 'public');
-            $userData['foto_perfil'] = $path;
-        } else {
-            \Log::info('No se encontró una foto de perfil válida');
-        }
-        
-        $user->update($userData);
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Perfil actualizado correctamente',
-            'data' => $user
-        ]);
     }
-
-    public function logout(Request $request)
+    
+    /**
+     * Send password reset link
+     * 
+     * @param ForgotPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Logged out successfully'
-        ]);
+        $status = $this->authService->sendPasswordResetLink($request->email);
+        
+        if ($status === Password::RESET_LINK_SENT) {
+            return $this->successResponse(null, 'Se ha enviado un enlace de recuperación a su correo electrónico');
+        }
+        
+        return $this->errorResponse('No se pudo enviar el correo de recuperación', 500);
+    }
+    
+    /**
+     * Reset password
+     * 
+     * @param ResetPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        $status = $this->authService->resetPassword($request->only('email', 'password', 'password_confirmation', 'token'));
+        
+        if ($status === Password::PASSWORD_RESET) {
+            return $this->successResponse(null, 'Contraseña actualizada correctamente');
+        }
+        
+        return $this->errorResponse('No se pudo actualizar la contraseña', 500);
     }
 }

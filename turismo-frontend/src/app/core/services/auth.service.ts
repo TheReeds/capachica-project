@@ -13,6 +13,7 @@ interface ProfileApiResponse {
     user: User;
     roles?: string[];
     permissions?: string[];
+    email_verified?: boolean;
   };
   message?: string;
 }
@@ -32,12 +33,14 @@ export class AuthService {
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isLoading = signal<boolean>(false);
   private readonly _profileLoaded = signal<boolean>(false);
+  private readonly _emailVerified = signal<boolean>(false);
 
   // Exponer los signals como readonly
   readonly isLoggedIn = this._isLoggedIn.asReadonly();
   readonly currentUser = this._currentUser.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly profileLoaded = this._profileLoaded.asReadonly();
+  readonly emailVerified = this._emailVerified.asReadonly();
 
   private userLoadAttempted = false;
   private userLoading = new BehaviorSubject<boolean>(false);
@@ -82,7 +85,7 @@ export class AuthService {
     console.log('Realizando petición para cargar perfil de usuario...');
     
     // Realiza la petición HTTP con reintentos
-    return this.http.get<any>(`${this.API_URL}/profile`).pipe(
+    return this.http.get<ProfileApiResponse>(`${this.API_URL}/profile`).pipe(
       retry({
         count: 2,
         delay: (error, retryCount) => {
@@ -93,6 +96,11 @@ export class AuthService {
       tap(response => {
         console.log('Respuesta de perfil recibida:', response);
         this.profileLoadRetryCount = 0; // Reinicia el contador de reintentos
+        
+        // Actualizar estado de verificación de email
+        if (response?.data?.email_verified !== undefined) {
+          this._emailVerified.set(response.data.email_verified);
+        }
       }),
       map(response => {
         // Extraer usuario de la respuesta según la estructura
@@ -102,11 +110,11 @@ export class AuthService {
           if (response.data.user) {
             user = response.data.user;
           } else {
-            user = response.data;
+            user = response.data as any;
           }
         } else if (response && !('success' in response)) {
           // Si la respuesta es directamente el usuario
-          user = response;
+          user = response as any;
         }
         
         console.log('Usuario extraído de la respuesta:', user);
@@ -185,6 +193,7 @@ export class AuthService {
     this._isLoggedIn.set(false);
     this._currentUser.set(null);
     this._profileLoaded.set(false);
+    this._emailVerified.set(false);
     
     // No redirigimos automáticamente en este método para evitar redirecciones innecesarias
     // Solo redirige si estamos en una ruta protegida
@@ -197,10 +206,30 @@ export class AuthService {
   }
 
   register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<ApiResponse<AuthResponse>>(`${this.API_URL}/register`, data)
+    // Convertir a FormData si se incluye foto de perfil
+    const formData = new FormData();
+    
+    // Añadir todos los campos al FormData
+    Object.keys(data).forEach(key => {
+      if (data[key] !== null && data[key] !== undefined) {
+        // Para los archivos, incluirlos directamente
+        if (key === 'foto_perfil' && data[key] instanceof File) {
+          formData.append(key, data[key] as File);
+        } else {
+          formData.append(key, data[key] as string);
+        }
+      }
+    });
+    
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.API_URL}/register`, formData)
       .pipe(
         map(response => response.data as AuthResponse),
-        tap(response => this.handleAuthResponse(response)),
+        tap(response => {
+          this.handleAuthResponse(response);
+          if (response.email_verified !== undefined) {
+            this._emailVerified.set(response.email_verified);
+          }
+        }),
         catchError(error => this.handleError(error))
       );
   }
@@ -217,10 +246,79 @@ export class AuthService {
             access_token: response.data.access_token,
             token_type: response.data.token_type,
             expires_in: 0,
-            user: response.data.user
+            user: response.data.user,
+            email_verified: response.data.email_verified
           };
         }),
-        tap(authResponse => this.handleAuthResponse(authResponse)),
+        tap(authResponse => {
+          this.handleAuthResponse(authResponse);
+          if (authResponse.email_verified !== undefined) {
+            this._emailVerified.set(authResponse.email_verified);
+          }
+        }),
+        catchError(error => this.handleError(error))
+      );
+  }
+  
+  // Autenticación con Google
+  loginWithGoogle(): Observable<string> {
+    return this.http.get<ApiResponse<{ url: string }>>(`${this.API_URL}/auth/google`)
+      .pipe(
+        map(response => {
+          if (!response.data || !response.data.url) {
+            throw new Error("No URL in response");
+          }
+          
+          return response.data.url;
+        }),
+        catchError(error => this.handleError(error))
+      );
+  }
+  
+  // Manejar callback de Google
+  handleGoogleCallback(token: string, code: string): Observable<AuthResponse> {
+    return this.http.get<ApiResponse<AuthResponse>>(`${this.API_URL}/auth/google/callback?code=${code}`)
+      .pipe(
+        map(response => response.data as AuthResponse),
+        tap(authResponse => {
+          this.handleAuthResponse(authResponse);
+          this._emailVerified.set(true); // Los usuarios de Google siempre están verificados
+        }),
+        catchError(error => this.handleError(error))
+      );
+  }
+  
+  // Verificar correo electrónico
+  verifyEmail(userId: number, hash: string): Observable<any> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/email/verify/${userId}/${hash}`)
+      .pipe(
+        tap(() => {
+          this._emailVerified.set(true);
+        }),
+        catchError(error => this.handleError(error))
+      );
+  }
+  
+  // Reenviar correo de verificación
+  resendVerificationEmail(): Observable<any> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/email/verification-notification`, {})
+      .pipe(
+        catchError(error => this.handleError(error))
+      );
+  }
+  
+  // Solicitar recuperación de contraseña
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/forgot-password`, { email })
+      .pipe(
+        catchError(error => this.handleError(error))
+      );
+  }
+  
+  // Restablecer contraseña
+  resetPassword(data: { email: string, token: string, password: string, password_confirmation: string }): Observable<any> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/reset-password`, data)
+      .pipe(
         catchError(error => this.handleError(error))
       );
   }
@@ -244,8 +342,15 @@ export class AuthService {
     return this.http.get<ProfileApiResponse>(`${this.API_URL}/profile`)
       .pipe(
         map(response => {
-          if (response.success && response.data && response.data.user) {
-            return response.data.user;
+          if (response.success && response.data) {
+            // Actualizar estado de verificación de email
+            if (response.data.email_verified !== undefined) {
+              this._emailVerified.set(response.data.email_verified);
+            }
+            
+            if (response.data.user) {
+              return response.data.user;
+            }
           }
           throw new Error('Formato de respuesta no válido');
         }),
@@ -284,5 +389,17 @@ export class AuthService {
     }
     
     return throwError(() => error);
+  }
+  verifyEmailWithFullUrl(url: string): Observable<any> {
+    return this.http.get<ApiResponse<any>>(url, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    }).pipe(
+      tap(() => {
+        this._emailVerified.set(true);
+      }),
+      catchError(error => this.handleError(error))
+    );
   }
 }

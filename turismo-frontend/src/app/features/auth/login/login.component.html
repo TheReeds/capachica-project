@@ -54,6 +54,8 @@
           <input 
             id="remember_me" 
             type="checkbox" 
+            [(ngModel)]="rememberMe"
+            [ngModelOptions]="{standalone: true}"
             class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
           <label for="remember_me" class="ml-2 block text-sm text-gray-900">
             Recordarme
@@ -61,13 +63,41 @@
         </div>
 
         <div class="text-sm">
-          <a href="#" class="font-medium text-primary-600 hover:text-primary-500 transition-colors">
+          <a routerLink="/forgot-password" class="font-medium text-primary-600 hover:text-primary-500 transition-colors">
             ¿Olvidaste tu contraseña?
           </a>
         </div>
       </div>
 
-      <div *ngIf="error" class="rounded-md bg-red-50 p-4">
+      <!-- Alerta de verificación de email -->
+      <div *ngIf="emailVerificationNeeded" class="rounded-md bg-yellow-50 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-yellow-800">
+              Verificación de correo requerida
+            </h3>
+            <div class="mt-2 text-sm text-yellow-700">
+              <p>
+                Para iniciar sesión, necesitas verificar tu dirección de correo electrónico.
+              </p>
+              <button 
+                type="button" 
+                class="mt-2 text-sm font-medium text-yellow-800 underline"
+                (click)="resendVerificationEmail()">
+                Reenviar correo de verificación
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje de error general -->
+      <div *ngIf="error && !emailVerificationNeeded" class="rounded-md bg-red-50 p-4">
         <div class="flex">
           <div class="ml-3">
             <h3 class="text-sm font-medium text-red-800">{{ error }}</h3>
@@ -84,6 +114,19 @@
           <span *ngIf="!loading">Iniciar sesión</span>
         </button>
       </div>
+      
+      <!-- Separador -->
+      <div class="relative my-4">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="bg-white px-2 text-gray-500">O continuar con</span>
+        </div>
+      </div>
+      
+      <!-- Botón de Google -->
+      <app-google-login-button></app-google-login-button>
     </form>
 
   </div>

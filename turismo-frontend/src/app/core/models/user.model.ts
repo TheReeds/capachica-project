@@ -8,6 +8,7 @@ export interface User {
   active?: boolean;
   created_at?: string;
   updated_at?: string;
+  google_id?: string;
   roles?: Role[];
 }
 
@@ -32,12 +33,14 @@ export interface Permission {
 
 export interface RegisterRequest {
   name: string;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
   email: string;
   password: string;
   password_confirmation: string;
-  phone: string;
+  phone?: string;
+  foto_perfil?: File | null;
+  [key: string]: string | File | null | undefined;
 }
 
 export interface LoginRequest {
@@ -50,7 +53,24 @@ export interface AuthResponse {
   token_type: string;
   expires_in: number;
   user: User;
+  email_verified?: boolean;
 }
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface VerifyEmailRequest {
+  id: number;
+  hash: string;
+}
+
 
 export interface ApiResponse<T> {
   success: boolean;

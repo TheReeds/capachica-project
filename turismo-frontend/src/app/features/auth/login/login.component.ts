@@ -1,30 +1,67 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { GoogleLoginButtonComponent } from '../../../shared/components/buttons/google-login-button.component';
+import { GoogleAuthService } from '../../../core/services/google-auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    RouterLink, 
+    FormsModule, 
+    GoogleLoginButtonComponent
+  ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private googleAuthService = inject(GoogleAuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loginForm: FormGroup;
   loading = false;
+  googleLoading = false;
   submitted = false;
   error = '';
+  rememberMe = false;
+  emailVerificationNeeded = false;
 
   constructor() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
+    });
+  }
+
+  ngOnInit() {
+    // Inicializar el servicio de Google Auth
+    this.googleAuthService.initGoogleOneTap(false);
+    
+    // Verificar si hay un token de Google en los parámetros de URL
+    this.route.queryParams.subscribe(params => {
+      const token = params['token'];
+      if (token) {
+        // Si hay un token, significa que venimos de un callback de Google
+        // Guardamos el token y redirigimos al dashboard
+        localStorage.setItem('auth_token', token);
+        this.authService.loadUserProfile(true).subscribe({
+          next: () => {
+            this.router.navigate(['/dashboard']);
+          },
+          error: () => {
+            this.error = 'Error al cargar el perfil de usuario';
+          }
+        });
+      }
     });
   }
 
@@ -35,6 +72,7 @@ export class LoginComponent {
   onSubmit() {
     this.submitted = true;
     this.error = '';
+    this.emailVerificationNeeded = false;
 
     if (this.loginForm.invalid) {
       return;
@@ -42,11 +80,43 @@ export class LoginComponent {
 
     this.loading = true;
     this.authService.login(this.loginForm.value).subscribe({
-      next: () => {
+      next: (response) => {
+        // Verificar si el usuario necesita verificar su correo
+        if (response.email_verified === false) {
+          this.emailVerificationNeeded = true;
+          this.error = 'Por favor, verifica tu correo electrónico antes de iniciar sesión.';
+          this.loading = false;
+          return;
+        }
+        
         this.router.navigate(['/dashboard']);
       },
       error: err => {
         this.error = err.error?.message || 'Credenciales inválidas';
+        this.loading = false;
+      }
+    });
+  }
+  
+  resendVerificationEmail() {
+    const email = this.loginForm.get('email')?.value;
+    
+    if (!email) {
+      this.error = 'Por favor, ingresa tu correo electrónico.';
+      return;
+    }
+    
+    this.loading = true;
+    this.authService.resendVerificationEmail().subscribe({
+      next: () => {
+        this.error = '';
+        this.emailVerificationNeeded = true;
+        this.loading = false;
+        // Mostrar mensaje de éxito
+        alert('Se ha enviado un nuevo correo de verificación. Por favor, revisa tu bandeja de entrada.');
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'Error al enviar el correo de verificación';
         this.loading = false;
       }
     });

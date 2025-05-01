@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +11,7 @@ use Spatie\Permission\Traits\HasRoles;
 use App\reservas\Emprendedores\Models\Emprendedor;
 use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
@@ -24,11 +24,14 @@ class User extends Authenticatable
         'phone',
         'active',
         'foto_perfil',
+        'google_id',
+        'avatar',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id',
     ];
 
     protected $casts = [
@@ -36,9 +39,11 @@ class User extends Authenticatable
         'password' => 'hashed',
         'active' => 'boolean',
     ];
+    
     protected $appends = [
         'foto_perfil_url',
     ];
+    
     /**
      * Obtener los emprendimientos administrados por el usuario
      */
@@ -62,14 +67,48 @@ class User extends Authenticatable
      */
     public function getFotoPerfilUrlAttribute()
     {
-        if (!$this->foto_perfil) {
+        if (!$this->foto_perfil && !$this->avatar) {
             return null;
         }
         
-        if (filter_var($this->foto_perfil, FILTER_VALIDATE_URL)) {
-            return $this->foto_perfil;
+        // Priorizar la foto de perfil cargada sobre el avatar de Google
+        if ($this->foto_perfil) {
+            if (filter_var($this->foto_perfil, FILTER_VALIDATE_URL)) {
+                return $this->foto_perfil;
+            }
+            
+            return url(Storage::url($this->foto_perfil));
         }
         
-        return url(Storage::url($this->foto_perfil));
+        // Si no hay foto de perfil pero hay avatar de Google, usar ese
+        return $this->avatar;
+    }
+    
+    /**
+     * Verificar si el usuario se registró mediante Google
+     */
+    public function registeredWithGoogle()
+    {
+        return $this->google_id !== null;
+    }
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
+
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new \App\Notifications\VerifyEmailNotification);
     }
 }
