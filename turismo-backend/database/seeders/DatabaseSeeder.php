@@ -93,6 +93,7 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'Sistema',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
             'phone' => '123456789',
             'active' => true
         ]);
