@@ -25,26 +25,33 @@ export class EmprendedorService {
   }
 
   // Obtener todos los emprendedores
-  /*getAllEmprendedores(): Observable<Emprendedor[]> {
-    return this.http.get<any>(`${this.API_URL}/emprendedores`)
-      .pipe(
-        tap(response => {
-          console.log('Respuesta original de la API:', response);
-        }),
-        map(response => this.procesarRespuestaAPI(response)),
-        catchError(error => {
-          console.error('Error al obtener emprendedores:', error);
-          
-          // Si hay error y está habilitado usar datos mock
-          if (this.useMockDataIfError) {
-            console.log('Usando datos mock debido al error');
-            return of(EMPRENDEDORES_MOCK);
+  getAllEmprendedores(): Observable<Emprendedor[]> {
+    return this.http.get<any>(`${this.API_URL}/emprendedores`).pipe(
+      map(response => {
+        const data = response?.data?.data || [];
+  
+        // Convertir imágenes (de string JSON a arreglo)
+        data.forEach((e: any) => {
+          try {
+            e.imagenes = JSON.parse(e.imagenes || '[]');
+          } catch {
+            e.imagenes = [];
           }
-          
-          return of([]);
-        })
-      );
-  }*/
+  
+          // Validar sliders_secundarios
+          if (!e.sliders_secundarios) {
+            e.sliders_secundarios = [];
+          }
+        });
+  
+        return data;
+      }),
+      catchError(error => {
+        console.error('Error al obtener emprendedores:', error);
+        return of([]);
+      })
+    );
+  }
 
   // Obtener un emprendedor único (como objeto)
   getEmprendedores(): Observable<Emprendedor[]> {
@@ -102,8 +109,8 @@ export class EmprendedorService {
           console.error(`Error al obtener emprendedor con ID ${id}:`, error);
           
           if (this.useMockDataIfError) {
-            const mockEmprendedor = EMPRENDEDORES_MOCK.find(e => e.id === id);
-            return of(mockEmprendedor || null);
+            //const mockEmprendedor = EMPRENDEDORES_MOCK.find(e => e.id === id);
+            //return of(mockEmprendedor || null);
           }
           
           return of(null);
