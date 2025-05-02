@@ -1,0 +1,262 @@
+<div class="w-full bg-orange-50 overflow-hidden">
+  <!-- Background Image -->
+  <img class="w-full h-[450px] object-cover" src="http://127.0.0.1:8000/storage/sliders/emprendedor/RvBlWFqQTaYkR5vESoL2L08HTxH0z9NI7E9gNqio.jpg" alt="Imagen principal">
+
+  
+
+<!-- Mensaje mientras se carga -->
+<ng-template #cargando>
+  <p>Cargando información del emprendedor...</p>
+</ng-template>
+
+  
+
+
+  <!-- Título y texto introductorio -->
+  <div *ngIf="emprendedor" class="text-center py-10">
+    <h1 class="text-4xl text-orange-800 font-semibold font-merriweather">
+      {{ emprendedor.nombre || 'Nombre no disponible' }}
+    </h1>
+
+    <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
+      {{ emprendedor.descripcion || 'Nombre no disponible' }}
+    </p>
+  </div>
+
+  <!-- img-->
+  <div class="px-10 py-8">
+    <h3 class="text-4xl text-amber-600 font-semibold font-merriweather pb-5">Fotos</h3>
+
+    <!-- Contenedor de imágenes en fila -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <!-- Imagen 1 -->
+      <div class="flex justify-center items-center">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div class="flex justify-center items-center" *ngFor="let img of getImagenesSecundarias()">
+            <img class="w-full h-full object-cover rounded-lg" [src]="img" alt="Imagen secundaria" />
+          </div>
+        </div>
+
+
+      </div>
+
+      
+
+      
+    </div>
+  </div>
+
+
+  <!-- Contenedor principal con márgenes adecuados -->
+  <!-- serv -->
+  <div *ngFor="let servicio of servicios" class="px-10 py-8">
+    <h3 class="text-4xl text-amber-600 font-semibold font-merriweather pb-5">Servicios</h3>
+    <!-- Secciones de Servicios -->
+    <div class="mb-16">
+      <!-- Sección 1: Alojamiento -->
+      <div class="mb-12 flex flex-wrap items-center">
+        <!-- Carrusel de imágenes -->
+        <div class="w-full md:w-1/2 p-4">
+          <div class="swiper-container w-full h-80">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <img class="w-full h-full object-cover rounded-lg" src="https://placehold.co/300x190"
+                  alt="Alojamiento Imagen 1" />
+              </div>
+
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+          </div>
+        </div>
+        <!-- Texto de la sección -->
+        <div class="w-full md:w-1/2 p-4">
+          <h2 class="text-3xl text-red-700 font-bold mb-4">Sección 1: {{servicio.nombre}}</h2>
+          <p class="mb-2 text-lg font-semibold">
+            <span class="text-orange-700">Descripción: </span>
+            Hospedaje circular en Ccotos, construido con técnicas tradicionales y materiales locales, proporcionando una
+            experiencia única en medio de la naturaleza.
+          </p>
+          <p class="mb-2 text-lg font-semibold">
+            <span class="text-orange-700">Servicios destacados:</span>
+          </p>
+          <ul class="list-disc ml-6 mb-4 text-lg">
+            <li>Habitación individual o familiar</li>
+            <li>Check-in automático</li>
+            <li>Espacios compartidos para actividades recreativas</li>
+          </ul>
+          <p class="mb-4 text-lg font-semibold">
+            <span class="text-orange-700">Precios y disponibilidad: </span>
+            <span class="text-red-600 font-bold">$50</span> por noche
+          </p>
+          <button class="bg-red-700 hover:bg-red-500 text-white px-6 py-3 rounded-full text-xl transition-all">
+            Reservar alojamiento
+          </button>
+        </div>
+      </div>
+
+      <!-- Sección 2: Gastronomía -->
+      <div class="mb-12 flex flex-wrap items-center">
+        <!-- Carrusel de imágenes -->
+        <div class="w-full md:w-1/2 p-4">
+          <div class="swiper-container w-full h-80">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <img class="w-full h-full object-cover rounded-lg" src="https://placehold.co/300x200"
+                  alt="Gastronomía Imagen 1" />
+              </div>
+
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+          </div>
+        </div>
+        <!-- Texto de la sección -->
+        <div class="w-full md:w-1/2 p-4">
+          <h2 class="text-3xl text-red-700 font-bold mb-4">Sección 2: Gastronomía</h2>
+          <p class="mb-2 text-lg font-semibold">
+            <span class="text-orange-700">Descripción: </span>
+            Comidas tradicionales preparadas con ingredientes locales como quinua, habas, y papa andina.
+          </p>
+          <p class="mb-2 text-lg font-semibold">
+            <span class="text-orange-700">Platos destacados:</span>
+          </p>
+          <ul class="list-disc ml-6 mb-4 text-lg">
+            <li>Cuy chactado (plato típico)</li>
+            <li>Sopa de quinua</li>
+            <li>Pan casero</li>
+          </ul>
+          <p class="mb-4 text-lg font-semibold">
+            <span class="text-orange-700">Precios: Menú por </span>
+            <span class="text-red-600 font-bold">$15</span>
+          </p>
+          <button class="bg-red-700 hover:bg-red-500 text-white px-6 py-3 rounded-full text-xl transition-all">
+            Ver más sobre el menú y reservar
+          </button>
+        </div>
+      </div>
+
+      <!-- Sección 3: Actividades -->
+      <div class="mb-12 flex flex-wrap items-center">
+        <!-- Carrusel de imágenes -->
+        <div class="w-full md:w-1/2 p-4">
+          <div class="swiper-container w-full h-80">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <img class="w-full h-full object-cover rounded-lg" src="https://placehold.co/300x200"
+                  alt="Actividades Imagen 1" />
+              </div>
+
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+          </div>
+        </div>
+        <!-- Texto de la sección -->
+        <div class="w-full md:w-1/2 p-4">
+          <h2 class="text-3xl text-red-700 font-bold mb-4">Sección 3: Actividades</h2>
+          <p class="mb-2 text-lg font-semibold">
+            <span class="text-orange-700">Descripción: </span>
+            Disfruta de paseos en kayak y actividades recreativas organizadas por la familia.
+          </p>
+          <p class="mb-2 text-lg font-semibold">
+            <span class="text-orange-700">Actividades destacadas:</span>
+          </p>
+          <ul class="list-disc ml-6 mb-4 text-lg">
+            <li>Paseo en kayak por el Lago Titicaca</li>
+            <li>Caminatas guiadas por los alrededores</li>
+            <li>Clases de cocina tradicional</li>
+          </ul>
+          <p class="mb-2 text-lg font-semibold">
+            <span class="text-orange-700">Precios:</span>
+          </p>
+          <ul class="list-none ml-6 mb-4 text-lg">
+            <li>Kayak: <span class="text-red-600 font-bold">$20</span> por persona</li>
+            <li>Caminata guiada: <span class="text-red-600 font-bold">$10</span> por persona</li>
+          </ul>
+          <button class="bg-red-700 hover:bg-red-500 text-white px-6 py-3 rounded-full text-xl transition-all">
+            Reservar actividades
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- turista-->
+  <!-- Testimonios de Turistas -->
+  <div class="px-10 py-10">
+    <h3 class="text-4xl text-amber-600 font-semibold font-merriweather pb-5">Reseña de turistas</h3>
+
+    <!-- Contenedor para los testimonios -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Testimonio 1 -->
+      <div class="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+        <div class="flex items-center mb-4">
+          <img class="w-16 h-16 rounded-full mr-4" src="https://placehold.co/69x69" alt="Usuario 1" />
+          <div>
+            <div class="text-yellow-400 text-lg">⭐ ⭐ ⭐ ⭐ ⭐</div>
+            <div class="text-gray-600 text-base">Argentina</div>
+            <div class="text-gray-800 text-xl font-semibold">Mario Miguel</div>
+          </div>
+        </div>
+        <blockquote class="text-gray-800 text-lg italic">
+          "El mejor plato que comí en todo mi viaje fue el cuy chactado que prepararon en la casa de los Apaza. No solo
+          la comida, sino las historias de la familia hicieron que nuestra visita fuera especial."
+        </blockquote>
+      </div>
+
+      <!-- Testimonio 2 -->
+      <div class="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+        <div class="flex items-center mb-4">
+          <img class="w-16 h-16 rounded-full mr-4" src="https://placehold.co/69x69" alt="Usuario 2" />
+          <div>
+            <div class="text-yellow-400 text-lg">⭐ ⭐ ⭐ ⭐ ⭐</div>
+            <div class="text-gray-600 text-base">España</div>
+            <div class="text-gray-800 text-xl font-semibold">Laura Pérez</div>
+          </div>
+        </div>
+        <blockquote class="text-gray-800 text-lg italic">
+          "La experiencia fue increíble, la calidez de la familia y la deliciosa comida nos hicieron sentir como en
+          casa. ¡Sin duda, uno de los mejores recuerdos de nuestro viaje!"
+        </blockquote>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!-- Swiper.js -->
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    const Swiper = new Swiper('.swiper-container', {
+      slidesPerView: 1,
+      spaceBetween: 10,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      loop: true,               // Activa el bucle del carrusel
+    });
+  </script>

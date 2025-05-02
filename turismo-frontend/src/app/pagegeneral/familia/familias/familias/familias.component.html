@@ -1,45 +1,55 @@
-<!-- Contenedor general fuera del *ngFor -->
+<!-- Contenedor general -->
 <div class="w-full bg-orange-50 overflow-hidden">
 
     <!-- Imagen de fondo -->
-    <img class="w-full h-[450px] object-cover" src="https://placehold.co/1440x375" alt="Imagen principal">
-  
-    <!-- Título y texto introductorio -->
+    <img class="w-full h-[450px] object-cover"
+        src="http://127.0.0.1:8000/storage/sliders/emprendedor/RvBlWFqQTaYkR5vESoL2L08HTxH0z9NI7E9gNqio.jpg"
+        alt="Vista panorámica de Capachica">
+
+    <!-- Título y descripción -->
     <div class="text-center py-10">
-      <h1 class="text-4xl text-orange-800 font-semibold font-merriweather">
-        Conoce a las familias que hacen posible el turismo comunitario en Capachica
-      </h1>
-      <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
-        Las familias de Capachica, en la región de Puno, Perú, ofrecen servicios auténticos de hospedaje y actividades
-        culturales. ¡Descubre la calidez de su hospitalidad y la belleza de la región!
-      </p>
+        <h1 class="text-4xl text-orange-800 font-semibold font-merriweather">
+            Conoce a las familias que hacen posible el turismo comunitario en Capachica
+        </h1>
+        <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
+            Las familias de Capachica, en la región de Puno, Perú, ofrecen servicios auténticos de hospedaje y
+            actividades
+            culturales. ¡Descubre la calidez de su hospitalidad y la belleza de la región!
+        </p>
     </div>
-  
-    <!-- Tarjetas -->
+
+    <!-- Tarjetas de familias -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 py-12 max-w-7xl mx-auto">
-  
-      <!-- Mensaje de carga si no hay emprendedores -->
-      <div *ngIf="!emprendedores || emprendedores.length === 0" class="col-span-3 text-center py-10">
-        <p class="text-lg text-gray-600">Cargando familias emprendedoras...</p>
-      </div>
-  
-      <!-- Iteración CORRECTA -->
-      <div *ngFor="let e of emprendedores" class="bg-white rounded-xl shadow-lg overflow-hidden transition transform hover:scale-105 hover:shadow-2xl">
-        <img class="w-full h-64 object-cover" src="https://placehold.co/655x465" alt="Familia {{e?.nombre}}">
-        <div class="p-6">
-          <div class="mb-4">
-            <h3 class="text-xl font-semibold text-amber-500">{{e?.nombre}}</h3>
-            <p class="text-lg text-amber-500">{{e?.ubicacion}}</p>
-          </div>
-          <p class="mt-4 text-gray-700">
-            {{e?.descripcion}}
-          </p>
-          <a  href="/detallefamilias/{{e?.id}}" class="inline-block mt-4 px-6 py-2 bg-amber-600 text-white text-lg font-semibold rounded-lg hover:bg-amber-500 transition">
-            Ver más...
-          </a>
+
+        <!-- Mensaje de carga -->
+        <div *ngIf="!emprendedores || emprendedores.length === 0" class="col-span-3 text-center py-10">
+            <p class="text-lg text-gray-600">Cargando emprendedoras...</p>
         </div>
-      </div>
-  
+
+        <!-- Tarjetas dinámicas -->
+        <div *ngFor="let e of emprendedores"
+            class="bg-white max-w-sm w-full mx-auto rounded-xl shadow-lg overflow-hidden transition transform hover:scale-105 hover:shadow-2xl">
+
+            <img class="w-full h-64 object-cover" [src]="getImagenPrincipal(e)"
+                [alt]="'Imagen representativa de la familia ' + e?.nombre + ' en ' + e?.ubicacion">
+
+
+            <!-- Contenido de la tarjeta -->
+            <div class="p-6">
+                <div class="mb-4">
+                    <h3 class="text-xl font-semibold text-amber-500">{{ e?.nombre }}</h3>
+                    <p class="text-lg text-amber-500">{{ e?.ubicacion }}</p>
+                </div>
+                <p class="mt-4 text-gray-700">
+                    {{ e?.descripcion }}
+                </p>
+
+                <!-- Botón de navegación -->
+                <a [routerLink]="['/detallefamilias', e?.id]"
+                    class="inline-block mt-4 px-6 py-2 bg-amber-600 text-white text-lg font-semibold rounded-lg hover:bg-amber-500 transition">
+                    Ver más...
+                </a>
+            </div>
+
+        </div>
     </div>
-  </div>
-  
