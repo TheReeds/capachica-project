@@ -15,7 +15,7 @@ import { PaginatedResponse } from '../../core/services/admin.service';
 })
 export class HomeComponent implements OnInit {
   private homeService = inject(HomeService);
-  
+
   homes: Home[] = [];
   reservas: Reserva[] = [];
   municipalidad: Municipalidad | null = null;
@@ -24,14 +24,30 @@ export class HomeComponent implements OnInit {
   currentPage = 1;
   searchTerm = '';
   selectedEmprendedor: Home | null = null;
+  categorias: any[] = [];
+  isDropdownOpen: boolean = false;
+
+  // ✅ Año actual para el footer
+  currentYear = new Date().getFullYear();
 
   ngOnInit() {
     this.loadEmprendedores();
     this.loadReservas();
     this.loadMunicipalidad();
+
+    this.homeService.getCategorias().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.categorias = res.data;
+        }
+      },
+      error: (err) => {
+        console.error('Error al obtener categorías', err);
+      }
+    });
   }
 
-  loadEmprendedores(page: number = 1){
+  loadEmprendedores(page: number = 1) {
     this.homeService.getEmprendedores(page, 10, this.searchTerm).subscribe({
       next: (data) => {
         this.paginacion = data;
@@ -45,7 +61,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  loadReservas(){
+  loadReservas() {
     this.homeService.getReserva().subscribe({
       next: (data) => {
         this.reservas = data;
@@ -84,5 +100,9 @@ export class HomeComponent implements OnInit {
 
   searchEmprendedores() {
     this.loadEmprendedores(1);
+  }
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
   }
 }
