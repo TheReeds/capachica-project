@@ -1,9 +1,10 @@
 // general-header.component.ts
-import { Component, inject, OnInit, signal, HostListener } from '@angular/core';
+import { Component, inject, OnInit, signal, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterModule, RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-general-header',
@@ -13,7 +14,7 @@ import { ThemeService } from '../../../core/services/theme.service';
     <div class="flex flex-col min-h-screen">
       <!-- Header - Transparent with scroll class -->
       <header 
-        class="fixed w-full z-50 transition-all duration-300"
+        class="fixed inset-x-0 top-0 z-50 transition-all duration-300"
         [ngClass]="{
           'backdrop-blur-md bg-white/70 dark:bg-gray-900/80 shadow-lg': scrolled() || mobileMenuOpen(),
           'bg-transparent': !scrolled() && !mobileMenuOpen()
@@ -88,8 +89,8 @@ import { ThemeService } from '../../../core/services/theme.service';
               </a>
             </nav>
 
-            <!-- Botones de acción -->
-            <div class="flex items-center space-x-3">
+            <!-- Botones de acción - sólo visible en escritorio cuando no hay menú móvil abierto -->
+            <div class="items-center space-x-3 hidden md:flex">
               <!-- Theme toggle button -->
               <button 
                 (click)="toggleDarkMode()" 
@@ -131,7 +132,50 @@ import { ThemeService } from '../../../core/services/theme.service';
               </button>
             </div>
 
-            <!-- Botón de menú móvil -->
+            <!-- Botones de acción en móvil - solo visible cuando NO hay menú abierto -->
+            <div class="flex items-center space-x-3 md:hidden" *ngIf="!mobileMenuOpen()">
+              <!-- Theme toggle button -->
+              <button 
+                (click)="toggleDarkMode()" 
+                class="p-2 rounded-full text-gray-800 dark:text-gray-200 hover:bg-amber-100 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200"
+                [title]="isDarkMode() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+              >
+                <svg *ngIf="!isDarkMode()" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+                <svg *ngIf="isDarkMode()" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </button>
+
+              <!-- Auth buttons -->
+              <button *ngIf="!isLoggedIn()" 
+                routerLink="/login" 
+                class="bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
+              >
+                Iniciar sesión
+              </button>
+              <button *ngIf="!isLoggedIn()" 
+                routerLink="/register" 
+                class="bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
+              >
+                Registrarse
+              </button>
+              <button *ngIf="isLoggedIn()" 
+                routerLink="/dashboard" 
+                class="bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
+              >
+                Mi cuenta
+              </button>
+              <button *ngIf="isLoggedIn()" 
+                (click)="logout()" 
+                class="bg-amber-700 hover:bg-amber-800 dark:bg-amber-700 dark:hover:bg-amber-800 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
+              >
+                Salir
+              </button>
+            </div>
+
+            <!-- Botón de menú móvil - siempre visible en móvil -->
             <button 
               class="md:hidden flex items-center p-2 rounded-md text-gray-800 dark:text-gray-200 hover:bg-amber-100 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200"
               (click)="toggleMobileMenu()"
@@ -248,11 +292,9 @@ import { ThemeService } from '../../../core/services/theme.service';
         </div>
       </header>
 
-      <!-- Spacer for fixed header -->
-      <div class="h-24"></div>
 
       <!-- Contenido principal -->
-      <main class="flex-1">
+      <main class="relative z-0 transition-all duration-300">
         <router-outlet></router-outlet>
       </main>
     </div>
@@ -292,9 +334,11 @@ import { ThemeService } from '../../../core/services/theme.service';
     }
   `]
 })
-export class GeneralHeaderComponent implements OnInit {
+export class GeneralHeaderComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private themeService = inject(ThemeService);
+  private router = inject(Router);
+  private routerSubscription: Subscription | null = null;
   
   mobileMenuOpen = signal(false);
   scrolled = signal(false);
@@ -302,13 +346,29 @@ export class GeneralHeaderComponent implements OnInit {
   ngOnInit() {
     // Initialize the theme
     this.themeService.initializeTheme();
+    
+    // Reset scroll position on navigation
+    this.routerSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      window.scrollTo(0, 0);
+      this.scrolled.set(false);
+      this.closeMobileMenu();
+    });
+  }
+  
+  ngOnDestroy() {
+    // Clean up subscription when component is destroyed
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
   }
   
   // Detect scroll position
   @HostListener('window:scroll', [])
   onWindowScroll() {
     const scrollPosition = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    this.scrolled.set(scrollPosition > 60);
+    this.scrolled.set(scrollPosition > 10); // Reduced threshold to make it more responsive
   }
   
   isLoggedIn(): boolean {
