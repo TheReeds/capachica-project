@@ -21,3 +21,10 @@ describe('DetallefamiliasComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+
+
+
+
+
+
+
