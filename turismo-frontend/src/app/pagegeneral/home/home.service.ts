@@ -35,11 +35,12 @@ export class HomeService {
   }
 
   getMunicipalidad(): Observable<Municipalidad> {
-    return this.http.get<{success: boolean, data: Municipalidad}>(`${this.API_URL}/municipalidad/1`)
+    return this.http.get<{ success: boolean; data: Municipalidad }>(`${this.API_URL}/municipalidad/1`)
       .pipe(
         map(response => response.data)
       );
   }
+  
   
   getCategorias(): Observable<any> {
     return this.http.get<any>('http://localhost:8000/api/categorias'); // Ajusta el dominio según tu backend

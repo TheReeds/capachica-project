@@ -1,4 +1,3 @@
-// home.component.ts
 import { Component, OnInit, inject, ViewEncapsulation, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -22,7 +21,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   private homeService = inject(HomeService);
   private themeService = inject(ThemeService);
   private router = inject(Router);
-  
+
   homes: Home[] = [];
   reservas: Reserva[] = [];
   municipalidad: Municipalidad | null = null;
@@ -41,12 +40,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loadEmprendedores();
     this.loadReservas();
-    this.loadMunicipalidad();
     this.loadCategorias();
+  
+    this.homeService.getMunicipalidad().subscribe({
+      next: (response) => {
+        this.municipalidad = response; // 👈 aquí el fix
+      },
+      error: (err) => console.error('Error cargando municipalidad', err)
+    });
   }
 
   ngAfterViewInit() {
-    // Initialize Swiper after view is initialized
     setTimeout(() => {
       this.initSwiper();
     }, 500);
@@ -77,17 +81,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     });
   }
 
-  loadMunicipalidad() {
-    this.homeService.getMunicipalidad().subscribe({
-      next: (data) => {
-        this.municipalidad = data;
-      },
-      error: (error) => {
-        console.error('Error al cargar municipalidad:', error);
-      }
-    });
-  }
-
   loadCategorias() {
     this.homeService.getCategorias().subscribe({
       next: (res) => {
@@ -105,8 +98,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.homeService.getEmprendedor(id).subscribe({
       next: (data) => {
         this.selectedEmprendedor = data;
-        
-        // Prevent body scrolling when modal is open
         document.body.style.overflow = 'hidden';
       },
       error: (error) => {
@@ -117,8 +108,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   closeEmprendedorDetails() {
     this.selectedEmprendedor = null;
-    
-    // Restore body scrolling when modal is closed
     document.body.style.overflow = '';
   }
 
@@ -129,20 +118,19 @@ export class HomeComponent implements OnInit, AfterViewInit {
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
-  
+
   closeDropdown(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest('.dropdown-container')) {
       this.isDropdownOpen = false;
     }
   }
-  
+
   isDarkMode(): boolean {
     return this.themeService.isDarkMode();
   }
 
   initSwiper() {
-    // Check if Swiper is loaded as a global variable
     if (typeof Swiper !== 'undefined' && !this.swiperInitialized) {
       try {
         const swiper = new Swiper('.swiper-container', {
@@ -174,7 +162,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       console.warn('Swiper not loaded yet or already initialized');
     }
   }
-  
+
   navigateTo(path: string) {
     this.router.navigate([path]);
   }

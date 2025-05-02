@@ -2,100 +2,78 @@
 <!-- Hero Carousel - Full width to work with transparent header -->
 <div class="relative">
   <!-- Hero carousel with full height for proper header overlay -->
-  <div id="default-carousel" class="relative w-full" data-carousel="slide">
-    <!-- Carousel wrapper - Taller to accommodate the header -->
-    <div class="relative h-screen overflow-hidden swiper-container">
-      <!-- Swiper Wrapper for slides -->
-      <div class="swiper-wrapper">
-        <!-- Item 1 -->
-        <div class="swiper-slide h-screen">
-          <div class="relative w-full h-full">
-            <img
-              src="https://i.ytimg.com/vi/Uq3B-hZiC2k/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLC9_gaWzDG_npMsQG2KL6SQ0Mk6mA"
-              class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out" alt="Imagen 1">
-            <!-- Gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70"></div>
-            
-            <!-- Hero content -->
-            <div class="absolute inset-0 flex items-center justify-center px-6 text-center">
-              <div class="max-w-4xl">
-                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">Explora la Belleza de Capachica</h1>
-                <p class="text-xl md:text-2xl text-white mb-8 drop-shadow-md">Descubre el auténtico turismo vivencial en las orillas del majestuoso lago Titicaca</p>
-                <a href="#explorar" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-full font-medium text-lg transition-all duration-300 inline-block">
-                  Explorar Ahora
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Item 2 -->
-        <div class="swiper-slide h-screen">
-          <div class="relative w-full h-full">
-            <img src="https://www.astursperu.org/wp-content/uploads/2017/07/comunidad-ccotos-asturs-peru.jpg"
-              class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out" alt="Imagen 2">
-            <!-- Gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70"></div>
-            
-            <!-- Hero content -->
-            <div class="absolute inset-0 flex items-center justify-center px-6 text-center">
-              <div class="max-w-4xl">
-                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">Experiencias Auténticas</h1>
-                <p class="text-xl md:text-2xl text-white mb-8 drop-shadow-md">Convive con familias locales y conoce de cerca sus tradiciones ancestrales</p>
-                <a href="#explorar" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-full font-medium text-lg transition-all duration-300 inline-block">
-                  Conoce Más
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Item 3 -->
-        <div class="swiper-slide h-screen">
-          <div class="relative w-full h-full">
-            <img
-              src="https://elcomercio.pe/resizer/BMwuJlc_kCnyR3oMlvH217bUNXM=/980x528/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/4XI64NKWC5EHTJZCG3ZWK6HN3M.jpg"
-              class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out" alt="Imagen 3">
-            <!-- Gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70"></div>
-            
-            <!-- Hero content -->
-            <div class="absolute inset-0 flex items-center justify-center px-6 text-center">
-              <div class="max-w-4xl">
-                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">Vive el Lago Titicaca</h1>
-                <p class="text-xl md:text-2xl text-white mb-8 drop-shadow-md">Navega por sus aguas y disfruta de paisajes impresionantes entre Perú y Bolivia</p>
-                <a href="#explorar" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-full font-medium text-lg transition-all duration-300 inline-block">
-                  Descubrir Ahora
-                </a>
-              </div>
+<!-- Carousel dinámico con sliders_principales -->
+<div class="relative w-full">
+  <div class="swiper mySwiper relative h-screen overflow-hidden">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide h-screen" *ngFor="let slider of municipalidad?.sliders_principales">
+        <div class="relative w-full h-full">
+          <img [src]="slider.url_completa"
+               [alt]="slider.nombre"
+               class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out" />
+          <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70"></div>
+          <div class="absolute inset-0 flex items-center justify-center px-6 text-center">
+            <div class="max-w-4xl">
+              <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+                {{ slider.nombre }}
+              </h1>
+              <p class="text-xl md:text-2xl text-white mb-8 drop-shadow-md">
+                Capachica te espera con experiencias únicas.
+              </p>
+              <a href="#explorar"
+                 class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-full font-medium text-lg transition-all duration-300 inline-block">
+                Explorar Ahora
+              </a>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Slider indicators -->
-    <div class="absolute z-30 flex justify-center space-x-3 bottom-10 left-1/2 transform -translate-x-1/2 swiper-pagination"></div>
+    <!-- Pagination -->
+    <div class="swiper-pagination absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30"></div>
 
-    <!-- Slider controls -->
-    <button type="button"
-      class="absolute top-1/2 start-5 z-30 flex items-center justify-center h-12 w-12 md:h-16 md:w-16 rounded-full bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm text-white hover:bg-white/50 dark:hover:bg-gray-800/50 focus:outline-none transform hover:scale-105 transition-all swiper-button-prev">
-      <svg class="w-4 h-4 md:w-6 md:h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-        viewBox="0 0 6 10">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4" />
-      </svg>
-      <span class="sr-only">Previous</span>
-    </button>
-
-    <button type="button"
-      class="absolute top-1/2 end-5 z-30 flex items-center justify-center h-12 w-12 md:h-16 md:w-16 rounded-full bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm text-white hover:bg-white/50 dark:hover:bg-gray-800/50 focus:outline-none transform hover:scale-105 transition-all swiper-button-next">
-      <svg class="w-4 h-4 md:w-6 md:h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-        viewBox="0 0 6 10">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
-      </svg>
-      <span class="sr-only">Next</span>
-    </button>
+    <!-- Navigation Buttons -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
   </div>
+</div>
+
+
+
+<!-- Galería de Imágenes Secundarias -->
+<section class="px-6 py-8 bg-white dark:bg-gray-900">
+  <h3 class="text-2xl font-bold text-center text-orange-600 dark:text-orange-400 mb-6">
+    Galería de Imágenes Secundarias
+  </h3>
+
+  <!-- Contenedor centrado -->
+  <div class="w-full flex justify-center">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl">
+      <div
+        *ngFor="let slider of municipalidad?.sliders_secundarios"
+        class="bg-gray-100 dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col items-center text-center transition transform hover:scale-105 w-72"
+      >
+        <img
+          [src]="slider.url_completa"
+          [alt]="slider.nombre"
+          class="w-full h-44 object-cover"
+        />
+        <div class="p-4">
+          <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+            {{ slider.descripcion.titulo }}
+          </h4>
+          <p class="text-sm text-gray-600 dark:text-gray-300">
+            {{ slider.descripcion.descripcion }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
 </div>
 
 <!-- Search Bar Section - Now with dark mode support -->
