@@ -1,4 +1,3 @@
-// home.model.ts
 export interface Home {
   id: number;
   nombre: string;
@@ -50,6 +49,35 @@ export interface HomeDTO {
   asociacion: number;
 }
 
+// Nuevas interfaces para sliders
+export interface Slider {
+  id: number;
+  url: string;
+  nombre: string;
+  es_principal: boolean;
+  tipo_entidad: string;
+  entidad_id: number;
+  orden: number;
+  activo: boolean;
+  created_at: string;
+  updated_at: string;
+  url_completa: string;
+}
+
+export interface SliderDescripcion {
+  id: number;
+  slider_id: number;
+  titulo: string;
+  descripcion: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SliderSecundario extends Slider {
+  descripcion: SliderDescripcion;
+}
+
+// Municipalidad actualizada
 export interface Municipalidad {
   id: number;
   nombre: string;
@@ -73,6 +101,10 @@ export interface Municipalidad {
   horariodeatencion: string;
   created_at: string;
   updated_at: string;
+
+  // Nuevos campos agregados:
+  sliders_principales: Slider[];
+  sliders_secundarios: SliderSecundario[];
 }
 
 export interface Reserva {

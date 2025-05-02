@@ -13,7 +13,10 @@ export class ThemeService {
   darkMode$ = this.darkModeSubject.asObservable();
 
   constructor() {
-    // Escuchar cambios del sistema si es posible
+    // Apply theme immediately on service creation
+    this.updateBodyClass(this.darkModeSubject.value);
+    
+    // Listen for system preference changes if possible
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (localStorage.getItem(this.darkModeKey) === null) {
@@ -21,9 +24,6 @@ export class ThemeService {
         }
       });
     }
-    
-    // Aplicar el tema inicial cuando se crea el servicio
-    this.initializeTheme();
   }
 
   private getInitialDarkModeState(): boolean {
@@ -32,12 +32,12 @@ export class ThemeService {
       return savedMode === 'true';
     }
     
-    // Si no hay preferencia guardada, usar la preferencia del sistema o la configuración predeterminada
+    // If no saved preference, use system preference or default config
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return true;
     }
     
-    return environment.defaultDarkMode;
+    return environment.defaultDarkMode || false;
   }
 
   toggleDarkMode(): void {
@@ -54,8 +54,9 @@ export class ThemeService {
     return this.darkModeSubject.value;
   }
 
-  // Actualizar clase en el body para aplicar estilos globales
+  // Update class on the document element to apply global styles
   private updateBodyClass(isDarkMode: boolean): void {
+    console.log('Updating theme to dark mode:', isDarkMode);
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -63,8 +64,9 @@ export class ThemeService {
     }
   }
 
-  // Inicializar el tema al arrancar la aplicación
+  // Initialize theme when application starts
   initializeTheme(): void {
+    console.log('Initializing theme, dark mode:', this.darkModeSubject.value);
     this.updateBodyClass(this.darkModeSubject.value);
   }
 }
