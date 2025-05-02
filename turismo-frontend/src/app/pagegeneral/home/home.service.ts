@@ -40,4 +40,9 @@ export class HomeService {
         map(response => response.data)
       );
   }
+  
+  getCategorias(): Observable<any> {
+    return this.http.get<any>('http://localhost:8000/api/categorias'); // Ajusta el dominio según tu backend
+  }
+  
 }
