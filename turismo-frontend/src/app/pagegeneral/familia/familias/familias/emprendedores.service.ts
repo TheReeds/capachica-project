@@ -3,7 +3,6 @@ import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../../../environments/environments";
 import { Observable, of, catchError, tap, map } from "rxjs";
 import { Emprendedor } from "./emprendedor.model";
-import { EMPRENDEDORES_MOCK } from "./datos-mock";
 
 @Injectable({
   providedIn: 'root'
