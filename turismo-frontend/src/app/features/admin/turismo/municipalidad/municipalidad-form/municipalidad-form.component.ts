@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DoCheck } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -454,6 +454,7 @@ import { SliderImage, SliderUploadComponent } from '../../../../../shared/compon
                 type="submit" 
                 class="inline-flex justify-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 [disabled]="saving || municipalidadForm.invalid"
+                (click)="logFormState($event)"
               >
                 @if (saving) {
                   <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -472,7 +473,7 @@ import { SliderImage, SliderUploadComponent } from '../../../../../shared/compon
     </div>
   `,
 })
-export class MunicipalidadFormComponent implements OnInit {
+export class MunicipalidadFormComponent implements OnInit, DoCheck {
   private fb = inject(FormBuilder);
   private turismoService = inject(TurismoService);
   private route = inject(ActivatedRoute);
@@ -490,6 +491,7 @@ export class MunicipalidadFormComponent implements OnInit {
   saving = false;
   submitted = false;
   error = '';
+  previousInvalidState = false;
   
   activeTab = 'informacion-general';
   
@@ -514,6 +516,51 @@ export class MunicipalidadFormComponent implements OnInit {
       this.loadMunicipalidad(this.municipalidadId);
     } else {
       this.loading = false;
+    }
+  }
+  
+  ngDoCheck() {
+    // Only log when form status changes to invalid
+    if (this.municipalidadForm && this.municipalidadForm.invalid && !this.previousInvalidState) {
+      console.log('Form became invalid. Current status:', {
+        formInvalid: this.municipalidadForm.invalid,
+        formErrors: this.getFormErrors(),
+        slidersSecundarios: this.slidersSecundariosArray.value
+      });
+    }
+    this.previousInvalidState = this.municipalidadForm ? this.municipalidadForm.invalid : false;
+  }
+  
+  getFormErrors() {
+    const errors: {[key: string]: any} = {};
+    Object.keys(this.municipalidadForm.controls).forEach(key => {
+      const control = this.municipalidadForm.get(key);
+      if (control && control.errors) {
+        errors[key] = control.errors;
+      }
+    });
+    return errors;
+  }
+  
+  logFormState(event: Event) {
+    if (this.municipalidadForm.invalid) {
+      event.preventDefault();
+      console.error('Form is invalid. Details:', {
+        formErrors: this.getFormErrors(),
+        slidersPrincipales: this.slidersPrincipales.length,
+        slidersSecundarios: this.slidersSecundarios.length
+      });
+      
+      // Check if secondary sliders have validation issues
+      const invalidSecondarySliders = this.slidersSecundarios.filter(slider => 
+        !slider.nombre || !slider.orden || (!this.isEditMode && !slider.imagen)
+      );
+      
+      if (invalidSecondarySliders.length > 0) {
+        console.error('Invalid secondary sliders:', invalidSecondarySliders);
+        this.activeTab = 'imagenes';
+        this.error = 'Hay problemas con las imágenes secundarias. Por favor, verifica que todas tengan nombre y orden.';
+      }
     }
   }
   
@@ -648,17 +695,35 @@ export class MunicipalidadFormComponent implements OnInit {
     console.log('Sliders secundarios eliminados:', deletedIds);
   }
   
-  // Eventos de slider
+  // Eventos de slider actualizados
   onSlidersPrincipalesChange(sliders: SliderImage[]) {
     console.log('Cambio en sliders principales:', sliders);
-    // Los sliders ya vienen marcados como principales del componente
-    this.slidersPrincipales = sliders;
+    
+    // Ensure all sliders have required fields
+    this.slidersPrincipales = sliders.map(slider => ({
+      ...slider,
+      es_principal: true,
+      nombre: slider.nombre || '',
+      orden: slider.orden || this.slidersPrincipales.length + 1
+    }));
+    
+    console.log('Updated sliders principales:', this.slidersPrincipales);
   }
   
   onSlidersSecundariosChange(sliders: SliderImage[]) {
-    console.log('Cambio en sliders secundarios:', sliders);
-    // Los sliders ya vienen marcados como secundarios del componente
-    this.slidersSecundarios = sliders;
+    console.log('Original sliders secundarios:', sliders);
+    
+    // Ensure all sliders have required fields
+    this.slidersSecundarios = sliders.map(slider => ({
+      ...slider,
+      es_principal: false,
+      nombre: slider.nombre || '',
+      orden: slider.orden || this.slidersSecundarios.length + 1,
+      titulo: slider.titulo || '',
+      descripcion: slider.descripcion || ''
+    }));
+    
+    console.log('Updated sliders secundarios:', this.slidersSecundarios);
   }
   
   isFieldInvalid(fieldName: string): boolean {
@@ -681,9 +746,18 @@ export class MunicipalidadFormComponent implements OnInit {
     
     const formData = this.municipalidadForm.value;
     
-    // Añadir sliders principales
+    // Añadir sliders principales - Asegurar datos completos
     formData.sliders_principales = this.slidersPrincipales.map(slider => {
       const newSlider = {...slider};
+      
+      // Validar y añadir campos requeridos
+      if (!newSlider.nombre) {
+        newSlider.nombre = 'Slider Principal ' + (slider.orden || 1);
+      }
+      
+      if (!newSlider.orden) {
+        newSlider.orden = this.slidersPrincipales.indexOf(slider) + 1;
+      }
       
       // Solo incluir 'imagen' si es un objeto File
       if (!(newSlider.imagen instanceof File)) {
@@ -696,9 +770,18 @@ export class MunicipalidadFormComponent implements OnInit {
       };
     });
     
-    // Añadir sliders secundarios con título y descripción
+    // Añadir sliders secundarios con título y descripción - Asegurar datos completos
     formData.sliders_secundarios = this.slidersSecundarios.map(slider => {
       const newSlider = {...slider};
+      
+      // Validar y añadir campos requeridos
+      if (!newSlider.nombre) {
+        newSlider.nombre = 'Slider Secundario ' + (slider.orden || 1);
+      }
+      
+      if (!newSlider.orden) {
+        newSlider.orden = this.slidersSecundarios.indexOf(slider) + 1;
+      }
       
       // Solo incluir 'imagen' si es un objeto File
       if (!(newSlider.imagen instanceof File)) {
@@ -725,6 +808,8 @@ export class MunicipalidadFormComponent implements OnInit {
     this.saving = true;
     
     if (this.isEditMode && this.municipalidadId) {
+      // Add logging to verify the method
+      console.log('Updating municipalidad with PUT method');
       // Actualizar municipalidad existente
       this.turismoService.updateMunicipalidad(this.municipalidadId, formData).subscribe({
         next: () => {
@@ -739,7 +824,8 @@ export class MunicipalidadFormComponent implements OnInit {
         }
       });
     } else {
-      // Crear nueva municipalidad
+      // Create new municipalidad
+      console.log('Creating new municipalidad with POST method');
       this.turismoService.createMunicipalidad(formData).subscribe({
         next: () => {
           this.saving = false;

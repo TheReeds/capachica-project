@@ -100,7 +100,7 @@ export interface SliderImage {
                 
                 <!-- Subir archivo -->
                 <div>
-                  <label [for]="'slider-imagen-' + i" class="block text-sm font-medium text-gray-700">Imagen</label>
+                  <label [for]="'slider-imagen-' + i" class="block text-sm font-medium text-gray-700">Imagen (máx. 5MB)</label>
                   <div class="mt-1">
                     <input 
                       [id]="'slider-imagen-' + i" 
@@ -110,6 +110,9 @@ export interface SliderImage {
                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
                     >
                   </div>
+                  @if (fileErrors[i]) {
+                    <p class="mt-1 text-sm text-red-600">{{ fileErrors[i] }}</p>
+                  }
                 </div>
                 
                 @if (!isSliderPrincipal) {
@@ -125,6 +128,9 @@ export interface SliderImage {
                         (input)="onInputChange()"
                       >
                     </div>
+                    @if (!isSliderPrincipal && getSliderFormGroup(i).get('titulo')?.invalid && getSliderFormGroup(i).get('titulo')?.touched) {
+                      <p class="mt-1 text-sm text-red-600">El título es obligatorio para sliders secundarios</p>
+                    }
                   </div>
                   
                   <!-- Descripción (solo para sliders secundarios) -->
@@ -182,6 +188,10 @@ export class SliderUploadComponent implements OnInit {
   private filePreviewUrls: {[index: number]: string | ArrayBuffer | null} = {};
   private fileStore: {[index: number]: File | null} = {}; // Almacén para archivos de imagen
   private deletedSliderIds: number[] = [];
+  fileErrors: {[index: number]: string} = {}; // Para almacenar errores de archivo
+  
+  // Constante para el tamaño máximo de archivo (5MB)
+  private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
   
   constructor(private fb: FormBuilder) {}
   
@@ -195,6 +205,7 @@ export class SliderUploadComponent implements OnInit {
     this.filePreviewUrls = {};
     this.fileStore = {};
     this.deletedSliderIds = [];
+    this.fileErrors = {};
     
     // Añadir sliders existentes al FormArray
     if (this.existingSliders && this.existingSliders.length > 0) {
@@ -205,7 +216,7 @@ export class SliderUploadComponent implements OnInit {
           nombre: [slider.nombre, Validators.required],
           es_principal: [this.isSliderPrincipal], // Siempre fijo basado en el tipo de componente
           orden: [slider.orden, Validators.required],
-          titulo: [slider.titulo || ''],
+          titulo: [slider.titulo || '', this.isSliderPrincipal ? [] : [Validators.required]],
           descripcion: [slider.descripcion || '']
         });
         
@@ -258,6 +269,12 @@ export class SliderUploadComponent implements OnInit {
   addSlider() {
     const index = this.slidersFormArray.length;
     this.slidersFormArray.push(this.createSliderFormGroup());
+    
+    // Initialize the image preview and file storage for this index
+    this.filePreviewUrls[index] = null;
+    this.fileStore[index] = null;
+    
+    console.log(`Added new slider at index ${index}, total: ${this.slidersFormArray.length}`);
     this.emitSlidersChange(); // Emitir cambio al añadir un nuevo slider
   }
   
@@ -271,6 +288,34 @@ export class SliderUploadComponent implements OnInit {
     this.slidersFormArray.removeAt(index);
     delete this.filePreviewUrls[index];
     delete this.fileStore[index];
+    delete this.fileErrors[index];
+    
+    // Reordenar los indices en filePreviewUrls y fileStore
+    const newFilePreviewUrls: {[index: number]: string | ArrayBuffer | null} = {};
+    const newFileStore: {[index: number]: File | null} = {};
+    const newFileErrors: {[index: number]: string} = {};
+    
+    Object.keys(this.filePreviewUrls).forEach((key) => {
+      const numKey = parseInt(key);
+      if (numKey > index) {
+        newFilePreviewUrls[numKey - 1] = this.filePreviewUrls[numKey];
+        newFileStore[numKey - 1] = this.fileStore[numKey];
+        if (this.fileErrors[numKey]) {
+          newFileErrors[numKey - 1] = this.fileErrors[numKey];
+        }
+      } else if (numKey < index) {
+        newFilePreviewUrls[numKey] = this.filePreviewUrls[numKey];
+        newFileStore[numKey] = this.fileStore[numKey];
+        if (this.fileErrors[numKey]) {
+          newFileErrors[numKey] = this.fileErrors[numKey];
+        }
+      }
+    });
+    
+    this.filePreviewUrls = newFilePreviewUrls;
+    this.fileStore = newFileStore;
+    this.fileErrors = newFileErrors;
+    
     this.emitSlidersChange();
   }
   
@@ -278,6 +323,17 @@ export class SliderUploadComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
       const file = input.files[0];
+      
+      // Validar tamaño de archivo (máximo 5MB)
+      if (file.size > this.MAX_FILE_SIZE) {
+        this.fileErrors[index] = `El archivo excede el tamaño máximo de 5MB (Tamaño actual: ${(file.size / (1024 * 1024)).toFixed(2)}MB)`;
+        // Limpiar el input de archivo
+        input.value = '';
+        return;
+      }
+      
+      // Limpiar errores previos si existían
+      delete this.fileErrors[index];
       
       // Guardar el archivo en nuestro almacén
       this.fileStore[index] = file;
@@ -317,9 +373,9 @@ export class SliderUploadComponent implements OnInit {
       
       const slider: SliderImage = {
         id: values.id,
-        nombre: values.nombre,
+        nombre: values.nombre || '',
         es_principal: this.isSliderPrincipal, // Siempre basado en el tipo de componente
-        orden: values.orden,
+        orden: values.orden || index + 1,
         // Solo incluir imagen si hay un archivo nuevo o URL existente
         ...(imagen ? { imagen } : {}),
         url_completa: typeof this.filePreviewUrls[index] === 'string' ? this.filePreviewUrls[index] as string : undefined
@@ -330,16 +386,34 @@ export class SliderUploadComponent implements OnInit {
         // Obtener directamente los valores del formulario
         slider.titulo = formGroup.get('titulo')?.value || '';
         slider.descripcion = formGroup.get('descripcion')?.value || '';
-        
-        // Asegurarnos de que el título tenga un valor válido (requerido)
-        if (!slider.titulo) {
-          console.warn('Slider secundario sin título:', index);
-        }
       }
       
       return slider;
     });
     
     this.changeSlidersEvent.emit(sliders);
+  }
+  
+  // Método para validar si hay errores de archivo
+  hasFileErrors(): boolean {
+    return Object.keys(this.fileErrors).length > 0;
+  }
+  
+  // Método para verificar si todos los sliders son válidos
+  areAllSlidersValid(): boolean {
+    // Verificar si hay errores de archivo
+    if (this.hasFileErrors()) {
+      return false;
+    }
+    
+    // Verificar si todos los grupos de formularios son válidos
+    for (let i = 0; i < this.slidersFormArray.length; i++) {
+      const formGroup = this.getSliderFormGroup(i);
+      if (formGroup.invalid) {
+        return false;
+      }
+    }
+    
+    return true;
   }
 }
