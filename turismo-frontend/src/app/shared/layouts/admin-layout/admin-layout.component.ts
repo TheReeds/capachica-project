@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal, computed, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { User } from '../../../core/models/user.model';
 
 @Component({
