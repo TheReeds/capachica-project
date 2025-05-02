@@ -25,7 +25,7 @@ export class EmprendedorService {
   }
 
   // Obtener todos los emprendedores
-  getAllEmprendedores(): Observable<Emprendedor[]> {
+  /*getAllEmprendedores(): Observable<Emprendedor[]> {
     return this.http.get<any>(`${this.API_URL}/emprendedores`)
       .pipe(
         tap(response => {
@@ -44,7 +44,7 @@ export class EmprendedorService {
           return of([]);
         })
       );
-  }
+  }*/
 
   // Obtener un emprendedor único (como objeto)
   getEmprendedores(): Observable<Emprendedor[]> {
@@ -95,7 +95,7 @@ export class EmprendedorService {
   }
 
   // Obtener un emprendedor por ID
-  getEmprendedorById(id: number): Observable<Emprendedor | null> {
+  /*getEmprendedorById(id: number): Observable<Emprendedor | null> {
     return this.http.get<any>(`${this.API_URL}/emprendedores/${id}`)
       .pipe(
         catchError(error => {
@@ -109,5 +109,5 @@ export class EmprendedorService {
           return of(null);
         })
       );
-  }
+  }*/
 }
