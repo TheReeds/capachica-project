@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminService, PaginatedResponse } from '../../../../core/services/admin.service';
 import { User } from '../../../../core/models/user.model';
 import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/admin-layout.component';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-user-list',
@@ -14,11 +15,11 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
   template: `
       <div class="space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 class="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Usuarios</h1>
           <div class="mt-4 sm:mt-0">
             <a 
               routerLink="/admin/users/create" 
-              class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
             >
               <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -29,28 +30,28 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
         </div>
         
         <!-- Filtros -->
-        <div class="rounded-lg bg-white p-6 shadow-sm">
+        <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors duration-200">
           <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div>
-              <label for="search" class="block text-sm font-medium text-gray-700">Buscar</label>
+              <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
               <div class="mt-1">
                 <input 
                   type="text" 
                   id="search" 
                   [(ngModel)]="filters.search" 
                   placeholder="Nombre o email" 
-                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                  class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
                 >
               </div>
             </div>
             
             <div>
-              <label for="active" class="block text-sm font-medium text-gray-700">Estado</label>
+              <label for="active" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
               <div class="mt-1">
                 <select 
                   id="active" 
                   [(ngModel)]="filters.active" 
-                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                  class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
                 >
                   <option [ngValue]="undefined">Todos</option>
                   <option [ngValue]="true">Activos</option>
@@ -60,12 +61,12 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
             </div>
             
             <div>
-              <label for="role" class="block text-sm font-medium text-gray-700">Rol</label>
+              <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rol</label>
               <div class="mt-1">
                 <select 
                   id="role" 
                   [(ngModel)]="filters.role" 
-                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                  class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
                 >
                   <option value="">Todos</option>
                   @for (role of roles; track role.id) {
@@ -79,7 +80,7 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
               <button 
                 type="button" 
                 (click)="applyFilters()" 
-                class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
               >
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
@@ -91,21 +92,21 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
         </div>
         
         <!-- Tabla de usuarios -->
-        <div class="rounded-lg bg-white shadow-sm overflow-hidden">
+        <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors duration-200">
           @if (loading) {
             <div class="flex justify-center items-center p-8">
-              <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
-              <span class="ml-4">Cargando usuarios...</span>
+              <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 dark:border-primary-600 border-r-transparent"></div>
+              <span class="ml-4 text-gray-900 dark:text-gray-200">Cargando usuarios...</span>
             </div>
           } @else if (users.length === 0) {
             <div class="p-8 text-center">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
               </svg>
-              <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron usuarios</h3>
-              <p class="mt-1 text-sm text-gray-500">Comienza creando un nuevo usuario.</p>
+              <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No se encontraron usuarios</h3>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Comienza creando un nuevo usuario.</p>
               <div class="mt-6">
-                <a routerLink="/admin/users/create" class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+                <a routerLink="/admin/users/create" class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200">
                   <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                   </svg>
@@ -115,57 +116,57 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
             </div>
           } @else {
             <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
+                <thead class="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Usuario</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Teléfono</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Roles</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   @for (user of users; track user.id) {
-                    <tr>
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
                       <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                          <div class="h-10 w-10 flex-shrink-0 rounded-full bg-primary-100 flex items-center justify-center">
-                            <span class="text-primary-800 font-medium">{{ getUserInitials(user) }}</span>
+                          <div class="h-10 w-10 flex-shrink-0 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
+                            <span class="text-primary-800 dark:text-primary-300 font-medium">{{ getUserInitials(user) }}</span>
                           </div>
                           <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-                            <div class="text-sm text-gray-500">{{ user.first_name }} {{ user.last_name }}</div>
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ user.name }}</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.first_name }} {{ user.last_name }}</div>
                           </div>
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {{ user.email }}
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {{ user.phone }}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex flex-wrap gap-1">
                           @if (user.roles?.length) {
                             @for (role of user.roles; track role.id) {
-                              <span class="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                              <span class="inline-flex rounded-full bg-blue-100 dark:bg-blue-900/40 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300 transition-colors duration-200">
                                 {{ role.name }}
                               </span>
                             }
                           } @else {
-                            <span class="text-xs text-gray-500">Sin roles</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Sin roles</span>
                           }
                         </div>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         @if (user.active) {
-                          <span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                          <span class="inline-flex rounded-full bg-green-100 dark:bg-green-900/40 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-300 transition-colors duration-200">
                             Activo
                           </span>
                         } @else {
-                          <span class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                          <span class="inline-flex rounded-full bg-red-100 dark:bg-red-900/40 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:text-red-300 transition-colors duration-200">
                             Inactivo
                           </span>
                         }
@@ -175,7 +176,7 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
                           @if (user.active) {
                             <button 
                               (click)="deactivateUser(user)" 
-                              class="text-red-600 hover:text-red-900"
+                              class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors duration-200"
                               title="Desactivar"
                             >
                               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,7 +186,7 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
                           } @else {
                             <button 
                               (click)="activateUser(user)" 
-                              class="text-green-600 hover:text-green-900"
+                              class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 transition-colors duration-200"
                               title="Activar"
                             >
                               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +197,7 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
                           
                           <a 
                             [routerLink]="['/admin/users/edit', user.id]" 
-                            class="text-primary-600 hover:text-primary-900"
+                            class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
                             title="Editar"
                           >
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +207,7 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
                           
                           <a 
                             [routerLink]="['/admin/users', user.id, 'permissions']" 
-                            class="text-primary-600 hover:text-primary-900"
+                            class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
                             title="Permisos"
                           >
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +217,7 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
                           
                           <button 
                             (click)="deleteUser(user)" 
-                            class="text-red-600 hover:text-red-900"
+                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors duration-200"
                             title="Eliminar"
                           >
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,10 +234,10 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
             
             <!-- Paginación -->
             @if (pagination) {
-              <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 sm:px-6">
                 <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
-                    <p class="text-sm text-gray-700">
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
                       Mostrando <span class="font-medium">{{ pagination.from || 0 }}</span> a <span class="font-medium">{{ pagination.to || 0 }}</span> de <span class="font-medium">{{ pagination.total }}</span> resultados
                     </p>
                   </div>
@@ -245,7 +246,7 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
                       <button
                         (click)="goToPage(currentPage - 1)"
                         [disabled]="!pagination.prev_page_url"
-                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-650 transition-colors duration-200"
                         [class.opacity-50]="!pagination.prev_page_url"
                         [class.cursor-not-allowed]="!pagination.prev_page_url"
                       >
@@ -259,22 +260,27 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
                         @if (link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;') {
                           <button
                             (click)="goToPage(+link.label)"
-                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium"
-                            [class.bg-primary-50]="link.active"
-                            [class.text-primary-600]="link.active"
-                            [class.text-gray-700]="!link.active"
-                            [class.hover:bg-gray-50]="!link.active"
+                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium transition-colors duration-200"
+                            [class.bg-primary-50]="link.active && !isDarkMode()"
+                            [ngClass]="{'bg-primary-50': link.active && !isDarkMode(),'dark:bg-primary-900/40': link.active && isDarkMode()}"
+                            [class.text-primary-600]="link.active && !isDarkMode()"
+                            [class.dark:text-primary-300]="link.active && isDarkMode()"
+                            [class.text-gray-700]="!link.active && !isDarkMode()"
+                            [class.dark:text-gray-300]="!link.active && isDarkMode()"
+                            [class.hover:bg-gray-50]="!link.active && !isDarkMode()"
+                            [class.dark:hover:bg-gray-650]="!link.active && isDarkMode()"
                             [disabled]="link.active"
                           >
                             {{ link.label }}
                           </button>
                         }
                       }
+
                       
                       <button
                         (click)="goToPage(currentPage + 1)"
                         [disabled]="!pagination.next_page_url"
-                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-650 transition-colors duration-200"
                         [class.opacity-50]="!pagination.next_page_url"
                         [class.cursor-not-allowed]="!pagination.next_page_url"
                       >
@@ -295,6 +301,7 @@ import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/ad
 })
 export class UserListComponent implements OnInit {
   private adminService = inject(AdminService);
+  private themeService = inject(ThemeService);
   
   users: User[] = [];
   roles: any[] = [];
@@ -431,5 +438,10 @@ export class UserListComponent implements OnInit {
         }
       });
     }
+  }
+  
+  // Helper method to check if dark mode is active
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 }

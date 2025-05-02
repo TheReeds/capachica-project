@@ -9,13 +9,13 @@ import { GastronomiaComponent } from './servicio/gastronomia/gastronomia.compone
 import { ArteytextiComponent } from './servicio/arteytexti/arteytexti.component';
 import { AlojamientoComponent } from './servicio/alojamiento/alojamiento.component';
 import { ActividadesComponent } from './servicio/actividades/actividades.component';
-import { GeneralLayoutComponent } from '../shared/layouts/general-layout/general-layout.component';
+import { GeneralHeaderComponent } from '../shared/components/header/general-header.component';
 
 
 export const PAGEGENERAL_ROUTES: Routes = [
   {
     path: '',
-    component: GeneralLayoutComponent,
+    component: GeneralHeaderComponent,
     children: [
     {
       path: 'home',

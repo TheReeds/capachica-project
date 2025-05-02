@@ -1,16 +1,166 @@
-.swiper-button-next,
-    .swiper-button-prev {
-      background-color: rgba(255, 255, 255, 0.5);
-      border-radius: 50%;
-    }
+/* home.component.css */
 
-    .swiper-pagination-bullet {
-      background-color: #ffffff;
-    }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-    .swiper-pagination-bullet-active {
-      background-color: #ff5733;
-    }
+::-webkit-scrollbar-track {
+  background: rgba(243, 244, 246, 0.1);
+}
 
+::-webkit-scrollbar-thumb {
+  background: #f59e0b;
+  border-radius: 4px;
+}
 
-    
+.dark ::-webkit-scrollbar-thumb {
+  background: #b45309;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #92400e;
+}
+
+/* Hero section */
+.swiper-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.swiper-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Smooth animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Custom transform hover states */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+/* Better backdrop filter support for browsers */
+@supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+  .backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Gradient overlays */
+.overlay-dark {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+}
+
+.dark .overlay-dark {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8));
+}
+
+/* Fade effect for swiper */
+.swiper-fade .swiper-slide {
+  transition-property: opacity;
+}
+
+.swiper-fade .swiper-slide:not(.swiper-slide-active) {
+  opacity: 0 !important;
+}
+
+/* Modal animation */
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.modal-exit {
+  opacity: 1;
+}
+
+.modal-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Testimonial cards */
+.testimonial-card {
+  transition: all 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Star ratings */
+.star-rating {
+  color: #f59e0b;
+}
+
+.dark .star-rating {
+  color: #fbbf24;
+}
+
+/* Image hover effects */
+.img-hover-zoom {
+  overflow: hidden;
+}
+
+.img-hover-zoom img {
+  transition: transform 0.5s ease;
+}
+
+.img-hover-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* Custom grid layout for responsive design */
+@media (min-width: 768px) {
+  .md-grid-2-3 {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 2rem;
+  }
+}
+
+/* Smooth transition for theme switching */
+.transition-theme {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Fix for iframe in dark mode */
+.dark iframe {
+  filter: invert(0.85) hue-rotate(180deg);
+}

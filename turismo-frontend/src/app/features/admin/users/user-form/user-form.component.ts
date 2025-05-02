@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AdminService } from '../../../../core/services/admin.service';
 import { AdminLayoutComponent } from '../../../../shared/layouts/admin-layout/admin-layout.component';
 import { Role, User } from '../../../../core/models/user.model';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-user-form',
@@ -13,13 +14,13 @@ import { Role, User } from '../../../../core/models/user.model';
   template: `
       <div class="space-y-6">
         <div class="sm:flex sm:items-center sm:justify-between">
-          <h1 class="text-2xl font-bold text-gray-900">{{ isEditMode ? 'Editar Usuario' : 'Crear Usuario' }}</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ isEditMode ? 'Editar Usuario' : 'Crear Usuario' }}</h1>
           <div class="mt-4 sm:mt-0">
             <a 
               routerLink="/admin/users" 
-              class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              class="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
             >
-              <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
               Volver al listado
@@ -27,79 +28,79 @@ import { Role, User } from '../../../../core/models/user.model';
           </div>
         </div>
         
-        <div class="bg-white shadow-sm rounded-lg">
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg transition-colors duration-200">
           @if (loading) {
             <div class="flex justify-center items-center p-8">
-              <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
-              <span class="ml-4">Cargando...</span>
+              <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 dark:border-primary-600 border-r-transparent"></div>
+              <span class="ml-4 text-gray-700 dark:text-gray-300">Cargando...</span>
             </div>
           } @else {
             <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-6 p-6">
               <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <!-- Nombre completo -->
                 <div class="sm:col-span-6">
-                  <label for="name" class="block text-sm font-medium text-gray-700">Nombre completo</label>
+                  <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre completo</label>
                   <div class="mt-1">
                     <input 
                       type="text" 
                       id="name" 
                       formControlName="name" 
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm" 
-                      [ngClass]="{'border-red-300': isFieldInvalid('name')}"
+                      class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200" 
+                      [ngClass]="{'border-red-300 dark:border-red-600': isFieldInvalid('name')}"
                     />
                     @if (isFieldInvalid('name')) {
-                      <p class="mt-2 text-sm text-red-600">El nombre completo es requerido</p>
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400">El nombre completo es requerido</p>
                     }
                   </div>
                 </div>
                 
                 <!-- Nombre -->
                 <div class="sm:col-span-3">
-                  <label for="first_name" class="block text-sm font-medium text-gray-700">Nombre</label>
+                  <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
                   <div class="mt-1">
                     <input 
                       type="text" 
                       id="first_name" 
                       formControlName="first_name" 
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm" 
-                      [ngClass]="{'border-red-300': isFieldInvalid('first_name')}"
+                      class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200" 
+                      [ngClass]="{'border-red-300 dark:border-red-600': isFieldInvalid('first_name')}"
                     />
                     @if (isFieldInvalid('first_name')) {
-                      <p class="mt-2 text-sm text-red-600">El nombre es requerido</p>
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400">El nombre es requerido</p>
                     }
                   </div>
                 </div>
                 
                 <!-- Apellido -->
                 <div class="sm:col-span-3">
-                  <label for="last_name" class="block text-sm font-medium text-gray-700">Apellido</label>
+                  <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Apellido</label>
                   <div class="mt-1">
                     <input 
                       type="text" 
                       id="last_name" 
                       formControlName="last_name" 
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm" 
-                      [ngClass]="{'border-red-300': isFieldInvalid('last_name')}"
+                      class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"  
+                      [ngClass]="{'border-red-300 dark:border-red-600': isFieldInvalid('last_name')}"
                     />
                     @if (isFieldInvalid('last_name')) {
-                      <p class="mt-2 text-sm text-red-600">El apellido es requerido</p>
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400">El apellido es requerido</p>
                     }
                   </div>
                 </div>
                 
                 <!-- Email -->
                 <div class="sm:col-span-3">
-                  <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+                  <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Correo electrónico</label>
                   <div class="mt-1">
                     <input 
                       type="email" 
                       id="email" 
                       formControlName="email" 
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm" 
-                      [ngClass]="{'border-red-300': isFieldInvalid('email')}"
+                      class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"  
+                      [ngClass]="{'border-red-300 dark:border-red-600': isFieldInvalid('email')}"
                     />
                     @if (isFieldInvalid('email')) {
-                      <p class="mt-2 text-sm text-red-600">
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400">
                         @if (userForm.get('email')?.errors?.['required']) {
                           El correo electrónico es requerido
                         } @else if (userForm.get('email')?.errors?.['email']) {
@@ -112,34 +113,34 @@ import { Role, User } from '../../../../core/models/user.model';
                 
                 <!-- Teléfono -->
                 <div class="sm:col-span-3">
-                  <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono</label>
+                  <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
                   <div class="mt-1">
                     <input 
                       type="tel" 
                       id="phone" 
                       formControlName="phone" 
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm" 
-                      [ngClass]="{'border-red-300': isFieldInvalid('phone')}"
+                      class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"  
+                      [ngClass]="{'border-red-300 dark:border-red-600': isFieldInvalid('phone')}"
                     />
                     @if (isFieldInvalid('phone')) {
-                      <p class="mt-2 text-sm text-red-600">El teléfono es requerido</p>
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400">El teléfono es requerido</p>
                     }
                   </div>
                 </div>
                 
                 <!-- Contraseña -->
                 <div class="sm:col-span-3">
-                  <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                  <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
                   <div class="mt-1">
                     <input 
                       type="password" 
                       id="password" 
                       formControlName="password" 
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm" 
-                      [ngClass]="{'border-red-300': isFieldInvalid('password')}"
+                      class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"  
+                      [ngClass]="{'border-red-300 dark:border-red-600': isFieldInvalid('password')}"
                     />
                     @if (isFieldInvalid('password')) {
-                      <p class="mt-2 text-sm text-red-600">
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400">
                         @if (userForm.get('password')?.errors?.['required']) {
                           La contraseña es requerida
                         } @else if (userForm.get('password')?.errors?.['minlength']) {
@@ -148,24 +149,24 @@ import { Role, User } from '../../../../core/models/user.model';
                       </p>
                     }
                     @if (isEditMode) {
-                      <p class="mt-2 text-sm text-gray-500">Dejar en blanco para mantener la contraseña actual</p>
+                      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Dejar en blanco para mantener la contraseña actual</p>
                     }
                   </div>
                 </div>
                 
                 <!-- Confirmar Contraseña -->
                 <div class="sm:col-span-3">
-                  <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
+                  <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar contraseña</label>
                   <div class="mt-1">
                     <input 
                       type="password" 
                       id="password_confirmation" 
                       formControlName="password_confirmation" 
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm" 
-                      [ngClass]="{'border-red-300': isFieldInvalid('password_confirmation')}"
+                      class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"  
+                      [ngClass]="{'border-red-300 dark:border-red-600': isFieldInvalid('password_confirmation')}"
                     />
                     @if (isFieldInvalid('password_confirmation')) {
-                      <p class="mt-2 text-sm text-red-600">
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400">
                         @if (userForm.get('password_confirmation')?.errors?.['required']) {
                           La confirmación de contraseña es requerida
                         } @else if (userForm.get('password_confirmation')?.errors?.['mustMatch']) {
@@ -178,12 +179,12 @@ import { Role, User } from '../../../../core/models/user.model';
                 
                 <!-- Estado -->
                 <div class="sm:col-span-3">
-                  <label for="active" class="block text-sm font-medium text-gray-700">Estado</label>
+                  <label for="active" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
                   <div class="mt-1">
                     <select 
                       id="active" 
                       formControlName="active" 
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                      class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200" 
                     >
                       <option [ngValue]="true">Activo</option>
                       <option [ngValue]="false">Inactivo</option>
@@ -193,7 +194,7 @@ import { Role, User } from '../../../../core/models/user.model';
                 
                 <!-- Roles -->
                 <div class="sm:col-span-6">
-                  <label class="block text-sm font-medium text-gray-700">Roles</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Roles</label>
                   <div class="mt-2 space-y-2">
                     @for (role of availableRoles; track role.id) {
                       <div class="flex items-center">
@@ -203,25 +204,25 @@ import { Role, User } from '../../../../core/models/user.model';
                           [value]="role.name" 
                           (change)="onRoleChange($event)" 
                           [checked]="isRoleSelected(role.name)"
-                          class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                          class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200" 
                         />
-                        <label [for]="'role-' + role.id" class="ml-2 block text-sm font-medium text-gray-700">
+                        <label [for]="'role-' + role.id" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                           {{ role.name }}
                         </label>
                       </div>
                     }
                   </div>
                   @if (userForm.get('roles')?.value.length === 0 && submitted) {
-                    <p class="mt-2 text-sm text-red-600">Seleccione al menos un rol</p>
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">Seleccione al menos un rol</p>
                   }
                 </div>
               </div>
               
               @if (error) {
-                <div class="rounded-md bg-red-50 p-4">
+                <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4 transition-colors duration-200">
                   <div class="flex">
                     <div class="ml-3">
-                      <h3 class="text-sm font-medium text-red-800">{{ error }}</h3>
+                      <h3 class="text-sm font-medium text-red-800 dark:text-red-300">{{ error }}</h3>
                     </div>
                   </div>
                 </div>
@@ -231,14 +232,14 @@ import { Role, User } from '../../../../core/models/user.model';
                 <button 
                   type="button"
                   routerLink="/admin/users"
-                  class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                  class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:ring-offset-2 transition-colors duration-200"
                 >
                   Cancelar
                 </button>
                 
                 <button 
                   type="submit" 
-                  class="inline-flex justify-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                  class="inline-flex justify-center rounded-md border border-transparent bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:ring-offset-2 transition-colors duration-200"
                   [disabled]="saving"
                 >
                   @if (saving) {
@@ -263,6 +264,7 @@ export class UserFormComponent implements OnInit {
   private adminService = inject(AdminService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private themeService = inject(ThemeService);
   
   userForm!: FormGroup;
   availableRoles: Role[] = [];
@@ -510,5 +512,4 @@ export class UserFormComponent implements OnInit {
       }
     });
   }
-  
 }
