@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -35,6 +35,12 @@ export class LoginComponent implements OnInit {
   rememberMe = false;
   emailVerificationNeeded = false;
 
+  // Para mostrar/ocultar contraseña
+  showPassword = false;
+
+  // Variable para evitar redirección en el primer clic
+  private isFirstClick = true;
+
   constructor() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -67,6 +73,11 @@ export class LoginComponent implements OnInit {
 
   get f() { 
     return this.loginForm.controls; 
+  }
+  
+  // Método para mostrar/ocultar contraseña
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit() {
@@ -120,5 +131,34 @@ export class LoginComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  // Añadir método para detectar clics fuera del modal
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // Ignorar el primer clic (el que abre el componente)
+    if (this.isFirstClick) {
+      this.isFirstClick = false;
+      return;
+    }
+    
+    // Obtener el elemento principal del modal (la tarjeta blanca)
+    const modalCard = document.querySelector('.mx-auto.w-full.max-w-6xl.overflow-hidden.rounded-2xl');
+    
+    // Si no encontramos el modal, no hacemos nada
+    if (!modalCard) return;
+    
+    // Verificar si el clic fue dentro del modal
+    const clickedInside = modalCard.contains(event.target as Node);
+    
+    // Si el clic fue fuera del modal, redirigir a la página inicial
+    if (!clickedInside) {
+      this.router.navigate(['/']);
+    }
+  }
+
+  // Prevenir que los clics dentro del modal se propaguen al documento
+  preventPropagation(event: MouseEvent) {
+    event.stopPropagation();
   }
 }
