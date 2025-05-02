@@ -63,7 +63,11 @@ class VerifyEmail extends Mailable implements ShouldQueue
         // Extraer el token y la firma
         $queryParams = parse_url($verificationUrl, PHP_URL_QUERY);
         
-        // Construye la URL del frontend
-        return config('app.frontend_url') . '/verify-email?' . $queryParams;
+        // Extraer id y hash de los parámetros de la ruta
+        $id = $user->getKey();
+        $hash = sha1($user->getEmailForVerification());
+        
+        // Construye la URL del frontend incluyendo todos los parámetros necesarios
+        return $frontendUrl . '/verify-email?' . $queryParams . '&id=' . $id . '&hash=' . $hash;
     }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { finalize } from 'rxjs';
+import { environment } from '../../../../environments/environments';
 
 @Component({
   selector: 'app-verify-email',
@@ -19,7 +20,7 @@ import { finalize } from 'rxjs';
         </div>
         
         <!-- Estado de carga -->
-        <div *ngIf="verifying" class="flex justify-center">
+        <div *ngIf="verifying" class="flex flex-col items-center justify-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
           <p class="mt-4 text-lg text-gray-600">Verificando tu correo electrónico...</p>
         </div>
@@ -102,6 +103,8 @@ export class VerifyEmailComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       const id = params['id'];
       const hash = params['hash'];
+      const expires = params['expires'];
+      const signature = params['signature'];
       
       if (!id || !hash) {
         this.verifying = false;
@@ -110,7 +113,13 @@ export class VerifyEmailComponent implements OnInit {
         return;
       }
       
-      this.verifyEmail(Number(id), hash);
+      // Si tenemos expires y signature, usamos la URL completa
+      if (expires && signature) {
+        this.verifyEmailWithFullUrl(id, hash, expires, signature);
+      } else {
+        // Caso de llamada directa a la API
+        this.verifyEmail(Number(id), hash);
+      }
     });
   }
 
@@ -130,6 +139,30 @@ export class VerifyEmailComponent implements OnInit {
         error: (error) => {
           this.success = false;
           this.errorMessage = error.error?.message || 'Error al verificar el correo electrónico.';
+        }
+      });
+  }
+  
+  verifyEmailWithFullUrl(id: number, hash: string, expires: string, signature: string): void {
+    // Construir la URL completa para la verificación
+    const verificationUrl = `${environment.apiUrl}/email/verify/${id}/${hash}?expires=${expires}&signature=${signature}`;
+    
+    this.authService.verifyEmailWithFullUrl(verificationUrl)
+      .pipe(
+        finalize(() => this.verifying = false)
+      )
+      .subscribe({
+        next: () => {
+          this.success = true;
+          // Si el usuario está autenticado, actualizar su estado de verificación
+          if (this.authService.isLoggedIn()) {
+            this.authService.loadUserProfile(true).subscribe();
+          }
+        },
+        error: (error) => {
+          this.success = false;
+          this.errorMessage = error.error?.message || 'Error al verificar el correo electrónico.';
+          console.error('Error de verificación:', error);
         }
       });
   }

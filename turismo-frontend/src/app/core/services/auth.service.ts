@@ -417,6 +417,11 @@ export class AuthService {
     return throwError(() => error);
   }
   
+  /**
+ * Verify email with a complete URL
+ * @param url Full verification URL
+ * @returns Observable<any>
+ */
   verifyEmailWithFullUrl(url: string): Observable<any> {
     return this.http.get<ApiResponse<any>>(url, {
       headers: {
@@ -425,8 +430,12 @@ export class AuthService {
     }).pipe(
       tap(() => {
         this._emailVerified.set(true);
+        console.log('Email verification successful, updating state');
       }),
-      catchError(error => this.handleError(error))
+      catchError(error => {
+        console.error('Error in email verification:', error);
+        return this.handleError(error);
+      })
     );
   }
   
