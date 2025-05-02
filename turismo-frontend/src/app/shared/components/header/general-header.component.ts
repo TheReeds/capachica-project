@@ -24,7 +24,7 @@ import { ThemeService } from '../../../core/services/theme.service';
             <!-- Logo y título -->
             <div class="flex items-center">
               <a routerLink="/home" class="flex items-center">
-                <img src="img/logo.png" alt="Logo Capachica" class="h-16 w-auto mr-3">
+                <img src="/assets/general/logo.png" alt="Logo Capachica" class="h-16 w-auto mr-3">
                 <div class="flex flex-col">
                   <h1 class="text-xl font-bold text-amber-800 dark:text-amber-400 transition-colors duration-200">Emprendedores</h1>
                   <h2 class="text-lg font-semibold text-amber-700 dark:text-amber-500 transition-colors duration-200">Capachica</h2>

@@ -40,27 +40,7 @@
   object-fit: cover;
 }
 
-/* Smooth animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-in-up {
-  animation: fadeInUp 0.8s ease-out forwards;
-}
-
 /* Custom transform hover states */
-.hover\:scale-102:hover {
-  transform: scale(1.02);
-}
-
 .hover\:scale-105:hover {
   transform: scale(1.05);
 }
@@ -91,35 +71,29 @@
   opacity: 0 !important;
 }
 
-/* Modal animation */
-.modal-enter {
-  opacity: 0;
-  transform: scale(0.95);
+/* Custom styling for buttons in swiper */
+.swiper-button-next,
+.swiper-button-prev {
+  color: white !important;
+  width: 16px !important;
+  height: 16px !important;
 }
 
-.modal-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 300ms, transform 300ms;
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 20px !important;
 }
 
-.modal-exit {
-  opacity: 1;
+.swiper-pagination-bullet {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  width: 10px !important;
+  height: 10px !important;
+  opacity: 0.7 !important;
 }
 
-.modal-exit-active {
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity 300ms, transform 300ms;
-}
-
-/* Testimonial cards */
-.testimonial-card {
-  transition: all 0.3s ease;
-}
-
-.testimonial-card:hover {
-  transform: translateY(-5px);
+.swiper-pagination-bullet-active {
+  background-color: #f59e0b !important;
+  opacity: 1 !important;
 }
 
 /* Star ratings */
@@ -144,23 +118,25 @@
   transform: scale(1.05);
 }
 
-/* Custom grid layout for responsive design */
-@media (min-width: 768px) {
-  .md-grid-2-3 {
-    display: grid;
-    grid-template-columns: 2fr 3fr;
-    gap: 2rem;
-  }
-}
-
-/* Smooth transition for theme switching */
-.transition-theme {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-}
-
 /* Fix for iframe in dark mode */
 .dark iframe {
   filter: invert(0.85) hue-rotate(180deg);
+}
+
+/* Smoother transitions for elements */
+.transition-theme {
+  transition-property: color, background-color, border-color;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure appropriate spacing for transparent header */
+.header-spacing {
+  padding-top: 4rem;
+}
+
+@media (min-width: 768px) {
+  .header-spacing {
+    padding-top: 5rem;
+  }
 }

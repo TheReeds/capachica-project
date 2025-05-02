@@ -1,43 +1,28 @@
 // home.component.ts
-import { Component, OnInit, inject, ViewEncapsulation, PLATFORM_ID, Inject } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, OnInit, inject, ViewEncapsulation, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeService } from './home.service';
 import { Home, HomeDTO, Reserva, ReservaDTO, Municipalidad } from './home.model';
 import { PaginatedResponse } from '../../core/services/admin.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { Router } from '@angular/router';
-import { trigger, transition, style, animate } from '@angular/animations';
+
+declare var Swiper: any;
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, SwiperModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  encapsulation: ViewEncapsulation.None,
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('600ms ease-in', style({ opacity: 1 })),
-      ]),
-    ]),
-    trigger('slideIn', [
-      transition(':enter', [
-        style({ transform: 'translateY(30px)', opacity: 0 }),
-        animate('600ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
-      ]),
-    ]),
-  ],
+  encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   private homeService = inject(HomeService);
   private themeService = inject(ThemeService);
   private router = inject(Router);
   
-  @Inject(PLATFORM_ID) private platformId: Object;
-
   homes: Home[] = [];
   reservas: Reserva[] = [];
   municipalidad: Municipalidad | null = null;
@@ -58,13 +43,13 @@ export class HomeComponent implements OnInit {
     this.loadReservas();
     this.loadMunicipalidad();
     this.loadCategorias();
-    
-    // Initialize Swiper after content is loaded
-    if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => {
-        this.initSwiper();
-      }, 500);
-    }
+  }
+
+  ngAfterViewInit() {
+    // Initialize Swiper after view is initialized
+    setTimeout(() => {
+      this.initSwiper();
+    }, 500);
   }
 
   loadEmprendedores(page: number = 1) {
@@ -122,9 +107,7 @@ export class HomeComponent implements OnInit {
         this.selectedEmprendedor = data;
         
         // Prevent body scrolling when modal is open
-        if (isPlatformBrowser(this.platformId)) {
-          document.body.style.overflow = 'hidden';
-        }
+        document.body.style.overflow = 'hidden';
       },
       error: (error) => {
         console.error('Error al cargar detalles del emprendedor:', error);
@@ -136,9 +119,7 @@ export class HomeComponent implements OnInit {
     this.selectedEmprendedor = null;
     
     // Restore body scrolling when modal is closed
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = '';
   }
 
   searchEmprendedores() {
@@ -150,11 +131,9 @@ export class HomeComponent implements OnInit {
   }
   
   closeDropdown(event: MouseEvent) {
-    if (isPlatformBrowser(this.platformId)) {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.dropdown-container')) {
-        this.isDropdownOpen = false;
-      }
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-container')) {
+      this.isDropdownOpen = false;
     }
   }
   
@@ -163,9 +142,9 @@ export class HomeComponent implements OnInit {
   }
 
   initSwiper() {
-    if (isPlatformBrowser(this.platformId) && !this.swiperInitialized) {
-      // Check if Swiper is loaded
-      if (typeof Swiper !== 'undefined') {
+    // Check if Swiper is loaded as a global variable
+    if (typeof Swiper !== 'undefined' && !this.swiperInitialized) {
+      try {
         const swiper = new Swiper('.swiper-container', {
           loop: true,
           autoplay: {
@@ -187,10 +166,12 @@ export class HomeComponent implements OnInit {
           speed: 1000,
         });
         this.swiperInitialized = true;
-      } else {
-        console.warn('Swiper not loaded yet, retrying in 500ms');
-        setTimeout(() => this.initSwiper(), 500);
+        console.log('Swiper initialized successfully');
+      } catch (error) {
+        console.error('Error initializing Swiper:', error);
       }
+    } else {
+      console.warn('Swiper not loaded yet or already initialized');
     }
   }
   
