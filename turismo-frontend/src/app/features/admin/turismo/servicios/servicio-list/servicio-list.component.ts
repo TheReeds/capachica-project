@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } from '../../../../../core/services/turismo.service';
+import { ThemeService } from '../../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-servicio-list',
@@ -11,11 +12,11 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
   template: `
     <div class="space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-2xl font-bold text-gray-900">Gestión de Servicios</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Servicios</h1>
         <div class="mt-4 sm:mt-0">
           <a 
             routerLink="/admin/servicios/create" 
-            class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
           >
             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -26,28 +27,28 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
       </div>
       
       <!-- Filtros -->
-      <div class="rounded-lg bg-white p-6 shadow-sm">
+      <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors duration-200">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
-            <label for="search" class="block text-sm font-medium text-gray-700">Buscar</label>
+            <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
             <div class="mt-1">
               <input 
                 type="text" 
                 id="search" 
                 [(ngModel)]="searchTerm" 
                 placeholder="Nombre o descripción" 
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
             </div>
           </div>
           
           <div>
-            <label for="emprendedor" class="block text-sm font-medium text-gray-700">Emprendedor</label>
+            <label for="emprendedor" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Emprendedor</label>
             <div class="mt-1">
               <select 
                 id="emprendedor" 
                 [(ngModel)]="selectedEmprendedorId" 
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todos</option>
                 @for (emprendedor of emprendedores; track emprendedor.id) {
@@ -58,12 +59,12 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
           </div>
           
           <div>
-            <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
+            <label for="categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
             <div class="mt-1">
               <select 
                 id="categoria" 
                 [(ngModel)]="selectedCategoriaId" 
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todas</option>
                 @for (categoria of categorias; track categoria.id) {
@@ -74,12 +75,12 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
           </div>
           
           <div>
-            <label for="estado" class="block text-sm font-medium text-gray-700">Estado</label>
+            <label for="estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
             <div class="mt-1">
               <select 
                 id="estado" 
                 [(ngModel)]="selectedEstado" 
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todos</option>
                 <option [ngValue]="true">Activos</option>
@@ -92,7 +93,7 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
             <button 
               type="button" 
               (click)="applyFilters()" 
-              class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
             >
               <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
@@ -104,21 +105,21 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
       </div>
       
       <!-- Tabla de servicios -->
-      <div class="rounded-lg bg-white shadow-sm overflow-hidden">
+      <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors duration-200">
         @if (loading) {
           <div class="flex justify-center items-center p-8">
-            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
-            <span class="ml-4">Cargando servicios...</span>
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 dark:border-primary-600 border-r-transparent"></div>
+            <span class="ml-4 text-gray-900 dark:text-gray-200">Cargando servicios...</span>
           </div>
         } @else if (!pagination || pagination.data.length === 0) {
           <div class="p-8 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron servicios</h3>
-            <p class="mt-1 text-sm text-gray-500">Comience creando un nuevo servicio.</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No se encontraron servicios</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Comience creando un nuevo servicio.</p>
             <div class="mt-6">
-              <a routerLink="/admin/servicios/create" class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+              <a routerLink="/admin/servicios/create" class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -128,77 +129,77 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
           </div>
         } @else {
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
+              <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emprendedor</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categorías</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horarios</th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nombre</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Descripción</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Precio</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Emprendedor</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categorías</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Horarios</th>
+                  <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 @for (servicio of pagination.data; track servicio.id) {
-                  <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-gray-900">{{ servicio.nombre }}</div>
+                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900 dark:text-white">{{ servicio.nombre }}</div>
                     </td>
-                    <td class="px-6 py-4">
-                      <div class="text-sm text-gray-500 truncate max-w-xs">{{ servicio.descripcion || 'Sin descripción' }}</div>
+                    <td class="px-4 py-4">
+                      <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">{{ servicio.descripcion || 'Sin descripción' }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">S/. {{ servicio.precio_referencial || '0.00' }}</div>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900 dark:text-white">S/. {{ servicio.precio_referencial || '0.00' }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900 dark:text-white">
                         @if (servicio.emprendedor) {
-                          <a [routerLink]="['/admin/emprendedores', servicio.emprendedor_id, 'servicios']" class="text-primary-600 hover:text-primary-900">
+                          <a [routerLink]="['/admin/emprendedores', servicio.emprendedor_id, 'servicios']" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200">
                             {{ servicio.emprendedor.nombre }}
                           </a>
                         } @else {
-                          <span class="text-gray-500">Sin emprendedor</span>
+                          <span class="text-gray-500 dark:text-gray-400">Sin emprendedor</span>
                         }
                       </div>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-4 py-4">
                       <div class="flex flex-wrap gap-1">
                         @for (categoria of servicio.categorias; track categoria.id) {
-                          <span class="inline-flex rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800">
+                          <span class="inline-flex rounded-full bg-primary-100 dark:bg-primary-900/40 px-2 py-0.5 text-xs font-medium text-primary-800 dark:text-primary-300 transition-colors duration-200">
                             {{ categoria.nombre }}
                           </span>
                         }
                         @if (!servicio.categorias || servicio.categorias.length === 0) {
-                          <span class="text-sm text-gray-500">Sin categorías</span>
+                          <span class="text-sm text-gray-500 dark:text-gray-400">Sin categorías</span>
                         }
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-4 whitespace-nowrap">
                       @if (servicio.estado) {
-                        <span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                        <span class="inline-flex rounded-full bg-green-100 dark:bg-green-900/40 px-2 py-0.5 text-xs font-medium text-green-800 dark:text-green-300 transition-colors duration-200">
                           Activo
                         </span>
                       } @else {
-                        <span class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                        <span class="inline-flex rounded-full bg-red-100 dark:bg-red-900/40 px-2 py-0.5 text-xs font-medium text-red-800 dark:text-red-300 transition-colors duration-200">
                           Inactivo
                         </span>
                       }
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-500">
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500 dark:text-gray-400">
                         @if (servicio.horarios && servicio.horarios.length > 0) {
                           <div class="flex items-center">
-                            <svg class="h-4 w-4 text-green-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-4 w-4 text-green-500 dark:text-green-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <span>{{ servicio.horarios.length }} {{ servicio.horarios.length === 1 ? 'horario' : 'horarios' }}</span>
                           </div>
                         } @else {
                           <div class="flex items-center">
-                            <svg class="h-4 w-4 text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-4 w-4 text-yellow-500 dark:text-yellow-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
                             <span>Sin horarios</span>
@@ -206,11 +207,22 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
                         }
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div class="flex items-center justify-end space-x-2">
                         <a 
+                          [routerLink]="['/admin/servicios/detail', servicio.id]" 
+                          class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
+                          title="Ver detalles"
+                        >
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                          </svg>
+                        </a>
+                        
+                        <a 
                           [routerLink]="['/admin/servicios/edit', servicio.id]" 
-                          class="text-primary-600 hover:text-primary-900"
+                          class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
                           title="Editar"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,8 +232,9 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
                         
                         <button 
                           (click)="toggleServicioEstado(servicio)" 
-                          [class]="servicio.estado ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'"
+                          [class]="servicio.estado ? 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300' : 'text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300'"
                           [title]="servicio.estado ? 'Desactivar' : 'Activar'"
+                          class="transition-colors duration-200"
                         >
                           @if (servicio.estado) {
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,7 +249,7 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
                         
                         <a 
                           [routerLink]="['/admin/reservas/servicio', servicio.id]" 
-                          class="text-blue-600 hover:text-blue-900"
+                          class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-200"
                           title="Ver reservas"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +259,7 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
                         
                         <button 
                           (click)="deleteServicio(servicio)" 
-                          class="text-red-600 hover:text-red-900"
+                          class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors duration-200"
                           title="Eliminar"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,10 +276,10 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
           
           <!-- Paginación -->
           @if (pagination) {
-            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 sm:px-6">
               <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-sm text-gray-700">
+                  <p class="text-sm text-gray-700 dark:text-gray-300">
                     Mostrando <span class="font-medium">{{ pagination.from || 0 }}</span> a <span class="font-medium">{{ pagination.to || 0 }}</span> de <span class="font-medium">{{ pagination.total }}</span> resultados
                   </p>
                 </div>
@@ -275,7 +288,7 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
                     <button
                       (click)="goToPage(currentPage - 1)"
                       [disabled]="!pagination.prev_page_url"
-                      class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-650 transition-colors duration-200"
                       [class.opacity-50]="!pagination.prev_page_url"
                       [class.cursor-not-allowed]="!pagination.prev_page_url"
                     >
@@ -289,11 +302,17 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
                       @if (link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;') {
                         <button
                           (click)="goToPage(+link.label)"
-                          class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium"
-                          [class.bg-primary-50]="link.active"
-                          [class.text-primary-600]="link.active"
-                          [class.text-gray-700]="!link.active"
-                          [class.hover:bg-gray-50]="!link.active"
+                          class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium transition-colors duration-200"
+                          [ngClass]="{
+                            'bg-primary-50': link.active && !isDarkMode(),
+                            'dark:bg-primary-900/40': link.active && isDarkMode(),
+                            'text-primary-600': link.active && !isDarkMode(),
+                            'dark:text-primary-300': link.active && isDarkMode(),
+                            'text-gray-700': !link.active && !isDarkMode(),
+                            'dark:text-gray-300': !link.active && isDarkMode(),
+                            'hover:bg-gray-50': !link.active && !isDarkMode(),
+                            'dark:hover:bg-gray-650': !link.active && isDarkMode()
+                          }"
                           [disabled]="link.active"
                         >
                           {{ link.label }}
@@ -304,7 +323,7 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
                     <button
                       (click)="goToPage(currentPage + 1)"
                       [disabled]="!pagination.next_page_url"
-                      class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-650 transition-colors duration-200"
                       [class.opacity-50]="!pagination.next_page_url"
                       [class.cursor-not-allowed]="!pagination.next_page_url"
                     >
@@ -325,6 +344,7 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } f
 })
 export class ServicioListComponent implements OnInit {
   private turismoService = inject(TurismoService);
+  private themeService = inject(ThemeService);
   
   pagination: PaginatedResponse<Servicio> | null = null;
   categorias: Categoria[] = [];
@@ -461,5 +481,10 @@ export class ServicioListComponent implements OnInit {
     
     this.currentPage = page;
     this.loadServicios();
+  }
+
+  // Helper method to check if dark mode is active
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 }

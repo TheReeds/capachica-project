@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../core/services/turismo.service';
+import { ThemeService } from '../../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-emprendedor-list',
@@ -11,11 +12,11 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
   template: `
     <div class="space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-2xl font-bold text-gray-900">Gestión de Emprendedores</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Emprendedores</h1>
         <div class="mt-4 sm:mt-0">
           <a 
             routerLink="/admin/emprendedores/create" 
-            class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
           >
             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -26,28 +27,28 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
       </div>
       
       <!-- Filtros -->
-      <div class="rounded-lg bg-white p-6 shadow-sm">
+      <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors duration-200">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
-            <label for="search" class="block text-sm font-medium text-gray-700">Buscar</label>
+            <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
             <div class="mt-1">
               <input 
                 type="text" 
                 id="search" 
                 [(ngModel)]="searchTerm" 
                 placeholder="Nombre o descripción" 
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
             </div>
           </div>
           
           <div>
-            <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
+            <label for="categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
             <div class="mt-1">
               <select 
                 id="categoria" 
                 [(ngModel)]="selectedCategoria" 
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option value="">Todas</option>
                 <option value="Artesanía">Artesanía</option>
@@ -61,12 +62,12 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
           </div>
           
           <div>
-            <label for="asociacion_id" class="block text-sm font-medium text-gray-700">Asociación</label>
+            <label for="asociacion_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Asociación</label>
             <div class="mt-1">
               <select 
                 id="asociacion_id" 
                 [(ngModel)]="selectedAsociacionId" 
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todas</option>
                 <option [ngValue]="0">Sin asociación</option>
@@ -81,7 +82,7 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
             <button 
               type="button" 
               (click)="applyFilters()" 
-              class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
             >
               <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
@@ -93,21 +94,21 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
       </div>
       
       <!-- Tabla de emprendedores -->
-      <div class="rounded-lg bg-white shadow-sm overflow-hidden">
+      <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors duration-200">
         @if (loading) {
           <div class="flex justify-center items-center p-8">
-            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
-            <span class="ml-4">Cargando emprendedores...</span>
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 dark:border-primary-600 border-r-transparent"></div>
+            <span class="ml-4 text-gray-900 dark:text-gray-200">Cargando emprendedores...</span>
           </div>
         } @else if (!pagination || pagination.data.length === 0) {
           <div class="p-8 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron emprendedores</h3>
-            <p class="mt-1 text-sm text-gray-500">Comience creando un nuevo emprendedor.</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No se encontraron emprendedores</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Comience creando un nuevo emprendedor.</p>
             <div class="mt-6">
-              <a routerLink="/admin/emprendedores/create" class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+              <a routerLink="/admin/emprendedores/create" class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -117,62 +118,64 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
           </div>
         } @else {
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
+              <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emprendedor</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Servicio</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ubicación</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asociación</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Emprendedor</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tipo de Servicio</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ubicación</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asociación</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categoría</th>
+                  <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 @for (emprendedor of pagination.data; track emprendedor.id) {
-                  <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
+                    <td class="px-4 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         @if (emprendedor.imagenes && emprendedor.imagenes.length > 0) {
-                          <div class="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-100">
+                          <div class="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
                             <img [src]="emprendedor.imagenes[0]" alt="Imagen de emprendedor" class="h-full w-full object-cover">
                           </div>
                         } @else {
-                          <div class="h-10 w-10 flex-shrink-0 rounded-full bg-primary-100 flex items-center justify-center">
-                            <span class="text-primary-800 font-medium">{{ getEmprendedorInitials(emprendedor) }}</span>
+                          <div class="h-10 w-10 flex-shrink-0 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
+                            <span class="text-primary-800 dark:text-primary-300 font-medium">{{ getEmprendedorInitials(emprendedor) }}</span>
                           </div>
                         }
                         <div class="ml-4">
-                          <div class="text-sm font-medium text-gray-900">{{ emprendedor.nombre }}</div>
-                          <div class="text-sm text-gray-500">{{ emprendedor.email }}</div>
+                          <div class="text-sm font-medium text-gray-900 dark:text-white">{{ emprendedor.nombre }}</div>
+                          <div class="text-sm text-gray-500 dark:text-gray-400">{{ emprendedor.email }}</div>
                         </div>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">{{ emprendedor.tipo_servicio }}</div>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900 dark:text-white">{{ emprendedor.tipo_servicio }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-500">{{ emprendedor.ubicacion }}</div>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500 dark:text-gray-400">{{ emprendedor.ubicacion }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900 dark:text-white">
                         @if (emprendedor.asociacion) {
                           {{ emprendedor.asociacion.nombre }}
                         } @else {
-                          <span class="text-gray-500">Sin asociación</span>
+                          <span class="text-gray-500 dark:text-gray-400">Sin asociación</span>
                         }
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <span class="inline-flex rounded-full bg-green-100 dark:bg-green-900/40 px-2 py-0.5 text-xs font-medium text-green-800 dark:text-green-300 transition-colors duration-200">
                         {{ emprendedor.categoria }}
                       </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div class="flex items-center justify-end space-x-2">
+                        
+                        
                         <a 
                           [routerLink]="['/admin/emprendedores/edit', emprendedor.id]" 
-                          class="text-primary-600 hover:text-primary-900"
+                          class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
                           title="Editar"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,7 +185,7 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
                         
                         <a 
                           [routerLink]="['/admin/emprendedores', emprendedor.id, 'servicios']" 
-                          class="text-green-600 hover:text-green-900"
+                          class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 transition-colors duration-200"
                           title="Ver servicios"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,9 +193,19 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
                           </svg>
                         </a>
                         
+                        <a 
+                          [routerLink]="['/admin/reservas/emprendedor', emprendedor.id]" 
+                          class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-200"
+                          title="Ver reservas"
+                        >
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                        </a>
+                        
                         <button 
                           (click)="deleteEmprendedor(emprendedor)" 
-                          class="text-red-600 hover:text-red-900"
+                          class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors duration-200"
                           title="Eliminar"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,10 +222,10 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
           
           <!-- Paginación -->
           @if (pagination) {
-            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 sm:px-6">
               <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-sm text-gray-700">
+                  <p class="text-sm text-gray-700 dark:text-gray-300">
                     Mostrando <span class="font-medium">{{ pagination.from || 0 }}</span> a <span class="font-medium">{{ pagination.to || 0 }}</span> de <span class="font-medium">{{ pagination.total }}</span> resultados
                   </p>
                 </div>
@@ -221,7 +234,7 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
                     <button
                       (click)="goToPage(currentPage - 1)"
                       [disabled]="!pagination.prev_page_url"
-                      class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-650 transition-colors duration-200"
                       [class.opacity-50]="!pagination.prev_page_url"
                       [class.cursor-not-allowed]="!pagination.prev_page_url"
                     >
@@ -235,11 +248,17 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
                       @if (link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;') {
                         <button
                           (click)="goToPage(+link.label)"
-                          class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium"
-                          [class.bg-primary-50]="link.active"
-                          [class.text-primary-600]="link.active"
-                          [class.text-gray-700]="!link.active"
-                          [class.hover:bg-gray-50]="!link.active"
+                          class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium transition-colors duration-200"
+                          [ngClass]="{
+                            'bg-primary-50': link.active && !isDarkMode(),
+                            'dark:bg-primary-900/40': link.active && isDarkMode(),
+                            'text-primary-600': link.active && !isDarkMode(),
+                            'dark:text-primary-300': link.active && isDarkMode(),
+                            'text-gray-700': !link.active && !isDarkMode(),
+                            'dark:text-gray-300': !link.active && isDarkMode(),
+                            'hover:bg-gray-50': !link.active && !isDarkMode(),
+                            'dark:hover:bg-gray-650': !link.active && isDarkMode()
+                          }"
                           [disabled]="link.active"
                         >
                           {{ link.label }}
@@ -250,7 +269,7 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
                     <button
                       (click)="goToPage(currentPage + 1)"
                       [disabled]="!pagination.next_page_url"
-                      class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-650 transition-colors duration-200"
                       [class.opacity-50]="!pagination.next_page_url"
                       [class.cursor-not-allowed]="!pagination.next_page_url"
                     >
@@ -271,6 +290,7 @@ import { TurismoService, Emprendedor, PaginatedResponse } from '../../../../../c
 })
 export class EmprendedorListComponent implements OnInit {
   private turismoService = inject(TurismoService);
+  private themeService = inject(ThemeService);
   
   pagination: PaginatedResponse<Emprendedor> | null = null;
   asociaciones: any[] = [];
@@ -303,16 +323,76 @@ export class EmprendedorListComponent implements OnInit {
   
   loadEmprendedores() {
     this.loading = true;
+    
+    // Como el método getEmprendedores no acepta un tercer parámetro para filtros,
+    // tenemos que construir una URL con query params o modificar el service
+    // Por ahora, usaremos solo la paginación básica
     this.turismoService.getEmprendedores(this.currentPage, this.itemsPerPage).subscribe({
       next: (response) => {
         this.pagination = response;
         this.loading = false;
+        
+        // Filtramos los resultados en el cliente si hay filtros activos
+        if (this.searchTerm || this.selectedCategoria || this.selectedAsociacionId !== null) {
+          this.filterResultsLocally();
+        }
       },
       error: (error) => {
         console.error('Error al cargar emprendedores:', error);
         this.loading = false;
       }
     });
+  }
+  
+  // Método para filtrar resultados localmente
+  filterResultsLocally() {
+    if (!this.pagination || !this.pagination.data) return;
+    
+    // Hacemos una copia de los datos originales
+    const originalData = [...this.pagination.data];
+    
+    // Filtramos según los criterios
+    let filteredData = originalData;
+    
+    // Filtro por término de búsqueda
+    if (this.searchTerm) {
+      const searchLower = this.searchTerm.toLowerCase();
+      filteredData = filteredData.filter(emp => 
+        emp.nombre?.toLowerCase().includes(searchLower) || 
+        emp.descripcion?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Filtro por categoría
+    if (this.selectedCategoria) {
+      filteredData = filteredData.filter(emp => 
+        emp.categoria === this.selectedCategoria
+      );
+    }
+    
+    // Filtro por asociación
+    if (this.selectedAsociacionId !== null) {
+      if (this.selectedAsociacionId === 0) {
+        // Sin asociación
+        filteredData = filteredData.filter(emp => !emp.asociacion_id);
+      } else {
+        // Con la asociación específica
+        filteredData = filteredData.filter(emp => 
+          emp.asociacion_id === this.selectedAsociacionId
+        );
+      }
+    }
+    
+    // Actualizamos los datos filtrados
+    if (this.pagination) {
+      this.pagination = {
+        ...this.pagination,
+        data: filteredData,
+        total: filteredData.length,
+        from: filteredData.length > 0 ? 1 : 0,
+        to: filteredData.length
+      };
+    }
   }
   
   getEmprendedorInitials(emprendedor: Emprendedor): string {
@@ -326,8 +406,6 @@ export class EmprendedorListComponent implements OnInit {
   
   applyFilters() {
     this.currentPage = 1;
-    // Aquí implementarías la lógica para filtrar emprendedores según searchTerm, selectedCategoria y selectedAsociacionId
-    // Por ahora, simplemente recargamos los emprendedores
     this.loadEmprendedores();
   }
   
@@ -358,5 +436,10 @@ export class EmprendedorListComponent implements OnInit {
     
     this.currentPage = page;
     this.loadEmprendedores();
+  }
+  
+  // Helper method to check if dark mode is active
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 }
