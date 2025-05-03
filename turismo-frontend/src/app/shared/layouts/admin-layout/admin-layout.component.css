@@ -1,38 +1,52 @@
 /* admin-layout.component.css */
 
-/* Scroll container */
+/* Scroll container con padding compensatorio para evitar desplazamientos */
 .sidebar-scroll-container {
-  scrollbar-width: none; /* Para Firefox */
-  -ms-overflow-style: none; /* Para Internet Explorer y Edge */
+  /* Reservamos espacio para el scrollbar permanentemente */
+  overflow-y: scroll;
+  padding-right: 6px;
+  /* Usamos border-box para incluir el padding en el ancho total */
+  box-sizing: border-box;
+  /* Esto mantiene un ancho consistente incluso cuando el scrollbar aparece */
+  width: 100%;
+ 
 }
 
-/* Ocultar scrollbar por defecto */
+
+
+/* Ocultar scrollbar por defecto pero mantener funcionalidad */
 .sidebar-scroll-container::-webkit-scrollbar {
-  width: 0;
+  width: 6px;
   background: transparent;
 }
 
-/* Configuración de scrollbar cuando está visible */
-.show-scrollbar {
-  scrollbar-width: thin; /* Para Firefox */
-  -ms-overflow-style: auto; /* Para Internet Explorer y Edge */
+/* Scrollbar siempre presente pero transparente cuando no está visible */
+.sidebar-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(251, 146, 60, 0);
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
 }
 
+/* Configuración de scrollbar cuando está visible */
 .show-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
 
 .show-scrollbar::-webkit-scrollbar-track {
   background: rgba(251, 146, 60, 0.1);
+  border-radius: 6px;
 }
 
 .show-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(251, 146, 60, 0.5);
   border-radius: 6px;
+  transition: background-color 0.3s ease;
 }
 
+/* Estilos para tema oscuro - CORREGIDO: cambiar a azul */
 .dark .show-scrollbar::-webkit-scrollbar-track {
   background: rgba(59, 130, 246, 0.1);
+  border-radius: 6px;
 }
 
 .dark .show-scrollbar::-webkit-scrollbar-thumb {
@@ -40,12 +54,29 @@
   border-radius: 6px;
 }
 
+/* Efectos hover para ambos temas */
 .show-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(251, 146, 60, 0.7);
 }
 
 .dark .show-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.7);
+}
+
+/* Soporte para Firefox */
+.sidebar-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+.show-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 146, 60, 0.5) rgba(251, 146, 60, 0.1);
+}
+
+.dark .show-scrollbar {
+  scrollbar-color: rgba(59, 130, 246, 0.5) rgba(59, 130, 246, 0.1);
 }
 
 /* Mejor estabilidad para iconos de menú */
@@ -209,4 +240,5 @@ button:active {
   .submenu-item:active {
     transform: scale(0.98);
   }
+  
 }

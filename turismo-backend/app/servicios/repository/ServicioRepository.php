@@ -3,6 +3,7 @@
 namespace App\Servicios\Repository;
 
 use App\Servicios\Models\Servicio;
+use App\Servicios\Models\ServicioHorario;
 use Illuminate\Database\Eloquent\Collection;
 use App\Pagegeneral\Repository\SliderRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -21,20 +22,20 @@ class ServicioRepository
 
     public function getAll(): Collection
     {
-        return $this->model->with(['emprendedor', 'categorias'])->get();
+        return $this->model->with(['emprendedor', 'categorias', 'horarios'])->get();
     }
 
     public function getPaginated(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->model->with(['emprendedor', 'categorias'])->paginate($perPage);
+        return $this->model->with(['emprendedor', 'categorias', 'horarios'])->paginate($perPage);
     }
 
     public function findById(int $id): ?Servicio
     {
-        return $this->model->with(['emprendedor', 'categorias'])->find($id);
+        return $this->model->with(['emprendedor', 'categorias', 'horarios', 'sliders'])->find($id);
     }
 
-    public function create(array $data, array $categoriaIds = []): Servicio
+    public function create(array $data, array $categoriaIds = [], array $horarios = []): Servicio
     {
         try {
             DB::beginTransaction();
@@ -42,13 +43,21 @@ class ServicioRepository
             // Extraer datos de sliders si existen
             $sliders = $data['sliders'] ?? [];
             
-            // Eliminar datos de sliders del array principal
+            // Eliminar datos de sliders y horarios del array principal
             unset($data['sliders']);
+            unset($data['horarios']);
             
             $servicio = $this->model->create($data);
             
             if (!empty($categoriaIds)) {
                 $servicio->categorias()->sync($categoriaIds);
+            }
+            
+            // Crear horarios si existen
+            if (!empty($horarios)) {
+                foreach ($horarios as $horario) {
+                    $servicio->horarios()->create($horario);
+                }
             }
             
             // Crear sliders si existen
@@ -63,14 +72,14 @@ class ServicioRepository
             }
             
             DB::commit();
-            return $servicio->fresh(['emprendedor', 'categorias', 'sliders']);
+            return $servicio->fresh(['emprendedor', 'categorias', 'sliders', 'horarios']);
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
     }
 
-    public function update(int $id, array $data, array $categoriaIds = []): bool
+    public function update(int $id, array $data, array $categoriaIds = [], array $horarios = []): bool
     {
         try {
             DB::beginTransaction();
@@ -85,14 +94,45 @@ class ServicioRepository
             $sliders = $data['sliders'] ?? [];
             $deletedSliderIds = $data['deleted_sliders'] ?? [];
             
-            // Eliminar datos de sliders del array principal
+            // Eliminar datos de sliders y horarios del array principal
             unset($data['sliders']);
             unset($data['deleted_sliders']);
+            unset($data['horarios']);
+            unset($data['deleted_horarios']);
             
             $updated = $servicio->update($data);
             
             if ($updated && !empty($categoriaIds)) {
                 $servicio->categorias()->sync($categoriaIds);
+            }
+            
+            // Actualizar horarios
+            if (!empty($horarios)) {
+                // Eliminar horarios existentes que no sean actualizados
+                $horariosIds = array_column($horarios, 'id');
+                $horariosIds = array_filter($horariosIds); // Eliminar valores nulos
+                
+                if (!empty($horariosIds)) {
+                    $servicio->horarios()->whereNotIn('id', $horariosIds)->delete();
+                } else {
+                    $servicio->horarios()->delete();
+                }
+                
+                // Crear o actualizar horarios
+                foreach ($horarios as $horarioData) {
+                    $horarioId = $horarioData['id'] ?? null;
+                    unset($horarioData['id']);
+                    
+                    if ($horarioId) {
+                        $horario = ServicioHorario::find($horarioId);
+                        if ($horario && $horario->servicio_id == $servicio->id) {
+                            $horario->update($horarioData);
+                        }
+                    } else {
+                        $horarioData['servicio_id'] = $servicio->id;
+                        ServicioHorario::create($horarioData);
+                    }
+                }
             }
             
             // Eliminar sliders especificados
@@ -126,6 +166,9 @@ class ServicioRepository
                 return false;
             }
             
+            // Eliminar horarios
+            $servicio->horarios()->delete();
+            
             // Eliminar sliders asociados
             $servicio->sliders->each(function ($slider) {
                 app(SliderRepository::class)->delete($slider->id);
@@ -144,14 +187,14 @@ class ServicioRepository
     public function getActiveServicios(): Collection
     {
         return $this->model->where('estado', true)
-            ->with(['emprendedor', 'categorias'])
+            ->with(['emprendedor', 'categorias', 'horarios'])
             ->get();
     }
 
     public function getServiciosByEmprendedor(int $emprendedorId): Collection
     {
         return $this->model->where('emprendedor_id', $emprendedorId)
-            ->with('categorias')
+            ->with(['categorias', 'horarios'])
             ->get();
     }
 
@@ -159,6 +202,38 @@ class ServicioRepository
     {
         return $this->model->whereHas('categorias', function ($query) use ($categoriaId) {
             $query->where('categorias.id', $categoriaId);
-        })->with(['emprendedor', 'categorias'])->get();
+        })->with(['emprendedor', 'categorias', 'horarios'])->get();
+    }
+    
+    /**
+     * Verifica la disponibilidad de un servicio en una fecha y horario específicos
+     */
+    public function verificarDisponibilidad(int $servicioId, string $fecha, string $horaInicio, string $horaFin): bool
+    {
+        $servicio = $this->findById($servicioId);
+        
+        if (!$servicio) {
+            return false;
+        }
+        
+        return $servicio->estaDisponible($fecha, $horaInicio, $horaFin);
+    }
+    
+    /**
+     * Obtiene los servicios disponibles en un área geográfica (por distancia)
+     */
+    public function getServiciosByUbicacion(float $latitud, float $longitud, float $distanciaKm = 10): Collection
+    {
+        // Fórmula haversine para cálculo de distancia
+        $haversine = "(6371 * acos(cos(radians($latitud)) * cos(radians(latitud)) * cos(radians(longitud) - radians($longitud)) + sin(radians($latitud)) * sin(radians(latitud))))";
+        
+        return $this->model->where('estado', true)
+            ->whereNotNull('latitud')
+            ->whereNotNull('longitud')
+            ->selectRaw("*, $haversine AS distancia")
+            ->havingRaw("distancia < ?", [$distanciaKm])
+            ->orderBy('distancia')
+            ->with(['emprendedor', 'categorias', 'horarios'])
+            ->get();
     }
 }

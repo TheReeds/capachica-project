@@ -3,6 +3,7 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environments';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { User } from '../models/user.model';
 
 export interface PaginatedResponse<T> {
   current_page: number;
@@ -139,11 +140,28 @@ export interface Servicio {
   precio_referencial?: number;
   emprendedor_id: number;
   estado?: boolean;
-  created_at?: string;
-  updated_at?: string;
+  // Nuevos campos
+  latitud?: number;
+  longitud?: number;
+  ubicacion_referencia?: string;
+  horarios?: ServicioHorario[];
+  // Relaciones
   emprendedor?: Emprendedor;
   categorias?: Categoria[];
   sliders?: Slider[];
+  created_at?: string;
+  updated_at?: string;
+}
+// Nuevo modelo para los horarios
+export interface ServicioHorario {
+  id?: number;
+  servicio_id?: number;
+  dia_semana: string; // 'lunes', 'martes', etc.
+  hora_inicio: string; // Formato 'HH:MM:SS'
+  hora_fin: string;    // Formato 'HH:MM:SS'
+  activo?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Categoria {
@@ -158,14 +176,39 @@ export interface Categoria {
 
 export interface Reserva {
   id?: number;
-  nombre: string;
-  fecha: string;
-  descripcion?: string;
-  redes_url?: string;
-  tipo: string;
+  usuario_id: number;
+  codigo_reserva: string;
+  estado: 'pendiente' | 'confirmada' | 'cancelada' | 'completada';
+  notas?: string;
+  servicios?: ReservaServicio[];
+  usuario?: User;
   created_at?: string;
   updated_at?: string;
-  emprendedores?: Emprendedor[];
+  // Propiedades calculadas
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  total_servicios?: number;
+}
+export interface ReservaServicio {
+  id?: number;
+  reserva_id: number;
+  servicio_id: number;
+  emprendedor_id: number;
+  fecha_inicio: string;
+  fecha_fin?: string;
+  hora_inicio: string;
+  hora_fin: string;
+  duracion_minutos: number;
+  cantidad?: number;
+  precio?: number;
+  estado: 'pendiente' | 'confirmado' | 'cancelado' | 'completado';
+  notas_cliente?: string;
+  notas_emprendedor?: string;
+  servicio?: Servicio;
+  emprendedor?: Emprendedor;
+  reserva?: Reserva;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ReservaDetalle {
@@ -193,9 +236,10 @@ export class TurismoService {
     
     // Añadir campos regulares
     Object.keys(data).forEach(key => {
-      // Ignorar sliders, deleted_sliders, categorías, etc. que se manejarán por separado
+      // Ignorar sliders, deleted_sliders, categorías, horarios, etc. que se manejarán por separado
       if (key !== 'sliders_principales' && key !== 'sliders_secundarios' && key !== 'sliders' && 
-          key !== 'imagenes' && key !== 'categorias' && key !== 'deleted_sliders') {
+          key !== 'imagenes' && key !== 'categorias' && key !== 'deleted_sliders' && 
+          key !== 'horarios' && key !== 'servicios') {
         
         // Solo enviar campo si tiene un valor válido
         if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
@@ -215,6 +259,25 @@ export class TurismoService {
   if (data.categorias && Array.isArray(data.categorias) && data.categorias.length > 0) {
     data.categorias.forEach((cat: number) => {
       formData.append('categorias[]', cat.toString());
+    });
+  }
+  // Manejar horarios (para servicios)
+  if (data.horarios && Array.isArray(data.horarios) && data.horarios.length > 0) {
+    data.horarios.forEach((horario: any, index: number) => {
+      // Si tiene ID, incluirlo para actualización
+      if (horario.id) {
+        formData.append(`horarios[${index}][id]`, horario.id.toString());
+      }
+      
+      // Incluir los campos obligatorios
+      formData.append(`horarios[${index}][dia_semana]`, horario.dia_semana);
+      formData.append(`horarios[${index}][hora_inicio]`, horario.hora_inicio);
+      formData.append(`horarios[${index}][hora_fin]`, horario.hora_fin);
+      
+      // Incluir el campo activo solo si está definido
+      if (horario.activo !== undefined) {
+        formData.append(`horarios[${index}][activo]`, horario.activo.toString());
+      }
     });
   }
   
@@ -480,11 +543,11 @@ export class TurismoService {
       .pipe(map(response => response.data));
   }
 
-  getReservasByEmprendedor(emprendedorId: number): Observable<Reserva[]> {
+  /*getReservasByEmprendedor(emprendedorId: number): Observable<Reserva[]> {
     return this.http.get<{ status: string, data: Reserva[] }>(`${this.API_URL}/emprendedores/${emprendedorId}/reservas`,
       { headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
-  }
+  }*/
 
   createEmprendedor(emprendedor: Emprendedor): Observable<Emprendedor> {
     const formData = this.prepareFormData(emprendedor);
@@ -507,10 +570,19 @@ export class TurismoService {
   }
 
   // Servicios
-  getServicios(page: number = 1, perPage: number = 10): Observable<PaginatedResponse<Servicio>> {
-    const params = new HttpParams()
+  getServicios(page: number = 1, perPage: number = 10, filters?: any): Observable<PaginatedResponse<Servicio>> {
+    let params = new HttpParams()
       .set('page', page.toString())
       .set('per_page', perPage.toString());
+    
+    // Añadir filtros si existen
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        if (filters[key] !== null && filters[key] !== undefined && filters[key] !== '') {
+          params = params.set(key, filters[key].toString());
+        }
+      });
+    }
 
     return this.http.get<{ success: boolean, data: PaginatedResponse<Servicio> }>(`${this.API_URL}/servicios`, 
       { params, headers: this.getSimpleHeaders() })
@@ -547,6 +619,28 @@ export class TurismoService {
   deleteServicio(id: number): Observable<any> {
     return this.http.delete<{ success: boolean, message: string }>(`${this.API_URL}/servicios/${id}`,
       { headers: this.getSimpleHeaders() });
+  }
+  verificarDisponibilidadServicio(servicioId: number, fecha: string, horaInicio: string, horaFin: string): Observable<{disponible: boolean}> {
+    const params = new HttpParams()
+      .set('servicio_id', servicioId.toString())
+      .set('fecha', fecha)
+      .set('hora_inicio', horaInicio)
+      .set('hora_fin', horaFin);
+    
+    return this.http.get<{ success: boolean, disponible: boolean }>(`${this.API_URL}/servicios/verificar-disponibilidad`, 
+      { params, headers: this.getSimpleHeaders() })
+      .pipe(map(response => ({ disponible: response.disponible })));
+  }
+  
+  getServiciosByUbicacion(latitud: number, longitud: number, distancia: number = 10): Observable<Servicio[]> {
+    const params = new HttpParams()
+      .set('latitud', latitud.toString())
+      .set('longitud', longitud.toString())
+      .set('distancia', distancia.toString());
+    
+    return this.http.get<{ success: boolean, data: Servicio[] }>(`${this.API_URL}/servicios/ubicacion`, 
+      { params, headers: this.getSimpleHeaders() })
+      .pipe(map(response => response.data));
   }
 
   // Sliders
@@ -668,21 +762,28 @@ export class TurismoService {
       { headers: this.getSimpleHeaders() });
   }
 
-  // Reservas
-  getReservas(): Observable<Reserva[]> {
-    return this.http.get<{ success: boolean, data: Reserva[] }>(`${this.API_URL}/reservas`,
-      { headers: this.getSimpleHeaders() })
+  // Métodos para reservas
+  getReservas(page: number = 1, perPage: number = 10, filters?: any): Observable<PaginatedResponse<Reserva>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('per_page', perPage.toString());
+    
+    // Añadir filtros si existen
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        if (filters[key] !== null && filters[key] !== undefined && filters[key] !== '') {
+          params = params.set(key, filters[key].toString());
+        }
+      });
+    }
+
+    return this.http.get<{ success: boolean, data: PaginatedResponse<Reserva> }>(`${this.API_URL}/reservas`, 
+      { params, headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
   }
 
   getReserva(id: number): Observable<Reserva> {
     return this.http.get<{ success: boolean, data: Reserva }>(`${this.API_URL}/reservas/${id}`,
-      { headers: this.getSimpleHeaders() })
-      .pipe(map(response => response.data));
-  }
-
-  getEmprendedoresByReserva(reservaId: number): Observable<Emprendedor[]> {
-    return this.http.get<{ success: boolean, data: Emprendedor[] }>(`${this.API_URL}/reservas/${reservaId}/emprendedores`,
       { headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
   }
@@ -703,46 +804,69 @@ export class TurismoService {
     return this.http.delete<{ success: boolean, message: string }>(`${this.API_URL}/reservas/${id}`,
       { headers: this.getSimpleHeaders() });
   }
-
-  // Detalles de Reserva
-  getReservaDetalles(): Observable<ReservaDetalle[]> {
-    return this.http.get<{ success: boolean, data: ReservaDetalle[] }>(`${this.API_URL}/reserva-detalles`,
+  
+  cambiarEstadoReserva(id: number, estado: string): Observable<Reserva> {
+    return this.http.put<{ success: boolean, data: Reserva, message: string }>(`${this.API_URL}/reservas/${id}/estado`, { estado },
       { headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
   }
-
-  getReservaDetalle(id: number): Observable<ReservaDetalle> {
-    return this.http.get<{ success: boolean, data: ReservaDetalle }>(`${this.API_URL}/reserva-detalles/${id}`,
+  
+  getReservasByEmprendedor(emprendedorId: number): Observable<Reserva[]> {
+    return this.http.get<{ success: boolean, data: Reserva[] }>(`${this.API_URL}/reservas/emprendedor/${emprendedorId}`,
       { headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
   }
-
-  getReservaDetallesByReserva(reservaId: number): Observable<ReservaDetalle[]> {
-    return this.http.get<{ success: boolean, data: ReservaDetalle[] }>(`${this.API_URL}/reserva-detalles/reserva/${reservaId}`,
+  
+  getReservasByServicio(servicioId: number): Observable<Reserva[]> {
+    return this.http.get<{ success: boolean, data: Reserva[] }>(`${this.API_URL}/reservas/servicio/${servicioId}`,
       { headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
   }
-
-  getReservaDetallesByEmprendedor(emprendedorId: number): Observable<ReservaDetalle[]> {
-    return this.http.get<{ success: boolean, data: ReservaDetalle[] }>(`${this.API_URL}/reserva-detalles/emprendedor/${emprendedorId}`,
+  
+  // Métodos para servicios de reserva
+  getServiciosByReserva(reservaId: number): Observable<ReservaServicio[]> {
+    return this.http.get<{ success: boolean, data: ReservaServicio[] }>(`${this.API_URL}/reserva-servicios/reserva/${reservaId}`,
       { headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
   }
-
-  createReservaDetalle(reservaDetalle: ReservaDetalle): Observable<ReservaDetalle> {
-    return this.http.post<{ success: boolean, data: ReservaDetalle, message: string }>(`${this.API_URL}/reserva-detalles`, reservaDetalle,
+  
+  cambiarEstadoServicioReserva(id: number, estado: string): Observable<ReservaServicio> {
+    return this.http.put<{ success: boolean, data: ReservaServicio, message: string }>(`${this.API_URL}/reserva-servicios/${id}/estado`, { estado },
       { headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
   }
-
-  updateReservaDetalle(id: number, reservaDetalle: ReservaDetalle): Observable<ReservaDetalle> {
-    return this.http.put<{ success: boolean, data: ReservaDetalle, message: string }>(`${this.API_URL}/reserva-detalles/${id}`, reservaDetalle,
-      { headers: this.getSimpleHeaders() })
+  
+  getCalendarioReservas(fechaInicio: string, fechaFin: string, emprendedorId?: number): Observable<ReservaServicio[]> {
+    let params = new HttpParams()
+      .set('fecha_inicio', fechaInicio)
+      .set('fecha_fin', fechaFin);
+    
+    if (emprendedorId) {
+      params = params.set('emprendedor_id', emprendedorId.toString());
+    }
+    
+    return this.http.get<{ success: boolean, data: ReservaServicio[] }>(`${this.API_URL}/reserva-servicios/calendario`, 
+      { params, headers: this.getSimpleHeaders() })
       .pipe(map(response => response.data));
   }
-
-  deleteReservaDetalle(id: number): Observable<any> {
-    return this.http.delete<{ success: boolean, message: string }>(`${this.API_URL}/reserva-detalles/${id}`,
-      { headers: this.getSimpleHeaders() });
+  
+  verificarDisponibilidadReservaServicio(servicioId: number, fechaInicio: string, fechaFin: string | null, horaInicio: string, horaFin: string, reservaServicioId?: number): Observable<{disponible: boolean}> {
+    let params = new HttpParams()
+      .set('servicio_id', servicioId.toString())
+      .set('fecha_inicio', fechaInicio)
+      .set('hora_inicio', horaInicio)
+      .set('hora_fin', horaFin);
+    
+    if (fechaFin) {
+      params = params.set('fecha_fin', fechaFin);
+    }
+    
+    if (reservaServicioId) {
+      params = params.set('reserva_servicio_id', reservaServicioId.toString());
+    }
+    
+    return this.http.get<{ success: boolean, disponible: boolean }>(`${this.API_URL}/reserva-servicios/verificar-disponibilidad`, 
+      { params, headers: this.getSimpleHeaders() })
+      .pipe(map(response => ({ disponible: response.disponible })));
   }
 }

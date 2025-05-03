@@ -101,6 +101,10 @@ Route::prefix('servicios')->group(function () {
     Route::get('/{id}', [ServicioController::class, 'show']);
     Route::get('/emprendedor/{emprendedorId}', [ServicioController::class, 'byEmprendedor']);
     Route::get('/categoria/{categoriaId}', [ServicioController::class, 'byCategoria']);
+    // Nueva ruta para verificar disponibilidad (no requiere autenticación)
+    Route::get('/verificar-disponibilidad', [ServicioController::class, 'verificarDisponibilidad']);
+    // Nueva ruta para obtener servicios por ubicación
+    Route::get('/ubicacion', [ServicioController::class, 'byUbicacion']);
 });
 
 // Categorías
@@ -179,25 +183,36 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [CategoriaController::class, 'destroy']);
     });
     
-    // Reservas
+    // Reservas (nuevas rutas)
     Route::prefix('reservas')->group(function () {
         Route::get('/', [ReservaController::class, 'index']);
         Route::get('/{id}', [ReservaController::class, 'show']);
         Route::post('/', [ReservaController::class, 'store']);
         Route::put('/{id}', [ReservaController::class, 'update']);
         Route::delete('/{id}', [ReservaController::class, 'destroy']);
-        Route::get('/{id}/emprendedores', [ReservaController::class, 'getEmprendedores']);
+        
+        // Cambiar estado de la reserva
+        Route::put('/{id}/estado', [ReservaController::class, 'cambiarEstado']);
+        
+        // Obtener reservas por emprendedor
+        Route::get('/emprendedor/{emprendedorId}', [ReservaController::class, 'byEmprendedor']);
+        
+        // Obtener reservas por servicio
+        Route::get('/servicio/{servicioId}', [ReservaController::class, 'byServicio']);
     });
-    
-    // Detalles de Reserva
-    Route::prefix('reserva-detalles')->group(function () {
-        Route::get('/', [ReservaDetalleController::class, 'index']);
-        Route::get('/{id}', [ReservaDetalleController::class, 'show']);
-        Route::post('/', [ReservaDetalleController::class, 'store']);
-        Route::put('/{id}', [ReservaDetalleController::class, 'update']);
-        Route::delete('/{id}', [ReservaDetalleController::class, 'destroy']);
-        Route::get('/reserva/{reservaId}', [ReservaDetalleController::class, 'getByReserva']);
-        Route::get('/emprendedor/{emprendedorId}', [ReservaDetalleController::class, 'getByEmprendedor']);
+    // Reserva Servicios (nuevas rutas)
+    Route::prefix('reserva-servicios')->group(function () {
+        // Obtener servicios por reserva
+        Route::get('/reserva/{reservaId}', [ReservaServicioController::class, 'byReserva']);
+        
+        // Cambiar estado de un servicio reservado
+        Route::put('/{id}/estado', [ReservaServicioController::class, 'cambiarEstado']);
+        
+        // Obtener servicios para calendario
+        Route::get('/calendario', [ReservaServicioController::class, 'calendario']);
+        
+        // Verificar disponibilidad de un servicio
+        Route::get('/verificar-disponibilidad', [ReservaServicioController::class, 'verificarDisponibilidad']);
     });
     
     // ===== RUTAS DE ADMINISTRACIÓN (CON PERMISOS) =====

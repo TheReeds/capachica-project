@@ -13,7 +13,7 @@ export interface User {
   roles?: Role[];
 }
 
-export interface Role {
+export interface Role { 
   id: number;
   name: string;
   guard_name?: string;

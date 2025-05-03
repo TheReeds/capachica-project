@@ -2,13 +2,14 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TurismoService, Servicio, Categoria, Emprendedor } from '../../../../../core/services/turismo.service';
+import { TurismoService, Servicio, Categoria, Emprendedor, ServicioHorario } from '../../../../../core/services/turismo.service';
 import { SliderImage, SliderUploadComponent } from '../../../../../shared/components/slider-upload/slider-upload.component';
+import { UbicacionMapComponent } from '../../../../../shared/components/ubicacion-map/ubicacion-map.component';
 
 @Component({
   selector: 'app-servicio-form',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, SliderUploadComponent],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, SliderUploadComponent, UbicacionMapComponent],
   template: `
     <div class="space-y-6">
       <div class="sm:flex sm:items-center sm:justify-between">
@@ -132,9 +133,194 @@ import { SliderImage, SliderUploadComponent } from '../../../../../shared/compon
                     </div>
                   </div>
                   
+                  <!-- Ubicación Geográfica -->
+                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Ubicación Geográfica</h3>
+                    <p class="mt-1 text-sm text-gray-500">Seleccione la ubicación donde se ofrece el servicio.</p>
+                    
+                    <div class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                      <!-- Latitud y Longitud -->
+                      <div class="sm:col-span-3">
+                        <label for="latitud" class="block text-sm font-medium text-gray-700">Latitud</label>
+                        <div class="mt-1">
+                          <input 
+                            type="number" 
+                            id="latitud" 
+                            formControlName="latitud"
+                            step="0.0000001"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                          >
+                        </div>
+                      </div>
+                      
+                      <div class="sm:col-span-3">
+                        <label for="longitud" class="block text-sm font-medium text-gray-700">Longitud</label>
+                        <div class="mt-1">
+                          <input 
+                            type="number" 
+                            id="longitud" 
+                            formControlName="longitud"
+                            step="0.0000001"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                          >
+                        </div>
+                      </div>
+                      
+                      <!-- Referencia de ubicación -->
+                      <div class="sm:col-span-6">
+                        <label for="ubicacion_referencia" class="block text-sm font-medium text-gray-700">Referencia de ubicación</label>
+                        <div class="mt-1">
+                          <input 
+                            type="text" 
+                            id="ubicacion_referencia" 
+                            formControlName="ubicacion_referencia"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                            placeholder="Ej: A 200m del muelle principal de Llachón"
+                          >
+                        </div>
+                      </div>
+                      
+                      <!-- Componente de mapa -->
+                      <div class="sm:col-span-6">
+                        <app-ubicacion-map
+                          [latitud]="servicioForm.get('latitud')?.value"
+                          [longitud]="servicioForm.get('longitud')?.value"
+                          (ubicacionChange)="onUbicacionChange($event)"
+                        ></app-ubicacion-map>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Horarios -->
+                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
+                    <div class="flex justify-between items-center">
+                      <h3 class="text-lg font-medium text-gray-900">Horarios Disponibles</h3>
+                      <button 
+                        type="button"
+                        (click)="addHorario()"
+                        class="inline-flex items-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                      >
+                        <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Añadir Horario
+                      </button>
+                    </div>
+                    
+                    <!-- Lista de horarios -->
+                    <div class="mt-4">
+                      @if (horariosArray.controls.length === 0) {
+                        <div class="rounded-md bg-yellow-50 p-4">
+                          <div class="flex">
+                            <div class="flex-shrink-0">
+                              <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                              </svg>
+                            </div>
+                            <div class="ml-3">
+                              <h3 class="text-sm font-medium text-yellow-800">Atención</h3>
+                              <div class="mt-2 text-sm text-yellow-700">
+                                <p>No hay horarios disponibles definidos. Este servicio no estará disponible para reservas hasta que se añada al menos un horario.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      } @else {
+                        <div class="bg-white shadow overflow-hidden rounded-md">
+                          <ul class="divide-y divide-gray-200">
+                            @for (control of horariosArray.controls; track i; let i = $index) {
+                              <li class="px-4 py-4">
+                                <div [formGroup]="getHorarioFormGroup(i)" class="flex flex-wrap gap-4 items-center">
+                                  <!-- Día de la semana -->
+                                  <div class="w-48">
+                                    <label [for]="'dia-semana-' + i" class="block text-xs font-medium text-gray-500">Día de la semana</label>
+                                    <select 
+                                      [id]="'dia-semana-' + i" 
+                                      formControlName="dia_semana"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                    >
+                                      <option value="lunes">Lunes</option>
+                                      <option value="martes">Martes</option>
+                                      <option value="miercoles">Miércoles</option>
+                                      <option value="jueves">Jueves</option>
+                                      <option value="viernes">Viernes</option>
+                                      <option value="sabado">Sábado</option>
+                                      <option value="domingo">Domingo</option>
+                                    </select>
+                                  </div>
+                                  
+                                  <!-- Hora de inicio -->
+                                  <div class="w-32">
+                                    <label [for]="'hora-inicio-' + i" class="block text-xs font-medium text-gray-500">Hora inicio</label>
+                                    <input 
+                                      [id]="'hora-inicio-' + i" 
+                                      type="time" 
+                                      formControlName="hora_inicio"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                    >
+                                  </div>
+                                  
+                                  <!-- Hora de fin -->
+                                  <div class="w-32">
+                                    <label [for]="'hora-fin-' + i" class="block text-xs font-medium text-gray-500">Hora fin</label>
+                                    <input 
+                                      [id]="'hora-fin-' + i" 
+                                      type="time" 
+                                      formControlName="hora_fin"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                    >
+                                  </div>
+                                  
+                                  <!-- Activo -->
+                                  <div class="w-24">
+                                    <label class="block text-xs font-medium text-gray-500">Estado</label>
+                                    <div class="mt-1 flex items-center">
+                                      <input 
+                                        [id]="'horario-activo-' + i" 
+                                        type="checkbox" 
+                                        formControlName="activo"
+                                        class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                      >
+                                      <label [for]="'horario-activo-' + i" class="ml-2 block text-sm text-gray-700">
+                                        Activo
+                                      </label>
+                                    </div>
+                                  </div>
+                                  
+                                  <!-- Eliminar -->
+                                  <div class="flex-grow flex justify-end">
+                                    <button 
+                                      type="button"
+                                      (click)="removeHorario(i)"
+                                      class="text-red-600 hover:text-red-900 focus:outline-none"
+                                      title="Eliminar horario"
+                                    >
+                                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                      </svg>
+                                    </button>
+                                  </div>
+                                  
+                                  <!-- Mensajes de error -->
+                                  @if (getHorarioFormGroup(i).get('hora_fin')?.value && 
+                                       getHorarioFormGroup(i).get('hora_inicio')?.value && 
+                                       getHorarioFormGroup(i).get('hora_fin')?.value <= getHorarioFormGroup(i).get('hora_inicio')?.value) {
+                                    <div class="w-full text-red-600 text-sm">
+                                      La hora de fin debe ser posterior a la hora de inicio
+                                    </div>
+                                  }
+                                </div>
+                              </li>
+                            }
+                          </ul>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  
                   <!-- Categorías -->
-                  <div class="sm:col-span-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Categorías</label>
+                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
+                    <label class="block text-lg font-medium text-gray-900 mb-2">Categorías</label>
                     <div class="border border-gray-300 rounded-md p-4 bg-gray-50">
                       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         @for (categoria of categorias; track categoria.id) {
@@ -156,14 +342,16 @@ import { SliderImage, SliderUploadComponent } from '../../../../../shared/compon
                       </div>
                     </div>
                   </div>
+                  
+                  <!-- Sliders / Imágenes -->
                   <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
-                  <app-slider-upload
-                    title="Imágenes del Servicio"
-                    [slidersFormArray]="slidersArray"
-                    [existingSliders]="sliders"
-                    (changeSlidersEvent)="onSlidersChange($event)"
-                    (deletedSlidersEvent)="onDeletedSlidersChange($event)"
-                  ></app-slider-upload>
+                    <app-slider-upload
+                      title="Imágenes del Servicio"
+                      [slidersFormArray]="slidersArray"
+                      [existingSliders]="sliders"
+                      (changeSlidersEvent)="onSlidersChange($event)"
+                      (deletedSlidersEvent)="onDeletedSlidersChange($event)"
+                    ></app-slider-upload>
                   </div>
                 </div>
               </div>
@@ -180,22 +368,22 @@ import { SliderImage, SliderUploadComponent } from '../../../../../shared/compon
               </button>
               <button
                 type="submit"
-                [disabled]="servicioForm.invalid || isSubmitting"
+                [disabled]="servicioForm.invalid || invalidHorarios() || isSubmitting"
                 class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                [class.opacity-50]="servicioForm.invalid || isSubmitting"
-                [class.cursor-not-allowed]="servicioForm.invalid || isSubmitting"
-                >
+                [class.opacity-50]="servicioForm.invalid || invalidHorarios() || isSubmitting"
+                [class.cursor-not-allowed]="servicioForm.invalid || invalidHorarios() || isSubmitting"
+              >
                 <ng-container *ngIf="isSubmitting; else textoNormal">
-                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
+                  </svg>
+                  Guardando...
                 </ng-container>
                 <ng-template #textoNormal>
-                    {{ isEditMode ? 'Actualizar' : 'Crear' }} Servicio
+                  {{ isEditMode ? 'Actualizar' : 'Crear' }} Servicio
                 </ng-template>
-                </button>
+              </button>
             </div>
           </div>
         </form>
@@ -256,11 +444,20 @@ export class ServicioFormComponent implements OnInit {
       precio_referencial: [0],
       emprendedor_id: ['', [Validators.required]],
       estado: [true],
-      sliders: this.fb.array([])
+      latitud: [null],
+      longitud: [null],
+      ubicacion_referencia: [''],
+      sliders: this.fb.array([]),
+      horarios: this.fb.array([])
     });
   }
+  
   get slidersArray(): FormArray {
     return this.servicioForm.get('sliders') as FormArray;
+  }
+  
+  get horariosArray(): FormArray {
+    return this.servicioForm.get('horarios') as FormArray;
   }
   
   loadCategorias() {
@@ -298,8 +495,18 @@ export class ServicioFormComponent implements OnInit {
           descripcion: servicio.descripcion,
           precio_referencial: servicio.precio_referencial,
           emprendedor_id: servicio.emprendedor_id,
-          estado: servicio.estado
+          estado: servicio.estado,
+          latitud: servicio.latitud,
+          longitud: servicio.longitud,
+          ubicacion_referencia: servicio.ubicacion_referencia
         });
+        
+        // Cargar horarios
+        if (servicio.horarios && servicio.horarios.length > 0) {
+          servicio.horarios.forEach(horario => {
+            this.addHorario(horario);
+          });
+        }
         
         // Guardar las categorías seleccionadas
         if (servicio.categorias && servicio.categorias.length > 0) {
@@ -312,6 +519,8 @@ export class ServicioFormComponent implements OnInit {
         }
         
         this.loading = false;
+        
+        // Cargar sliders
         if (servicio.sliders && servicio.sliders.length > 0) {
           this.sliders = servicio.sliders.map(slider => ({
             id: slider.id,
@@ -328,7 +537,55 @@ export class ServicioFormComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+  
+  // Métodos para horarios
+  getHorarioFormGroup(index: number): FormGroup {
+    return this.horariosArray.at(index) as FormGroup;
+  }
+  
+  createHorarioFormGroup(horario?: ServicioHorario): FormGroup {
+    return this.fb.group({
+      id: [horario?.id || null],
+      dia_semana: [horario?.dia_semana || 'lunes', Validators.required],
+      hora_inicio: [horario?.hora_inicio || '09:00:00', Validators.required],
+      hora_fin: [horario?.hora_fin || '18:00:00', Validators.required],
+      activo: [horario?.activo !== undefined ? horario.activo : true]
+    });
+  }
+  
+  addHorario(horario?: ServicioHorario) {
+    this.horariosArray.push(this.createHorarioFormGroup(horario));
+  }
+  
+  removeHorario(index: number) {
+    this.horariosArray.removeAt(index);
+  }
+  
+  invalidHorarios(): boolean {
+    if (this.horariosArray.length === 0) {
+      return false; // No es inválido, simplemente no hay horarios
+    }
     
+    for (let i = 0; i < this.horariosArray.length; i++) {
+      const group = this.getHorarioFormGroup(i);
+      const inicio = group.get('hora_inicio')?.value;
+      const fin = group.get('hora_fin')?.value;
+      
+      if (!inicio || !fin || inicio >= fin) {
+        return true; // Horario inválido
+      }
+    }
+    
+    return false;
+  }
+  
+  // Método para manejar cambios de ubicación desde el mapa
+  onUbicacionChange(event: {lat: number, lng: number}) {
+    this.servicioForm.patchValue({
+      latitud: event.lat,
+      longitud: event.lng
+    });
   }
   
   // Categorías
@@ -345,20 +602,45 @@ export class ServicioFormComponent implements OnInit {
       this.selectedCategorias = this.selectedCategorias.filter(id => id !== categoriaId);
     }
   }
+  
+  // Sliders
   onSlidersChange(sliders: SliderImage[]) {
     this.sliders = sliders;
   }
+  
   onDeletedSlidersChange(deletedIds: number[]) {
     this.deletedSliderIds = deletedIds;
   }
+  
   submitForm() {
-    if (this.servicioForm.invalid || this.isSubmitting) return;
+    if (this.servicioForm.invalid || this.invalidHorarios() || this.isSubmitting) return;
     
     this.isSubmitting = true;
     
     // Preparar datos para enviar
     const formData = this.servicioForm.value;
     formData.categorias = this.selectedCategorias;
+    
+    // Convertir tiempos a formato correcto (añadir segundos si faltan)
+    formData.horarios = formData.horarios.map((horario: any) => {
+      // Asegurar que hora_inicio y hora_fin tengan formato correcto (HH:MM:SS)
+      if (horario.hora_inicio && !horario.hora_inicio.includes(':')) {
+        horario.hora_inicio = `${horario.hora_inicio}:00`;
+      }
+      if (horario.hora_fin && !horario.hora_fin.includes(':')) {
+        horario.hora_fin = `${horario.hora_fin}:00`;
+      }
+      
+      // Si solo tiene HH:MM, añadir segundos
+      if (horario.hora_inicio && horario.hora_inicio.split(':').length === 2) {
+        horario.hora_inicio = `${horario.hora_inicio}:00`;
+      }
+      if (horario.hora_fin && horario.hora_fin.split(':').length === 2) {
+        horario.hora_fin = `${horario.hora_fin}:00`;
+      }
+      
+      return horario;
+    });
     
     // Añadir sliders al formData
     formData.sliders = this.sliders.map(slider => ({

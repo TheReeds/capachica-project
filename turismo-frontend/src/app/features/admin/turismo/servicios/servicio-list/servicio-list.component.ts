@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TurismoService, Servicio, Categoria, PaginatedResponse } from '../../../../../core/services/turismo.service';
+import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } from '../../../../../core/services/turismo.service';
 
 @Component({
   selector: 'app-servicio-list',
@@ -42,6 +42,22 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse } from '../../..
           </div>
           
           <div>
+            <label for="emprendedor" class="block text-sm font-medium text-gray-700">Emprendedor</label>
+            <div class="mt-1">
+              <select 
+                id="emprendedor" 
+                [(ngModel)]="selectedEmprendedorId" 
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option [ngValue]="null">Todos</option>
+                @for (emprendedor of emprendedores; track emprendedor.id) {
+                  <option [ngValue]="emprendedor.id">{{ emprendedor.nombre }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          
+          <div>
             <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
             <div class="mt-1">
               <select 
@@ -72,7 +88,7 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse } from '../../..
             </div>
           </div>
           
-          <div class="flex items-end">
+          <div class="flex items-end md:col-span-4">
             <button 
               type="button" 
               (click)="applyFilters()" 
@@ -121,6 +137,7 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse } from '../../..
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emprendedor</th>
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categorías</th>
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horarios</th>
                   <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
@@ -170,6 +187,25 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse } from '../../..
                         </span>
                       }
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500">
+                        @if (servicio.horarios && servicio.horarios.length > 0) {
+                          <div class="flex items-center">
+                            <svg class="h-4 w-4 text-green-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>{{ servicio.horarios.length }} {{ servicio.horarios.length === 1 ? 'horario' : 'horarios' }}</span>
+                          </div>
+                        } @else {
+                          <div class="flex items-center">
+                            <svg class="h-4 w-4 text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <span>Sin horarios</span>
+                          </div>
+                        }
+                      </div>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div class="flex items-center justify-end space-x-2">
                         <a 
@@ -197,6 +233,16 @@ import { TurismoService, Servicio, Categoria, PaginatedResponse } from '../../..
                             </svg>
                           }
                         </button>
+                        
+                        <a 
+                          [routerLink]="['/admin/reservas/servicio', servicio.id]" 
+                          class="text-blue-600 hover:text-blue-900"
+                          title="Ver reservas"
+                        >
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                        </a>
                         
                         <button 
                           (click)="deleteServicio(servicio)" 
@@ -282,11 +328,13 @@ export class ServicioListComponent implements OnInit {
   
   pagination: PaginatedResponse<Servicio> | null = null;
   categorias: Categoria[] = [];
+  emprendedores: Emprendedor[] = [];
   loading = true;
   
   // Filtros
   searchTerm = '';
   selectedCategoriaId: number | null = null;
+  selectedEmprendedorId: number | null = null;
   selectedEstado: boolean | null = null;
   
   // Paginación
@@ -295,6 +343,7 @@ export class ServicioListComponent implements OnInit {
   
   ngOnInit() {
     this.loadCategorias();
+    this.loadEmprendedores();
     this.loadServicios();
   }
   
@@ -309,9 +358,40 @@ export class ServicioListComponent implements OnInit {
     });
   }
   
+  loadEmprendedores() {
+    this.turismoService.getEmprendedores(1, 100).subscribe({
+      next: (response) => {
+        this.emprendedores = response.data;
+      },
+      error: (error) => {
+        console.error('Error al cargar emprendedores:', error);
+      }
+    });
+  }
+  
   loadServicios() {
     this.loading = true;
-    this.turismoService.getServicios(this.currentPage, this.itemsPerPage).subscribe({
+    
+    // Preparar filtros
+    const filters: any = {};
+    
+    if (this.searchTerm) {
+      filters.search = this.searchTerm;
+    }
+    
+    if (this.selectedCategoriaId !== null) {
+      filters.categoria_id = this.selectedCategoriaId;
+    }
+    
+    if (this.selectedEmprendedorId !== null) {
+      filters.emprendedor_id = this.selectedEmprendedorId;
+    }
+    
+    if (this.selectedEstado !== null) {
+      filters.estado = this.selectedEstado;
+    }
+    
+    this.turismoService.getServicios(this.currentPage, this.itemsPerPage, filters).subscribe({
       next: (response) => {
         this.pagination = response;
         this.loading = false;
@@ -325,8 +405,6 @@ export class ServicioListComponent implements OnInit {
   
   applyFilters() {
     this.currentPage = 1;
-    // Aquí implementarías la lógica para filtrar servicios según searchTerm, selectedCategoriaId y selectedEstado
-    // Por ahora, simplemente recargamos los servicios
     this.loadServicios();
   }
   
