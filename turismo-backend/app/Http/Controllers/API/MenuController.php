@@ -69,15 +69,9 @@ class MenuController extends Controller
                 'children' => [
                     [
                         'id' => 'user-list',
-                        'title' => 'Lista de Usuarios',
+                        'title' => 'Gestión de Usuarios',
                         'path' => '/admin/users',
                         'permissions' => ['user_read'],
-                    ],
-                    [
-                        'id' => 'user-create',
-                        'title' => 'Crear Usuario',
-                        'path' => '/admin/users/create',
-                        'permissions' => ['user_create'],
                     ],
                     [
                         'id' => 'roles',
@@ -101,27 +95,6 @@ class MenuController extends Controller
                 'permissions' => ['municipalidad_read'],
             ],
             [
-                'id' => 'asociaciones',
-                'title' => 'Asociaciones',
-                'icon' => 'users-group',
-                'path' => '/admin/asociaciones',
-                'permissions' => ['asociacion_read'],
-                'children' => [
-                    [
-                        'id' => 'asociacion-list',
-                        'title' => 'Lista de Asociaciones',
-                        'path' => '/admin/asociaciones',
-                        'permissions' => ['asociacion_read'],
-                    ],
-                    [
-                        'id' => 'asociacion-create',
-                        'title' => 'Crear Asociación',
-                        'path' => '/admin/asociaciones/create',
-                        'permissions' => ['asociacion_create'],
-                    ],
-                ]
-            ],
-            [
                 'id' => 'emprendedores',
                 'title' => 'Emprendedores',
                 'icon' => 'store',
@@ -130,15 +103,15 @@ class MenuController extends Controller
                 'children' => [
                     [
                         'id' => 'emprendedor-list',
-                        'title' => 'Lista de Emprendedores',
+                        'title' => 'Gestión de Emprendedores',
                         'path' => '/admin/emprendedores',
                         'permissions' => ['emprendedor_read'],
                     ],
                     [
-                        'id' => 'emprendedor-create',
-                        'title' => 'Crear Emprendedor',
-                        'path' => '/admin/emprendedores/create',
-                        'permissions' => ['emprendedor_create'],
+                        'id' => 'asociacion-list',
+                        'title' => 'Gestión de Asociaciones',
+                        'path' => '/admin/asociaciones',
+                        'permissions' => ['asociacion_read'],
                     ],
                 ]
             ],
@@ -151,15 +124,9 @@ class MenuController extends Controller
                 'children' => [
                     [
                         'id' => 'servicio-list',
-                        'title' => 'Lista de Servicios',
+                        'title' => 'Gestión de Servicios',
                         'path' => '/admin/servicios',
                         'permissions' => ['servicio_read'],
-                    ],
-                    [
-                        'id' => 'servicio-create',
-                        'title' => 'Crear Servicio',
-                        'path' => '/admin/servicios/create',
-                        'permissions' => ['servicio_create'],
                     ],
                     [
                         'id' => 'categorias',
