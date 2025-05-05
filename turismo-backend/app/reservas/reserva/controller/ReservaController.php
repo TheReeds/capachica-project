@@ -14,7 +14,7 @@ use App\Reservas\Reserva\Requests\ReservaRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
-
+use App\Servicios\Repository\ServicioRepository;
 
 class ReservaController extends Controller
 {
@@ -478,7 +478,7 @@ class ReservaController extends Controller
     {
         try {
             // Obtener información del servicio para verificar permisos
-            $servicio = app(App\Servicios\Repository\ServicioRepository::class)->findById($servicioId);
+            $servicio = app(ServicioRepository::class)->findById($servicioId);
             
             if (!$servicio) {
                 return response()->json([

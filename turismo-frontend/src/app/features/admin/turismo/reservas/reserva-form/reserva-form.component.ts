@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from '../../../../../core/services/turismo.service';
-/*
+
 @Component({
   selector: 'app-reserva-form',
   standalone: true,
@@ -75,7 +75,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                         [ngClass]="{'bg-gray-100': isEditMode}"
                       >
                     </div>
-                    @if (reservaForm.get('codigo_reserva')?.errors?.required && reservaForm.get('codigo_reserva')?.touched) {
+                    @if (reservaForm.get('codigo_reserva')?.errors?.['required'] && reservaForm.get('codigo_reserva')?.touched) {
                       <p class="mt-2 text-sm text-red-600">El código de reserva es obligatorio</p>
                     }
                   </div>
@@ -95,7 +95,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                         }
                       </select>
                     </div>
-                    @if (reservaForm.get('usuario_id')?.errors?.required && reservaForm.get('usuario_id')?.touched) {
+                    @if (reservaForm.get('usuario_id')?.errors?.['required'] && reservaForm.get('usuario_id')?.touched) {
                       <p class="mt-2 text-sm text-red-600">El cliente es obligatorio</p>
                     }
                   </div>
@@ -184,7 +184,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                                 }
                               </select>
                             </div>
-                            @if (getServicioFormGroup(i).get('servicio_id')?.errors?.required && getServicioFormGroup(i).get('servicio_id')?.touched) {
+                            @if (getServicioFormGroup(i).get('servicio_id')?.errors?.['required'] && getServicioFormGroup(i).get('servicio_id')?.touched) {
                               <p class="mt-2 text-sm text-red-600">El servicio es obligatorio</p>
                             }
                           </div>
@@ -219,7 +219,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                                 (change)="onFechaHoraChange(i)"
                               >
                             </div>
-                            @if (getServicioFormGroup(i).get('fecha_inicio')?.errors?.required && getServicioFormGroup(i).get('fecha_inicio')?.touched) {
+                            @if (getServicioFormGroup(i).get('fecha_inicio')?.errors?.['required'] && getServicioFormGroup(i).get('fecha_inicio')?.touched) {
                               <p class="mt-2 text-sm text-red-600">La fecha de inicio es obligatoria</p>
                             }
                           </div>
@@ -268,7 +268,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                                 (change)="onFechaHoraChange(i)"
                               >
                             </div>
-                            @if (getServicioFormGroup(i).get('hora_inicio')?.errors?.required && getServicioFormGroup(i).get('hora_inicio')?.touched) {
+                            @if (getServicioFormGroup(i).get('hora_inicio')?.errors?.['required'] && getServicioFormGroup(i).get('hora_inicio')?.touched) {
                               <p class="mt-2 text-sm text-red-600">La hora de inicio es obligatoria</p>
                             }
                           </div>
@@ -285,7 +285,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                                 (change)="onFechaHoraChange(i)"
                               >
                             </div>
-                            @if (getServicioFormGroup(i).get('hora_fin')?.errors?.required && getServicioFormGroup(i).get('hora_fin')?.touched) {
+                            @if (getServicioFormGroup(i).get('hora_fin')?.errors?.['required'] && getServicioFormGroup(i).get('hora_fin')?.touched) {
                               <p class="mt-2 text-sm text-red-600">La hora de fin es obligatoria</p>
                             }
                             
@@ -308,7 +308,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                               >
                             </div>
-                            @if (getServicioFormGroup(i).get('duracion_minutos')?.errors?.required && getServicioFormGroup(i).get('duracion_minutos')?.touched) {
+                            @if (getServicioFormGroup(i).get('duracion_minutos')?.errors?.['required'] && getServicioFormGroup(i).get('duracion_minutos')?.touched) {
                               <p class="mt-2 text-sm text-red-600">La duración es obligatoria</p>
                             }
                           </div>
@@ -849,4 +849,4 @@ export class ReservaFormComponent implements OnInit {
     
     return partes.map(p => p.padStart(2, '0')).join(':');
   }
-}*/
+}
