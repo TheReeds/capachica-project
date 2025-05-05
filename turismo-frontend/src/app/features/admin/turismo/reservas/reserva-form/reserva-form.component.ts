@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from '../../../../../core/services/turismo.service';
-
+/*
 @Component({
   selector: 'app-reserva-form',
   standalone: true,
@@ -849,4 +849,4 @@ export class ReservaFormComponent implements OnInit {
     
     return partes.map(p => p.padStart(2, '0')).join(':');
   }
-}
+}*/
