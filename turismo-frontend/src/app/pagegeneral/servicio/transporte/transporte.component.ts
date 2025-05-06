@@ -4,14 +4,14 @@ import { RouterModule } from '@angular/router';
 import { ServiciosService } from '../servicios/servicios.service';
 
 @Component({
-  selector: 'app-actividades',
+  selector: 'app-transporte',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './actividades.component.html',
-  styleUrls: ['./actividades.component.css']
+  templateUrl: './transporte.component.html',
+  styleUrls: ['./transporte.component.css']
 })
-export class ActividadesComponent implements OnInit {
-  actividades: any[] = [];
+export class TransporteComponent implements OnInit {
+  transportes: any[] = [];
 
   constructor(private serviciosService: ServiciosService) {}
 
@@ -19,9 +19,9 @@ export class ActividadesComponent implements OnInit {
     this.serviciosService.obtenerServicios().subscribe((res: any) => {
       const todos = res?.data?.data ?? [];
 
-      this.actividades = todos
+      this.transportes = todos
         .filter((servicio: any) =>
-          servicio.categorias?.some((cat: any) => cat.id === 5)
+          servicio.categorias?.some((cat: any) => cat.id === 4)
         )
         .map((servicio: any) => {
           let imagenPrincipal = 'default.jpg';
@@ -43,3 +43,4 @@ export class ActividadesComponent implements OnInit {
     });
   }
 }
+

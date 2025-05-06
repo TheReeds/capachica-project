@@ -1,0 +1,56 @@
+/* Estilo base del componente */
+:host {
+    display: block;
+    background-color: #f9fafb; /* Gris claro */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Estilo para los botones del sidebar */
+  button {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #fde68a; /* Hover amarillo suave */
+  }
+  
+  /* Modal scroll handling */
+  .modal-scroll {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Estilo para las tarjetas de servicios */
+  .card-servicio {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .card-servicio:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Estilo para etiquetas de categoría */
+  .categoria-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    background-color: #fef3c7;
+    color: #92400e;
+    margin-right: 0.25rem;
+  }
+  
+  /* Modal */
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 800px;
+    width: 100%;
+  }
+  
