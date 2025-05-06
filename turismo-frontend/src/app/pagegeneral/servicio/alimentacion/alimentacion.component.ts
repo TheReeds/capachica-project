@@ -1,17 +1,17 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { ServiciosService } from '../servicios/servicios.service';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-actividades',
+  selector: 'app-alimentacion',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './actividades.component.html',
-  styleUrls: ['./actividades.component.css']
+  imports: [CommonModule, RouterModule], // ✅ Agrega aquí CommonModule
+  templateUrl: './alimentacion.component.html',
+  styleUrls: ['./alimentacion.component.css']
 })
-export class ActividadesComponent implements OnInit {
-  actividades: any[] = [];
+export class AlimentacionComponent implements OnInit {
+  alimentaciones: any[] = [];
 
   constructor(private serviciosService: ServiciosService) {}
 
@@ -19,9 +19,9 @@ export class ActividadesComponent implements OnInit {
     this.serviciosService.obtenerServicios().subscribe((res: any) => {
       const todos = res?.data?.data ?? [];
 
-      this.actividades = todos
+      this.alimentaciones = todos
         .filter((servicio: any) =>
-          servicio.categorias?.some((cat: any) => cat.id === 5)
+          servicio.categorias?.some((cat: any) => cat.id === 2)
         )
         .map((servicio: any) => {
           let imagenPrincipal = 'default.jpg';
@@ -43,3 +43,4 @@ export class ActividadesComponent implements OnInit {
     });
   }
 }
+

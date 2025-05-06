@@ -16,36 +16,30 @@
       </div>
     </div>
   </div>
-  
-
-
-<section class="px-6 py-10 bg-white dark:bg-gray-900 transition-colors duration-500">
-    <h2 class="text-3xl font-bold text-green-700 dark:text-green-400 mb-4 text-center">Actividades</h2>
-    <p class="text-lg text-green-500 dark:text-green-300 mb-6 text-center">
-      Vive experiencias únicas en Capachica
+  <section class="px-6 py-10 bg-white dark:bg-gray-900 transition-colors duration-500">
+    <h2 class="text-3xl font-bold text-purple-700 dark:text-purple-400 mb-4 text-center">Artesanías</h2>
+    <p class="text-lg text-purple-500 dark:text-purple-300 mb-6 text-center">
+      Productos hechos a mano por familias capachiqueñas
     </p>
   
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       <div
-        *ngFor="let actividad of actividades"
+        *ngFor="let artesania of artesanias"
         class="rounded-2xl overflow-hidden shadow-lg relative bg-white dark:bg-gray-800 transition duration-300"
       >
         <img
-          [src]="'http://127.0.0.1:8000/storage/' + actividad.imagenPrincipal"
-          alt="{{ actividad.nombre }}"
+          [src]="'http://127.0.0.1:8000/storage/' + artesania.imagenPrincipal"
+          alt="{{ artesania.nombre }}"
           class="w-full h-80 object-cover"
         />
-  
-        <div class="absolute top-2 left-2 bg-emerald-800 text-white text-xs font-semibold px-3 py-1 rounded">
-          {{ actividad.nombre }}
+        <div class="absolute top-2 left-2 bg-purple-800 text-white text-xs font-semibold px-3 py-1 rounded">
+          {{ artesania.nombre }}
         </div>
-  
         <div class="absolute bottom-16 left-3 text-white text-lg font-bold drop-shadow">
-          {{ actividad.emprendedor?.nombre || 'Sin emprendedor' }}
+          {{ artesania.emprendedor?.nombre || 'Sin emprendedor' }}
         </div>
-  
         <div class="absolute bottom-3 right-3 bg-white dark:bg-gray-700 text-black dark:text-white font-semibold px-4 py-1 rounded shadow">
-          S/. {{ actividad.precio_referencial || '---' }}
+          S/. {{ artesania.precio_referencial || '---' }}
         </div>
       </div>
     </div>
