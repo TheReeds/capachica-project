@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { GoogleLoginButtonComponent } from '../../../shared/components/buttons/google-login-button.component';
 import { GoogleAuthService } from '../../../core/services/google-auth.service';
 import { RegisterRequest } from '../../../core/models/user.model';
+import { ThemeService } from '../../../core/services/theme.service';
 
 // Custom validator function
 export function MustMatch(controlName: string, matchingControlName: string) {
@@ -42,6 +43,7 @@ export class RegisterComponent implements OnInit {
   private googleAuthService = inject(GoogleAuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  public themeService = inject(ThemeService);
 
   registerForm: FormGroup;
   loading = false;
@@ -223,5 +225,13 @@ export class RegisterComponent implements OnInit {
   // Prevenir que los clics dentro del modal se propaguen al documento
   preventPropagation(event: MouseEvent) {
     event.stopPropagation();
+  }
+
+  toggleDarkMode() {
+    this.themeService.toggleDarkMode();
+  }
+  
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 }

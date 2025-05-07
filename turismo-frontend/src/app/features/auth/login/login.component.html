@@ -1,80 +1,90 @@
-<div class="flex min-h-screen items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8" style="background-image: url('/assets/images/foto07.jpg'); background-size: cover; background-position: center;">
-  <div class="mx-auto w-full max-w-6xl overflow-hidden rounded-2xl sm:rounded-3xl bg-white shadow-xl lg:flex" style="height: 670px; max-height: 670px;">
+<div class="flex min-h-screen items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8" style="background-image: url('/assets/images/foto05.jpg'); background-size: cover; background-position: center;">
+  <div class="mx-auto w-full max-w-6xl overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-gray-800 shadow-xl lg:flex" style="height: 520px; max-height: 520px;">
     <!-- Panel izquierdo -->
-    <div class="w-full p-4 sm:p-6 md:p-8 lg:p-10 lg:w-1/2 h-full flex flex-col">
-      <div class="mb-4">
-        <h1 class="mb-1 text-3xl font-bold text-gray-900">Capachica Travel</h1>
-        <p class="text-gray-600">Explora más. Vive experiencias.</p>
+    <div class="w-full p-4 sm:p-5 md:p-6 lg:p-8 lg:w-1/2 h-full flex flex-col">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <h1 class="mb-1 text-2xl font-bold text-gray-900 dark:text-white">Capachica Travel</h1>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Explora más. Vive experiencias.</p>
+        </div>
+        <button (click)="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg *ngIf="!isDarkMode()" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+          <svg *ngIf="isDarkMode()" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
       </div>
 
-      <div class="mb-4 flex border-b border-gray-200">
-        <button class="flex-1 border-b-2 border-black py-2 text-center font-semibold transition-colors">
+      <div class="mb-3 flex border-b border-gray-200 dark:border-gray-700">
+        <button class="flex-1 border-b-2 border-orange-500 py-2 text-center font-semibold transition-colors dark:text-white">
           Iniciar sesión
         </button>
-        <a routerLink="/register" class="flex-1 border-b-0 py-2 text-center font-semibold text-gray-400 hover:text-gray-600 transition-colors">
+        <a routerLink="/register" class="flex-1 border-b-0 py-2 text-center font-semibold text-gray-400 hover:text-gray-600 transition-colors dark:hover:text-gray-300">
           Registrarse
         </a>
       </div>
 
-      <h2 class="mb-3 text-xl font-bold text-gray-900">
+      <h2 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
         Comienza tu aventura
       </h2>
-      <p class="mb-3 text-gray-600">
+      <p class="mb-2 text-gray-600 dark:text-gray-300 text-sm">
         Inicia sesión con cuenta externa
       </p>
 
-      <div class="mb-4 flex justify-center space-x-4">
-        <app-google-login-button class="w-98 h-12 rounded-2xl"></app-google-login-button>
+      <div class="mb-3 flex justify-center space-x-4">
+        <app-google-login-button class="w-98 h-10 rounded-2xl"></app-google-login-button>
       </div>
 
-      <div class="relative mb-4">
+      <div class="relative mb-3">
         <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
+          <div class="w-full border-t border-gray-300 dark:border-gray-700"></div>
         </div>
         <div class="relative flex justify-center text-sm">
-          <span class="bg-white px-4 text-gray-500">o</span>
+          <span class="bg-white dark:bg-gray-800 px-4 text-gray-500 dark:text-gray-400">o</span>
         </div>
       </div>
 
-      <form class="space-y-3 flex-grow" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <form class="space-y-2 flex-grow" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Correo electrónico</label>
           <input
             id="email"
             type="email"
             formControlName="email"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" 
             autocomplete="email"
             placeholder="admin@ejemplo.com"
             [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-500': submitted && f['email'].errors}" />
           <div *ngIf="submitted && f['email'].errors" class="mt-1">
-            <p class="text-sm text-red-600" *ngIf="f['email'].errors['required']">El correo electrónico es requerido</p>
-            <p class="text-sm text-red-600" *ngIf="f['email'].errors['email']">Ingrese un correo electrónico válido</p>
+            <p class="text-sm text-red-600 dark:text-red-400" *ngIf="f['email'].errors['required']">El correo electrónico es requerido</p>
+            <p class="text-sm text-red-600 dark:text-red-400" *ngIf="f['email'].errors['email']">Ingrese un correo electrónico válido</p>
           </div>
         </div>
 
         <div class="password-field">
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contraseña</label>
           <div class="relative">
             <input
               id="password"
               [type]="showPassword ? 'text' : 'password'"
               formControlName="password"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" 
               autocomplete="current-password"
               placeholder="••••••••"
               [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-500': submitted && f['password'].errors}" />
             <span class="password-toggle" (click)="togglePasswordVisibility()">
-              <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
               </svg>
             </span>
           </div>
-          <p class="text-sm text-red-600 mt-1" *ngIf="submitted && f['password'].errors?.['required']">
+          <p class="text-sm text-red-600 dark:text-red-400 mt-1" *ngIf="submitted && f['password'].errors?.['required']">
             La contraseña es requerida
           </p>
         </div>
@@ -86,19 +96,19 @@
               type="checkbox"
               [(ngModel)]="rememberMe"
               [ngModelOptions]="{standalone: true}"
-              class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" /> 
-            <label for="remember_me" class="ml-2 block text-sm text-gray-700">
+              class="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" /> 
+            <label for="remember_me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
               Recordarme
             </label>
           </div>
           <div>
-            <a routerLink="/forgot-password" class="text-sm font-medium text-blue-600 hover:text-blue-700">
+            <a routerLink="/forgot-password" class="text-sm font-medium text-orange-500 hover:text-orange-600 dark:hover:text-orange-400">
               ¿Olvidaste tu contraseña?
             </a> 
           </div>
         </div>
 
-        <div *ngIf="emailVerificationNeeded" class="rounded-md border border-yellow-300 bg-yellow-50 p-2"> 
+        <div *ngIf="emailVerificationNeeded" class="rounded-md border border-yellow-300 bg-yellow-50 dark:bg-yellow-900 dark:border-yellow-800 p-2"> 
           <div class="flex">
             <div class="flex-shrink-0">
               <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -106,14 +116,14 @@
               </svg>
             </div>
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-yellow-800">
+              <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-300">
                 Verificación de correo requerida
               </h3>
-              <div class="mt-1 text-sm text-yellow-700">
+              <div class="mt-1 text-sm text-yellow-700 dark:text-yellow-400">
                 <p>Necesitas verificar tu dirección de correo electrónico.</p>
                 <button
                   type="button"
-                  class="mt-1 text-sm font-medium text-yellow-800 underline hover:text-yellow-900"
+                  class="mt-1 text-sm font-medium text-yellow-800 dark:text-yellow-300 underline hover:text-yellow-900 dark:hover:text-yellow-200"
                   (click)="resendVerificationEmail()">
                   Reenviar correo de verificación
                 </button>
@@ -122,7 +132,7 @@
           </div>
         </div>
 
-        <div *ngIf="error && !emailVerificationNeeded" class="rounded-md border border-red-300 bg-red-50 p-2"> 
+        <div *ngIf="error && !emailVerificationNeeded" class="rounded-md border border-red-300 bg-red-50 dark:bg-red-900 dark:border-red-800 p-2"> 
           <div class="flex">
             <div class="flex-shrink-0">
               <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -130,7 +140,7 @@
               </svg>
             </div>
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">{{ error }}</h3>
+              <h3 class="text-sm font-medium text-red-800 dark:text-red-300">{{ error }}</h3>
             </div>
           </div>
         </div>
@@ -138,7 +148,7 @@
         <div class="pt-1 mt-auto">
           <button
             type="submit"
-            class="w-full rounded-lg bg-black py-3 text-center font-semibold text-white hover:bg-gray-800 active:bg-gray-900"
+            class="w-full rounded-lg bg-orange-500 py-2 text-center font-semibold text-white hover:bg-orange-600 active:bg-orange-700"
             [disabled]="loading">
             <span *ngIf="loading" class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
             <span *ngIf="!loading">Comenzar</span>
@@ -149,36 +159,19 @@
 
     <!-- Panel derecho con imagen y mensaje -->
     <div class="hidden lg:block lg:w-1/2 relative">
-      <img src="/assets/images/foto03.jpg" alt="Capachica Travel" class="h-full w-full object-cover" />
-      
-      <!-- Flechas de navegación -->
-      <div class="absolute inset-y-0 left-0 flex items-center">
-        <button class="rounded-r-full bg-white p-2 shadow-lg text-gray-700 hover:text-gray-900 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-      </div>
-      
-      <div class="absolute inset-y-0 right-0 flex items-center">
-        <button class="rounded-l-full bg-white p-2 shadow-lg text-gray-700 hover:text-gray-900 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
+      <img src="/assets/images/foto01.jpg" alt="Capachica Travel" class="h-full w-full object-cover" />
       
       <!-- Mensaje flotante en la parte superior -->
-      <div class="absolute top-10 right-10 max-w-sm rounded-xl bg-white p-4 shadow-lg">
+      <div class="absolute top-10 right-10 max-w-sm rounded-xl bg-white dark:bg-gray-800 p-4 shadow-lg">
         <div class="flex justify-between items-start">
-          <h3 class="text-xl font-bold">¡Viaja por el mundo, a tu manera!</h3>
+          <h3 class="text-xl font-bold dark:text-white">¡Viaja por el mundo, a tu manera!</h3>
           <div class="ml-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
             </svg>
           </div>
         </div>
-        <p class="mt-2 text-gray-600">
+        <p class="mt-2 text-gray-600 dark:text-gray-300">
           Explora destinos a tu ritmo con viajes personalizados y experiencias inolvidables.
         </p>
       </div>
