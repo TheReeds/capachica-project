@@ -7,9 +7,18 @@ import { ServicioService } from './servicios.service';
 import { Servicio } from './servicio.model';
 import { Emprendedor } from './emprendedor.model';
 
+// componente.ts
+import Swiper from 'swiper';
+import { SwiperOptions } from 'swiper/types';
+import { Navigation, Pagination } from 'swiper/modules';
+
+Swiper.use([Navigation, Pagination]);
+
+
 @Component({
   selector: 'app-detallefamilias',
   templateUrl: './detallefamilias.component.html',
+  styleUrls: ['./detallefamilias.component.css'],
   standalone: true,
   imports: [CommonModule, RouterModule] 
 })
@@ -55,4 +64,33 @@ export class DetallefamiliasComponent implements OnInit {
   getImagenesSecundarias(): string[] {
     return this.emprendedor?.sliders_secundarios?.map(s => s.url_completa) || [];
   }
+
+  getImagenesPrincipal(): string[] {
+    return this.emprendedor?.sliders_principales?.map(s => s.url_completa) || [];
+  }
+
+  
+  
+
+  ngAfterViewInit() {
+    new Swiper('.mySwiper', {
+      slidesPerView: 1,
+      spaceBetween: 20,
+      loop: true,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      breakpoints: {
+        640: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        1024: { slidesPerView: 3 },
+      },
+    });
+  }
+  
 }
