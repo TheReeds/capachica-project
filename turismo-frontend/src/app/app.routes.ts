@@ -40,10 +40,6 @@ export const routes: Routes = [
                 loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES)
             },
             {
-                path: 'emprendedores',
-                loadChildren: () => import('./features/emprendedores/emprendedores.routes').then(m => m.EMPRENDEDORES_ROUTES)
-            },
-            {
                 path: 'categorias',
                 loadChildren: () => import('./features/categorias/categorias.routes').then(m => m.CATEGORIAS_ROUTES)
             }
