@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { SobrenosotrosComponent } from './sobrenosotros/sobrenosotros.component';
+import { EventosComponent } from './eventos/eventos.component';
 import { ContactosComponent } from './contactos/contactos.component';
 import { HomeComponent } from './home/home.component';
 import { FamiliasComponent } from './familia/familias/familias/familias.component';
@@ -25,9 +25,9 @@ export const PAGEGENERAL_ROUTES: Routes = [
       title: 'Home'
     },
     {
-      path: 'sobrenosotros',
-      component: SobrenosotrosComponent,
-      title: 'Sobre Nosotros'
+      path: 'eventos',
+      component: EventosComponent,
+      title: 'Eventos'
     },
     {
       path: 'contactos',
@@ -97,7 +97,7 @@ export const PAGEGENERAL_ROUTES: Routes = [
 ];
 
 // Para exportación fácil de los componentes
-export * from './sobrenosotros/sobrenosotros.component';
+export * from './eventos/eventos.component';
 export * from './contactos/contactos.component';
 export * from './home/home.component';
 export * from './familia/familias/familias/familias.component';

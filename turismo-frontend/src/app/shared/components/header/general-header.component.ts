@@ -67,7 +67,7 @@ import { Subscription, filter } from 'rxjs';
                 <span>Servicios</span>
                 <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-600 dark:bg-amber-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
-              <a routerLink="/sobrenosotros" 
+              <a routerLink="/eventos" 
                 routerLinkActive="text-amber-800 dark:text-amber-400 font-medium border-b-2 border-amber-600 dark:border-amber-500" 
                 class="flex items-center text-gray-800 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-400 py-1 transition-colors duration-200 relative group"
               >
@@ -84,7 +84,7 @@ import { Subscription, filter } from 'rxjs';
                 <svg class="w-5 h-5 mr-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                 </svg>
-                <span>Paquetes</span>
+                <span>Planes</span>
                 <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-600 dark:bg-amber-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
             </nav>
@@ -222,7 +222,7 @@ import { Subscription, filter } from 'rxjs';
                 </svg>
                 <span>Servicios</span>
               </a>
-              <a routerLink="/sobrenosotros" 
+              <a routerLink="/eventos" 
                 routerLinkActive="text-amber-800 dark:text-amber-400 font-medium" 
                 class="flex items-center text-gray-800 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-400 py-2 px-1 transition-colors duration-200" 
                 (click)="closeMobileMenu()"
@@ -230,7 +230,7 @@ import { Subscription, filter } from 'rxjs';
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <span>Sobre nosotros</span>
+                <span>Eventos</span>
               </a>
               <a routerLink="/contactos" 
                 routerLinkActive="text-amber-800 dark:text-amber-400 font-medium" 

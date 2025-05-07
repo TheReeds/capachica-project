@@ -50,14 +50,6 @@ export const routes: Routes = [
     {
         path: '**',
         redirectTo: 'home', // Cambiado a 'home' en lugar de 'dashboard' para redirigir a una ruta pública
-    },
-
-    {
-        path: 'servicios',
-        children: [
-          { path: '', component: ServiciosComponent },
-          { path: 'alojamiento', component: AlojamientoComponent }
-        ]
     }
     
 ];
