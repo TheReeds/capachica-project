@@ -1,6 +1,7 @@
 // src/app/features/admin/admin.routes.ts
 import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from '../../shared/layouts/admin-layout/admin-layout.component';
+import { ProfileComponent } from '../profile/profile.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -10,6 +11,11 @@ export const ADMIN_ROUTES: Routes = [
         path: 'users',
         loadChildren: () => import('./users/users.routes').then(m => m.USERS_ROUTES),
         title: 'Gestión de Usuarios'
+      },
+      {
+        path: 'profile',
+        loadChildren: () => import('../profile/profile.routes').then(m => m.PROFILE_ROUTES),
+        title: 'Mi perfil'
       },
       {
         path: 'roles',
