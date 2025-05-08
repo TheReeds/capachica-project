@@ -33,6 +33,7 @@ class MisEmprendimientosController extends Controller
                 ->with([
                     'asociacion',
                     'servicios.categorias',
+                    'servicios.sliders',
                     'slidersPrincipales',
                     'slidersSecundarios.descripcion',
                     'administradores'
@@ -69,10 +70,12 @@ class MisEmprendimientosController extends Controller
                 ->with([
                     'asociacion',
                     'servicios.categorias',
+                    'servicios.sliders',
+                    'servicios.horarios',
                     'slidersPrincipales',
                     'slidersSecundarios.descripcion',
                     'administradores',
-                    'reservas'
+                    //'reservas'
                 ])
                 ->where('emprendedores.id', $id)
                 ->first();
