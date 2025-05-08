@@ -3,24 +3,25 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from '../../../../../core/services/turismo.service';
+import { ThemeService } from '../../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-reserva-form',
   standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule],
   template: `
-    <div class="space-y-6">
+    <div class="space-y-6 transition-colors duration-300">
       <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">{{ isEditMode ? 'Editar' : 'Crear' }} Reserva</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{{ isEditMode ? 'Editar' : 'Crear' }} Reserva</h1>
           <p class="mt-1 text-sm text-gray-500">
             {{ isEditMode ? 'Actualice la información de la reserva' : 'Complete el formulario para crear una nueva reserva' }}
           </p>
         </div>
         <div class="mt-4 sm:mt-0">
-          <a 
-            routerLink="/admin/reservas" 
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+          <a
+            routerLink="/admin/reservas"
+            class="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-300"
           >
             <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -29,9 +30,9 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
           </a>
         </div>
       </div>
-      
+
       @if (loading) {
-        <div class="rounded-lg bg-white p-6 shadow-sm">
+        <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors duration-300">
           <div class="flex justify-center items-center p-8">
             <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
             <span class="ml-4">Cargando...</span>
@@ -39,20 +40,20 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
         </div>
       } @else {
         <form [formGroup]="reservaForm" (ngSubmit)="submitForm()" class="space-y-6">
-          <div class="rounded-lg bg-white shadow-sm overflow-hidden">
+          <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors duration-300">
             <div class="p-6 space-y-6">
               <!-- Información básica de la reserva -->
               <div>
-                <h2 class="text-lg font-medium text-gray-900">Información de la Reserva</h2>
+                <h2 class="text-lg font-medium text-gray-900 dark:text-white transition-colors duration-300">Información de la Reserva</h2>
                 <div class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                   <!-- Estado de la reserva -->
                   <div class="sm:col-span-2">
-                    <label for="estado" class="block text-sm font-medium text-gray-700">Estado</label>
+                    <label for="estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">Estado</label>
                     <div class="mt-1">
-                      <select 
-                        id="estado" 
+                      <select
+                        id="estado"
                         formControlName="estado"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors duration-300"
                       >
                         <option value="pendiente">Pendiente</option>
                         <option value="confirmada">Confirmada</option>
@@ -61,31 +62,31 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                       </select>
                     </div>
                   </div>
-                  
+
                   <!-- Código de reserva (solo lectura si es edición) -->
                   <div class="sm:col-span-2">
                     <label for="codigo_reserva" class="block text-sm font-medium text-gray-700">Código de Reserva</label>
                     <div class="mt-1">
-                      <input 
-                        type="text" 
-                        id="codigo_reserva" 
+                      <input
+                        type="text"
+                        id="codigo_reserva"
                         formControlName="codigo_reserva"
                         [readonly]="isEditMode"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-                        [ngClass]="{'bg-gray-100': isEditMode}"
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors duration-300"
+                        [ngClass]="{'bg-gray-100 dark:bg-gray-600': isEditMode}"
                       >
                     </div>
                     @if (reservaForm.get('codigo_reserva')?.errors?.['required'] && reservaForm.get('codigo_reserva')?.touched) {
-                      <p class="mt-2 text-sm text-red-600">El código de reserva es obligatorio</p>
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">El código de reserva es obligatorio</p>
                     }
                   </div>
-                  
+
                   <!-- Usuario (Cliente) -->
                   <div class="sm:col-span-2">
                     <label for="usuario_id" class="block text-sm font-medium text-gray-700">Cliente</label>
                     <div class="mt-1">
-                      <select 
-                        id="usuario_id" 
+                      <select
+                        id="usuario_id"
                         formControlName="usuario_id"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                       >
@@ -96,16 +97,16 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                       </select>
                     </div>
                     @if (reservaForm.get('usuario_id')?.errors?.['required'] && reservaForm.get('usuario_id')?.touched) {
-                      <p class="mt-2 text-sm text-red-600">El cliente es obligatorio</p>
+                      <p class="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">El cliente es obligatorio</p>
                     }
                   </div>
-                  
+
                   <!-- Notas generales -->
                   <div class="sm:col-span-6">
                     <label for="notas" class="block text-sm font-medium text-gray-700">Notas</label>
                     <div class="mt-1">
-                      <textarea 
-                        id="notas" 
+                      <textarea
+                        id="notas"
                         formControlName="notas"
                         rows="3"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -115,12 +116,12 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                   </div>
                 </div>
               </div>
-              
+
               <!-- Servicios de la reserva -->
-              <div class="pt-6 border-t border-gray-200">
+              <div class="pt-6 border-t border-gray-200 dark:border-gray-700 transition-colors duration-300">
                 <div class="flex justify-between items-center">
-                  <h2 class="text-lg font-medium text-gray-900">Servicios Reservados</h2>
-                  <button 
+                  <h2 class="text-lg font-medium text-gray-900 dark:text-white transition-colors duration-300">Servicios Reservados</h2>
+                  <button
                     type="button"
                     (click)="addServicio()"
                     class="inline-flex items-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -131,9 +132,9 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                     Añadir Servicio
                   </button>
                 </div>
-                
+
                 @if (serviciosArray.controls.length === 0) {
-                  <div class="mt-4 rounded-md bg-yellow-50 p-4">
+                  <div class="mt-4 rounded-md bg-yellow-50 dark:bg-yellow-900/30 p-4 transition-colors duration-300">
                     <div class="flex">
                       <div class="flex-shrink-0">
                         <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +156,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                       <div [formGroup]="getServicioFormGroup(i)" class="border border-gray-200 rounded-md p-4">
                         <div class="flex justify-between">
                           <h3 class="text-md font-medium text-gray-900">Servicio #{{ i + 1 }}</h3>
-                          <button 
+                          <button
                             type="button"
                             (click)="removeServicio(i)"
                             class="text-red-600 hover:text-red-900"
@@ -166,14 +167,14 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                             </svg>
                           </button>
                         </div>
-                        
+
                         <div class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                           <!-- Selección de servicio -->
                           <div class="sm:col-span-3">
                             <label [for]="'servicio_id-' + i" class="block text-sm font-medium text-gray-700">Servicio</label>
                             <div class="mt-1">
-                              <select 
-                                [id]="'servicio_id-' + i" 
+                              <select
+                                [id]="'servicio_id-' + i"
                                 formControlName="servicio_id"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                 (change)="onServicioChange(i)"
@@ -185,16 +186,16 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                               </select>
                             </div>
                             @if (getServicioFormGroup(i).get('servicio_id')?.errors?.['required'] && getServicioFormGroup(i).get('servicio_id')?.touched) {
-                              <p class="mt-2 text-sm text-red-600">El servicio es obligatorio</p>
+                              <p class="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">El servicio es obligatorio</p>
                             }
                           </div>
-                          
+
                           <!-- Emprendedor (se actualiza automáticamente al seleccionar servicio) -->
                           <div class="sm:col-span-3">
                             <label [for]="'emprendedor_id-' + i" class="block text-sm font-medium text-gray-700">Emprendedor</label>
                             <div class="mt-1">
-                              <select 
-                                [id]="'emprendedor_id-' + i" 
+                              <select
+                                [id]="'emprendedor_id-' + i"
                                 formControlName="emprendedor_id"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                 [attr.disabled]="true"
@@ -206,31 +207,31 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                               </select>
                             </div>
                           </div>
-                          
+
                           <!-- Fecha de inicio -->
                           <div class="sm:col-span-2">
                             <label [for]="'fecha_inicio-' + i" class="block text-sm font-medium text-gray-700">Fecha de inicio</label>
                             <div class="mt-1">
-                              <input 
-                                type="date" 
-                                [id]="'fecha_inicio-' + i" 
+                              <input
+                                type="date"
+                                [id]="'fecha_inicio-' + i"
                                 formControlName="fecha_inicio"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                 (change)="onFechaHoraChange(i)"
                               >
                             </div>
                             @if (getServicioFormGroup(i).get('fecha_inicio')?.errors?.['required'] && getServicioFormGroup(i).get('fecha_inicio')?.touched) {
-                              <p class="mt-2 text-sm text-red-600">La fecha de inicio es obligatoria</p>
+                              <p class="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">La fecha de inicio es obligatoria</p>
                             }
                           </div>
-                          
+
                           <!-- Fecha de fin (opcional) -->
                           <div class="sm:col-span-2">
                             <label [for]="'fecha_fin-' + i" class="block text-sm font-medium text-gray-700">Fecha de fin (opcional)</label>
                             <div class="mt-1">
-                              <input 
-                                type="date" 
-                                [id]="'fecha_fin-' + i" 
+                              <input
+                                type="date"
+                                [id]="'fecha_fin-' + i"
                                 formControlName="fecha_fin"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                 [min]="getServicioFormGroup(i).get('fecha_inicio')?.value"
@@ -238,13 +239,13 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                               >
                             </div>
                           </div>
-                          
+
                           <!-- Estado del servicio -->
                           <div class="sm:col-span-2">
                             <label [for]="'estado-servicio-' + i" class="block text-sm font-medium text-gray-700">Estado</label>
                             <div class="mt-1">
-                              <select 
-                                [id]="'estado-servicio-' + i" 
+                              <select
+                                [id]="'estado-servicio-' + i"
                                 formControlName="estado"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                               >
@@ -255,78 +256,78 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                               </select>
                             </div>
                           </div>
-                          
+
                           <!-- Hora de inicio -->
                           <div class="sm:col-span-2">
                             <label [for]="'hora_inicio-' + i" class="block text-sm font-medium text-gray-700">Hora de inicio</label>
                             <div class="mt-1">
-                              <input 
-                                type="time" 
-                                [id]="'hora_inicio-' + i" 
+                              <input
+                                type="time"
+                                [id]="'hora_inicio-' + i"
                                 formControlName="hora_inicio"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                 (change)="onFechaHoraChange(i)"
                               >
                             </div>
                             @if (getServicioFormGroup(i).get('hora_inicio')?.errors?.['required'] && getServicioFormGroup(i).get('hora_inicio')?.touched) {
-                              <p class="mt-2 text-sm text-red-600">La hora de inicio es obligatoria</p>
+                              <p class="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">La hora de inicio es obligatoria</p>
                             }
                           </div>
-                          
+
                           <!-- Hora de fin -->
                           <div class="sm:col-span-2">
                             <label [for]="'hora_fin-' + i" class="block text-sm font-medium text-gray-700">Hora de fin</label>
                             <div class="mt-1">
-                              <input 
-                                type="time" 
-                                [id]="'hora_fin-' + i" 
+                              <input
+                                type="time"
+                                [id]="'hora_fin-' + i"
                                 formControlName="hora_fin"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                 (change)="onFechaHoraChange(i)"
                               >
                             </div>
                             @if (getServicioFormGroup(i).get('hora_fin')?.errors?.['required'] && getServicioFormGroup(i).get('hora_fin')?.touched) {
-                              <p class="mt-2 text-sm text-red-600">La hora de fin es obligatoria</p>
+                              <p class="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">La hora de fin es obligatoria</p>
                             }
-                            
-                            @if (getServicioFormGroup(i).get('hora_fin')?.value && 
-                                 getServicioFormGroup(i).get('hora_inicio')?.value && 
+
+                            @if (getServicioFormGroup(i).get('hora_fin')?.value &&
+                                 getServicioFormGroup(i).get('hora_inicio')?.value &&
                                  getServicioFormGroup(i).get('hora_fin')?.value <= getServicioFormGroup(i).get('hora_inicio')?.value) {
-                              <p class="mt-2 text-sm text-red-600">La hora de fin debe ser posterior a la hora de inicio</p>
+                              <p class="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">La hora de fin debe ser posterior a la hora de inicio</p>
                             }
                           </div>
-                          
+
                           <!-- Duración (en minutos) -->
                           <div class="sm:col-span-2">
                             <label [for]="'duracion_minutos-' + i" class="block text-sm font-medium text-gray-700">Duración (minutos)</label>
                             <div class="mt-1">
-                              <input 
-                                type="number" 
-                                [id]="'duracion_minutos-' + i" 
+                              <input
+                                type="number"
+                                [id]="'duracion_minutos-' + i"
                                 formControlName="duracion_minutos"
                                 min="1"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                               >
                             </div>
                             @if (getServicioFormGroup(i).get('duracion_minutos')?.errors?.['required'] && getServicioFormGroup(i).get('duracion_minutos')?.touched) {
-                              <p class="mt-2 text-sm text-red-600">La duración es obligatoria</p>
+                              <p class="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">La duración es obligatoria</p>
                             }
                           </div>
-                          
+
                           <!-- Cantidad -->
                           <div class="sm:col-span-2">
                             <label [for]="'cantidad-' + i" class="block text-sm font-medium text-gray-700">Cantidad</label>
                             <div class="mt-1">
-                              <input 
-                                type="number" 
-                                [id]="'cantidad-' + i" 
+                              <input
+                                type="number"
+                                [id]="'cantidad-' + i"
                                 formControlName="cantidad"
                                 min="1"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                               >
                             </div>
                           </div>
-                          
+
                           <!-- Precio -->
                           <div class="sm:col-span-2">
                             <label [for]="'precio-' + i" class="block text-sm font-medium text-gray-700">Precio</label>
@@ -334,9 +335,9 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                               <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <span class="text-gray-500 sm:text-sm">S/.</span>
                               </div>
-                              <input 
-                                type="number" 
-                                [id]="'precio-' + i" 
+                              <input
+                                type="number"
+                                [id]="'precio-' + i"
                                 formControlName="precio"
                                 min="0"
                                 step="0.01"
@@ -344,13 +345,13 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                               >
                             </div>
                           </div>
-                          
+
                           <!-- Notas del cliente -->
                           <div class="sm:col-span-3">
                             <label [for]="'notas_cliente-' + i" class="block text-sm font-medium text-gray-700">Notas del cliente</label>
                             <div class="mt-1">
-                              <textarea 
-                                [id]="'notas_cliente-' + i" 
+                              <textarea
+                                [id]="'notas_cliente-' + i"
                                 formControlName="notas_cliente"
                                 rows="2"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -358,13 +359,13 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                               ></textarea>
                             </div>
                           </div>
-                          
+
                           <!-- Notas del emprendedor -->
                           <div class="sm:col-span-3">
                             <label [for]="'notas_emprendedor-' + i" class="block text-sm font-medium text-gray-700">Notas del emprendedor</label>
                             <div class="mt-1">
-                              <textarea 
-                                [id]="'notas_emprendedor-' + i" 
+                              <textarea
+                                [id]="'notas_emprendedor-' + i"
                                 formControlName="notas_emprendedor"
                                 rows="2"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -372,7 +373,7 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                               ></textarea>
                             </div>
                           </div>
-                          
+
                           <!-- Indicador de disponibilidad -->
                           <div class="sm:col-span-6">
                             @if (verificandoDisponibilidad[i]) {
@@ -408,13 +409,13 @@ import { TurismoService, Reserva, Servicio, ReservaServicio, Emprendedor } from 
                 }
               </div>
             </div>
-            
+
             <!-- Botones de acción -->
-            <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
+            <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 text-right sm:px-6 transition-colors duration-300">
               <button
                 type="button"
                 (click)="cancel()"
-                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mr-2"
+                class="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mr-2 transition-colors duration-300"
               >
                 Cancelar
               </button>
@@ -448,33 +449,34 @@ export class ReservaFormComponent implements OnInit {
   private turismoService = inject(TurismoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  
+  private themeService = inject(ThemeService);
+
   reservaForm!: FormGroup;
   reserva: Reserva | null = null;
-  
+
   // Listas para selección
   serviciosDisponibles: Servicio[] = [];
   emprendedores: Emprendedor[] = [];
   usuarios: any[] = []; // Lista de usuarios para asignar como clientes
-  
+
   // Estado del componente
   loading = true;
   isSubmitting = false;
   isEditMode = false;
   reservaId: number | null = null;
   servicioPreseleccionadoId: number | null = null;
-  
+
   // Para control de disponibilidad
   verificandoDisponibilidad: {[index: number]: boolean} = {};
   disponibilidadVerificada: {[index: number]: boolean} = {};
   servicioDisponible: {[index: number]: boolean} = {};
-  
+
   ngOnInit() {
     this.initForm();
     this.loadServicios();
     this.loadEmprendedores();
     this.loadUsuarios();
-    
+
     // Verificar si es modo edición
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -487,21 +489,21 @@ export class ReservaFormComponent implements OnInit {
       if (servicioId) {
         this.servicioPreseleccionadoId = +servicioId;
       }
-      
+
       // Generar código de reserva aleatorio
       this.reservaForm.patchValue({
         codigo_reserva: this.generarCodigoReserva()
       });
-      
+
       this.loading = false;
-      
+
       // Si hay servicio preseleccionado, añadirlo automáticamente
       if (this.servicioPreseleccionadoId) {
         this.addServicio(this.servicioPreseleccionadoId);
       }
     }
   }
-  
+
   initForm() {
     this.reservaForm = this.fb.group({
       usuario_id: ['', [Validators.required]],
@@ -511,19 +513,19 @@ export class ReservaFormComponent implements OnInit {
       servicios: this.fb.array([])
     });
   }
-  
+
   get serviciosArray(): FormArray {
     return this.reservaForm.get('servicios') as FormArray;
   }
-  
+
   getServicioFormGroup(index: number): FormGroup {
     return this.serviciosArray.at(index) as FormGroup;
   }
-  
+
   createServicioFormGroup(reservaServicio?: ReservaServicio): FormGroup {
     const fechaActual = new Date().toISOString().split('T')[0];
     const horaActual = new Date().toTimeString().slice(0, 8);
-    
+
     return this.fb.group({
       id: [reservaServicio?.id || null],
       servicio_id: [reservaServicio?.servicio_id || this.servicioPreseleccionadoId || '', [Validators.required]],
@@ -540,13 +542,13 @@ export class ReservaFormComponent implements OnInit {
       notas_emprendedor: [reservaServicio?.notas_emprendedor || '']
     });
   }
-  
+
   loadReserva(id: number) {
     this.loading = true;
     this.turismoService.getReserva(id).subscribe({
       next: (reserva) => {
         this.reserva = reserva;
-        
+
         // Llenar el formulario con los datos de la reserva
         this.reservaForm.patchValue({
           usuario_id: reserva.usuario_id,
@@ -554,7 +556,7 @@ export class ReservaFormComponent implements OnInit {
           estado: reserva.estado,
           notas: reserva.notas
         });
-        
+
         // Cargar servicios de la reserva
         if (reserva.servicios && reserva.servicios.length > 0) {
           reserva.servicios.forEach((servicio, index) => {
@@ -565,17 +567,17 @@ export class ReservaFormComponent implements OnInit {
             this.verificandoDisponibilidad[index] = false;
           });
         }
-        
+
         this.loading = false;
       },
       error: (error) => {
         console.error('Error al cargar reserva:', error);
         this.loading = false;
-        alert('Error al cargar la reserva. Por favor, intente nuevamente.');
+        alert("Error al cargar la reserva. Por favor, intente nuevamente.");
       }
     });
   }
-  
+
   loadServicios() {
     this.turismoService.getServicios(1, 1000).subscribe({
       next: (response) => {
@@ -586,7 +588,7 @@ export class ReservaFormComponent implements OnInit {
       }
     });
   }
-  
+
   loadEmprendedores() {
     this.turismoService.getEmprendedores(1, 1000).subscribe({
       next: (response) => {
@@ -597,7 +599,7 @@ export class ReservaFormComponent implements OnInit {
       }
     });
   }
-  
+
   loadUsuarios() {
     // En un caso real, esto debería llamar a un servicio de usuarios
     // Para este ejemplo, usaremos un array estático
@@ -607,31 +609,31 @@ export class ReservaFormComponent implements OnInit {
       { id: 3, name: 'Emprendedor Local', email: 'emprendedor@example.com' }
     ];
   }
-  
+
   addServicio(servicioId?: number, reservaServicio?: ReservaServicio) {
     const index = this.serviciosArray.length;
     this.serviciosArray.push(this.createServicioFormGroup(reservaServicio));
-    
+
     // Inicializar estado de disponibilidad
     this.verificandoDisponibilidad[index] = false;
     this.disponibilidadVerificada[index] = false;
     this.servicioDisponible[index] = false;
-    
+
     // Si se especifica un servicio, seleccionarlo y actualizar el emprendedor
     if (servicioId && !reservaServicio) {
       this.getServicioFormGroup(index).patchValue({ servicio_id: servicioId });
       this.onServicioChange(index);
     }
   }
-  
+
   removeServicio(index: number) {
     this.serviciosArray.removeAt(index);
-    
+
     // Actualizar índices en los arrays de disponibilidad
     const newVerificando: {[index: number]: boolean} = {};
     const newVerificada: {[index: number]: boolean} = {};
     const newDisponible: {[index: number]: boolean} = {};
-    
+
     Object.keys(this.verificandoDisponibilidad).forEach((key) => {
       const numKey = parseInt(key);
       if (numKey > index) {
@@ -644,60 +646,60 @@ export class ReservaFormComponent implements OnInit {
         newDisponible[numKey] = this.servicioDisponible[numKey];
       }
     });
-    
+
     this.verificandoDisponibilidad = newVerificando;
     this.disponibilidadVerificada = newVerificada;
     this.servicioDisponible = newDisponible;
   }
-  
+
   onServicioChange(index: number) {
     const servicioId = this.getServicioFormGroup(index).get('servicio_id')?.value;
     if (!servicioId) return;
-    
+
     // Buscar el servicio seleccionado
     const servicio = this.serviciosDisponibles.find(s => s.id == servicioId);
     if (!servicio) return;
-    
+
     // Actualizar emprendedor_id automáticamente
     this.getServicioFormGroup(index).patchValue({
       emprendedor_id: servicio.emprendedor_id
     });
-    
+
     // Si hay precio referencial, actualizar precio
     if (servicio.precio_referencial) {
       this.getServicioFormGroup(index).patchValue({
         precio: servicio.precio_referencial
       });
     }
-    
+
     // Verificar disponibilidad si tiene todos los datos necesarios
     this.verificarDisponibilidad(index);
   }
-  
+
   onFechaHoraChange(index: number) {
     // Actualizar duración en minutos al cambiar horas
     const horaInicio = this.getServicioFormGroup(index).get('hora_inicio')?.value;
     const horaFin = this.getServicioFormGroup(index).get('hora_fin')?.value;
-    
+
     if (horaInicio && horaFin) {
       const inicioMinutos = this.horaAMinutos(horaInicio);
       const finMinutos = this.horaAMinutos(horaFin);
-      
+
       // Si hora fin es menor que hora inicio, se asume que es del día siguiente
       let duracionMinutos = finMinutos - inicioMinutos;
       if (duracionMinutos <= 0) {
         duracionMinutos += 24 * 60; // Añadir un día en minutos
       }
-      
+
       this.getServicioFormGroup(index).patchValue({
         duracion_minutos: duracionMinutos
       });
     }
-    
+
     // Verificar disponibilidad si tiene todos los datos necesarios
     this.verificarDisponibilidad(index);
   }
-  
+
   verificarDisponibilidad(index: number) {
     const servicioId = this.getServicioFormGroup(index).get('servicio_id')?.value;
     const fechaInicio = this.getServicioFormGroup(index).get('fecha_inicio')?.value;
@@ -705,24 +707,24 @@ export class ReservaFormComponent implements OnInit {
     const horaInicio = this.getServicioFormGroup(index).get('hora_inicio')?.value;
     const horaFin = this.getServicioFormGroup(index).get('hora_fin')?.value;
     const reservaServicioId = this.getServicioFormGroup(index).get('id')?.value;
-    
+
     // Verificar que tenemos todos los datos necesarios
     if (!servicioId || !fechaInicio || !horaInicio || !horaFin) {
       this.disponibilidadVerificada[index] = false;
       return;
     }
-    
+
     // Formatear las horas a HH:MM:SS
     const horaInicioFormat = this.formatearHora(horaInicio);
     const horaFinFormat = this.formatearHora(horaFin);
-    
+
     this.verificandoDisponibilidad[index] = true;
     this.disponibilidadVerificada[index] = false;
-    
+
     this.turismoService.verificarDisponibilidadReservaServicio(
-      servicioId, 
-      fechaInicio, 
-      fechaFin, 
+      servicioId,
+      fechaInicio,
+      fechaFin,
       horaInicioFormat,
       horaFinFormat,
       reservaServicioId
@@ -740,7 +742,7 @@ export class ReservaFormComponent implements OnInit {
       }
     });
   }
-  
+
   hayServiciosNoDisponibles(): boolean {
     for (let i = 0; i < this.serviciosArray.length; i++) {
       if (this.disponibilidadVerificada[i] && !this.servicioDisponible[i]) {
@@ -749,21 +751,21 @@ export class ReservaFormComponent implements OnInit {
     }
     return false;
   }
-  
+
   numServiciosVerificados(): number {
     return Object.values(this.disponibilidadVerificada).filter(v => v).length;
   }
-  
+
   submitForm() {
     if (this.reservaForm.invalid || this.hayServiciosNoDisponibles() || this.isSubmitting || this.numServiciosVerificados() !== this.serviciosArray.length) {
       return;
     }
-    
+
     this.isSubmitting = true;
-    
+
     // Preparar datos para enviar
     const formData = this.reservaForm.value;
-    
+
     // Asegurar que hora_inicio y hora_fin tengan el formato correcto (HH:MM:SS)
     formData.servicios = formData.servicios.map((servicio: any) => {
       return {
@@ -772,13 +774,13 @@ export class ReservaFormComponent implements OnInit {
         hora_fin: this.formatearHora(servicio.hora_fin)
       };
     });
-    
+
     // Crear o actualizar la reserva
     if (this.isEditMode && this.reservaId) {
       this.turismoService.updateReserva(this.reservaId, formData).subscribe({
         next: () => {
           this.isSubmitting = false;
-          alert('Reserva actualizada correctamente');
+          alert("Reserva actualizada correctamente");
           this.router.navigateByUrl('/admin/reservas');
         },
         error: (error) => {
@@ -791,7 +793,7 @@ export class ReservaFormComponent implements OnInit {
       this.turismoService.createReserva(formData).subscribe({
         next: () => {
           this.isSubmitting = false;
-          alert('Reserva creada correctamente');
+          alert("Reserva creada correctamente");
           this.router.navigateByUrl('/admin/reservas');
         },
         error: (error) => {
@@ -802,51 +804,55 @@ export class ReservaFormComponent implements OnInit {
       });
     }
   }
-  
+
   cancel() {
     this.router.navigateByUrl('/admin/reservas');
   }
-  
+
   // Métodos de utilidad
   generarCodigoReserva(): string {
     const fecha = new Date();
     const year = fecha.getFullYear().toString().substr(-2);
     const month = String(fecha.getMonth() + 1).padStart(2, '0');
     const day = String(fecha.getDate()).padStart(2, '0');
-    
+
     // Generar 6 caracteres aleatorios (letras y números)
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let codigo = '';
     for (let i = 0; i < 6; i++) {
       codigo += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    
+
     return `RES-${year}${month}${day}-${codigo}`;
   }
-  
+
   sumarHoras(hora: string, horas: number): string {
     const [h, m, s] = hora.split(':').map(Number);
     const fecha = new Date();
     fecha.setHours(h, m, s || 0);
     fecha.setTime(fecha.getTime() + horas * 60 * 60 * 1000);
-    
+
     return `${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}:${String(fecha.getSeconds()).padStart(2, '0')}`;
   }
-  
+
   horaAMinutos(hora: string): number {
     const [h, m, s] = hora.split(':').map(Number);
     return (h || 0) * 60 + (m || 0) + (s || 0) / 60;
   }
-  
+
   formatearHora(hora: string): string {
     // Asegurar que la hora tenga el formato HH:MM:SS
     if (!hora) return '00:00:00';
-    
+
     const partes = hora.split(':');
     while (partes.length < 3) {
       partes.push('00');
     }
-    
+
     return partes.map(p => p.padStart(2, '0')).join(':');
+  }
+
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 }
