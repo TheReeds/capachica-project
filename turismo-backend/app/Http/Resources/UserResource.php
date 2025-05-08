@@ -24,6 +24,12 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'active' => (bool) $this->active,
             'foto_perfil' => $this->getFotoPerfilUrl(),
+            'country' => $this->country,
+            'birth_date' => $this->birth_date ? $this->birth_date->format('Y-m-d') : null,
+            'address' => $this->address,
+            'gender' => $this->gender,
+            'preferred_language' => $this->preferred_language,
+            'last_login' => $this->last_login ? $this->last_login->format('Y-m-d H:i:s') : null,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];

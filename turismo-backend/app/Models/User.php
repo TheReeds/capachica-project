@@ -26,6 +26,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'foto_perfil',
         'google_id',
         'avatar',
+        'country',
+        'birth_date',
+        'address',
+        'gender',
+        'preferred_language',
+        'last_login',
     ];
 
     protected $hidden = [
@@ -38,6 +44,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'active' => 'boolean',
+        'birth_date' => 'date', // Cast birth_date to date
+        'last_login' => 'datetime', // Cast last_login to datetime
     ];
     
     protected $appends = [
