@@ -24,6 +24,10 @@ export const routes: Routes = [
         path: '',
         loadChildren: () => import('./pagegeneral/pagegeneral.routes').then(m => m.PAGEGENERAL_ROUTES)
     },
+    {
+        path: '',
+        loadChildren: () => import('./features/admin-empredimientos/admin-emprendimientos.routes').then(m => m.ADMIN_EMPRENDEDORES_ROUTES)
+    },
     
     // Todas las rutas protegidas por autenticación
     {

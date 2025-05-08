@@ -1,22 +1,12 @@
+// src/app/core/services/auth.service.ts
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError, map, of, BehaviorSubject, filter, take, switchMap, finalize, retry, timer } from 'rxjs';
 
-import { User, RegisterRequest, LoginRequest, AuthResponse, Role } from '../models/user.model';
+import { User, RegisterRequest, LoginRequest, AuthResponse, ProfileResponse, Role, Permission } from '../models/user.model';
 import { environment } from '../../../environments/environments';
 import { ApiResponse } from '../models/api.model';
-
-interface ProfileApiResponse {
-  success: boolean;
-  data: {
-    user: User;
-    roles?: string[];
-    permissions?: string[];
-    email_verified?: boolean;
-  };
-  message?: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +26,10 @@ export class AuthService {
   private readonly _emailVerified = signal<boolean>(false);
   private readonly _userRoles = signal<string[]>([]);
   private readonly _userPermissions = signal<string[]>([]);
+  
+  // Signals específicos para la gestión de emprendimientos
+  private readonly _administraEmprendimientos = signal<boolean>(false);
+  private readonly _emprendimientos = signal<any[]>([]);
 
   // Exponer los signals como readonly
   readonly isLoggedIn = this._isLoggedIn.asReadonly();
@@ -45,6 +39,8 @@ export class AuthService {
   readonly emailVerified = this._emailVerified.asReadonly();
   readonly userRoles = this._userRoles.asReadonly();
   readonly userPermissions = this._userPermissions.asReadonly();
+  readonly administraEmprendimientos = this._administraEmprendimientos.asReadonly();
+  readonly emprendimientos = this._emprendimientos.asReadonly();
 
   private userLoadAttempted = false;
   private userLoading = new BehaviorSubject<boolean>(false);
@@ -89,7 +85,7 @@ export class AuthService {
     console.log('Realizando petición para cargar perfil de usuario...');
     
     // Realiza la petición HTTP con reintentos
-    return this.http.get<ProfileApiResponse>(`${this.API_URL}/profile`).pipe(
+    return this.http.get<ProfileResponse>(`${this.API_URL}/profile`).pipe(
       retry({
         count: 2,
         delay: (error, retryCount) => {
@@ -115,6 +111,17 @@ export class AuthService {
         if (response?.data?.permissions) {
           console.log('Permisos recibidos:', response.data.permissions);
           this._userPermissions.set(response.data.permissions);
+        }
+        
+        // Actualizar información de emprendimientos
+        if (response?.data?.administra_emprendimientos !== undefined) {
+          console.log('Administra emprendimientos:', response.data.administra_emprendimientos);
+          this._administraEmprendimientos.set(response.data.administra_emprendimientos);
+        }
+        
+        if (response?.data?.emprendimientos) {
+          console.log('Emprendimientos recibidos:', response.data.emprendimientos);
+          this._emprendimientos.set(response.data.emprendimientos);
         }
       }),
       map(response => {
@@ -211,12 +218,16 @@ export class AuthService {
     this._emailVerified.set(false);
     this._userRoles.set([]);
     this._userPermissions.set([]);
+    this._administraEmprendimientos.set(false);
+    this._emprendimientos.set([]);
     
     // No redirigimos automáticamente en este método para evitar redirecciones innecesarias
     // Solo redirige si estamos en una ruta protegida
     if (window.location.pathname.startsWith('/dashboard') || 
         window.location.pathname.startsWith('/admin') ||
-        window.location.pathname.startsWith('/profile')) {
+        window.location.pathname.startsWith('/profile') ||
+        window.location.pathname.startsWith('/mis-emprendimientos') ||
+        window.location.pathname.startsWith('/emprendimiento')) {
       console.log('Redirigiendo a login desde ruta protegida...');
       this.router.navigate(['/login']);
     }
@@ -272,9 +283,42 @@ export class AuthService {
           if (authResponse.email_verified !== undefined) {
             this._emailVerified.set(authResponse.email_verified);
           }
+          
+          // En lugar de redirigir directamente, usamos el nuevo método
+          this.handlePostLoginRedirect();
         }),
         catchError(error => this.handleError(error))
       );
+  }
+  
+  // Método para manejar la redirección después del login basado en si el usuario administra emprendimientos
+  handlePostLoginRedirect() {
+    // Verificar si el usuario administra emprendimientos
+    if (this.currentUser() && this._profileLoaded() && this._isLoggedIn()) {
+      // Obtener los datos del perfil actual
+      this.http.get<ProfileResponse>(`${this.API_URL}/profile`).pipe(
+        take(1)
+      ).subscribe({
+        next: (response) => {
+          const administraEmprendimientos = response?.data?.administra_emprendimientos;
+          
+          if (administraEmprendimientos) {
+            // Si administra emprendimientos, redirigir a la selección de panel
+            this.router.navigate(['/seleccion-panel']);
+          } else {
+            // Si no administra emprendimientos, redirigir al dashboard normal
+            this.router.navigate(['/dashboard']);
+          }
+        },
+        error: () => {
+          // En caso de error, redirigir al dashboard por defecto
+          this.router.navigate(['/dashboard']);
+        }
+      });
+    } else {
+      // Por defecto, ir al dashboard
+      this.router.navigate(['/dashboard']);
+    }
   }
   
   // Autenticación con Google
@@ -300,6 +344,9 @@ export class AuthService {
         tap(authResponse => {
           this.handleAuthResponse(authResponse);
           this._emailVerified.set(true); // Los usuarios de Google siempre están verificados
+          
+          // Usar el método de redirección personalizado
+          this.handlePostLoginRedirect();
         }),
         catchError(error => this.handleError(error))
       );
@@ -356,7 +403,7 @@ export class AuthService {
   }
 
   getProfile(): Observable<User> {
-    return this.http.get<ProfileApiResponse>(`${this.API_URL}/profile`)
+    return this.http.get<ProfileResponse>(`${this.API_URL}/profile`)
       .pipe(
         map(response => {
           if (response.success && response.data) {
@@ -372,6 +419,15 @@ export class AuthService {
             
             if (response.data.permissions) {
               this._userPermissions.set(response.data.permissions);
+            }
+            
+            // Actualizar información de emprendimientos
+            if (response.data.administra_emprendimientos !== undefined) {
+              this._administraEmprendimientos.set(response.data.administra_emprendimientos);
+            }
+            
+            if (response.data.emprendimientos) {
+              this._emprendimientos.set(response.data.emprendimientos);
             }
             
             if (response.data.user) {
@@ -450,6 +506,7 @@ export class AuthService {
     const permissions = this.userPermissions();
     return permissions.includes(permission);
   }
+  
   updateProfile(data: FormData): Observable<User> {
     data.append('_method', 'PUT'); // Esto es clave para Laravel
   
@@ -467,5 +524,4 @@ export class AuthService {
         catchError(error => this.handleError(error))
       );
   }
-  
 }

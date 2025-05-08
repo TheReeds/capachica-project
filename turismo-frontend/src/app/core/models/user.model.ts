@@ -8,7 +8,9 @@ export interface User {
   updated_at?: string;
   google_id?: string;
   foto_perfil?: string;
-  email_verified_at?: string;
+  foto_perfil_url?: string | null;
+  avatar?: string | null;
+  email_verified_at?: string | null;
   roles?: Array<{
     id: number;
     name: string;
@@ -20,6 +22,15 @@ export interface User {
   gender?: string;
   preferred_language?: string;
   last_login?: string;
+  permissions?: Permission[];
+  pivot?: {
+    user_id?: number;
+    emprendedor_id?: number;
+    es_principal?: boolean;
+    rol?: string;
+    created_at?: string;
+    updated_at?: string;
+  };
 }
 
 export interface Role { 
@@ -82,6 +93,18 @@ export interface ResetPasswordRequest {
 export interface VerifyEmailRequest {
   id: number;
   hash: string;
+}
+export interface ProfileResponse {
+  success: boolean;
+  message?: string;
+  data: {
+    user: User;
+    roles?: string[];
+    permissions?: string[];
+    administra_emprendimientos?: boolean;
+    emprendimientos?: any[];
+    email_verified?: boolean;
+  };
 }
 
 
