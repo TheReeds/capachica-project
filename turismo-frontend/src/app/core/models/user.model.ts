@@ -8,7 +8,12 @@ export interface User {
   updated_at?: string;
   google_id?: string;
   foto_perfil?: string;
-  roles?: Role[];
+  email_verified_at?: string;
+  roles?: Array<{
+    id: number;
+    name: string;
+    permissions?: string[] | Permission[];
+  }>;
   country?: string;
   birth_date?: string;
   address?: string;

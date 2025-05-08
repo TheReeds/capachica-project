@@ -450,4 +450,22 @@ export class AuthService {
     const permissions = this.userPermissions();
     return permissions.includes(permission);
   }
+  updateProfile(data: FormData): Observable<User> {
+    data.append('_method', 'PUT'); // Esto es clave para Laravel
+  
+    return this.http.post<ApiResponse<User>>(`${this.API_URL}/profile`, data)
+      .pipe(
+        map(response => {
+          if (!response.data) {
+            throw new Error("No data in response");
+          }
+          return response.data;
+        }),
+        tap(user => {
+          this._currentUser.set(user);
+        }),
+        catchError(error => this.handleError(error))
+      );
+  }
+  
 }

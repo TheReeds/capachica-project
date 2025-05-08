@@ -4,151 +4,19 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../core/models/user.model';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  template: `
-    
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold text-gray-900">Mi Perfil</h1>
-      
-      <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="card">
-          <h2 class="text-lg font-medium text-gray-900">Información personal</h2>
-          
-          <div class="mt-4">
-            @if (loading) {
-              <div class="flex justify-center">
-                <span class="inline-block h-6 w-6 animate-spin rounded-full border-4 border-gray-300 border-t-primary-600"></span>
-              </div>
-            } @else {
-              <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-4">
-                <!-- Nombre completo -->
-                <div>
-                  <label for="name" class="form-label">Nombre completo</label>
-                  <input 
-                    id="name" 
-                    type="text" 
-                    formControlName="name" 
-                    class="form-input" 
-                  />
-                  @if (submitted && f['name'].errors) {
-                    <p class="form-error">El nombre completo es requerido</p>
-                  }
-                </div>
-                
-                
-                
-                <!-- Email -->
-                <div>
-                  <label for="email" class="form-label">Correo electrónico</label>
-                  <input 
-                    id="email" 
-                    type="email" 
-                    formControlName="email" 
-                    class="form-input" 
-                    readonly
-                  />
-                </div>
-                
-                <!-- Teléfono -->
-                <div>
-                  <label for="phone" class="form-label">Teléfono</label>
-                  <input 
-                    id="phone" 
-                    type="tel" 
-                    formControlName="phone" 
-                    class="form-input" 
-                  />
-                  @if (submitted && f['phone'].errors) {
-                    <p class="form-error">El teléfono es requerido</p>
-                  }
-                </div>
-                
-                @if (updateError) {
-                  <div class="rounded-md bg-red-50 p-4">
-                    <div class="flex">
-                      <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">{{ updateError }}</h3>
-                      </div>
-                    </div>
-                  </div>
-                }
-                
-                @if (updateSuccess) {
-                  <div class="rounded-md bg-green-50 p-4">
-                    <div class="flex">
-                      <div class="ml-3">
-                        <h3 class="text-sm font-medium text-green-800">Perfil actualizado con éxito</h3>
-                      </div>
-                    </div>
-                  </div>
-                }
-                
-                <div class="flex justify-end">
-                  <button 
-                    type="submit" 
-                    class="btn-primary"
-                    [disabled]="updating"
-                  >
-                    @if (updating) {
-                      <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                      Actualizando...
-                    } @else {
-                      Actualizar perfil
-                    }
-                  </button>
-                </div>
-              </form>
-            }
-          </div>
-        </div>
-        
-        <div class="card">
-          <h2 class="text-lg font-medium text-gray-900">Roles y permisos</h2>
-          
-          @if (user && user.roles && user.roles.length > 0) {
-            <div class="mt-4">
-              <h3 class="text-md font-medium text-gray-900">Tus roles:</h3>
-              <ul class="mt-2 space-y-3">
-                @for (role of user.roles; track role.id) {
-                  <li class="bg-gray-50 p-3 rounded-md">
-                    <div class="font-medium">{{ role.name }}</div>
-                    <div class="mt-1 text-sm text-gray-600">
-                      <strong>Permisos:</strong>
-                      <div class="mt-1 flex flex-wrap gap-1">
-                        @for (permission of role.permissions; track permission) {
-                          <span class="inline-flex items-center rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800">
-                            {{ permission }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  </li>
-                }
-              </ul>
-            </div>
-          } @else {
-            <div class="mt-4 text-sm text-gray-600">
-              No tienes roles asignados.
-            </div>
-          }
-          
-          <div class="mt-6">
-            <a routerLink="/dashboard" class="btn-secondary inline-block">
-              Volver al dashboard
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  public themeService = inject(ThemeService);
   
   profileForm!: FormGroup;
   user: User | null = null;
@@ -158,17 +26,48 @@ export class ProfileComponent implements OnInit {
   submitted = false;
   updateError = '';
   updateSuccess = false;
+  fileError = '';
+  selectedFile: File | null = null;
+  userInitials = '';
+  
+  // Para controlar las pestañas
+  activeTab = 'personal';
+  
+  // Mapa de idiomas
+  languageOptions = [
+    { value: '', label: 'Seleccionar idioma' },
+    { value: 'es', label: 'Español' },
+    { value: 'en', label: 'Inglés' },
+    { value: 'pt', label: 'Portugués' },
+    { value: 'fr', label: 'Francés' },
+    { value: 'de', label: 'Alemán' }
+  ];
+  
+  // Mapa de géneros
+  genderOptions = [
+    { value: '', label: 'Seleccionar género' },
+    { value: 'male', label: 'Masculino' },
+    { value: 'female', label: 'Femenino' },
+    { value: 'other', label: 'Otro' },
+    { value: 'prefer_not_to_say', label: 'Prefiero no decir' }
+  ];
   
   ngOnInit() {
+    this.initForm();
+    this.loadUserProfile();
+  }
+  
+  initForm(): void {
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
-      first_name: ['', Validators.required],
-      last_name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required]
+      phone: ['', Validators.required],
+      country: [''],
+      birth_date: [''],
+      address: [''],
+      gender: [''],
+      preferred_language: ['']
     });
-    
-    this.loadUserProfile();
   }
   
   get f() { return this.profileForm.controls; }
@@ -179,16 +78,63 @@ export class ProfileComponent implements OnInit {
       next: (user) => {
         this.user = user;
         this.profileForm.patchValue({
-          name: user.name,
-          email: user.email,
-          phone: user.phone
+          name: user.name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          country: user.country || '',
+          birth_date: user.birth_date || '',
+          address: user.address || '',
+          gender: user.gender || '',
+          preferred_language: user.preferred_language || ''
         });
+        this.userInitials = this.getUserInitials();
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading profile:', error);
         this.loading = false;
+        this.updateError = 'Error al cargar el perfil. Inténtelo de nuevo más tarde.';
       }
     });
+  }
+  
+  getUserInitials(): string {
+    if (!this.user) return '';
+    
+    if (this.user.name) {
+      const nameParts = this.user.name.split(' ');
+      if (nameParts.length > 1) {
+        return (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+      }
+      return this.user.name.substring(0, 2).toUpperCase();
+    }
+    
+    return 'U';
+  }
+  
+  onFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.fileError = '';
+    this.selectedFile = null;
+    
+    if (input.files && input.files.length) {
+      const file = input.files[0];
+      if (!file.type.startsWith('image/')) {
+        this.fileError = 'El archivo debe ser una imagen.';
+        input.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        this.fileError = 'La imagen no debe superar los 5MB.';
+        input.value = '';
+        return;
+      }
+      this.selectedFile = file;
+    }
+  }
+  
+  setActiveTab(tabName: string): void {
+    this.activeTab = tabName;
   }
   
   onSubmit() {
@@ -202,23 +148,95 @@ export class ProfileComponent implements OnInit {
     
     this.updating = true;
     
-    // Aquí normalmente se llamaría a un método del servicio para actualizar el perfil
-    // Como no teníamos un endpoint específico para esto, simularemos una actualización exitosa
-    setTimeout(() => {
-      this.updating = false;
-      this.updateSuccess = true;
-      
-      // Actualizar el usuario en el servicio de autenticación
-      if (this.user) {
-        const updatedUser = {
-          ...this.user,
-          name: this.profileForm.value.name,
-          first_name: this.profileForm.value.first_name,
-          last_name: this.profileForm.value.last_name,
-          phone: this.profileForm.value.phone
-        };
-        // Aquí se actualizaría el usuario en el servicio
+    const formData = new FormData();
+    const formValue = this.profileForm.value;
+    
+    // Agregar todos los campos del formulario al FormData
+    Object.keys(formValue).forEach(key => {
+      if (formValue[key] !== null && formValue[key] !== undefined) {
+        formData.append(key, formValue[key]);
       }
-    }, 1000);
+    });
+    
+    // Agregar la foto de perfil si existe
+    if (this.selectedFile) {
+      formData.append('foto_perfil', this.selectedFile);
+    }
+    
+    this.authService.updateProfile(formData).subscribe({
+      next: (user) => {
+        this.user = user;
+        this.updateSuccess = true;
+        this.updating = false;
+        this.submitted = false;
+        this.loadUserProfile(); // Recargar el perfil para mostrar los cambios
+      },
+      error: (error) => {
+        this.updating = false;
+        this.updateError = error.error?.message || 'Ha ocurrido un error al actualizar el perfil.';
+        
+        // Manejar errores específicos de campos
+        if (error.error?.errors) {
+          const errors = error.error.errors;
+          Object.keys(errors).forEach(key => {
+            const errorMessage = Array.isArray(errors[key]) ? errors[key][0] : errors[key];
+            if (key === 'foto_perfil') {
+              this.fileError = errorMessage;
+            } else {
+              const control = this.profileForm.get(key);
+              if (control) {
+                control.setErrors({ serverError: errorMessage });
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+  
+  formatDate(date: string | null): string {
+    if (!date) return 'Nunca';
+    return new Date(date).toLocaleString();
+  }
+  
+  resetForm(): void {
+    this.submitted = false;
+    this.updateError = '';
+    this.fileError = '';
+    this.selectedFile = null;
+    this.loadUserProfile();
+  }
+  
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
+  }
+  
+  toggleDarkMode(): void {
+    this.themeService.toggleDarkMode();
+  }
+  
+  // Helper para garantizar el tipo en las plantillas
+  getPermissions(role: any): string[] {
+    if (!role || !role.permissions) return [];
+  
+    // Convertir a array de strings si es necesario
+    if (Array.isArray(role.permissions)) {
+      return role.permissions.map((p: string | { name: string }) =>
+        typeof p === 'string' ? p : p.name
+      );
+    }
+  
+    return [];
+  }
+  
+  
+  // Helper para verificar si los roles existen
+  hasRoles(): boolean {
+    return !!this.user && !!this.user.roles && this.user.roles.length > 0;
+  }
+  
+  // Helper para obtener la longitud de roles de manera segura
+  getRolesLength(): number {
+    return this.user?.roles?.length || 0;
   }
 }
