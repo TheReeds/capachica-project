@@ -39,33 +39,7 @@ import { User } from '../../core/models/user.model';
                   }
                 </div>
                 
-                <!-- Nombre -->
-                <div>
-                  <label for="first_name" class="form-label">Nombre</label>
-                  <input 
-                    id="first_name" 
-                    type="text" 
-                    formControlName="first_name" 
-                    class="form-input" 
-                  />
-                  @if (submitted && f['first_name'].errors) {
-                    <p class="form-error">El nombre es requerido</p>
-                  }
-                </div>
                 
-                <!-- Apellido -->
-                <div>
-                  <label for="last_name" class="form-label">Apellido</label>
-                  <input 
-                    id="last_name" 
-                    type="text" 
-                    formControlName="last_name" 
-                    class="form-input" 
-                  />
-                  @if (submitted && f['last_name'].errors) {
-                    <p class="form-error">El apellido es requerido</p>
-                  }
-                </div>
                 
                 <!-- Email -->
                 <div>
@@ -206,8 +180,6 @@ export class ProfileComponent implements OnInit {
         this.user = user;
         this.profileForm.patchValue({
           name: user.name,
-          first_name: user.first_name,
-          last_name: user.last_name,
           email: user.email,
           phone: user.phone
         });

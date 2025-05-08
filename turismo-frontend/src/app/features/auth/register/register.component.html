@@ -111,7 +111,73 @@
           <p class="text-sm text-red-600 dark:text-red-400 mt-1" *ngIf="submitted && f['phone'].errors?.['required']">El teléfono es requerido</p>
           <p class="text-sm text-red-600 dark:text-red-400 mt-1" *ngIf="f['phone'].errors?.['serverError']">{{ f['phone'].errors?.['serverError'] }}</p>
         </div>
-
+        <div>
+          <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">País</label>
+          <input
+            id="country" 
+            type="text" 
+            formControlName="country" 
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" 
+            placeholder="Tu país"
+            [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-500': f['country'].errors}" />
+          <p class="text-sm text-red-600 dark:text-red-400 mt-1" *ngIf="f['country'].errors?.['serverError']">{{ f['country'].errors?.['serverError'] }}</p>
+        </div>
+        
+        <div>
+          <label for="birth_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de nacimiento</label>
+          <input
+            id="birth_date" 
+            type="date" 
+            formControlName="birth_date" 
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" 
+            [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-500': f['birth_date'].errors}" />
+          <p class="text-sm text-red-600 dark:text-red-400 mt-1" *ngIf="f['birth_date'].errors?.['serverError']">{{ f['birth_date'].errors?.['serverError'] }}</p>
+        </div>
+        
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dirección</label>
+          <input
+            id="address" 
+            type="text" 
+            formControlName="address" 
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" 
+            placeholder="Tu dirección"
+            [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-500': f['address'].errors}" />
+          <p class="text-sm text-red-600 dark:text-red-400 mt-1" *ngIf="f['address'].errors?.['serverError']">{{ f['address'].errors?.['serverError'] }}</p>
+        </div>
+        
+        <div>
+          <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Género</label>
+          <select
+            id="gender" 
+            formControlName="gender" 
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" 
+            [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-500': f['gender'].errors}">
+            <option value="">Seleccionar</option>
+            <option value="male">Masculino</option>
+            <option value="female">Femenino</option>
+            <option value="other">Otro</option>
+            <option value="prefer_not_to_say">Prefiero no decir</option>
+          </select>
+          <p class="text-sm text-red-600 dark:text-red-400 mt-1" *ngIf="f['gender'].errors?.['serverError']">{{ f['gender'].errors?.['serverError'] }}</p>
+        </div>
+        
+        <div>
+          <label for="preferred_language" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Idioma preferido</label>
+          <select
+            id="preferred_language" 
+            formControlName="preferred_language" 
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" 
+            [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-500': f['preferred_language'].errors}">
+            <option value="">Seleccionar</option>
+            <option value="es">Español</option>
+            <option value="en">Inglés</option>
+            <option value="pt">Portugués</option>
+            <option value="fr">Francés</option>
+            <option value="de">Alemán</option>
+          </select>
+          <p class="text-sm text-red-600 dark:text-red-400 mt-1" *ngIf="f['preferred_language'].errors?.['serverError']">{{ f['preferred_language'].errors?.['serverError'] }}</p>
+        </div>
         <div>
           <label for="foto_perfil" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto de perfil (Opcional)</label>
           <input

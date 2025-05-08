@@ -1,8 +1,6 @@
 export interface User {
   id?: number;
   name: string;
-  first_name: string;
-  last_name: string;
   email: string;
   phone: string;
   active?: boolean;
@@ -11,6 +9,12 @@ export interface User {
   google_id?: string;
   foto_perfil?: string;
   roles?: Role[];
+  country?: string;
+  birth_date?: string;
+  address?: string;
+  gender?: string;
+  preferred_language?: string;
+  last_login?: string;
 }
 
 export interface Role { 
@@ -34,13 +38,16 @@ export interface Permission {
 
 export interface RegisterRequest {
   name: string;
-  first_name?: string;
-  last_name?: string;
   email: string;
   password: string;
   password_confirmation: string;
   phone?: string;
   foto_perfil?: File | null;
+  country?: string;
+  birth_date?: string;
+  address?: string;
+  gender?: string;
+  preferred_language?: string;
   [key: string]: string | File | null | undefined;
 }
 
