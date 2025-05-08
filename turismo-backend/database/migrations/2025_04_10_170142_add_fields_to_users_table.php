@@ -12,8 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            // Remove first_name and last_name if you want to drop these columns
-            $table->dropColumn(['first_name', 'last_name']);
+
             
             // Add new columns with proper types
             $table->string('country')->nullable();
