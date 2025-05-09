@@ -95,6 +95,13 @@ class MenuController extends Controller
                 'permissions' => ['municipalidad_read'],
             ],
             [
+                'id' => 'evento',
+                'title' => 'Evento',
+                'icon' => 'events',
+                'path' => '/admin/evento',
+                'permissions' => ['user_read'],
+            ],
+            [
                 'id' => 'emprendedores',
                 'title' => 'Emprendedores',
                 'icon' => 'store',

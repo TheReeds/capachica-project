@@ -20,6 +20,7 @@ use App\reservas\reservadetalle\Controller\ReservaDetalleController;
 use App\Servicios\Controllers\ServicioController;
 use App\Servicios\Controllers\CategoriaController;
 use App\Http\Controllers\API\GoogleAuthController;
+use App\Evento\Controllers\EventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,6 +112,19 @@ Route::prefix('servicios')->group(function () {
 Route::prefix('categorias')->group(function () {
     Route::get('/', [CategoriaController::class, 'index']);
     Route::get('/{id}', [CategoriaController::class, 'show']);
+});
+
+// Evento
+
+Route::prefix('eventos')->group(function () {
+    Route::get('', [EventController::class, 'index']); // Listar eventos
+    Route::post('', [EventController::class, 'store']); // Crear evento
+
+    Route::get('/{id}', [EventController::class, 'show']); // Mostrar evento específico
+    Route::put('/{id}', [EventController::class, 'update']); // Actualizar evento
+    Route::delete('/{id}', [EventController::class, 'destroy']); // Eliminar evento
+
+    Route::get('/{id}/emprendedor', [EmprendedorController::class, 'getEmprendedores']); // Obtener emprendedor del evento
 });
 
 // ===== RUTAS PROTEGIDAS =====
