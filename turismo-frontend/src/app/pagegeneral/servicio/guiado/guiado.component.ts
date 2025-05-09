@@ -21,7 +21,7 @@ export class GuiadoComponent implements OnInit {
 
       this.guiados = todos
         .filter((servicio: any) =>
-          servicio.categorias?.some((cat: any) => cat.id === 6)
+          servicio.categorias?.some((cat: any) => cat.id === 6)  // Solo Guiado Turístico (ID de categoría 6)
         )
         .map((servicio: any) => {
           let imagenPrincipal = 'default.jpg';
@@ -43,4 +43,3 @@ export class GuiadoComponent implements OnInit {
     });
   }
 }
-

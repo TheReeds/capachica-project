@@ -21,7 +21,7 @@ export class AlimentacionComponent implements OnInit {
 
       this.alimentaciones = todos
         .filter((servicio: any) =>
-          servicio.categorias?.some((cat: any) => cat.id === 2)
+          servicio.categorias?.some((cat: any) => cat.id === 2)  // Solo Alimentación (ID de categoría 2)
         )
         .map((servicio: any) => {
           let imagenPrincipal = 'default.jpg';
@@ -43,4 +43,3 @@ export class AlimentacionComponent implements OnInit {
     });
   }
 }
-

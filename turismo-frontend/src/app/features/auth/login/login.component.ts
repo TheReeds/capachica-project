@@ -81,6 +81,15 @@ export class LoginComponent implements OnInit {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
+  
+  // Métodos para manejar el tema oscuro
+  toggleDarkMode() {
+    this.themeService.toggleDarkMode();
+  }
+  
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
+  }
 
   // Métodos para manejar el tema oscuro
   toggleDarkMode() {

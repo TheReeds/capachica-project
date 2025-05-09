@@ -107,10 +107,10 @@ class GoogleAuthController extends Controller
                 return $this->errorResponse('Token no proporcionado', 400);
             }
             
-            // Verificar el token con la API de Google
+            // Verify token with Google API
             $client = new GoogleClient(['client_id' => config('services.google.client_id')]);
             
-            // Configurar cliente para ignorar verificación SSL solo en desarrollo
+            // Configure client to ignore SSL verification only in development
             if (app()->environment('local')) {
                 $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
             }
@@ -121,45 +121,59 @@ class GoogleAuthController extends Controller
                 return $this->errorResponse('Token inválido', 400);
             }
             
-            // Procesar la información del payload
+            // Process payload information
             $googleId = $payload['sub'];
             $email = $payload['email'];
             $name = $payload['name'] ?? '';
             $picture = $payload['picture'] ?? null;
+            $locale = $payload['locale'] ?? null;
             
-            // Buscar o crear usuario
+            // Find or create user
             $user = User::where('google_id', $googleId)
                         ->orWhere('email', $email)
                         ->first();
             
             if (!$user) {
-                // Crear nuevo usuario
+                // Create new user
                 $user = User::create([
                     'name' => $name,
                     'email' => $email,
                     'password' => Hash::make(Str::random(16)),
                     'google_id' => $googleId,
                     'avatar' => $picture,
-                    'email_verified_at' => now(),  // Consideramos verificado el email de Google
+                    'preferred_language' => $locale ? substr($locale, 0, 2) : null,
+                    'email_verified_at' => now(), // Consider Google email verified
                     'active' => true,
+                    'last_login' => now()
                 ]);
                 
-                // Asignar rol predeterminado
+                // Assign default role
                 $user->assignRole('user');
             } else if (!$user->google_id) {
-                // Actualizar usuario existente con google_id
-                $user->update([
+                // Update existing user with google_id
+                $updateData = [
                     'google_id' => $googleId,
                     'avatar' => $picture,
                     'email_verified_at' => now(),
                     'active' => true,
-                ]);
+                    'last_login' => now()
+                ];
+                
+                // Add preferred language if not set and available from Google
+                if (!$user->preferred_language && $locale) {
+                    $updateData['preferred_language'] = substr($locale, 0, 2);
+                }
+                
+                $user->update($updateData);
+            } else {
+                // Update last login time
+                $user->update(['last_login' => now()]);
             }
             
-            // Eliminar tokens anteriores
+            // Delete previous tokens
             $user->tokens()->delete();
             
-            // Crear nuevo token
+            // Create new token
             $token = $user->createToken('auth_token')->plainTextToken;
             
             return $this->successResponse([

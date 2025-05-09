@@ -1,3 +1,4 @@
+// src/app/core/guards/auth.guard.ts
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { Observable, of, map, catchError, take, switchMap, tap } from 'rxjs';
@@ -56,7 +57,30 @@ export const nonAuthGuard: CanActivateFn = () => {
     return true;
   }
   
-  // Si el usuario está autenticado, redirigir al dashboard
-  console.log('NonAuthGuard: Usuario ya autenticado, redirigiendo a dashboard');
-  return router.createUrlTree(['/dashboard']);
+  // Si el usuario está autenticado, verificar si administra emprendimientos
+  console.log('NonAuthGuard: Usuario autenticado, verificando estado de emprendimientos');
+  
+  // Si hay señal de que administra emprendimientos
+  if (authService.administraEmprendimientos()) {
+    console.log('NonAuthGuard: Usuario administra emprendimientos, redirigiendo a selección de panel');
+    return router.createUrlTree(['/seleccion-panel']);
+  }
+  
+  // Si no administra emprendimientos o no está cargada la información,
+  // intentar cargar el perfil para obtener la información más reciente
+  return authService.loadUserProfile(false).pipe(
+    map(user => {
+      if (authService.administraEmprendimientos()) {
+        console.log('NonAuthGuard: Perfil cargado, usuario administra emprendimientos');
+        return router.createUrlTree(['/seleccion-panel']);
+      } else {
+        console.log('NonAuthGuard: Perfil cargado, usuario no administra emprendimientos');
+        return router.createUrlTree(['/dashboard']);
+      }
+    }),
+    catchError(() => {
+      console.log('NonAuthGuard: Error al cargar perfil, redirigiendo a dashboard por defecto');
+      return of(router.createUrlTree(['/dashboard']));
+    })
+  );
 };

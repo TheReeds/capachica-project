@@ -21,7 +21,7 @@ export class ActividadesComponent implements OnInit {
 
       this.actividades = todos
         .filter((servicio: any) =>
-          servicio.categorias?.some((cat: any) => cat.id === 5)
+          servicio.categorias?.some((cat: any) => cat.id === 5)  // Solo actividades
         )
         .map((servicio: any) => {
           let imagenPrincipal = 'default.jpg';

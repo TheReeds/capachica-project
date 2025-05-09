@@ -26,11 +26,15 @@ class AuthService
     {
         $userData = [
             'name' => $data['name'],
-            'first_name' => $data['first_name'] ?? null,
-            'last_name' => $data['last_name'] ?? null,
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'] ?? null,
+            'country' => $data['country'] ?? null,
+            'birth_date' => $data['birth_date'] ?? null,
+            'address' => $data['address'] ?? null,
+            'gender' => $data['gender'] ?? null,
+            'preferred_language' => $data['preferred_language'] ?? null,
+            'active' => true,
         ];
         
         // Process profile photo if provided
@@ -69,6 +73,9 @@ class AuthService
             return ['error' => 'inactive_user'];
         }
         
+        // Update last_login timestamp
+        $user->update(['last_login' => now()]);
+        
         // Delete previous tokens
         $user->tokens()->delete();
         
@@ -88,13 +95,12 @@ class AuthService
     /**
      * Handle Google OAuth login
      *
-     * @param string $provider
      * @return array
      */
     public function handleGoogleCallback(): array
     {
         try {
-                // Configurar Socialite para ignorar verificación SSL solo en desarrollo
+            // Configure Socialite to ignore SSL verification only in development
             if (app()->environment('local')) {
                 $client = new \GuzzleHttp\Client(['verify' => false]);
                 \Laravel\Socialite\Facades\Socialite::driver('google')->setHttpClient($client);
@@ -102,12 +108,15 @@ class AuthService
             
             $googleUser = Socialite::driver('google')->stateless()->user();
             
-            // Buscar usuario por google_id o por email
+            // Search user by google_id or email
             $user = User::where('google_id', $googleUser->id)
                         ->orWhere('email', $googleUser->email)
                         ->first();
             
-            // Si el usuario no existe, crear uno nuevo
+            // Extract available data from Google
+            $locale = $googleUser->user['locale'] ?? null;
+            
+            // If the user doesn't exist, create a new one
             if (!$user) {
                 $user = User::create([
                     'name' => $googleUser->name,
@@ -115,25 +124,39 @@ class AuthService
                     'password' => Hash::make(Str::random(16)),
                     'google_id' => $googleUser->id,
                     'avatar' => $googleUser->avatar,
-                    'email_verified_at' => now(), // Marcar como verificado ya que proviene de Google
+                    'email_verified_at' => now(), // Mark as verified since it comes from Google
+                    'preferred_language' => $locale ? substr($locale, 0, 2) : null, // Extract language code from locale
+                    'active' => true,
+                    'last_login' => now(),
                 ]);
                 
-                // Asignar rol de usuario
+                // Assign user role
                 $user->assignRole('user');
             } 
-            // Si el usuario existe pero no tiene google_id, actualizar
+            // If the user exists but doesn't have google_id, update it
             else if (!$user->google_id) {
-                $user->update([
+                $updateData = [
                     'google_id' => $googleUser->id,
                     'avatar' => $googleUser->avatar,
-                    'email_verified_at' => now(), // Marcar como verificado
-                ]);
+                    'email_verified_at' => now(), // Mark as verified
+                    'last_login' => now(),
+                ];
+                
+                // Add preferred language if not already set and available from Google
+                if (!$user->preferred_language && $locale) {
+                    $updateData['preferred_language'] = substr($locale, 0, 2);
+                }
+                
+                $user->update($updateData);
+            } else {
+                // Update last login time
+                $user->update(['last_login' => now()]);
             }
             
-            // Eliminar tokens anteriores
+            // Delete previous tokens
             $user->tokens()->delete();
             
-            // Crear nuevo token
+            // Create new token
             $token = $user->createToken('auth_token')->plainTextToken;
             
             return [
@@ -164,7 +187,10 @@ class AuthService
     public function updateProfile(User $user, array $data, ?UploadedFile $profilePhoto = null): User
     {
         $userData = array_filter($data, function ($key) {
-            return in_array($key, ['name', 'first_name', 'last_name', 'email', 'phone']);
+            return in_array($key, [
+                'name', 'email', 'phone', 'country', 
+                'birth_date', 'address', 'gender', 'preferred_language'
+            ]);
         }, ARRAY_FILTER_USE_KEY);
         
         // Update password if provided
@@ -182,15 +208,15 @@ class AuthService
             $userData['foto_perfil'] = $profilePhoto->store('fotos_perfil', 'public');
         }
         
-        // Si el email cambia, marcar como no verificado
+        // If email changes, mark as not verified
         if (isset($userData['email']) && $userData['email'] !== $user->email) {
             $userData['email_verified_at'] = null;
         }
         
         $user->update($userData);
         
-        // Si el email cambió, enviar verificación
-        if (isset($userData['email']) && $userData['email'] !== $user->email) {
+        // If email changed, send verification
+        if (isset($userData['email']) && $userData['email'] !== $user->getOriginal('email')) {
             $user->sendEmailVerificationNotification();
         }
         

@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { GoogleLoginButtonComponent } from '../../../shared/components/buttons/google-login-button.component';
 import { GoogleAuthService } from '../../../core/services/google-auth.service';
 import { RegisterRequest } from '../../../core/models/user.model';
+import { ThemeService } from '../../../core/services/theme.service';
 
 // Custom validator function
 export function MustMatch(controlName: string, matchingControlName: string) {
@@ -42,6 +43,7 @@ export class RegisterComponent implements OnInit {
   private googleAuthService = inject(GoogleAuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  public themeService = inject(ThemeService);
 
   registerForm: FormGroup;
   loading = false;
@@ -62,10 +64,13 @@ export class RegisterComponent implements OnInit {
   constructor() {
     this.registerForm = this.fb.group({
       name: ['', Validators.required],
-      first_name: [''],
-      last_name: [''],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
+      country: [''],
+      birth_date: [''],
+      address: [''],
+      gender: [''],
+      preferred_language: [''],
       password: ['', [Validators.required, Validators.minLength(8)]],
       password_confirmation: ['', Validators.required]
     }, {
@@ -133,19 +138,20 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    let nameValue = this.registerForm.value.name;
-    if (!nameValue && this.registerForm.value.first_name && this.registerForm.value.last_name) {
-        nameValue = `${this.registerForm.value.first_name} ${this.registerForm.value.last_name}`;
-    }
-
     this.loading = true;
 
     const registerData: RegisterRequest = {
-      name: nameValue,
+      name: this.registerForm.value.name,
       email: this.registerForm.value.email,
       password: this.registerForm.value.password,
       password_confirmation: this.registerForm.value.password_confirmation,
       phone: this.registerForm.value.phone,
+      // Nuevos campos
+      country: this.registerForm.value.country || null,
+      birth_date: this.registerForm.value.birth_date || null,
+      address: this.registerForm.value.address || null,
+      gender: this.registerForm.value.gender || null,
+      preferred_language: this.registerForm.value.preferred_language || null,
       foto_perfil: this.selectedFile
     };
 
@@ -223,5 +229,13 @@ export class RegisterComponent implements OnInit {
   // Prevenir que los clics dentro del modal se propaguen al documento
   preventPropagation(event: MouseEvent) {
     event.stopPropagation();
+  }
+
+  toggleDarkMode() {
+    this.themeService.toggleDarkMode();
+  }
+  
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 }
