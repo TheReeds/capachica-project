@@ -20,7 +20,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Opción Panel de Administración -->
             <div 
-              class="bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              class="bg-white hover:bg-orange-400 dark:hover:bg-orange-800 dark:bg-gray-700 border dark:border-gray-600 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               (click)="navigateTo('/dashboard')">
               <div class="flex justify-center mb-4">
                 <div class="w-16 h-16 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center">
@@ -35,7 +35,7 @@ import { AuthService } from '../../../core/services/auth.service';
             
             <!-- Opción Gestión de Emprendimientos -->
             <div 
-              class="bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              class="bg-white hover:bg-blue-400 dark:hover:bg-blue-800 dark:bg-gray-700 border dark:border-gray-600 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               (click)="navigateTo('/mis-emprendimientos')">
               <div class="flex justify-center mb-4">
                 <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
