@@ -21,7 +21,7 @@ export class ArtesaniaComponent implements OnInit {
 
       this.artesanias = todos
         .filter((servicio: any) =>
-          servicio.categorias?.some((cat: any) => cat.id === 3)
+          servicio.categorias?.some((cat: any) => cat.id === 3)  // Solo Artesanías (ID de categoría 3)
         )
         .map((servicio: any) => {
           let imagenPrincipal = 'default.jpg';
@@ -43,4 +43,3 @@ export class ArtesaniaComponent implements OnInit {
     });
   }
 }
-

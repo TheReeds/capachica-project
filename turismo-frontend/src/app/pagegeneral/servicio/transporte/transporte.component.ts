@@ -21,7 +21,7 @@ export class TransporteComponent implements OnInit {
 
       this.transportes = todos
         .filter((servicio: any) =>
-          servicio.categorias?.some((cat: any) => cat.id === 4)
+          servicio.categorias?.some((cat: any) => cat.id === 4)  // Solo Transporte (ID de categoría 4)
         )
         .map((servicio: any) => {
           let imagenPrincipal = 'default.jpg';
@@ -43,4 +43,3 @@ export class TransporteComponent implements OnInit {
     });
   }
 }
-
