@@ -26,9 +26,10 @@ export const PAGEGENERAL_ROUTES: Routes = [
     },
     {
       path: 'eventos',
-      component: EventosComponent,
-      title: 'Eventos'
+      loadChildren: () =>
+        import('./eventos/eventos.routes').then(m => m.EVENTOS_ROUTES)
     },
+
     {
       path: 'contactos',
       component: ContactosComponent,
@@ -74,25 +75,27 @@ export const PAGEGENERAL_ROUTES: Routes = [
       component: FamiliasComponent,
       title: 'Familias'
     },
-    
+
     {
       path: 'servicios',
       loadChildren: () => import('./servicio/servicios/servicios.routes').then(m => m.SERVICIOS_ROUTES)
     },
-    
+
 
     {
       path: 'servicios',
       loadChildren: () =>
         import('./servicio/servicios/servicios.routes').then(m => m.SERVICIOS_ROUTES)
     },
+
     {
       path: 'detallefamilias/:id',
       component: DetallefamiliasComponent,
       title: 'Detalle de Familias'
-    }]
-    
-    
+    }],
+
+
+
    }
 ];
 

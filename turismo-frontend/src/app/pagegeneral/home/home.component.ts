@@ -41,7 +41,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.loadEmprendedores();
     this.loadReservas();
     this.loadCategorias();
-  
+
     this.homeService.getMunicipalidad().subscribe({
       next: (response) => {
         this.municipalidad = response; // 👈 aquí el fix

@@ -6,15 +6,16 @@ import { AuthService } from '../../../core/services/auth.service';
 import { GoogleLoginButtonComponent } from '../../../shared/components/buttons/google-login-button.component';
 import { GoogleAuthService } from '../../../core/services/google-auth.service';
 import { ActivatedRoute } from '@angular/router';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    RouterLink, 
-    FormsModule, 
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    FormsModule,
     GoogleLoginButtonComponent
   ],
   templateUrl: './login.component.html',
@@ -26,6 +27,7 @@ export class LoginComponent implements OnInit {
   private googleAuthService = inject(GoogleAuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  public themeService = inject(ThemeService);
 
   loginForm: FormGroup;
   loading = false;
@@ -51,7 +53,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     // Inicializar el servicio de Google Auth
     this.googleAuthService.initGoogleOneTap(false);
-    
+
     // Verificar si hay un token de Google en los parámetros de URL
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
@@ -71,13 +73,22 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  get f() { 
-    return this.loginForm.controls; 
+  get f() {
+    return this.loginForm.controls;
   }
-  
+
   // Método para mostrar/ocultar contraseña
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
+  }
+
+  // Métodos para manejar el tema oscuro
+  toggleDarkMode() {
+    this.themeService.toggleDarkMode();
+  }
+
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 
   onSubmit() {
@@ -99,7 +110,7 @@ export class LoginComponent implements OnInit {
           this.loading = false;
           return;
         }
-        
+
         this.router.navigate(['/dashboard']);
       },
       error: err => {
@@ -108,15 +119,15 @@ export class LoginComponent implements OnInit {
       }
     });
   }
-  
+
   resendVerificationEmail() {
     const email = this.loginForm.get('email')?.value;
-    
+
     if (!email) {
       this.error = 'Por favor, ingresa tu correo electrónico.';
       return;
     }
-    
+
     this.loading = true;
     this.authService.resendVerificationEmail().subscribe({
       next: () => {
@@ -141,16 +152,16 @@ export class LoginComponent implements OnInit {
       this.isFirstClick = false;
       return;
     }
-    
+
     // Obtener el elemento principal del modal (la tarjeta blanca)
     const modalCard = document.querySelector('.mx-auto.w-full.max-w-6xl.overflow-hidden.rounded-2xl');
-    
+
     // Si no encontramos el modal, no hacemos nada
     if (!modalCard) return;
-    
+
     // Verificar si el clic fue dentro del modal
     const clickedInside = modalCard.contains(event.target as Node);
-    
+
     // Si el clic fue fuera del modal, redirigir a la página inicial
     if (!clickedInside) {
       this.router.navigate(['/']);
