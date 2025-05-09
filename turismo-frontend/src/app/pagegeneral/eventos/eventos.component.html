@@ -1,1 +1,94 @@
-EVENTOS
+<div class="relative w-full h-[40vh] overflow-hidden">
+    <img src="https://consultasenlinea.mincetur.gob.pe/fichaInventario/foto.aspx?cod=471157"
+      alt="Península de Capachica" class="w-full h-full object-cover absolute inset-0 z-10" />
+    <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70 z-20"></div>
+    <div class="absolute inset-0 flex items-center justify-center text-center z-30 px-6">
+      <div class="max-w-4xl">
+        <h1 class="text-3xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+          Eventos Turísticos
+        </h1>
+        <p class="text-lg md:text-xl text-white mb-6 drop-shadow-md">
+          Accede a una lista con los últimos eventos turísticos, tanto nacionales como internacionales.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <section *ngIf="eventoDestacado" class="bg-pink-100 text-gray-800 py-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
+      <div class="mr-6 mb-4 md:mb-0">
+        <img
+          [src]="eventoDestacado.imagen"
+          [alt]="eventoDestacado.titulo"
+          class="w-full md:w-96 h-64 object-cover rounded-lg shadow-xl">
+      </div>
+      <div class="text-center md:text-left">
+        <h2 class="text-3xl font-bold mb-4 text-pink-600">{{ eventoDestacado.titulo }}</h2>
+        <p class="text-xl mb-6">{{ eventoDestacado.descripcion }}</p>
+        <p class="text-lg mb-6">Fecha: {{ eventoDestacado.fecha }}</p>
+        <a [routerLink]="['/eventos/eventosdetalle', eventoDestacado.id]"
+          class="inline-block text-white bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+          Más Información
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-gray-50 py-6">
+    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <label for="anio" class="text-lg text-gray-700">Año:</label>
+        <select id="anio" class="border rounded-lg px-4 py-2">
+          <option value="todos">Todos</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+        </select>
+      </div>
+      <div class="flex items-center space-x-4">
+        <label for="mes" class="text-lg text-gray-700">Mes:</label>
+        <select id="mes" class="border rounded-lg px-4 py-2">
+          <option value="proximos">Próximos</option>
+          <option value="enero">Enero</option>
+          <option value="febrero">Febrero</option>
+          </select>
+      </div>
+      <div class="flex items-center space-x-4">
+        <label for="tipo_evento" class="text-lg text-gray-700">Tipo de evento:</label>
+        <select id="tipo_evento" class="border rounded-lg px-4 py-2">
+          <option value="todos">Todos</option>
+          <option value="culturales">Culturales</option>
+          <option value="deporte">Deporte</option>
+          <option value="gastronomia">Gastronomía</option>
+        </select>
+      </div>
+      <button class="bg-blue-500 text-white p-2 rounded-full">
+        <i class="fa fa-calendar-alt"></i> Ver calendario </button>
+    </div>
+  </section>
+
+  <section class="py-8">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Todos los eventos</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div *ngFor="let evento of eventos" class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img [src]="evento.imagen" [alt]="evento.titulo" class="w-full h-48 object-cover">
+          <div class="p-4">
+            <h3 class="text-xl font-semibold text-gray-800">{{ evento.titulo }}</h3>
+            <p class="text-gray-600 line-clamp-3">{{ evento.descripcion }}</p> <div class="mt-2 flex items-center space-x-2">
+              <span class="text-gray-500">Fecha: {{ evento.fecha }}</span>
+            </div>
+            <div class="mt-4">
+              <a [routerLink]="['/eventosdetalle', evento.id]"
+                class="inline-block text-white bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                Más Información
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+

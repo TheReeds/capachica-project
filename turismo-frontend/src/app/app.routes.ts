@@ -5,30 +5,32 @@ import { AlojamientoComponent, ServiciosComponent } from './pagegeneral/pagegene
 
 export const routes: Routes = [
     // Ruta por defecto
-    
+
     {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full'
     },
-    
+
     // Rutas de autenticación (login, register, etc.)
     {
         path: '',
         canActivate: [nonAuthGuard],
         loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
     },
-    
+
     // Rutas de página general pública
     {
         path: '',
         loadChildren: () => import('./pagegeneral/pagegeneral.routes').then(m => m.PAGEGENERAL_ROUTES)
     },
+
     {
         path: '',
         loadChildren: () => import('./features/admin-empredimientos/admin-emprendimientos.routes').then(m => m.ADMIN_EMPRENDEDORES_ROUTES)
     },
     
+
     // Todas las rutas protegidas por autenticación
     {
         path: '',
@@ -49,11 +51,11 @@ export const routes: Routes = [
             }
         ]
     },
-    
+
     // Ruta para manejar rutas no encontradas
     {
         path: '**',
         redirectTo: 'home', // Cambiado a 'home' en lugar de 'dashboard' para redirigir a una ruta pública
     }
-    
+
 ];
