@@ -58,6 +58,11 @@ export const ADMIN_ROUTES: Routes = [
         title: 'Gestión de Asociaciones'
       },
       {
+        path: 'evento',
+        loadChildren: () => import('./turismo/evento/eventos.routes').then(m => m.EVENTOS_ROUTES),
+        title: 'Gestión de Eventos'
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
