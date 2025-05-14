@@ -5,6 +5,7 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { TurismoService, Servicio, Categoria, Emprendedor, ServicioHorario } from '../../../../../core/services/turismo.service';
 import { SliderImage, SliderUploadComponent } from '../../../../../shared/components/slider-upload/slider-upload.component';
 import { UbicacionMapComponent } from '../../../../../shared/components/ubicacion-map/ubicacion-map.component';
+import { ThemeService } from '../../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-servicio-form',
@@ -14,14 +15,14 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
     <div class="space-y-6">
       <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">{{ isEditMode ? 'Editar' : 'Crear' }} Servicio</h1>
-          <p class="mt-1 text-sm text-gray-500">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors">{{ isEditMode ? 'Editar' : 'Crear' }} Servicio</h1>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors">
             {{ isEditMode ? 'Actualice la información del servicio.' : 'Complete el formulario para crear un nuevo servicio.' }}
           </p>
         </div>
         <div class="mt-4 sm:mt-0">
-          <a 
-            [routerLink]="backLink" 
+          <a
+            [routerLink]="backLink"
             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +32,7 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
           </a>
         </div>
       </div>
-      
+
       @if (loading) {
         <div class="rounded-lg bg-white p-6 shadow-sm">
           <div class="flex justify-center items-center p-8">
@@ -41,38 +42,38 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
         </div>
       } @else {
         <form [formGroup]="servicioForm" (ngSubmit)="submitForm()" class="space-y-6">
-          <div class="rounded-lg bg-white shadow-sm overflow-hidden">
+          <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors">
             <div class="p-6 space-y-6">
               <!-- Información básica -->
               <div>
-                <h2 class="text-lg font-medium text-gray-900">Información del Servicio</h2>
+                <h2 class="text-lg font-medium text-gray-900 dark:text-white transition-colors">Información del Servicio</h2>
                 <div class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                   <!-- Nombre -->
                   <div class="sm:col-span-4">
-                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre del Servicio</label>
+                    <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Nombre del Servicio</label>
                     <div class="mt-1">
-                      <input 
-                        type="text" 
-                        id="nombre" 
+                      <input
+                        type="text"
+                        id="nombre"
                         formControlName="nombre"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors"
                       >
                     </div>
                     @if (servicioForm.get('nombre')?.invalid && servicioForm.get('nombre')?.touched) {
                       <p class="mt-2 text-sm text-red-600">El nombre es obligatorio</p>
                     }
                   </div>
-                  
+
                   <!-- Precio referencial -->
                   <div class="sm:col-span-2">
-                    <label for="precio_referencial" class="block text-sm font-medium text-gray-700">Precio Referencial</label>
+                    <label for="precio_referencial" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Precio Referencial</label>
                     <div class="mt-1 relative rounded-md shadow-sm">
                       <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                         <span class="text-gray-500 sm:text-sm">S/.</span>
                       </div>
-                      <input 
-                        type="number" 
-                        id="precio_referencial" 
+                      <input
+                        type="number"
+                        id="precio_referencial"
                         formControlName="precio_referencial"
                         min="0"
                         step="0.01"
@@ -80,28 +81,28 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                       >
                     </div>
                   </div>
-                  
+
                   <!-- Descripción -->
                   <div class="sm:col-span-6">
-                    <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+                    <label for="descripcion" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Descripción</label>
                     <div class="mt-1">
-                      <textarea 
-                        id="descripcion" 
+                      <textarea
+                        id="descripcion"
                         formControlName="descripcion"
                         rows="3"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors"
                       ></textarea>
                     </div>
                   </div>
-                  
+
                   <!-- Emprendedor -->
                   <div class="sm:col-span-3">
-                    <label for="emprendedor_id" class="block text-sm font-medium text-gray-700">Emprendedor</label>
+                    <label for="emprendedor_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Emprendedor</label>
                     <div class="mt-1">
-                      <select 
-                        id="emprendedor_id" 
+                      <select
+                        id="emprendedor_id"
                         formControlName="emprendedor_id"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors"
                         [attr.disabled]="isEmprendedorPreselected ? true : null"
                       >
                         <option value="">Seleccione emprendedor</option>
@@ -114,72 +115,72 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                       <p class="mt-2 text-sm text-red-600">El emprendedor es obligatorio</p>
                     }
                   </div>
-                  
+
                   <!-- Estado -->
                   <div class="sm:col-span-3">
-                    <label class="block text-sm font-medium text-gray-700">Estado</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Estado</label>
                     <div class="mt-2">
                       <div class="flex items-center">
-                        <input 
+                        <input
                           type="checkbox"
-                          id="estado" 
+                          id="estado"
                           formControlName="estado"
                           class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         >
-                        <label for="estado" class="ml-2 block text-sm text-gray-700">
+                        <label for="estado" class="font-medium text-gray-700 dark:text-gray-200 transition-colors">
                           Servicio activo
                         </label>
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- Ubicación Geográfica -->
-                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Ubicación Geográfica</h3>
-                    <p class="mt-1 text-sm text-gray-500">Seleccione la ubicación donde se ofrece el servicio.</p>
-                    
+                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 transition-colors">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white transition-colors">Ubicación Geográfica</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors">Seleccione la ubicación donde se ofrece el servicio.</p>
+
                     <div class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                       <!-- Latitud y Longitud -->
                       <div class="sm:col-span-3">
-                        <label for="latitud" class="block text-sm font-medium text-gray-700">Latitud</label>
+                        <label for="latitud" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Latitud</label>
                         <div class="mt-1">
-                          <input 
-                            type="number" 
-                            id="latitud" 
+                          <input
+                            type="number"
+                            id="latitud"
                             formControlName="latitud"
                             step="0.0000001"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors"
                           >
                         </div>
                       </div>
-                      
+
                       <div class="sm:col-span-3">
-                        <label for="longitud" class="block text-sm font-medium text-gray-700">Longitud</label>
+                        <label for="longitud" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Longitud</label>
                         <div class="mt-1">
-                          <input 
-                            type="number" 
-                            id="longitud" 
+                          <input
+                            type="number"
+                            id="longitud"
                             formControlName="longitud"
                             step="0.0000001"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors"
                           >
                         </div>
                       </div>
-                      
+
                       <!-- Referencia de ubicación -->
                       <div class="sm:col-span-6">
-                        <label for="ubicacion_referencia" class="block text-sm font-medium text-gray-700">Referencia de ubicación</label>
+                        <label for="ubicacion_referencia" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Referencia de ubicación</label>
                         <div class="mt-1">
-                          <input 
-                            type="text" 
-                            id="ubicacion_referencia" 
+                          <input
+                            type="text"
+                            id="ubicacion_referencia"
                             formControlName="ubicacion_referencia"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors"
                             placeholder="Ej: A 200m del muelle principal de Llachón"
                           >
                         </div>
                       </div>
-                      
+
                       <!-- Componente de mapa -->
                       <div class="sm:col-span-6">
                         <app-ubicacion-map
@@ -190,12 +191,12 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- Horarios -->
-                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
+                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 transition-colors">
                     <div class="flex justify-between items-center">
-                      <h3 class="text-lg font-medium text-gray-900">Horarios Disponibles</h3>
-                      <button 
+                      <h3 class="text-lg font-medium text-gray-900 dark:text-white transition-colors">Horarios Disponibles</h3>
+                      <button
                         type="button"
                         (click)="addHorario()"
                         class="inline-flex items-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -206,7 +207,7 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                         Añadir Horario
                       </button>
                     </div>
-                    
+
                     <!-- Lista de horarios -->
                     <div class="mt-4">
                       @if (horariosArray.controls.length === 0) {
@@ -226,16 +227,16 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                           </div>
                         </div>
                       } @else {
-                        <div class="bg-white shadow overflow-hidden rounded-md">
-                          <ul class="divide-y divide-gray-200">
+                        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-md transition-colors">
+                          <ul class="divide-y divide-gray-200 dark:divide-gray-700 transition-colors">
                             @for (control of horariosArray.controls; track i; let i = $index) {
                               <li class="px-4 py-4">
                                 <div [formGroup]="getHorarioFormGroup(i)" class="flex flex-wrap gap-4 items-center">
                                   <!-- Día de la semana -->
                                   <div class="w-48">
                                     <label [for]="'dia-semana-' + i" class="block text-xs font-medium text-gray-500">Día de la semana</label>
-                                    <select 
-                                      [id]="'dia-semana-' + i" 
+                                    <select
+                                      [id]="'dia-semana-' + i"
                                       formControlName="dia_semana"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                     >
@@ -248,36 +249,36 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                                       <option value="domingo">Domingo</option>
                                     </select>
                                   </div>
-                                  
+
                                   <!-- Hora de inicio -->
                                   <div class="w-32">
                                     <label [for]="'hora-inicio-' + i" class="block text-xs font-medium text-gray-500">Hora inicio</label>
-                                    <input 
-                                      [id]="'hora-inicio-' + i" 
-                                      type="time" 
+                                    <input
+                                      [id]="'hora-inicio-' + i"
+                                      type="time"
                                       formControlName="hora_inicio"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                     >
                                   </div>
-                                  
+
                                   <!-- Hora de fin -->
                                   <div class="w-32">
                                     <label [for]="'hora-fin-' + i" class="block text-xs font-medium text-gray-500">Hora fin</label>
-                                    <input 
-                                      [id]="'hora-fin-' + i" 
-                                      type="time" 
+                                    <input
+                                      [id]="'hora-fin-' + i"
+                                      type="time"
                                       formControlName="hora_fin"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                     >
                                   </div>
-                                  
+
                                   <!-- Activo -->
                                   <div class="w-24">
                                     <label class="block text-xs font-medium text-gray-500">Estado</label>
                                     <div class="mt-1 flex items-center">
-                                      <input 
-                                        [id]="'horario-activo-' + i" 
-                                        type="checkbox" 
+                                      <input
+                                        [id]="'horario-activo-' + i"
+                                        type="checkbox"
                                         formControlName="activo"
                                         class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                                       >
@@ -286,10 +287,10 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                                       </label>
                                     </div>
                                   </div>
-                                  
+
                                   <!-- Eliminar -->
                                   <div class="flex-grow flex justify-end">
-                                    <button 
+                                    <button
                                       type="button"
                                       (click)="removeHorario(i)"
                                       class="text-red-600 hover:text-red-900 focus:outline-none"
@@ -300,10 +301,10 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                                       </svg>
                                     </button>
                                   </div>
-                                  
+
                                   <!-- Mensajes de error -->
-                                  @if (getHorarioFormGroup(i).get('hora_fin')?.value && 
-                                       getHorarioFormGroup(i).get('hora_inicio')?.value && 
+                                  @if (getHorarioFormGroup(i).get('hora_fin')?.value &&
+                                       getHorarioFormGroup(i).get('hora_inicio')?.value &&
                                        getHorarioFormGroup(i).get('hora_fin')?.value <= getHorarioFormGroup(i).get('hora_inicio')?.value) {
                                     <div class="w-full text-red-600 text-sm">
                                       La hora de fin debe ser posterior a la hora de inicio
@@ -317,34 +318,34 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                       }
                     </div>
                   </div>
-                  
+
                   <!-- Categorías -->
-                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
-                    <label class="block text-lg font-medium text-gray-900 mb-2">Categorías</label>
-                    <div class="border border-gray-300 rounded-md p-4 bg-gray-50">
+                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 transition-colors">
+                    <label class="font-medium text-gray-700 dark:text-gray-200 transition-colors">Categorías</label>
+                    <div class="border border-gray-300 dark:border-gray-600 rounded-md p-4 bg-gray-50 dark:bg-gray-700 transition-colors">
                       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         @for (categoria of categorias; track categoria.id) {
                           <div class="relative flex items-start">
                             <div class="flex items-center h-5">
-                              <input 
+                              <input
                                 type="checkbox"
-                                [id]="'categoria_' + categoria.id" 
+                                [id]="'categoria_' + categoria.id"
                                 [checked]="isSelectedCategoria(categoria.id || 0)"
                                 (change)="toggleCategoria(categoria.id || 0, $event)"
                                 class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                               >
                             </div>
                             <div class="ml-3 text-sm">
-                              <label [for]="'categoria_' + categoria.id" class="font-medium text-gray-700">{{ categoria.nombre }}</label>
+                              <label [for]="'categoria_' + categoria.id" class="font-medium text-gray-700 dark:text-gray-200 transition-colors">{{ categoria.nombre }}</label>
                             </div>
                           </div>
                         }
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- Sliders / Imágenes -->
-                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200">
+                  <div class="sm:col-span-6 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 transition-colors">
                     <app-slider-upload
                       title="Imágenes del Servicio"
                       [slidersFormArray]="slidersArray"
@@ -356,13 +357,13 @@ import { UbicacionMapComponent } from '../../../../../shared/components/ubicacio
                 </div>
               </div>
             </div>
-            
+
             <!-- Botones de acción -->
-            <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
+            <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 text-right sm:px-6 transition-colors">
               <button
                 type="button"
                 (click)="cancel()"
-                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mr-2"
+                class="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mr-2 transition-colors"
               >
                 Cancelar
               </button>
@@ -396,28 +397,29 @@ export class ServicioFormComponent implements OnInit {
   private turismoService = inject(TurismoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  
+  private themeService = inject(ThemeService);
+
   servicioForm!: FormGroup;
   servicio: Servicio | null = null;
   categorias: Categoria[] = [];
   emprendedores: Emprendedor[] = [];
   sliders: SliderImage[] = [];
   deletedSliderIds: number[] = [];
-  
+
   loading = true;
   isSubmitting = false;
   isEditMode = false;
   servicioId: number | null = null;
-  
+
   selectedCategorias: number[] = [];
   isEmprendedorPreselected = false;
   backLink = '/admin/servicios';
-  
+
   ngOnInit() {
     this.initForm();
     this.loadCategorias();
     this.loadEmprendedores();
-    
+
     // Verificar si es modo edición
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -432,11 +434,11 @@ export class ServicioFormComponent implements OnInit {
         this.servicioForm.patchValue({ emprendedor_id: +emprendedorId });
         this.backLink = `/admin/emprendedores/${emprendedorId}/servicios`;
       }
-      
+
       this.loading = false;
     }
   }
-  
+
   initForm() {
     this.servicioForm = this.fb.group({
       nombre: ['', [Validators.required]],
@@ -451,15 +453,15 @@ export class ServicioFormComponent implements OnInit {
       horarios: this.fb.array([])
     });
   }
-  
+
   get slidersArray(): FormArray {
     return this.servicioForm.get('sliders') as FormArray;
   }
-  
+
   get horariosArray(): FormArray {
     return this.servicioForm.get('horarios') as FormArray;
   }
-  
+
   loadCategorias() {
     this.turismoService.getCategorias().subscribe({
       next: (categorias) => {
@@ -470,7 +472,7 @@ export class ServicioFormComponent implements OnInit {
       }
     });
   }
-  
+
   loadEmprendedores() {
     // Cargar todos los emprendedores (primera página con tamaño grande)
     this.turismoService.getEmprendedores(1, 100).subscribe({
@@ -482,13 +484,13 @@ export class ServicioFormComponent implements OnInit {
       }
     });
   }
-  
+
   loadServicio(id: number) {
     this.loading = true;
     this.turismoService.getServicio(id).subscribe({
       next: (servicio) => {
         this.servicio = servicio;
-        
+
         // Llenar el formulario con los datos del servicio
         this.servicioForm.patchValue({
           nombre: servicio.nombre,
@@ -500,26 +502,26 @@ export class ServicioFormComponent implements OnInit {
           longitud: servicio.longitud,
           ubicacion_referencia: servicio.ubicacion_referencia
         });
-        
+
         // Cargar horarios
         if (servicio.horarios && servicio.horarios.length > 0) {
           servicio.horarios.forEach(horario => {
             this.addHorario(horario);
           });
         }
-        
+
         // Guardar las categorías seleccionadas
         if (servicio.categorias && servicio.categorias.length > 0) {
           this.selectedCategorias = servicio.categorias.map(c => c.id || 0).filter(id => id > 0);
         }
-        
+
         // Establecer la ruta de regreso si viene de un emprendedor
         if (servicio.emprendedor_id) {
           this.backLink = `/admin/emprendedores/${servicio.emprendedor_id}/servicios`;
         }
-        
+
         this.loading = false;
-        
+
         // Cargar sliders
         if (servicio.sliders && servicio.sliders.length > 0) {
           this.sliders = servicio.sliders.map(slider => ({
@@ -538,12 +540,12 @@ export class ServicioFormComponent implements OnInit {
       }
     });
   }
-  
+
   // Métodos para horarios
   getHorarioFormGroup(index: number): FormGroup {
     return this.horariosArray.at(index) as FormGroup;
   }
-  
+
   createHorarioFormGroup(horario?: ServicioHorario): FormGroup {
     return this.fb.group({
       id: [horario?.id || null],
@@ -553,33 +555,33 @@ export class ServicioFormComponent implements OnInit {
       activo: [horario?.activo !== undefined ? horario.activo : true]
     });
   }
-  
+
   addHorario(horario?: ServicioHorario) {
     this.horariosArray.push(this.createHorarioFormGroup(horario));
   }
-  
+
   removeHorario(index: number) {
     this.horariosArray.removeAt(index);
   }
-  
+
   invalidHorarios(): boolean {
     if (this.horariosArray.length === 0) {
       return false; // No es inválido, simplemente no hay horarios
     }
-    
+
     for (let i = 0; i < this.horariosArray.length; i++) {
       const group = this.getHorarioFormGroup(i);
       const inicio = group.get('hora_inicio')?.value;
       const fin = group.get('hora_fin')?.value;
-      
+
       if (!inicio || !fin || inicio >= fin) {
         return true; // Horario inválido
       }
     }
-    
+
     return false;
   }
-  
+
   // Método para manejar cambios de ubicación desde el mapa
   onUbicacionChange(event: {lat: number, lng: number}) {
     this.servicioForm.patchValue({
@@ -587,40 +589,40 @@ export class ServicioFormComponent implements OnInit {
       longitud: event.lng
     });
   }
-  
+
   // Categorías
   isSelectedCategoria(categoriaId: number): boolean {
     return this.selectedCategorias.includes(categoriaId);
   }
-  
+
   toggleCategoria(categoriaId: number, event: Event) {
     const isChecked = (event.target as HTMLInputElement).checked;
-    
+
     if (isChecked && !this.isSelectedCategoria(categoriaId)) {
       this.selectedCategorias.push(categoriaId);
     } else if (!isChecked && this.isSelectedCategoria(categoriaId)) {
       this.selectedCategorias = this.selectedCategorias.filter(id => id !== categoriaId);
     }
   }
-  
+
   // Sliders
   onSlidersChange(sliders: SliderImage[]) {
     this.sliders = sliders;
   }
-  
+
   onDeletedSlidersChange(deletedIds: number[]) {
     this.deletedSliderIds = deletedIds;
   }
-  
+
   submitForm() {
     if (this.servicioForm.invalid || this.invalidHorarios() || this.isSubmitting) return;
-    
+
     this.isSubmitting = true;
-    
+
     // Preparar datos para enviar
     const formData = this.servicioForm.value;
     formData.categorias = this.selectedCategorias;
-    
+
     // Convertir tiempos a formato correcto (añadir segundos si faltan)
     formData.horarios = formData.horarios.map((horario: any) => {
       // Asegurar que hora_inicio y hora_fin tengan formato correcto (HH:MM:SS)
@@ -630,7 +632,7 @@ export class ServicioFormComponent implements OnInit {
       if (horario.hora_fin && !horario.hora_fin.includes(':')) {
         horario.hora_fin = `${horario.hora_fin}:00`;
       }
-      
+
       // Si solo tiene HH:MM, añadir segundos
       if (horario.hora_inicio && horario.hora_inicio.split(':').length === 2) {
         horario.hora_inicio = `${horario.hora_inicio}:00`;
@@ -638,10 +640,10 @@ export class ServicioFormComponent implements OnInit {
       if (horario.hora_fin && horario.hora_fin.split(':').length === 2) {
         horario.hora_fin = `${horario.hora_fin}:00`;
       }
-      
+
       return horario;
     });
-    
+
     // Añadir sliders al formData
     formData.sliders = this.sliders.map(slider => ({
       ...slider,
@@ -654,10 +656,10 @@ export class ServicioFormComponent implements OnInit {
       // Si tiene orden, mantenerlo, si no asignar uno basado en la posición
       orden: slider.orden || this.sliders.indexOf(slider) + 1
     }));
-    
+
     // Añadir los IDs de sliders eliminados
     formData.deleted_sliders = this.deletedSliderIds;
-    
+
     // Crear o actualizar servicio
     if (this.isEditMode && this.servicioId) {
       this.turismoService.updateServicio(this.servicioId, formData).subscribe({
@@ -687,12 +689,16 @@ export class ServicioFormComponent implements OnInit {
       });
     }
   }
-  
+
   cancel() {
     this.navigateBack();
   }
-  
+
   navigateBack() {
     this.router.navigateByUrl(this.backLink);
+  }
+
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 }
