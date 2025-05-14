@@ -240,13 +240,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [RoleController::class, 'update'])->middleware('permission:role_update');
         Route::delete('/{id}', [RoleController::class, 'destroy'])->middleware('permission:role_delete');
     });
-    
+    Route::get('/users/{id}/permissions', [PermissionController::class, 'getUserPermissions']);
     // Permisos
     Route::prefix('permissions')->middleware('permission:permission_read')->group(function () {
         Route::get('/', [PermissionController::class, 'index']);
         Route::post('/assign-to-user', [PermissionController::class, 'assignPermissionsToUser'])->middleware('permission:permission_assign');
         Route::post('/assign-to-role', [PermissionController::class, 'assignPermissionsToRole'])->middleware('permission:permission_assign');
-        Route::get('/users/{id}/permissions', [PermissionController::class, 'getUserPermissions']);
+        
     });
     
     // Gestión de Usuarios

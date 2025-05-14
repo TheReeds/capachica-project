@@ -64,7 +64,7 @@ class MenuController extends Controller
                 'title' => 'Usuarios',
                 'icon' => 'users',
                 'path' => '/admin/users',
-                'permissions' => ['user_read'],
+                'permissions' => ['user_create'],
                 'children' => [
                     [
                         'id' => 'user-list',
@@ -91,21 +91,21 @@ class MenuController extends Controller
                 'title' => 'Municipalidad',
                 'icon' => 'building',
                 'path' => '/admin/municipalidad',
-                'permissions' => ['municipalidad_read'],
+                'permissions' => ['municipalidad_create'],
             ],
             [
                 'id' => 'evento',
                 'title' => 'Evento',
                 'icon' => 'events',
                 'path' => '/admin/evento',
-                'permissions' => ['user_read'],
+                'permissions' => ['user_create'],
             ],
             [
                 'id' => 'emprendedores',
                 'title' => 'Emprendedores',
                 'icon' => 'store',
                 'path' => '/admin/emprendedores',
-                'permissions' => ['emprendedor_read'],
+                'permissions' => ['emprendedor_create'],
                 'children' => [
                     [
                         'id' => 'emprendedor-list',
@@ -126,7 +126,7 @@ class MenuController extends Controller
                 'title' => 'Servicios',
                 'icon' => 'briefcase',
                 'path' => '/admin/servicios',
-                'permissions' => ['servicio_read'],
+                'permissions' => ['servicio_create'],
                 'children' => [
                     [
                         'id' => 'servicio-list',

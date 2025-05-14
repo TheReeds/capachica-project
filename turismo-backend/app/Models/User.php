@@ -62,7 +62,11 @@ class User extends Authenticatable implements MustVerifyEmail
                     ->withPivot('es_principal', 'rol')
                     ->withTimestamps();
     }
-    
+    public function emprendedores()
+    {
+        return $this->emprendimientos();
+    }
+
     /**
      * Verificar si el usuario administra algún emprendimiento
      */
