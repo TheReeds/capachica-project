@@ -57,7 +57,7 @@ class MenuController extends Controller
                 'id' => 'dashboard',
                 'title' => 'Dashboard',
                 'icon' => 'dashboard',
-                'path' => '/admin/dashboard',
+                'path' => '/dashboard',
                 'permissions' => ['user_read'], // Permisos mínimos para ver el dashboard
             ],
             [

@@ -13,14 +13,6 @@ export const SERVICIOS_ROUTES: Routes = [
     loadComponent: () => import('../alojamiento/alojamiento.component').then(m => m.AlojamientoComponent)
   },
   {
-    path: '',
-    loadComponent: () => import('./servicios.component').then(m => m.ServiciosComponent)
-  },
-  {
-    path: 'alojamiento',
-    loadComponent: () => import('../alojamiento/alojamiento.component').then(m => m.AlojamientoComponent)
-  },
-  {
     path: 'actividades',
     loadComponent: () => import('../actividades/actividades.component').then(m => m.ActividadesComponent)
   },

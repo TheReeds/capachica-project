@@ -94,40 +94,52 @@ class DatabaseSeeder extends Seeder
     
     private function createUsers()
     {
-        // Usuario administrador
+        // Admin user
         $admin = User::create([
             'name' => 'Administrador',
-            'first_name' => 'Admin',
-            'last_name' => 'Sistema',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
             'phone' => '123456789',
-            'active' => true
+            'country' => 'Perú',
+            'birth_date' => '1990-01-15',
+            'address' => 'Plaza Principal s/n, Capachica, Puno',
+            'gender' => 'male',
+            'preferred_language' => 'es',
+            'active' => true,
+            'last_login' => now()->subDays(1)
         ]);
         $admin->assignRole('admin');
         
-        // Usuario normal
+        // Normal user
         $user = User::create([
             'name' => 'Usuario Normal',
-            'first_name' => 'Usuario',
-            'last_name' => 'Prueba',
             'email' => 'user@example.com',
             'password' => Hash::make('password'),
             'phone' => '987654321',
-            'active' => true
+            'country' => 'Perú',
+            'birth_date' => '1995-06-20',
+            'address' => 'Av. Arequipa 123, Lima',
+            'gender' => 'female',
+            'preferred_language' => 'es',
+            'active' => true,
+            'last_login' => now()->subDays(3)
         ]);
         $user->assignRole('user');
         
-        // Usuario emprendedor
+        // Entrepreneur user
         $emprendedor = User::create([
             'name' => 'Emprendedor Local',
-            'first_name' => 'Juan',
-            'last_name' => 'Mamani',
             'email' => 'emprendedor@example.com',
             'password' => Hash::make('password'),
             'phone' => '555444333',
-            'active' => true
+            'country' => 'Perú',
+            'birth_date' => '1985-12-10',
+            'address' => 'Comunidad Llachón, Capachica, Puno',
+            'gender' => 'male',
+            'preferred_language' => 'es',
+            'active' => true,
+            'last_login' => now()->subHours(12)
         ]);
         $emprendedor->assignRole('emprendedor');
     }

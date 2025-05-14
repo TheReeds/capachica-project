@@ -61,14 +61,16 @@ export class DetallefamiliasComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Captura el ID de la URL
     this.route.paramMap.subscribe(params => {
-      this.id = Number(params.get('id'));
+      this.id = Number(params.get('id')); // Convierte el ID a número
       this.cargarEmprendedor();
       this.cargarServicios();
     });
   }
 
   cargarEmprendedor() {
+    // Llama al servicio para obtener el emprendedor por ID
     this.emprendedorService.getEmprendedorById(this.id).subscribe(emprendedor => {
       this.emprendedor = emprendedor;
       if (!emprendedor) {
@@ -80,6 +82,7 @@ export class DetallefamiliasComponent implements OnInit {
   }
 
   cargarServicios() {
+    // Llama al servicio para obtener los servicios filtrados por el emprendedor
     this.servicioService.obtenerServicios().subscribe((data: Servicio[]) => {
       this.servicios = data.filter(s => s.emprendedor_id === this.id);
     });
@@ -102,13 +105,14 @@ export class DetallefamiliasComponent implements OnInit {
 
 
   getImagenesSecundarias(): string[] {
+    // Devuelve las imágenes secundarias si existen
     return this.emprendedor?.sliders_secundarios?.map(s => s.url_completa) || [];
   }
 
   getImagenesPrincipal(): string[] {
+    // Devuelve las imágenes principales si existen
     return this.emprendedor?.sliders_principales?.map(s => s.url_completa) || [];
   }
-
 
 
 

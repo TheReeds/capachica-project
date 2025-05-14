@@ -10,23 +10,53 @@ import { RouterModule } from '@angular/router';
   templateUrl: './servicios.component.html',
   styleUrls: ['./servicios.component.css']
 })
-
-
 export class ServiciosComponent implements OnInit {
-  servicios: any[] = [];
   categorias: any[] = [];
-  serviciosFiltrados: any[] = [];
+  categoriaSeleccionada: string = '';
   emprendedorSeleccionado: any = null;
   municipalidad: any = null;
 
-  // ✅ NUEVO: estructura para agrupar por nombre de categoria_servicio
-  serviciosAgrupadosPorCategoria: { [categoria: string]: any[] } = {};
-
   constructor(private serviciosService: ServiciosService) {}
 
+  obtenerEmoji(nombre: string): string {
+    const lower = nombre.toLowerCase();
+    if (lower.includes('alojamiento')) return '🛏️';
+    if (lower.includes('actividades')) return '🎯';
+    if (lower.includes('alimentación')) return '🍽️';
+    if (lower.includes('artesanía')) return '🎨';
+    if (lower.includes('transporte')) return '🚗';
+    if (lower.includes('guiado')) return '🧭';
+    return '🌐'; // Emoji por defecto
+  }
+  
+  obtenerColorBorde(nombre: string): any {
+    const lower = nombre.toLowerCase();
+    return {
+      'border-orange-400 dark:border-orange-500': lower.includes('alojamiento'),
+      'border-blue-400 dark:border-blue-500': lower.includes('actividades'),
+      'border-green-400 dark:border-green-500': lower.includes('alimentación'),
+      'border-pink-400 dark:border-pink-500': lower.includes('artesanía'),
+      'border-purple-400 dark:border-purple-500': lower.includes('transporte'),
+      'border-yellow-400 dark:border-yellow-500': lower.includes('guiado'),
+      'border-gray-300 dark:border-gray-600': true // Fallback
+    };
+  }
+  
+  obtenerColorTexto(nombre: string): any {
+    const lower = nombre.toLowerCase();
+    return {
+      'text-orange-600 dark:text-orange-400': lower.includes('alojamiento'),
+      'text-blue-600 dark:text-blue-400': lower.includes('actividades'),
+      'text-green-600 dark:text-green-400': lower.includes('alimentación'),
+      'text-pink-600 dark:text-pink-400': lower.includes('artesanía'),
+      'text-purple-600 dark:text-purple-400': lower.includes('transporte'),
+      'text-yellow-600 dark:text-yellow-400': lower.includes('guiado'),
+      'text-gray-600 dark:text-gray-300': true // Fallback
+    };
+  }
+  
   ngOnInit(): void {
     this.cargarMunicipalidad();
-    this.cargarServicios();
     this.cargarCategorias();
   }
 
@@ -44,62 +74,19 @@ export class ServiciosComponent implements OnInit {
     });
   }
 
-  cargarServicios() {
-    this.serviciosService.obtenerServicios().subscribe((res: any) => {
-      this.servicios = res.data;
-      this.serviciosFiltrados = this.servicios;
-
-      // ✅ Agrupamos servicios por categoria_servicio.nombre
-      this.serviciosAgrupadosPorCategoria = {};
-      for (const servicio of this.servicios) {
-        const categoriaNombre = servicio.categoria_servicio?.nombre || 'Sin categoría';
-        if (!this.serviciosAgrupadosPorCategoria[categoriaNombre]) {
-          this.serviciosAgrupadosPorCategoria[categoriaNombre] = [];
-        }
-        this.serviciosAgrupadosPorCategoria[categoriaNombre].push(servicio);
-      }
-
-      console.log('✔ Servicios agrupados:', this.serviciosAgrupadosPorCategoria);
-    });
-  }
-
   cargarCategorias() {
     this.serviciosService.obtenerCategorias().subscribe((res: any) => {
-      this.categorias = res.data ?? res;
-  
-      // ✅ Si no es un array, lo corregimos
-      if (!Array.isArray(this.categorias)) {
-        console.error('❌ categorias no es un arreglo:', this.categorias);
-        this.categorias = [];
+      const data = res.data ?? res;
+
+      if (Array.isArray(data)) {
+        this.categorias = data;
+      } else {
+        this.categorias = [data]; // por si devuelve un solo objeto
       }
+
+      console.log('✔ Categorías con servicios:', this.categorias);
     });
   }
-  
-
-  categoriaSeleccionada: string = '';
-
-  filtrarPorCategoria(categoriaId: number): void {
-    // 🔍 Buscar categoría por ID
-    const categoria = this.categorias.find((c: any) => c?.id === categoriaId);
-  
-    // ✅ Validación defensiva
-    if (!categoria) {
-      console.warn(`⚠️ Categoría con ID ${categoriaId} no encontrada.`);
-      this.categoriaSeleccionada = '';
-      this.serviciosFiltrados = [];
-      return;
-    }
-  
-    // ✅ Seteamos nombre seleccionado
-    this.categoriaSeleccionada = categoria.nombre;
-  
-    // 🔎 Filtramos los servicios por esa categoría
-    this.serviciosFiltrados = this.servicios.filter(servicio =>
-      Array.isArray(servicio.categorias) &&
-      servicio.categorias.some((cat: any) => cat?.id === categoriaId)
-    );
-  }
-  
 
   abrirDetalleEmprendedor(servicio: any): void {
     this.emprendedorSeleccionado = servicio;
@@ -108,6 +95,5 @@ export class ServiciosComponent implements OnInit {
   cerrarDetalleEmprendedor(): void {
     this.emprendedorSeleccionado = null;
   }
-  
   
 }
