@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name'); // Agrega la columna first_name
             $table->string('name');
-            $table->string('last_name'); // Si deseas tener 'last_name' también
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
