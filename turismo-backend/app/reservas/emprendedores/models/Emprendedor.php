@@ -114,4 +114,10 @@ class Emprendedor extends Model
                     ->with('descripcion')
                     ->orderBy('orden');
     }
+
+    public function eventos()
+    {
+    return $this->hasMany(\App\Models\Evento\Models\Evento::class, 'id_emprendedor');
+    }
+
 }
