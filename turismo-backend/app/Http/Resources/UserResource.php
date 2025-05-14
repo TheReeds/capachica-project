@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use \Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class UserResource extends JsonResource

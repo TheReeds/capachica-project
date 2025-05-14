@@ -3,18 +3,18 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Servicios\Models\Categoria;
-use App\Pagegeneral\Models\Municipalidad;
-use App\Reservas\Asociaciones\Models\Asociacion;
-use App\Servicios\Models\Servicio;
-use App\Servicios\Models\ServicioHorario;
-use App\Reservas\Reserva\Models\Reserva;
-use App\Reservas\Reserva\Models\ReservaServicio;
+use App\Models\Categoria;
+use App\Models\Municipalidad;
+use App\Models\Asociacion;
+use App\Models\Servicio;
+use App\Models\ServicioHorario;
+use App\Models\Reserva;
+use App\Models\ReservaServicio;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\reservas\Emprendedores\Models\Emprendedor;
+use App\Models\Emprendedor;
 
 class DatabaseSeeder extends Seeder
 {

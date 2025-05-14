@@ -1,26 +1,26 @@
 <?php
 
+use App\Http\Controllers\API\AccessControl\PermissionController;
+use App\Http\Controllers\API\AccessControl\RoleController;
+use App\Http\Controllers\API\AccessControl\UserController;
+use App\Http\Controllers\API\Asociaciones\AsociacionController;
+use App\Http\Controllers\API\Auth\AuthController;
+use App\Http\Controllers\API\Auth\GoogleAuthController;
+use App\Http\Controllers\API\Dashboard\DashboardController;
+use App\Http\Controllers\API\Emprendedores\EmprendedorController;
+use App\Http\Controllers\API\Emprendedores\MisEmprendimientosController;
+use App\Http\Controllers\API\Evento\EventController;
+use App\Http\Controllers\API\PageGeneral\MunicipalidadController;
+use App\Http\Controllers\API\PageGeneral\SliderController;
+use App\Http\Controllers\API\Reservas\ReservaController;
+use App\Http\Controllers\API\Reservas\ReservaServicioController;
+use App\Http\Controllers\API\Servicios\CategoriaController;
+use App\Http\Controllers\API\Servicios\ServicioController;
+use App\Http\Controllers\MenuController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\RoleController;
-use App\Http\Controllers\API\PermissionController;
-use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\DashboardController;
-use App\Http\Controllers\Api\MenuController;
-use App\pagegeneral\controller\SliderController;
-use App\pagegeneral\Controller\MunicipalidadController;
-use App\bussinespage\controller\DocenteController;
-use App\jorge\controller\EstudianteController;
-use App\reservas\Emprendedores\Http\Controllers\EmprendedorController;
-use App\reservas\Emprendedores\Http\Controllers\MisEmprendimientosController;
-use App\reservas\Asociaciones\Http\Controllers\AsociacionController;
-use App\reservas\reserva\Controller\ReservaController;
-use App\reservas\reservadetalle\Controller\ReservaDetalleController;
-use App\Servicios\Controllers\ServicioController;
-use App\Servicios\Controllers\CategoriaController;
-use App\Http\Controllers\API\GoogleAuthController;
-use App\Evento\Controllers\EventController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -199,6 +199,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Reservas (nuevas rutas)
     Route::prefix('reservas')->group(function () {
+        Route::post('/mis-reservas', [ReservaController::class, 'createUserReservation']);
         Route::get('/', [ReservaController::class, 'index']);
         Route::get('/{id}', [ReservaController::class, 'show']);
         Route::post('/', [ReservaController::class, 'store']);

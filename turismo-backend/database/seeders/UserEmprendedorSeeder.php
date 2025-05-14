@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Emprendedor;
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\reservas\Emprendedores\Models\Emprendedor;
 
 class UserEmprendedorSeeder extends Seeder
 {
