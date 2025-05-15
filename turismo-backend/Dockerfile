@@ -24,14 +24,18 @@ COPY . .
 # Instalar las dependencias
 RUN composer install --optimize-autoloader --no-dev
 
+# Generar la clave de la aplicación
+RUN php artisan key:generate
+
+# Crear el enlace simbólico de storage
+RUN php artisan storage:link
+
 # Configuración de permisos para almacenamiento y caché
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage
 
 # Exponer el puerto 80 para Apache
 EXPOSE 80
 
-# Generar la clave de la aplicación
-RUN php artisan key:generate
-
-# Comando de inicio
+# Comando de inicio de Apache
 CMD ["apache2-foreground"]
