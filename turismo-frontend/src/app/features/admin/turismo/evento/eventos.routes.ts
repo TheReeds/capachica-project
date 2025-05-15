@@ -13,9 +13,9 @@ export const EVENTOS_ROUTES: Routes = [
     path: 'create',
     component: EventoFormComponent
   },
-  {
+   {
     path: 'edit/:id',
-    component: EventoFormComponent
+    component: EventoFormComponent  
   }
   
 ];

@@ -27,6 +27,7 @@ export class EmprendedorService {
   // Obtener todos los emprendedores
   getAllEmprendedores(): Observable<Emprendedor[]> {
     return this.http.get<any>(`${this.API_URL}/emprendedores`).pipe(
+      
       map(response => {
         const data = response?.data || [];
 
