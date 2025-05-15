@@ -82,11 +82,22 @@ export class DetallefamiliasComponent implements OnInit {
   }
 
   cargarServicios() {
-    // Llama al servicio para obtener los servicios filtrados por el emprendedor
-    this.servicioService.obtenerServicios().subscribe((data: Servicio[]) => {
-      this.servicios = data.filter(s => s.emprendedor_id === this.id);
-    });
-  }
+  this.servicioService.obtenerServicios().subscribe((resp: any) => {
+    // resp es el objeto completo
+    const serviciosArray = resp.data?.data; // Aquí está el array real
+
+    if (Array.isArray(serviciosArray)) {
+      this.servicios = serviciosArray.filter(s => s.emprendedor_id === this.id);
+    } else {
+      console.error('La propiedad data.data no es un array:', serviciosArray);
+      this.servicios = [];
+    }
+  }, error => {
+    console.error('Error en obtenerServicios:', error);
+  });
+}
+
+
 
   // Ordena los horarios por día de la semana
   getOrdenadosHorarios(horarios: any[] | undefined): any[] {
@@ -121,9 +132,15 @@ export class DetallefamiliasComponent implements OnInit {
   
   //Método para sanitizar URLs de mapas de Google
   getMapaUrl(lat: number | string, lng: number | string): SafeResourceUrl {
-    const url = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  if (!lat || !lng || isNaN(Number(lat)) || isNaN(Number(lng))) {
+    console.warn('Latitud o longitud inválida:', lat, lng);
+    return this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
   }
+
+  const url = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+}
+
 
 
   get horariosArray(): FormArray {

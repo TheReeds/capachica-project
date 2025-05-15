@@ -1,25 +1,21 @@
 <!-- Contenedor general -->
 <div class="w-full bg-orange-50 dark:bg-gray-800 overflow-hidden">
 
-    <!-- Imagen de fondo -->
-    <img class="w-full h-[450px] object-cover"
-        src="http://127.0.0.1:8000/storage/sliders/emprendedor/RvBlWFqQTaYkR5vESoL2L08HTxH0z9NI7E9gNqio.jpg"
-        alt="Vista panorámica de Capachica">
-
     <!-- Título y descripción -->
-    <div class="text-center py-10">
-        <h1 class="text-4xl text-orange-800 dark:text-orange-400 font-semibold font-merriweather">
-            Conoce a las familias que hacen posible el turismo comunitario en Capachica
+    <div class="text-center p-10 pt-30">
+        <h1 class=" titulox text-4xl text-blue-900 dark:text-blue-400 font-semibold font-merriweather p-5">
+            "Capachica: Emprender con identidad"
         </h1>
-        <p class="text-lg text-gray-600 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
-            Las familias de Capachica, en la región de Puno, Perú, ofrecen servicios auténticos de hospedaje y
-            actividades
-            culturales. ¡Descubre la calidez de su hospitalidad y la belleza de la región!
+        <p class="text-lg  dark:text-gray-300 mt-5 max-w-2xl mx-auto">
+            Desde tejidos ancestrales hasta sabores tradicionales, conoce a las familias que mantienen viva la herencia
+            cultural de Capachica mientras crean nuevas oportunidades.
         </p>
     </div>
 
+    <hr class="mr-8 ml-8" style="height: 4px; background-color: #9B2226; border: none;">
+
     <!-- Tarjetas de familias -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 py-12 max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-4 py-12 max-w-7xl mx-auto">
 
         <!-- Mensaje de carga -->
         <div *ngIf="!emprendedores || emprendedores.length === 0" class="col-span-3 text-center py-10">
@@ -28,26 +24,32 @@
 
         <!-- Tarjetas dinámicas -->
         <div *ngFor="let e of emprendedores"
-            class="bg-white dark:bg-gray-700 max-w-sm w-full mx-auto rounded-xl shadow-lg overflow-hidden transition transform hover:scale-105 hover:shadow-2xl">
+            class="bg-white max-w-sm w-full mx-auto rounded-xl shadow-lg overflow-hidden transition transform hover:scale-105 hover:shadow-2xl dark:bg-gray-700">
+            <div class="p-5">
+                <img class="w-full h-64 object-cover rounded-lg " [src]="getImagenPrincipal(e)"
+                    [alt]="'Imagen representativa de la familia ' + e?.nombre + ' en ' + e?.ubicacion">
+            </div>
 
-            <img class="w-full h-64 object-cover" [src]="getImagenPrincipal(e)"
-                [alt]="'Imagen representativa de la familia ' + e?.nombre + ' en ' + e?.ubicacion">
 
             <!-- Contenido de la tarjeta -->
-            <div class="p-6">
+            <div class="p-4">
                 <div class="mb-4">
-                    <h3 class="text-xl font-semibold text-amber-500 dark:text-amber-400">{{ e?.nombre }}</h3>
-                    <p class="text-lg text-amber-500 dark:text-amber-400">{{ e?.ubicacion }}</p>
+                    <h3 class="text-center text-xl font-bold text-rose-600 dark:text-amber-400">{{ e?.nombre }}</h3>
+                    <p class="text-center text-lg text-amber-500 font-semibold text-xs dark:text-amber-400 pt-2">{{
+                        e?.ubicacion }}</p>
                 </div>
-                <p class="mt-4 text-gray-700 dark:text-gray-300">
+                <p class="text-center  mt-4 text-gray-600 font-semibold dark:text-gray-300 text-xs">
                     {{ e?.descripcion }}
                 </p>
 
                 <!-- Botón de navegación -->
-                <a [routerLink]="['/detallefamilias', e?.id]"
-                    class="inline-block mt-4 px-6 py-2 bg-amber-600 dark:bg-amber-500 text-white text-lg font-semibold rounded-lg hover:bg-amber-500 dark:hover:bg-amber-400 transition">
-                    Ver más...
-                </a>
+                <div class="text-right mt-4">
+                    <a [routerLink]="['/detallefamilias', e?.id]"
+                        class="inline-block px-6 py-2 bg-blue-600 dark:bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-green-500 dark:hover:bg-amber-400 transition">
+                        + Información
+                    </a>
+                </div>
+
             </div>
 
         </div>
