@@ -119,15 +119,17 @@ Route::prefix('categorias')->group(function () {
 // Evento
 
 Route::prefix('eventos')->group(function () {
-    Route::get('', [EventController::class, 'index']); // Listar eventos
-    Route::post('', [EventController::class, 'store']); // Crear evento
-
-    Route::get('/{id}', [EventController::class, 'show']); // Mostrar evento específico
-    Route::put('/{id}', [EventController::class, 'update']); // Actualizar evento
-    Route::delete('/{id}', [EventController::class, 'destroy']); // Eliminar evento
-
-    Route::get('/{id}/emprendedor', [EmprendedorController::class, 'getEmprendedores']); // Obtener emprendedor del evento
-});
+        Route::get('/', [EventController::class, 'index']);
+        Route::get('/{id}', [EventController::class, 'show']);
+        Route::get('/emprendedor/{emprendedorId}', [EventController::class, 'byEmprendedor']);
+        Route::get('/activos', [EventController::class, 'eventosActivos']);
+        Route::get('/proximos', [EventController::class, 'proximosEventos']);
+        
+        // Crear, actualizar y eliminar (requieren autenticación)
+        Route::post('/', [EventController::class, 'store']);
+        Route::put('/{id}', [EventController::class, 'update']);
+        Route::delete('/{id}', [EventController::class, 'destroy']);
+    });
 Route::prefix('planes')->group(function () {
     Route::get('/publicos', [PlanController::class, 'getPublicPlanes']);
     Route::get('/{id}', [PlanController::class, 'show']);
@@ -255,15 +257,28 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     
     // Gestión de Usuarios
-    Route::prefix('users')->middleware('permission:user_read')->group(function () {
+    Route::prefix('users')->middleware('can:user_read')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::get('/{id}', [UserController::class, 'show']);
-        Route::post('/', [UserController::class, 'store'])->middleware('permission:user_create');
-        Route::put('/{id}', [UserController::class, 'update'])->middleware('permission:user_update');
-        Route::delete('/{id}', [UserController::class, 'destroy'])->middleware('permission:user_delete');
-        Route::put('/{id}/activate', [UserController::class, 'activate'])->middleware('permission:user_update');
-        Route::put('/{id}/deactivate', [UserController::class, 'deactivate'])->middleware('permission:user_update');
-        Route::put('/{id}/roles', [UserController::class, 'assignRoles'])->middleware('permission:user_update');
+        
+        // Creación de usuario (requiere permiso user_create)
+        Route::post('/', [UserController::class, 'store'])->middleware('can:user_create');
+        
+        // Actualización de usuario (requiere permiso user_update)
+        Route::middleware('can:user_update')->group(function () {
+            Route::put('/{id}', [UserController::class, 'update']);
+            Route::patch('/{id}', [UserController::class, 'update']);
+            Route::post('/{id}/activate', [UserController::class, 'activate']);
+            Route::post('/{id}/deactivate', [UserController::class, 'deactivate']);
+            Route::post('/{id}/roles', [UserController::class, 'assignRoles']);
+            
+            // Gestión de foto de perfil
+            Route::post('/{id}/profile-photo', [UserController::class, 'updateProfilePhoto']);
+            Route::delete('/{id}/profile-photo', [UserController::class, 'deleteProfilePhoto']);
+        });
+        
+        // Eliminación de usuario (requiere permiso user_delete)
+        Route::delete('/{id}', [UserController::class, 'destroy'])->middleware('can:user_delete');
     });
     Route::prefix('planes')->group(function () {
         Route::get('/', [PlanController::class, 'index']);
@@ -282,4 +297,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('dashboard')->middleware('permission:user_read')->group(function () {
         Route::get('/summary', [DashboardController::class, 'summary']);
     });
+});
+Route::get('/status', function () {
+    return response()->json([
+        'status' => 'online',
+        'version' => '1.0.0',
+        'timestamp' => now()->toIso8601String()
+    ]);
 });

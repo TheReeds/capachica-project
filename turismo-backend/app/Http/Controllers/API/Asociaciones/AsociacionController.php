@@ -62,11 +62,13 @@ class AsociacionController extends Controller
             $validator = Validator::make($request->all(), [
                 'nombre' => 'required|string|max:255',
                 'descripcion' => 'nullable|string',
-                'ubicacion' => 'nullable|string|max:255',
+                'latitud' => 'nullable|numeric',
+                'longitud' => 'nullable|numeric',
                 'telefono' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:255',
                 'municipalidad_id' => 'required|exists:municipalidad,id',
                 'estado' => 'boolean',
+                'imagen' => 'nullable|image|max:2048', // 2MB max
             ]);
 
             if ($validator->fails()) {
@@ -77,7 +79,10 @@ class AsociacionController extends Controller
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $asociacion = $this->asociacionService->create($request->all());
+            $asociacion = $this->asociacionService->create(
+                $request->except('imagen'),
+                $request->hasFile('imagen') ? $request->file('imagen') : null
+            );
 
             return response()->json([
                 'success' => true,
@@ -103,11 +108,13 @@ class AsociacionController extends Controller
             $validator = Validator::make($request->all(), [
                 'nombre' => 'sometimes|required|string|max:255',
                 'descripcion' => 'nullable|string',
-                'ubicacion' => 'nullable|string|max:255',
+                'latitud' => 'nullable|numeric',
+                'longitud' => 'nullable|numeric',
                 'telefono' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:255',
                 'municipalidad_id' => 'sometimes|required|exists:municipalidad,id',
                 'estado' => 'boolean',
+                'imagen' => 'nullable|image|max:2048', // 2MB max
             ]);
 
             if ($validator->fails()) {
@@ -118,7 +125,11 @@ class AsociacionController extends Controller
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $asociacion = $this->asociacionService->update($id, $request->all());
+            $asociacion = $this->asociacionService->update(
+                $id,
+                $request->except('imagen'),
+                $request->hasFile('imagen') ? $request->file('imagen') : null
+            );
 
             if (!$asociacion) {
                 return response()->json([
@@ -214,6 +225,46 @@ class AsociacionController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error al obtener asociaciones por municipalidad: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    /**
+     * Obtener asociaciones por ubicación geográfica
+     */
+    public function getByUbicacion(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'latitud' => 'required|numeric',
+                'longitud' => 'required|numeric',
+                'distancia' => 'nullable|numeric|min:0.1|max:100',
+            ]);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error de validación',
+                    'errors' => $validator->errors()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+            
+            $latitud = $request->latitud;
+            $longitud = $request->longitud;
+            $distancia = $request->distancia ?? 10;
+            
+            $asociaciones = $this->asociacionService->getByUbicacion($latitud, $longitud, $distancia);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $asociaciones
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener asociaciones por ubicación: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,

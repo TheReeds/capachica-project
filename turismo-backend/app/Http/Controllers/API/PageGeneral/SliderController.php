@@ -128,7 +128,7 @@ class SliderController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'nombre' => 'required|string|max:255',
-                'tipo_entidad' => 'required|string|in:municipalidad,emprendedor,servicio',
+                'tipo_entidad' => 'required|string|in:municipalidad,emprendedor,servicio,evento',
                 'entidad_id' => 'required|integer|min:1',
                 'es_principal' => 'required|boolean',
                 'orden' => 'nullable|integer|min:0',

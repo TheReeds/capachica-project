@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\API\AccessControl;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 
@@ -21,7 +23,7 @@ class UserController extends Controller
         
         // Filter by active status if provided
         if ($request->has('active')) {
-            $query->where('active', $request->active);
+            $query->where('active', $request->boolean('active'));
         }
         
         // Filter by role if provided
@@ -44,6 +46,13 @@ class UserController extends Controller
         $perPage = $request->get('per_page', 15);
         $users = $query->with('roles')->paginate($perPage);
         
+        // Transform users using UserResource
+        $userCollection = $users->getCollection()->map(function ($user) {
+            return new UserResource($user);
+        });
+        
+        $users->setCollection($userCollection);
+        
         return response()->json([
             'success' => true,
             'data' => $users
@@ -57,12 +66,16 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'first_name' => 'nullable|string|max:255',
-            'last_name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'phone' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
             'active' => 'boolean',
+            'country' => 'nullable|string|max:100',
+            'birth_date' => 'nullable|date',
+            'address' => 'nullable|string|max:255',
+            'gender' => 'nullable|string|in:male,female,other,prefer_not_to_say',
+            'preferred_language' => 'nullable|string|max:50',
+            'foto_perfil' => 'nullable|image|max:5120', // 5MB max
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,name',
         ]);
@@ -70,21 +83,31 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation error',
+                'message' => 'Error de validación',
                 'errors' => $validator->errors()
             ], 422);
         }
 
-        $user = User::create([
+        $userData = [
             'name' => $request->name,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'active' => $request->has('active') ? $request->active : true,
-        ]);
+            'active' => $request->has('active') ? $request->boolean('active') : true,
+            'country' => $request->country,
+            'birth_date' => $request->birth_date,
+            'address' => $request->address,
+            'gender' => $request->gender,
+            'preferred_language' => $request->preferred_language,
+        ];
+        
+        // Process profile photo if provided
+        if ($request->hasFile('foto_perfil')) {
+            $userData['foto_perfil'] = $request->file('foto_perfil')->store('fotos_perfil', 'public');
+        }
 
+        $user = User::create($userData);
+        
         // Assign roles if provided
         if ($request->has('roles')) {
             $user->syncRoles($request->roles);
@@ -95,8 +118,8 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'User created successfully',
-            'data' => $user->load('roles')
+            'message' => 'Usuario creado exitosamente',
+            'data' => new UserResource($user->load('roles'))
         ], 201);
     }
 
@@ -110,9 +133,10 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'user' => $user,
+                'user' => new UserResource($user),
                 'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
+                'administra_emprendimientos' => $user->administraEmprendimientos(),
             ]
         ]);
     }
@@ -126,35 +150,53 @@ class UserController extends Controller
         
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
-            'first_name' => 'nullable|string|max:255',
-            'last_name' => 'nullable|string|max:255',
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
-            'phone' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'active' => 'boolean',
+            'country' => 'nullable|string|max:100',
+            'birth_date' => 'nullable|date',
+            'address' => 'nullable|string|max:255',
+            'gender' => 'nullable|string|in:male,female,other,prefer_not_to_say',
+            'preferred_language' => 'nullable|string|max:50',
+            'foto_perfil' => 'nullable|image|max:5120', // 5MB max
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation error',
+                'message' => 'Error de validación',
                 'errors' => $validator->errors()
             ], 422);
         }
 
         // Update user data
-        $userData = $request->only(['name', 'first_name', 'last_name', 'email', 'phone']);
+        $userData = $request->only([
+            'name', 'email', 'phone', 'active', 'country', 
+            'birth_date', 'address', 'gender', 'preferred_language'
+        ]);
         
         // Update password if provided
         if ($request->filled('password')) {
             $userData['password'] = Hash::make($request->password);
         }
         
+        // Process profile photo if provided
+        if ($request->hasFile('foto_perfil')) {
+            // Delete previous photo if exists
+            if ($user->foto_perfil && !filter_var($user->foto_perfil, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            
+            $userData['foto_perfil'] = $request->file('foto_perfil')->store('fotos_perfil', 'public');
+        }
+        
         $user->update($userData);
 
         return response()->json([
             'success' => true,
-            'message' => 'User updated successfully',
-            'data' => $user->load('roles')
+            'message' => 'Usuario actualizado exitosamente',
+            'data' => new UserResource($user->load('roles'))
         ]);
     }
 
@@ -169,16 +211,21 @@ class UserController extends Controller
         if ($user->hasRole('admin')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cannot delete admin users'
+                'message' => 'No se puede eliminar usuarios administradores'
             ], 403);
         }
 
-        // Soft delete would be better in production
+        // Delete profile photo if exists
+        if ($user->foto_perfil && !filter_var($user->foto_perfil, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete($user->foto_perfil);
+        }
+        
+        // Delete user
         $user->delete();
         
         return response()->json([
             'success' => true,
-            'message' => 'User deleted successfully'
+            'message' => 'Usuario eliminado exitosamente'
         ]);
     }
 
@@ -192,8 +239,8 @@ class UserController extends Controller
         
         return response()->json([
             'success' => true,
-            'message' => 'User activated successfully',
-            'data' => $user
+            'message' => 'Usuario activado exitosamente',
+            'data' => new UserResource($user)
         ]);
     }
 
@@ -208,7 +255,7 @@ class UserController extends Controller
         if ($user->hasRole('admin')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cannot deactivate admin users'
+                'message' => 'No se puede desactivar usuarios administradores'
             ], 403);
         }
         
@@ -216,8 +263,8 @@ class UserController extends Controller
         
         return response()->json([
             'success' => true,
-            'message' => 'User deactivated successfully',
-            'data' => $user
+            'message' => 'Usuario desactivado exitosamente',
+            'data' => new UserResource($user)
         ]);
     }
 
@@ -234,7 +281,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation error',
+                'message' => 'Error de validación',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -244,11 +291,74 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Roles assigned successfully',
+            'message' => 'Roles asignados exitosamente',
             'data' => [
-                'user' => $user->only(['id', 'name', 'email']),
+                'user' => new UserResource($user),
                 'roles' => $user->getRoleNames()
             ]
+        ]);
+    }
+    
+    /**
+     * Upload or update user profile photo.
+     */
+    public function updateProfilePhoto(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'foto_perfil' => 'required|image|max:5120', // 5MB max
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::findOrFail($id);
+        
+        // Delete previous photo if exists
+        if ($user->foto_perfil && !filter_var($user->foto_perfil, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete($user->foto_perfil);
+        }
+        
+        // Store new photo
+        $photoPath = $request->file('foto_perfil')->store('fotos_perfil', 'public');
+        $user->update(['foto_perfil' => $photoPath]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto de perfil actualizada exitosamente',
+            'data' => new UserResource($user)
+        ]);
+    }
+    
+    /**
+     * Delete user profile photo.
+     */
+    public function deleteProfilePhoto($id)
+    {
+        $user = User::findOrFail($id);
+        
+        if (!$user->foto_perfil) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene foto de perfil'
+            ], 400);
+        }
+        
+        // Delete photo if it's not a URL
+        if (!filter_var($user->foto_perfil, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete($user->foto_perfil);
+        }
+        
+        $user->update(['foto_perfil' => null]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto de perfil eliminada exitosamente',
+            'data' => new UserResource($user)
         ]);
     }
 }

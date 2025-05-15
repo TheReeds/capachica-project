@@ -73,7 +73,7 @@ class ServicioController extends Controller
         if (!$servicio) {
             return response()->json([
                 'success' => false,
-                'message' => 'Servicio no encontrado'
+                'message' => 'Servicio no encontrado'   
             ], 404);
         }
         

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use Illuminate\Support\Facades\Storage;
 
 class Asociacion extends Model
 {
@@ -22,12 +22,15 @@ class Asociacion extends Model
         'email',
         'municipalidad_id',
         'estado',
+        'imagen',
     ];
 
     protected $casts = [
         'estado' => 'boolean',
+        'latitud' => 'float',
+        'longitud' => 'float',
     ];
-
+    protected $appends = ['imagen_url'];
     /**
      * Obtener la municipalidad a la que pertenece la asociación
      */
@@ -42,5 +45,22 @@ class Asociacion extends Model
     public function emprendedores(): HasMany
     {
         return $this->hasMany(Emprendedor::class);
+    }
+    /**
+     * Obtener la URL completa de la imagen
+     */
+    public function getImagenUrlAttribute(): ?string
+    {
+        if (!$this->imagen) {
+            return null;
+        }
+
+        // Si es una URL completa, devolverla tal cual
+        if (filter_var($this->imagen, FILTER_VALIDATE_URL)) {
+            return $this->imagen;
+        }
+
+        // Generar URL del almacenamiento
+        return url(Storage::url($this->imagen));
     }
 }

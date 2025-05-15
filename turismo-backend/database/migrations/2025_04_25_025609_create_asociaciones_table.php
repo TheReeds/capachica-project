@@ -27,6 +27,17 @@ return new class extends Migration
         Schema::table('emprendedores', function (Blueprint $table) {
             $table->foreignId('asociacion_id')->nullable()->constrained('asociaciones')->nullOnDelete();
         });
+        Schema::table('asociaciones', function (Blueprint $table) {
+            // Eliminar el campo ubicación
+            $table->dropColumn('ubicacion');
+            
+            // Agregar campos de latitud y longitud
+            $table->decimal('latitud', 10, 7)->nullable();
+            $table->decimal('longitud', 10, 7)->nullable();
+            
+            // Agregar campo para la imagen
+            $table->string('imagen')->nullable();
+        });
     }
 
     /**
@@ -38,7 +49,13 @@ return new class extends Migration
             $table->dropForeign(['asociacion_id']);
             $table->dropColumn('asociacion_id');
         });
-        
+        Schema::table('asociaciones', function (Blueprint $table) {
+            // Eliminar los nuevos campos
+            $table->dropColumn(['latitud', 'longitud', 'imagen']);
+            
+            // Restaurar el campo ubicación
+            $table->string('ubicacion')->nullable();
+        });
         Schema::dropIfExists('asociaciones');
     }
 };
