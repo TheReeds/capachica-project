@@ -11,21 +11,3 @@ services:
         value: false
       - key: APP_URL
         value: https://capachica-turismo-backend.onrender.com
-      - key: DB_CONNECTION
-        value: pgsql
-      - key: DB_HOST
-        value: dpg-postgresql.render.com
-      - key: DB_PORT
-        value: 5432
-      - key: DB_DATABASE
-        value: turismobackend
-      - key: DB_USERNAME
-        value: turismobackend_user
-      - key: DB_PASSWORD
-        value: kmWF4eCouuSJIbalbYn4H2vwEe2hGgSn
-      - key: GOOGLE_CLIENT_ID
-        value: 224558118614-hl5eu0beckempma0gq6h1nbhk2sug16a.apps.googleusercontent.com
-      - key: GOOGLE_CLIENT_SECRET
-        value: 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
-      - key: GOOGLE_REDIRECT_URI
-        value: https://capachica-turismo-backend.onrender.com/api/auth/google/callback
