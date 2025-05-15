@@ -1,5 +1,5 @@
-# Utilizar una imagen oficial de PHP con Apache
-FROM php:8.2-apache
+# Utilizar una imagen oficial de PHP con FPM
+FROM php:8.2-fpm
 
 # Instalar extensiones necesarias para Laravel y PostgreSQL
 RUN apt-get update && apt-get install -y \
@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    nginx \
     && docker-php-ext-install pdo pdo_pgsql zip gd mbstring xml
 
 # Instalar Composer
@@ -20,22 +21,23 @@ WORKDIR /var/www/html
 
 # Copiar los archivos de la aplicación
 COPY . .
-RUN cp .env.example .env
-# Instalar las dependencias
+
+# Instalar dependencias de Composer
 RUN composer install --optimize-autoloader --no-dev
 
-# Generar la clave de la aplicación
-RUN php artisan key:generate
+# Copiar archivo de configuración de Nginx
+COPY ./nginx.conf /etc/nginx/nginx.conf
 
-# Crear el enlace simbólico de storage
-RUN php artisan storage:link
-
-# Configuración de permisos para almacenamiento y caché
+# Configurar permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage
 
-# Exponer el puerto 80 para Apache
+# Generar la clave de la aplicación
+RUN php artisan key:generate
+RUN php artisan storage:link
+
+# Exponer el puerto 80 para Nginx
 EXPOSE 80
 
-# Comando de inicio de Apache
-CMD ["apache2-foreground"]
+# Iniciar Nginx y PHP-FPM
+CMD ["bash", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
