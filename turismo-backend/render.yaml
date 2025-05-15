@@ -11,4 +11,4 @@ services:
         value: false
       - key: APP_URL
         value: https://capachica-turismo-backend.onrender.com
-    startCommand: "" # vacía porque lo define el CMD del Dockerfile
+    startCommand: ""
