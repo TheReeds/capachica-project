@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Route;
 // Rutas públicas de autenticación
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/', fn() => response()->json(['status' => 'ok']));
 
 // Rutas para autenticación con Google
 Route::prefix('auth/google')->group(function () {
