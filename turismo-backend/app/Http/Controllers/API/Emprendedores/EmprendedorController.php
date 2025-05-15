@@ -81,7 +81,7 @@ class EmprendedorController extends Controller
         $id = (int) $id;
         
         $emprendedor = $this->emprendedorService->getById($id);
-        
+    
         if (!$emprendedor) {
             return response()->json([
                 'success' => false,
@@ -93,6 +93,8 @@ class EmprendedorController extends Controller
         $emprendedor->load([
             'slidersPrincipales', 
             'slidersSecundarios',
+            'servicios.horarios',
+            'servicios.sliders',
             'asociacion',
             'administradores' // Cargar los administradores
         ]);
@@ -100,6 +102,7 @@ class EmprendedorController extends Controller
         return response()->json([
             'success' => true,
             'data' => $emprendedor
+            
         ]);
     }
 
