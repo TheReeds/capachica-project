@@ -28,6 +28,7 @@ class ServicioRequest extends FormRequest
             'precio_referencial' => 'nullable|numeric|min:0',
             'emprendedor_id' => 'required|exists:emprendedores,id',
             'estado' => 'sometimes',  // Quitamos la validación boolean para manejarla manualmente
+            'capacidad' => 'required|integer|min:1',
             'latitud' => 'nullable|numeric|between:-90,90',
             'longitud' => 'nullable|numeric|between:-180,180',
             'ubicacion_referencia' => 'nullable|string|max:255',

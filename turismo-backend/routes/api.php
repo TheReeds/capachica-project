@@ -16,6 +16,8 @@ use App\Http\Controllers\API\Reservas\ReservaController;
 use App\Http\Controllers\API\Reservas\ReservaServicioController;
 use App\Http\Controllers\API\Servicios\CategoriaController;
 use App\Http\Controllers\API\Servicios\ServicioController;
+use App\Http\Controllers\API\Planes\PlanController;
+use App\Http\Controllers\API\Planes\PlanInscripcionController;
 use App\Http\Controllers\MenuController;
 
 use Illuminate\Http\Request;
@@ -126,7 +128,10 @@ Route::prefix('eventos')->group(function () {
 
     Route::get('/{id}/emprendedor', [EmprendedorController::class, 'getEmprendedores']); // Obtener emprendedor del evento
 });
-
+Route::prefix('planes')->group(function () {
+    Route::get('/publicos', [PlanController::class, 'getPublicPlanes']);
+    Route::get('/{id}', [PlanController::class, 'show']);
+});
 // ===== RUTAS PROTEGIDAS =====
 Route::middleware('auth:sanctum')->group(function () {
     // Perfil de usuario
@@ -260,7 +265,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}/deactivate', [UserController::class, 'deactivate'])->middleware('permission:user_update');
         Route::put('/{id}/roles', [UserController::class, 'assignRoles'])->middleware('permission:user_update');
     });
-    
+    Route::prefix('planes')->group(function () {
+        Route::get('/', [PlanController::class, 'index']);
+        Route::post('/', [PlanController::class, 'store']);
+        Route::put('/{id}', [PlanController::class, 'update']);
+        Route::delete('/{id}', [PlanController::class, 'destroy']);
+        
+        // Inscripciones a planes
+        Route::get('/mis-planes', [PlanInscripcionController::class, 'misPlanes']);
+        Route::post('/{planId}/inscribirse', [PlanInscripcionController::class, 'inscribirse']);
+        Route::put('/inscripciones/{inscripcionId}/cancelar', [PlanInscripcionController::class, 'cancelarInscripcion']);
+        Route::put('/inscripciones/{inscripcionId}/confirmar', [PlanInscripcionController::class, 'confirmarInscripcion']);
+        Route::post('/inscripciones/{inscripcionId}/generar-reservas', [PlanInscripcionController::class, 'generarReservas']);
+    });
     // Dashboard
     Route::prefix('dashboard')->middleware('permission:user_read')->group(function () {
         Route::get('/summary', [DashboardController::class, 'summary']);

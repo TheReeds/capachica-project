@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\API\Evento;
 
 use App\Http\Controllers\Controller;
-use App\Evento\Repository\EventoRepository;
-use App\Evento\Requests\EventoRequest;
 
+use App\Repository\EventoRepository;
+use App\Http\Requests\EventoRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;

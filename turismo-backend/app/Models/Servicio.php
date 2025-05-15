@@ -18,6 +18,7 @@ class Servicio extends Model
         'precio_referencial',
         'emprendedor_id',
         'estado',
+        'capacidad',
         'latitud',
         'longitud',
         'ubicacion_referencia',

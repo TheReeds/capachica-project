@@ -21,6 +21,9 @@ return new class extends Migration
             $table->boolean('estado')->default(true);
             $table->timestamps();
         });
+        Schema::table('servicios', function (Blueprint $table) {
+            $table->integer('capacidad')->default(1)->after('estado');
+        });
 
     }
 

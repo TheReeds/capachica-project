@@ -101,7 +101,8 @@ class ReservaServicioRepository
         string $horaFin,
         ?int $reservaServicioId = null
     ): bool {
-        return !ReservaServicio::verificarSolapamiento(
+        // Verificar primero si hay solapamiento de horarios
+        $haySolapamiento = ReservaServicio::verificarSolapamiento(
             $servicioId,
             $fechaInicio,
             $fechaFin,
@@ -109,6 +110,27 @@ class ReservaServicioRepository
             $horaFin,
             $reservaServicioId
         );
+        
+        if ($haySolapamiento) {
+            return false;
+        }
+        
+        // Verificar disponibilidad de cupos
+        $servicio = app(ServicioRepository::class)->findById($servicioId);
+        
+        if (!$servicio) {
+            return false;
+        }
+        
+        // Contar cuántas reservas hay para este servicio en este horario
+        $reservasCount = ReservaServicio::where('servicio_id', $servicioId)
+            ->where('fecha_inicio', $fechaInicio)
+            ->where('hora_inicio', $horaInicio)
+            ->whereIn('estado', [ReservaServicio::ESTADO_PENDIENTE, ReservaServicio::ESTADO_CONFIRMADO])
+            ->count();
+        
+        // Verificar si hay cupos disponibles
+        return $reservasCount < $servicio->capacidad;
     }
     
     /**
