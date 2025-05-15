@@ -31,4 +31,9 @@ export class EventosComponent implements OnInit {
       this.eventoDestacado = this.eventos.find(e => e.id === 1) || this.eventos[0];
     }
   }
+  toggleDarkMode() {
+  document.documentElement.classList.toggle('dark');
+}
+mostrarModalCalendario = false;
+
 }
