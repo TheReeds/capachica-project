@@ -18,7 +18,10 @@ RUN apt-get update && apt-get install -y supervisor \
 
 # Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/local/bin/composer
+
+# Configurar supervisord
 COPY ./supervisord.conf /etc/supervisord.conf
+
 # Crear carpeta de trabajo
 WORKDIR /var/www/html
 
@@ -37,8 +40,14 @@ RUN php artisan key:generate && php artisan storage:link
 # Migrar y sembrar DB
 RUN php artisan migrate --force && php artisan db:seed --force
 
-# Configurar permisos
+# Configurar permisos de Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# FIX rápido: permisos necesarios para nginx y php-fpm funcionar correctamente
+RUN mkdir -p /var/lib/nginx/body && \
+    chmod -R 777 /var/lib/nginx && \
+    touch /var/log/php-fpm.log && \
+    chmod 666 /var/log/php-fpm.log
 
 # Configurar Nginx
 COPY ./nginx.conf /etc/nginx/nginx.conf
@@ -49,6 +58,8 @@ COPY ./supervisord.conf /etc/supervisord.conf
 # Exponer el puerto
 EXPOSE 80
 
-# Iniciar supervisord para correr Nginx + PHP-FPM
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+# Forzar ejecución como root (si tu base cambia a www-data en algún paso)
+USER root
 
+# Iniciar supervisord
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
