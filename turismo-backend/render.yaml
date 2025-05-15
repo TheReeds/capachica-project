@@ -11,5 +11,4 @@ services:
         value: false
       - key: APP_URL
         value: https://capachica-turismo-backend.onrender.com
-    buildCommand: "composer install && npm install && npm run build && php artisan migrate --force && php artisan db:seed --force"
-    startCommand: "apache2-foreground"
+    startCommand: "" # vacía porque lo define el CMD del Dockerfile

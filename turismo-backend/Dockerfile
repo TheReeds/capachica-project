@@ -1,7 +1,7 @@
-# Utilizar una imagen oficial de PHP con FPM
+# Imagen base
 FROM php:8.2-fpm
 
-# Instalar extensiones necesarias para Laravel y PostgreSQL
+# Dependencias del sistema
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     git \
@@ -11,33 +11,41 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     nginx \
+    supervisor \
     && docker-php-ext-install pdo pdo_pgsql zip gd mbstring xml
 
-# Instalar Composer
+# Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/local/bin/composer
 
-# Establecer el directorio de trabajo
+# Crear carpeta de trabajo
 WORKDIR /var/www/html
 
-# Copiar los archivos de la aplicación
+# Copiar código
 COPY . .
 
-# Instalar dependencias de Composer
+# Asegurar existencia de archivo .env
+RUN cp .env.example .env
+
+# Instalar dependencias de Laravel
 RUN composer install --optimize-autoloader --no-dev
 
-# Copiar archivo de configuración de Nginx
-COPY ./nginx.conf /etc/nginx/nginx.conf
+# Generar APP_KEY y enlaces de almacenamiento
+RUN php artisan key:generate && php artisan storage:link
+
+# Migrar y sembrar DB
+RUN php artisan migrate --force && php artisan db:seed --force
 
 # Configurar permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage
 
-# Generar la clave de la aplicación
-RUN php artisan key:generate
-RUN php artisan storage:link
+# Configurar Nginx
+COPY ./nginx.conf /etc/nginx/nginx.conf
 
-# Exponer el puerto 80 para Nginx
+# Supervisord para manejar múltiples procesos
+COPY ./supervisord.conf /etc/supervisord.conf
+
+# Exponer el puerto
 EXPOSE 80
 
-# Iniciar Nginx y PHP-FPM
-CMD ["bash", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+# Iniciar supervisord para correr Nginx + PHP-FPM
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
