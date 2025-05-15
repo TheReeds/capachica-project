@@ -34,7 +34,6 @@ class EventoRequest extends FormRequest
         'duracion_horas' => 'nullable|integer|min:0',
         'coordenada_x' => 'nullable|numeric|between:-90,90',
         'coordenada_y' => 'nullable|numeric|between:-180,180',
-        'imagen_url' => 'nullable|string|max:255', // O podrías usar 'image' si se sube un archivo
         'id_emprendedor' => 'required|exists:emprendedores,id',
         'que_llevar' => 'nullable|string',
         
@@ -89,7 +88,6 @@ class EventoRequest extends FormRequest
             'duracion_horas.integer' => 'La duración debe ser un número entero',
             'coordenada_x.between' => 'La latitud debe estar entre -90 y 90',
             'coordenada_y.between' => 'La longitud debe estar entre -180 y 180',
-            'imagen_url.max' => 'La URL de la imagen no debe superar los 255 caracteres',
             'id_emprendedor.required' => 'Debe seleccionar un emprendedor',
             'id_emprendedor.exists' => 'El emprendedor seleccionado no existe',
             

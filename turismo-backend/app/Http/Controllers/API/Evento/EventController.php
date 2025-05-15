@@ -125,7 +125,6 @@ class EventController extends Controller
                 'duracion_horas' => 'sometimes|integer',
                 'coordenada_x' => 'sometimes|numeric',
                 'coordenada_y' => 'sometimes|numeric',
-                'imagen_url' => 'nullable|string',
                 'id_emprendedor' => 'sometimes|exists:emprendedores,id',
                 'que_llevar' => 'nullable|string',
             ]);

@@ -24,7 +24,6 @@ return new class extends Migration
             $table->integer('duracion_horas');
             $table->decimal('coordenada_x', 10, 6);
             $table->decimal('coordenada_y', 10, 6);
-            $table->string('imagen_url')->nullable();
             $table->unsignedBigInteger('id_emprendedor');
             $table->text('que_llevar')->nullable();
             $table->timestamps();

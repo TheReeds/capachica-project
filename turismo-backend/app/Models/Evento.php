@@ -20,7 +20,6 @@ class Evento extends Model
         'duracion_horas',
         'coordenada_x',
         'coordenada_y',
-        'imagen_url',
         'id_emprendedor',
         'que_llevar',
     ];
