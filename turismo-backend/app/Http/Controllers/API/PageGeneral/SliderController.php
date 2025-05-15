@@ -53,7 +53,7 @@ class SliderController extends Controller
     public function getByEntidad(Request $request, string $tipo, int $id): JsonResponse
     {
         try {
-            $tiposValidos = ['municipalidad', 'emprendedor', 'servicio'];
+            $tiposValidos = ['municipalidad', 'emprendedor', 'servicio', 'evento'];
             
             if (!in_array($tipo, $tiposValidos)) {
                 return response()->json([
