@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\User;
-use GuzzleHttp\Client;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
@@ -103,8 +102,8 @@ class AuthService
         try {
             // Configure Socialite to ignore SSL verification only in development
             if (app()->environment('local')) {
-                $client = new Client(['verify' => false]);
-                Socialite::driver('google')->setHttpClient($client);
+                $client = new \GuzzleHttp\Client(['verify' => false]);
+                \Laravel\Socialite\Facades\Socialite::driver('google')->setHttpClient($client);
             }
             
             $googleUser = Socialite::driver('google')->stateless()->user();

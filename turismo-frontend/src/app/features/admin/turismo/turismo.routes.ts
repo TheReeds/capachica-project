@@ -27,11 +27,6 @@ export const TURISMO_ROUTES: Routes = [
     title: 'Gestión de Municipalidad'
   },
   {
-    path: 'evento',
-    loadChildren: () => import('./evento/eventos.routes').then(m => m.EVENTOS_ROUTES),
-    title: 'Gestión de Evento'
-  },
-  {
     path: 'asociaciones',
     loadChildren: () => import('./asociaciones/asociaciones.routes').then(m => m.ASOCIACIONES_ROUTES),
     title: 'Gestión de Asociaciones'

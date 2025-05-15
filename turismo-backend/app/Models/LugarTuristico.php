@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LugarTuristico extends Model
 {
@@ -12,4 +12,5 @@ class LugarTuristico extends Model
     protected $fillable = [
         'nombre', 'descripcion', 'ubicacion', 'imagen'
     ];
+
 }

@@ -14,8 +14,8 @@ import { ThemeService } from '../../../../../core/services/theme.service';
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Servicios</h1>
         <div class="mt-4 sm:mt-0">
-          <a 
-            routerLink="/admin/servicios/create" 
+          <a
+            routerLink="/admin/servicios/create"
             class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
           >
             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,29 +25,29 @@ import { ThemeService } from '../../../../../core/services/theme.service';
           </a>
         </div>
       </div>
-      
+
       <!-- Filtros -->
       <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors duration-200">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
             <div class="mt-1">
-              <input 
-                type="text" 
-                id="search" 
-                [(ngModel)]="searchTerm" 
-                placeholder="Nombre o descripción" 
+              <input
+                type="text"
+                id="search"
+                [(ngModel)]="searchTerm"
+                placeholder="Nombre o descripción"
                 class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
             </div>
           </div>
-          
+
           <div>
             <label for="emprendedor" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Emprendedor</label>
             <div class="mt-1">
-              <select 
-                id="emprendedor" 
-                [(ngModel)]="selectedEmprendedorId" 
+              <select
+                id="emprendedor"
+                [(ngModel)]="selectedEmprendedorId"
                 class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todos</option>
@@ -57,13 +57,13 @@ import { ThemeService } from '../../../../../core/services/theme.service';
               </select>
             </div>
           </div>
-          
+
           <div>
             <label for="categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
             <div class="mt-1">
-              <select 
-                id="categoria" 
-                [(ngModel)]="selectedCategoriaId" 
+              <select
+                id="categoria"
+                [(ngModel)]="selectedCategoriaId"
                 class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todas</option>
@@ -73,13 +73,13 @@ import { ThemeService } from '../../../../../core/services/theme.service';
               </select>
             </div>
           </div>
-          
+
           <div>
             <label for="estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
             <div class="mt-1">
-              <select 
-                id="estado" 
-                [(ngModel)]="selectedEstado" 
+              <select
+                id="estado"
+                [(ngModel)]="selectedEstado"
                 class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todos</option>
@@ -88,11 +88,11 @@ import { ThemeService } from '../../../../../core/services/theme.service';
               </select>
             </div>
           </div>
-          
+
           <div class="flex items-end md:col-span-4">
-            <button 
-              type="button" 
-              (click)="applyFilters()" 
+            <button
+              type="button"
+              (click)="applyFilters()"
               class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
             >
               <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +103,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
           </div>
         </div>
       </div>
-      
+
       <!-- Tabla de servicios -->
       <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors duration-200">
         @if (loading) {
@@ -209,10 +209,10 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                     </td>
                     <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div class="flex items-center justify-end space-x-2">
-                        
-                        
-                        <a 
-                          [routerLink]="['/admin/servicios/edit', servicio.id]" 
+
+
+                        <a
+                          [routerLink]="['/admin/servicios/edit', servicio.id]"
                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
                           title="Editar"
                         >
@@ -220,9 +220,9 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                           </svg>
                         </a>
-                        
-                        <button 
-                          (click)="toggleServicioEstado(servicio)" 
+
+                        <button
+                          (click)="toggleServicioEstado(servicio)"
                           [class]="servicio.estado ? 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300' : 'text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300'"
                           [title]="servicio.estado ? 'Desactivar' : 'Activar'"
                           class="transition-colors duration-200"
@@ -237,9 +237,9 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                             </svg>
                           }
                         </button>
-                        
-                        <a 
-                          [routerLink]="['/admin/reservas/servicio', servicio.id]" 
+
+                        <a
+                          [routerLink]="['/admin/reservas/servicio', servicio.id]"
                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-200"
                           title="Ver reservas"
                         >
@@ -247,9 +247,9 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                           </svg>
                         </a>
-                        
-                        <button 
-                          (click)="deleteServicio(servicio)" 
+
+                        <button
+                          (click)="deleteServicio(servicio)"
                           class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors duration-200"
                           title="Eliminar"
                         >
@@ -264,7 +264,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
               </tbody>
             </table>
           </div>
-          
+
           <!-- Paginación -->
           @if (pagination) {
             <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 sm:px-6">
@@ -288,7 +288,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                       </svg>
                     </button>
-                    
+
                     @for (link of pagination.links; track $index) {
                       @if (link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;') {
                         <button
@@ -310,7 +310,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                         </button>
                       }
                     }
-                    
+
                     <button
                       (click)="goToPage(currentPage + 1)"
                       [disabled]="!pagination.next_page_url"
@@ -333,31 +333,32 @@ import { ThemeService } from '../../../../../core/services/theme.service';
     </div>
   `,
 })
+
 export class ServicioListComponent implements OnInit {
   private turismoService = inject(TurismoService);
   private themeService = inject(ThemeService);
-  
+
   pagination: PaginatedResponse<Servicio> | null = null;
   categorias: Categoria[] = [];
   emprendedores: Emprendedor[] = [];
   loading = true;
-  
+
   // Filtros
   searchTerm = '';
   selectedCategoriaId: number | null = null;
   selectedEmprendedorId: number | null = null;
   selectedEstado: boolean | null = null;
-  
+
   // Paginación
   currentPage = 1;
   itemsPerPage = 10;
-  
+
   ngOnInit() {
     this.loadCategorias();
     this.loadEmprendedores();
     this.loadServicios();
   }
-  
+
   loadCategorias() {
     this.turismoService.getCategorias().subscribe({
       next: (categorias) => {
@@ -368,7 +369,7 @@ export class ServicioListComponent implements OnInit {
       }
     });
   }
-  
+
   loadEmprendedores() {
     this.turismoService.getEmprendedores(1, 100).subscribe({
       next: (response) => {
@@ -379,29 +380,29 @@ export class ServicioListComponent implements OnInit {
       }
     });
   }
-  
+
   loadServicios() {
     this.loading = true;
-    
+
     // Preparar filtros
     const filters: any = {};
-    
+
     if (this.searchTerm) {
       filters.search = this.searchTerm;
     }
-    
+
     if (this.selectedCategoriaId !== null) {
       filters.categoria_id = this.selectedCategoriaId;
     }
-    
+
     if (this.selectedEmprendedorId !== null) {
       filters.emprendedor_id = this.selectedEmprendedorId;
     }
-    
+
     if (this.selectedEstado !== null) {
       filters.estado = this.selectedEstado;
     }
-    
+
     this.turismoService.getServicios(this.currentPage, this.itemsPerPage, filters).subscribe({
       next: (response) => {
         this.pagination = response;
@@ -413,21 +414,21 @@ export class ServicioListComponent implements OnInit {
       }
     });
   }
-  
+
   applyFilters() {
     this.currentPage = 1;
     this.loadServicios();
   }
-  
+
   toggleServicioEstado(servicio: Servicio) {
     if (!servicio.id) return;
-    
+
     // Clonar el servicio para no mutar el original
     const servicioActualizado = {
       ...servicio,
       estado: !servicio.estado
     };
-    
+
     this.turismoService.updateServicio(servicio.id, servicioActualizado).subscribe({
       next: (updated) => {
         // Actualizar el servicio en la lista
@@ -444,10 +445,10 @@ export class ServicioListComponent implements OnInit {
       }
     });
   }
-  
+
   deleteServicio(servicio: Servicio) {
     if (!servicio.id) return;
-    
+
     if (confirm(`¿Está seguro de eliminar el servicio "${servicio.nombre}"? Esta acción no se puede deshacer.`)) {
       this.turismoService.deleteServicio(servicio.id).subscribe({
         next: () => {
@@ -462,14 +463,14 @@ export class ServicioListComponent implements OnInit {
       });
     }
   }
-  
+
   goToPage(page: number) {
     if (!this.pagination) return;
-    
+
     if (page < 1 || page > this.pagination.last_page) {
       return;
     }
-    
+
     this.currentPage = page;
     this.loadServicios();
   }

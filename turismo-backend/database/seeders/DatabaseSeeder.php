@@ -3,18 +3,18 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Categoria;
-use App\Models\Municipalidad;
-use App\Models\Asociacion;
-use App\Models\Servicio;
-use App\Models\ServicioHorario;
-use App\Models\Reserva;
-use App\Models\ReservaServicio;
+use App\Servicios\Models\Categoria;
+use App\Pagegeneral\Models\Municipalidad;
+use App\Reservas\Asociaciones\Models\Asociacion;
+use App\Servicios\Models\Servicio;
+use App\Servicios\Models\ServicioHorario;
+use App\Reservas\Reserva\Models\Reserva;
+use App\Reservas\Reserva\Models\ReservaServicio;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Models\Emprendedor;
+use App\reservas\Emprendedores\Models\Emprendedor;
 
 class DatabaseSeeder extends Seeder
 {
@@ -25,32 +25,32 @@ class DatabaseSeeder extends Seeder
     {
         // Crear roles y permisos
         $this->createRolesAndPermissions();
-        
+
         // Crear usuarios admin y usuario normal
         $this->createUsers();
-        
+
         // Crear datos de municipalidad
         $this->createMunicipalidad();
-        
+
         // Crear categorías
         $this->createCategorias();
-        
+
         // Crear asociaciones
         $this->createAsociaciones();
-        
+
         // Crear emprendedores
         $this->createEmprendedores();
-        
+
         // Crear servicios y sus horarios
         $this->createServicios();
-        
+
         // Crear reservas de ejemplo
         $this->createReservas();
-        
+
         // Ejecutar el seeder para asociar usuarios con emprendimientos
         $this->call(UserEmprendedorSeeder::class);
     }
-    
+
     private function createRolesAndPermissions()
     {
         // Crear permisos
@@ -63,35 +63,42 @@ class DatabaseSeeder extends Seeder
             'categoria_create', 'categoria_read', 'categoria_update', 'categoria_delete',
             'asociacion_create', 'asociacion_read', 'asociacion_update', 'asociacion_delete',
             'municipalidad_update', 'municipalidad_read',
-            'reserva_create', 'reserva_read', 'reserva_update', 'reserva_delete'
+            'reserva_create', 'reserva_read', 'reserva_update', 'reserva_delete',
+            // Nuevos permisos para lugares turísticos
+            'lugar_turistico_create', 'lugar_turistico_read', 'lugar_turistico_update', 'lugar_turistico_delete',
+            'lugar_turistico_tipo_create', 'lugar_turistico_tipo_read', 'lugar_turistico_tipo_update', 'lugar_turistico_tipo_delete',
+            'lugar_turistico_ruta_create', 'lugar_turistico_ruta_read', 'lugar_turistico_ruta_update', 'lugar_turistico_ruta_delete',
+
+            // Nuevos permisos para reportes
+            'reporte_read', 'reporte_exportar'
         ];
-        
+
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
         }
-        
+
         // Crear roles
         $adminRole = Role::create(['name' => 'admin']);
         $userRole = Role::create(['name' => 'user']);
         $emprendedorRole = Role::create(['name' => 'emprendedor']);
-        
+
         // Asignar todos los permisos al rol admin
         $adminRole->givePermissionTo(Permission::all());
-        
+
         // Asignar permisos limitados al rol user
         $userRole->givePermissionTo([
-            'user_read', 'emprendedor_read', 'servicio_read', 
+            'user_read', 'emprendedor_read', 'servicio_read',
             'categoria_read', 'asociacion_read', 'municipalidad_read',
             'reserva_create', 'reserva_read', 'reserva_update'
         ]);
-        
+
         // Asignar permisos de emprendedor
         $emprendedorRole->givePermissionTo([
-            'emprendedor_read', 'servicio_create', 'servicio_read', 
+            'emprendedor_read', 'servicio_create', 'servicio_read',
             'servicio_update', 'servicio_delete', 'reserva_read'
         ]);
     }
-    
+
     private function createUsers()
     {
         // Admin user
@@ -110,7 +117,7 @@ class DatabaseSeeder extends Seeder
             'last_login' => now()->subDays(1)
         ]);
         $admin->assignRole('admin');
-        
+
         // Normal user
         $user = User::create([
             'name' => 'Usuario Normal',
@@ -126,7 +133,7 @@ class DatabaseSeeder extends Seeder
             'last_login' => now()->subDays(3)
         ]);
         $user->assignRole('user');
-        
+
         // Entrepreneur user
         $emprendedor = User::create([
             'name' => 'Emprendedor Local',
@@ -143,7 +150,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $emprendedor->assignRole('emprendedor');
     }
-    
+
     private function createMunicipalidad()
     {
         Municipalidad::create([
@@ -168,7 +175,7 @@ class DatabaseSeeder extends Seeder
             'horariodeatencion' => 'Lunes a Viernes: 8:00 am - 4:00 pm'
         ]);
     }
-    
+
     private function createCategorias()
     {
         $categorias = [
@@ -203,12 +210,12 @@ class DatabaseSeeder extends Seeder
                 'icono_url' => 'icons/guiado.svg'
             ]
         ];
-        
+
         foreach ($categorias as $categoria) {
             Categoria::create($categoria);
         }
     }
-    
+
     private function createAsociaciones()
     {
         $asociaciones = [
@@ -237,12 +244,12 @@ class DatabaseSeeder extends Seeder
                 'municipalidad_id' => 1
             ]
         ];
-        
+
         foreach ($asociaciones as $asociacion) {
             Asociacion::create($asociacion);
         }
     }
-    
+
     private function createEmprendedores()
     {
         $emprendedores = [
@@ -362,12 +369,12 @@ class DatabaseSeeder extends Seeder
                 'estado' => true
             ]
         ];
-        
+
         foreach ($emprendedores as $emprendedor) {
             Emprendedor::create($emprendedor);
         }
     }
-    
+
     private function createServicios()
     {
         $servicios = [
@@ -510,7 +517,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]
             ],
-            
+
             // Servicios para Restaurante Sumaq Mijuna
             [
                 'nombre' => 'Almuerzo típico',
@@ -590,7 +597,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]
             ],
-            
+
             // Servicios para Artesanías Titicaca
             [
                 'nombre' => 'Chullo tradicional',
@@ -670,7 +677,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]
             ],
-            
+
             // Servicios para Transportes Lacustres Titicaca
             [
                 'nombre' => 'Tour a Isla Ticonata',
@@ -762,7 +769,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]
             ],
-            
+
             // Servicios para Aventuras Titicaca
             [
                 'nombre' => 'Kayak al amanecer',
@@ -849,19 +856,19 @@ class DatabaseSeeder extends Seeder
                 ]
             ]
         ];
-        
+
         foreach ($servicios as $servicio) {
             $categorias = $servicio['categorias'];
             $horarios = $servicio['horarios'];
-            
+
             unset($servicio['categorias']);
             unset($servicio['horarios']);
-            
+
             $nuevoServicio = Servicio::create($servicio);
-            
+
             // Asociar categorías
             $nuevoServicio->categorias()->attach($categorias);
-            
+
             // Crear horarios para el servicio
             foreach ($horarios as $horario) {
                 $horario['servicio_id'] = $nuevoServicio->id;
@@ -869,7 +876,7 @@ class DatabaseSeeder extends Seeder
             }
         }
     }
-    
+
     private function createReservas()
     {
         // Crear algunas reservas de ejemplo
@@ -956,13 +963,13 @@ class DatabaseSeeder extends Seeder
                 ]
             ]
         ];
-        
+
         foreach ($reservas as $reservaData) {
             $servicios = $reservaData['servicios'];
             unset($reservaData['servicios']);
-            
+
             $reserva = Reserva::create($reservaData);
-            
+
             // Crear servicios para la reserva
             foreach ($servicios as $servicioData) {
                 $servicioData['reserva_id'] = $reserva->id;

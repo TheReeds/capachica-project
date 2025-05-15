@@ -44,7 +44,7 @@ export const ADMIN_ROUTES: Routes = [
       },
       {
         path: 'reservas',
-        loadChildren: () => import('./turismo/reservas/reservas.routes').then(m => m.RESERVAS_ROUTES),
+                            loadChildren: () => import('./turismo/reservas/reservas.routes').then(m => m.RESERVAS_ROUTES),
         title: 'Gestión de Reservas'
       },
       {
@@ -58,9 +58,19 @@ export const ADMIN_ROUTES: Routes = [
         title: 'Gestión de Asociaciones'
       },
       {
-        path: 'evento',
-        loadChildren: () => import('./turismo/evento/eventos.routes').then(m => m.EVENTOS_ROUTES),
-        title: 'Gestión de Eventos'
+        path: 'destinos',
+        loadChildren: () => import('./turismo/destinos/destinos.routes').then(m => m.DESTINOS_ROUTES),
+        title: 'Gestión de Destinos Turísticos'
+      },
+      {
+        path: 'lugares-turisticos',
+        loadChildren: () => import('./turismo/lugares-turisticos/lugares-turisticos.routes').then(m => m.LUGARES_TURISTICOS_ROUTES),
+        title: 'Gestión de Lugares Turísticos'
+      },
+      {
+        path: 'reportes',
+        loadChildren: () => import('./turismo/reportes/reportes.routes').then(m => m.REPORTES_ROUTES),
+        title: 'Reportes'
       },
       {
         path: '',

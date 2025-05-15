@@ -49,10 +49,10 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   themeService = inject(ThemeService);
   menuService = inject(MenuService);
   router = inject(Router);
-  
+
   @ViewChild('userMenuContainer') userMenuContainer!: ElementRef;
   @ViewChild('sidebarScrollContainer') sidebarScrollContainer!: ElementRef;
-  
+
   // Signals para controlar estados de la UI
   sidebarOpen = signal(true);
   sidebarCollapsed = signal(false);
@@ -62,41 +62,41 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   menuLoading = signal(false);
   currentPageTitle = signal('Dashboard');
   showScrollbar = signal(false);
-  
+
   // Estado de submenús - cambiado para permitir múltiples submenús abiertos
   private openSubmenuIds = signal<string[]>([]);
-  
+
   // Subscriptions
   private themeSubscription: Subscription | null = null;
   private menuSubscription: Subscription | null = null;
   private routerSubscription: Subscription | null = null;
-  
+
   // Computed properties
   displayName = computed(() => {
     const user = this.authService.currentUser();
     if (!user) return 'Usuario';
     return user.name || 'Usuario';
   });
-  
+
   profilePhotoUrl = computed(() => {
     const user = this.authService.currentUser();
     if (!user || !user['foto_perfil']) return null;
     return user['foto_perfil'];
   });
-  
+
   userRole = computed(() => {
     const user = this.authService.currentUser();
     if (!user) return 'Usuario';
-    
+
     const roles = this.authService.userRoles();
-    
+
     if (roles && roles.length > 0) {
       return this.capitalize(roles[0]);
     } else if (user.roles && user.roles.length > 0) {
       const role = user.roles[0].name || user.roles[0];
       return this.capitalize(role.toString());
     }
-    
+
     return 'Usuario';
   });
 
@@ -104,36 +104,36 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   lastLoginFormatted = computed(() => {
     const user = this.authService.currentUser();
     if (!user || !user.last_login) return 'Nunca';
-    
+
     // Formato de fecha (puedes ajustarlo según tus necesidades)
     const date = new Date(user.last_login);
-    
+
     // Si es hoy, mostrar solo la hora
     const today = new Date();
     if (date.toDateString() === today.toDateString()) {
       return `Hoy, ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
     }
-    
+
     // Si es ayer
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     if (date.toDateString() === yesterday.toDateString()) {
       return `Ayer, ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
     }
-    
+
     // Para otras fechas
     return date.toLocaleDateString() + ', ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   });
-  
+
   userCountry = computed(() => {
     const user = this.authService.currentUser();
     return user?.country || 'No especificado';
   });
-  
+
   preferredLanguage = computed(() => {
     const user = this.authService.currentUser();
     if (!user?.preferred_language) return 'No especificado';
-    
+
     // Mapeo de códigos de idioma a nombres
     const languageMap: Record<string, string> = {
       'es': 'Español',
@@ -142,54 +142,54 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       'fr': 'Francés',
       'de': 'Alemán'
     };
-    
+
     return languageMap[user.preferred_language] || user.preferred_language;
   });
-  
+
   userGender = computed(() => {
     const user = this.authService.currentUser();
     if (!user?.gender) return 'No especificado';
-    
+
     const genderMap: Record<string, string> = {
       'male': 'Masculino',
       'female': 'Femenino',
       'other': 'Otro',
       'prefer_not_to_say': 'Prefiere no decirlo'
     };
-    
+
     return genderMap[user.gender] || user.gender;
   });
-  
+
   userAddress = computed(() => {
     const user = this.authService.currentUser();
     return user?.address || 'No especificada';
   });
-  
+
   userBirthDate = computed(() => {
     const user = this.authService.currentUser();
     if (!user?.birth_date) return 'No especificada';
-    
+
     // Formatear la fecha de nacimiento
     const date = new Date(user.birth_date);
     return date.toLocaleDateString();
   });
-  
+
   // Listener para detectar cambios de tamaño de ventana
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     this.adjustSidebarForMobile();
   }
-  
+
   // Listener para detectar clics fuera de los menús
   @HostListener('document:click', ['$event'])
   handleDocumentClick(event: MouseEvent) {
     // Cerrar menú de usuario cuando se hace clic fuera
-    if (this.userMenuOpen && this.userMenuContainer && 
+    if (this.userMenuOpen && this.userMenuContainer &&
         !this.userMenuContainer.nativeElement.contains(event.target)) {
       this.userMenuOpen = false;
     }
   }
-  
+
   // Efecto para el tema
   private themeEffect = effect(() => {
     if (this.darkMode()) {
@@ -201,7 +201,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     }
     console.log('Modo oscuro:', this.darkMode());
   });
-  
+
   constructor() {
     // Los event listeners ahora se gestionan con @HostListener
   }
@@ -212,17 +212,17 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       console.log('Dark mode subscription update:', isDark);
       this.darkMode.set(isDark);
     });
-    
+
     // Inicializar tema
     this.themeService.initializeTheme();
-    
+
     // Verificar autenticación y cargar perfil
     if (this.authService.isLoggedIn()) {
       console.log('AdminLayout: Usuario está autenticado, verificando perfil...');
-      
+
       if (!this.authService.currentUser()) {
         console.log('AdminLayout: Perfil no cargado, intentando cargar...');
-        
+
         this.authService.loadUserProfile(true).subscribe({
           next: user => {
             console.log('AdminLayout: Perfil cargado correctamente:', user);
@@ -239,16 +239,16 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     } else {
       console.log('AdminLayout: Usuario no está autenticado');
     }
-    
+
     // Ajustar sidebar para móviles
     this.adjustSidebarForMobile();
-    
+
     // Cargar estado guardado del sidebar
     const savedCollapsed = localStorage.getItem('sidebarCollapsed');
     if (savedCollapsed === 'true') {
       this.sidebarCollapsed.set(true);
     }
-    
+
     // Suscribirse a cambios de ruta para actualizar el título de la página y el menú
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -257,21 +257,21 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
         this.updateMenuStateBasedOnRoute();
       });
   }
-  
+
   ngOnDestroy() {
     if (this.themeSubscription) {
       this.themeSubscription.unsubscribe();
     }
-    
+
     if (this.menuSubscription) {
       this.menuSubscription.unsubscribe();
     }
-    
+
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
   }
-  
+
   loadMenuItems() {
     this.menuLoading.set(true);
     this.menuSubscription = this.menuService.loadMenu().subscribe({
@@ -281,7 +281,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
         this.updateCurrentPageTitle();
         this.updateMenuStateBasedOnRoute(); // Actualizar estado del menú
         console.log('Menú cargado:', menuItems);
-        
+
         // Asegurar que se muestre el último elemento del menú
         setTimeout(() => this.scrollToBottom(), 100);
       },
@@ -291,7 +291,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   // Método para desplazarse al final del menú
   scrollToBottom() {
     if (this.sidebarScrollContainer && this.sidebarScrollContainer.nativeElement) {
@@ -299,24 +299,24 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       element.scrollTop = element.scrollHeight;
     }
   }
-  
+
   // Para mostrar/ocultar scrollbar
   onSidebarMouseEnter() {
     this.showScrollbar.set(true);
   }
-  
+
   onSidebarMouseLeave() {
     this.showScrollbar.set(false);
   }
-  
+
   // Para verificar si la ruta actual es parte de un submenú
   isSubmenuActive(item: MenuItem): boolean {
     if (!item.children) return false;
-    
+
     const currentPath = window.location.pathname;
     return item.children.some(child => currentPath.includes(child.path));
   }
-  
+
   // Para manejar los submenús - permite múltiples submenús abiertos
   toggleSubmenu(id: string): void {
     const currentOpenSubmenuIds = this.openSubmenuIds();
@@ -332,38 +332,38 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   isSubmenuOpen(id: string): boolean {
     return this.openSubmenuIds().includes(id);
   }
-  
+
   // Método para verificar si un ítem de menú debería estar abierto basado en la ruta actual
   shouldMenuBeOpen(item: MenuItem): boolean {
     if (!item.children) return false;
-    
+
     const currentPath = window.location.pathname;
     return item.children.some(child => currentPath.includes(child.path));
   }
-  
+
   // Método para actualizar el estado del menú según la ruta actual
   updateMenuStateBasedOnRoute(): void {
     const items = this.menuItems();
-    
+
     if (!items || !items.length) return;
-    
+
     const currentPath = window.location.pathname;
     const newOpenSubmenuIds: string[] = [];
-    
+
     // Buscar submenús que tengan un hijo con la ruta actual
     for (const item of items) {
       if (item.children && item.children.length > 0) {
-        const hasActiveChild = item.children.some(child => 
+        const hasActiveChild = item.children.some(child =>
           child.path && currentPath.includes(child.path)
         );
-        
+
         // Si encontramos un submenú que contiene la ruta actual, lo añadimos a los abiertos
         if (hasActiveChild) {
           newOpenSubmenuIds.push(item.id);
         }
       }
     }
-    
+
     // Actualizar submenús abiertos (ahora permitimos múltiples)
     this.openSubmenuIds.set(newOpenSubmenuIds);
   }
@@ -376,7 +376,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   userInitials(): string {
     const user = this.authService.currentUser();
     if (!user) return '';
-    
+
     // Si tenemos nombre completo, usar las iniciales del nombre
     if (user.name) {
       const nameParts = user.name.split(' ');
@@ -385,7 +385,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       }
       return user.name.substring(0, 2).toUpperCase();
     }
-    
+
     return 'U'; // Usuario por defecto si no hay información
   }
 
@@ -422,14 +422,14 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       this.currentPageTitle.set('Dashboard');
       return;
     }
-    
+
     // Buscar el ítem activo basado en la ruta actual
     const currentPath = window.location.pathname;
-    
+
     // Primero buscar en items principales
     let activeItem = items.find(item => item.path && currentPath.includes(item.path));
     let title = activeItem?.title;
-    
+
     // Si no se encuentra, buscar en los subitems
     if (!title) {
       for (const item of items) {
@@ -442,10 +442,10 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     this.currentPageTitle.set(title || 'Dashboard');
   }
-  
+
   // Obtener el título actual de la página
   getCurrentPageTitle(): string {
     return this.currentPageTitle();
@@ -460,7 +460,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       'users-group': 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
       'user': 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
       'building': 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
-      'store': 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z',
+      'store': 'M3 3h2l.4 2M7 13h1' +
+        '0l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z',
       'briefcase': 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
       'calendar': 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
       'shop': 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
@@ -472,7 +473,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       'language': 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
       'clock': 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
     };
-    
+
     return iconMap[iconName] || iconMap['dashboard']; // Fallback a dashboard
   }
 
