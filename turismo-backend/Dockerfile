@@ -20,7 +20,7 @@ WORKDIR /var/www/html
 
 # Copiar los archivos de la aplicación
 COPY . .
-
+RUN cp .env.example .env
 # Instalar las dependencias
 RUN composer install --optimize-autoloader --no-dev
 
