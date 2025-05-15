@@ -1,7 +1,7 @@
 :host {
   display: block;
   min-height: 100vh;
-  background-image: url('/assets/images/foto05.jpg');
+  background-image: url('/assets/images/foto01.jpg');
   background-size: cover;
   background-position: center;
   position: relative;
@@ -44,20 +44,20 @@
 
 /* Estilos para controlar la altura del contenedor y el scroll */
 .mx-auto {
-  height: 670px !important;
-  max-height: 670px !important;
+  height: 520px !important;
+  max-height: 520px !important;
 }
 
 /* Custom scroll styles for the form container */
 .overflow-y-auto {
-  max-height: 670px; /* Altura fija */
+  max-height: 520px; /* Altura fija reducida */
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.05);
+  scrollbar-color: #FFA500 rgba(0, 0, 0, 0.05);
 }
 
 .overflow-y-auto::-webkit-scrollbar {
-  width: 4px; /* Reducido de 8px a 4px para hacerlo más sutil */
+  width: 4px; /* Ancho sutil del scrollbar */
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
@@ -66,7 +66,7 @@
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: #FFA500;
   border-radius: 4px;
 }
 
@@ -102,34 +102,62 @@
   color: #6b7280;
 }
 
-/* Orange button styles */
-.btn-orange {
-  background-color: #FFA500;
-  color: white;
+/* Estilo para el botón naranja */
+button[type="submit"] {
   transition: all 0.2s ease;
+  background-color: #FFA500;
 }
 
-.btn-orange:hover {
+button[type="submit"]:hover {
   background-color: #e69500;
 }
 
-.btn-orange:active {
+button[type="submit"]:active {
   background-color: #CC8400;
 }
 
-.btn-orange:disabled {
+button[type="submit"]:disabled {
   background-color: #FFD280;
   cursor: not-allowed;
+}
+
+/* Estilo para la barra inferior activa */
+.border-b-2.border-orange-500 {
+  border-bottom-width: 2px;
+  border-color: #FFA500;
+  font-weight: 600;
+}
+
+/* Dark mode text colors */
+.dark .text-gray-900 {
+  color: white;
+}
+
+.dark .text-gray-600 {
+  color: #D1D5DB;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151;
+}
+
+.dark .bg-white {
+  background-color: #1F2937;
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 
+              0 10px 10px -5px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilos mejorados para el scrollbar del formulario de registro */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.05);
+  scrollbar-color: #FFA500 rgba(0, 0, 0, 0.05);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 4px; /* Reducido de 6px a 4px */
+  width: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -139,12 +167,12 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: #FFA500;
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #e69500;
 }
 
 /* Optimización para que el contenido del form sea visible sin scroll excesivo */
@@ -180,4 +208,22 @@ input.py-2 {
 /* Asegurar que el panel de registro tenga exactamente el mismo tamaño que el login */
 .w-full.p-4.custom-scrollbar {
   box-sizing: border-box;
+}
+
+/* Reducir tamaño de fuentes para un diseño más compacto */
+h1.text-2xl {
+  font-size: 1.375rem;
+}
+
+h2.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-sm {
+  font-size: 0.8125rem;
+}
+
+/* Reducir padding general para hacer el componente más compacto */
+.p-4, .p-5, .p-6, .p-8 {
+  padding: 1rem;
 }

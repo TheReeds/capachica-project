@@ -75,7 +75,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   displayName = computed(() => {
     const user = this.authService.currentUser();
     if (!user) return 'Usuario';
-    return user.name || `${user.first_name} ${user.last_name}` || 'Usuario';
+    return user.name || 'Usuario';
   });
   
   profilePhotoUrl = computed(() => {
@@ -98,6 +98,80 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     }
     
     return 'Usuario';
+  });
+
+  // Nuevas propiedades computadas para los campos adicionales
+  lastLoginFormatted = computed(() => {
+    const user = this.authService.currentUser();
+    if (!user || !user.last_login) return 'Nunca';
+    
+    // Formato de fecha (puedes ajustarlo según tus necesidades)
+    const date = new Date(user.last_login);
+    
+    // Si es hoy, mostrar solo la hora
+    const today = new Date();
+    if (date.toDateString() === today.toDateString()) {
+      return `Hoy, ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    }
+    
+    // Si es ayer
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return `Ayer, ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    }
+    
+    // Para otras fechas
+    return date.toLocaleDateString() + ', ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  });
+  
+  userCountry = computed(() => {
+    const user = this.authService.currentUser();
+    return user?.country || 'No especificado';
+  });
+  
+  preferredLanguage = computed(() => {
+    const user = this.authService.currentUser();
+    if (!user?.preferred_language) return 'No especificado';
+    
+    // Mapeo de códigos de idioma a nombres
+    const languageMap: Record<string, string> = {
+      'es': 'Español',
+      'en': 'Inglés',
+      'pt': 'Portugués',
+      'fr': 'Francés',
+      'de': 'Alemán'
+    };
+    
+    return languageMap[user.preferred_language] || user.preferred_language;
+  });
+  
+  userGender = computed(() => {
+    const user = this.authService.currentUser();
+    if (!user?.gender) return 'No especificado';
+    
+    const genderMap: Record<string, string> = {
+      'male': 'Masculino',
+      'female': 'Femenino',
+      'other': 'Otro',
+      'prefer_not_to_say': 'Prefiere no decirlo'
+    };
+    
+    return genderMap[user.gender] || user.gender;
+  });
+  
+  userAddress = computed(() => {
+    const user = this.authService.currentUser();
+    return user?.address || 'No especificada';
+  });
+  
+  userBirthDate = computed(() => {
+    const user = this.authService.currentUser();
+    if (!user?.birth_date) return 'No especificada';
+    
+    // Formatear la fecha de nacimiento
+    const date = new Date(user.birth_date);
+    return date.toLocaleDateString();
   });
   
   // Listener para detectar cambios de tamaño de ventana
@@ -303,14 +377,16 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     const user = this.authService.currentUser();
     if (!user) return '';
     
-    const firstName = user.first_name || '';
-    const lastName = user.last_name || '';
-    
-    if (!firstName && !lastName) {
-      return user.name?.substring(0, 2).toUpperCase() || '';
+    // Si tenemos nombre completo, usar las iniciales del nombre
+    if (user.name) {
+      const nameParts = user.name.split(' ');
+      if (nameParts.length > 1) {
+        return (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+      }
+      return user.name.substring(0, 2).toUpperCase();
     }
     
-    return (firstName.charAt(0) + (lastName ? lastName.charAt(0) : firstName.charAt(1))).toUpperCase();
+    return 'U'; // Usuario por defecto si no hay información
   }
 
   toggleSidebar() {
@@ -392,6 +468,9 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       'chart': 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
       'report': 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
       'notification': 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+      'globe': 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+      'language': 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
+      'clock': 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
     };
     
     return iconMap[iconName] || iconMap['dashboard']; // Fallback a dashboard

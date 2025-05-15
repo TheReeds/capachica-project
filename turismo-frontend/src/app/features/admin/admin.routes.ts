@@ -1,6 +1,7 @@
 // src/app/features/admin/admin.routes.ts
 import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from '../../shared/layouts/admin-layout/admin-layout.component';
+import { ProfileComponent } from '../profile/profile.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -10,6 +11,11 @@ export const ADMIN_ROUTES: Routes = [
         path: 'users',
         loadChildren: () => import('./users/users.routes').then(m => m.USERS_ROUTES),
         title: 'Gestión de Usuarios'
+      },
+      {
+        path: 'profile',
+        loadChildren: () => import('../profile/profile.routes').then(m => m.PROFILE_ROUTES),
+        title: 'Mi perfil'
       },
       {
         path: 'roles',
@@ -50,6 +56,11 @@ export const ADMIN_ROUTES: Routes = [
         path: 'asociaciones',
         loadChildren: () => import('./turismo/asociaciones/asociaciones.routes').then(m => m.ASOCIACIONES_ROUTES),
         title: 'Gestión de Asociaciones'
+      },
+      {
+        path: 'evento',
+        loadChildren: () => import('./turismo/evento/eventos.routes').then(m => m.EVENTOS_ROUTES),
+        title: 'Gestión de Eventos'
       },
       {
         path: '',

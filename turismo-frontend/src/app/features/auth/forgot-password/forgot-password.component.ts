@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,6 +16,7 @@ export class ForgotPasswordComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  public themeService = inject(ThemeService);
 
   forgotForm: FormGroup;
   loading = false;
@@ -84,5 +86,13 @@ export class ForgotPasswordComponent {
   // Prevenir que los clics dentro del modal se propaguen al documento
   preventPropagation(event: MouseEvent) {
     event.stopPropagation();
+  }
+
+  toggleDarkMode() {
+    this.themeService.toggleDarkMode();
+  }
+  
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 }

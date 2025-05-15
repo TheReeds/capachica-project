@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { GoogleLoginButtonComponent } from '../../../shared/components/buttons/google-login-button.component';
 import { GoogleAuthService } from '../../../core/services/google-auth.service';
 import { ActivatedRoute } from '@angular/router';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +27,7 @@ export class LoginComponent implements OnInit {
   private googleAuthService = inject(GoogleAuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  public themeService = inject(ThemeService);
 
   loginForm: FormGroup;
   loading = false;
@@ -78,6 +80,15 @@ export class LoginComponent implements OnInit {
   // Método para mostrar/ocultar contraseña
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
+  }
+  
+  // Métodos para manejar el tema oscuro
+  toggleDarkMode() {
+    this.themeService.toggleDarkMode();
+  }
+  
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 
   onSubmit() {

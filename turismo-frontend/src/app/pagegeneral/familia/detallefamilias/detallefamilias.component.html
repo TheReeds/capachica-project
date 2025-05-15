@@ -1,231 +1,368 @@
-<div class="w-full bg-orange-50 overflow-hidden">
-  <!-- Background Image -->
-  <img class="w-full h-[450px] object-cover" src="http://127.0.0.1:8000/storage/sliders/emprendedor/RvBlWFqQTaYkR5vESoL2L08HTxH0z9NI7E9gNqio.jpg" alt="Imagen principal">
+<div class="w-full bg-orange-50 overflow-hidden pt-25 pr-10 pl-10 dark:bg-gray-900 dark:text-gray-300">
+  <!-- Contenedor para la imagen y el texto -->
+  <div class="flex items-center justify-between font-sans bg-orange-200">
+    <!-- Parte de la imagen (Efecto Parallax) -->
+    <div class="w-1/2 pr-10 bg-cover bg-center h-[450px]"
+      [style.backgroundImage]="'url(' + getImagenesPrincipal()[0] + ')'" style="background-attachment: fixed;">
+    </div>
 
-  
+    <!-- Parte del texto (Título y descripción) -->
+    <div class="w-1/2 pl-10 flex items-center justify-center">
+      <div *ngIf="emprendedor" class="text-left">
+        <h1 class="text-4xl text-orange-800 font-semibold font-mono dark:text-red-400">
+          {{ emprendedor.nombre || 'Nombre no disponible' }}
+        </h1>
 
-<!-- Mensaje mientras se carga -->
-<ng-template #cargando>
-  <p>Cargando información del emprendedor...</p>
-</ng-template>
-
-  
-
-
-  <!-- Título y texto introductorio -->
-  <div *ngIf="emprendedor" class="text-center py-10">
-    <h1 class="text-4xl text-orange-800 font-semibold font-merriweather">
-      {{ emprendedor.nombre || 'Nombre no disponible' }}
-    </h1>
-
-    <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
-      {{ emprendedor.descripcion || 'Nombre no disponible' }}
-    </p>
+        <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto dark:text-gray-300">
+          {{ emprendedor.descripcion || 'Descripción no disponible' }}
+        </p>
+      </div>
+    </div>
   </div>
 
-  <!-- img-->
-  <div class="px-10 py-8">
-    <h3 class="text-4xl text-amber-600 font-semibold font-merriweather pb-5">Fotos</h3>
-
-    <!-- Contenedor de imágenes en fila -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      <!-- Imagen 1 -->
-      <div class="flex justify-center items-center">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <div class="flex justify-center items-center" *ngFor="let img of getImagenesSecundarias()">
-            <img class="w-full h-full object-cover rounded-lg" [src]="img" alt="Imagen secundaria" />
-          </div>
+  <!-- u+m+c -->
+  <!-- Cards de información -->
+<div *ngIf="emprendedor" class="max-w-7xl mx-auto text-center px-4 lg:px-8 pt-8 pb-12">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 dark:bg-gray-900 dark:text-gray-300">
+    
+    <!-- Ubicación -->
+    <div class="bg-white border-l-4 border-amber-500 rounded-xl shadow-lg p-6 transform transition-transform duration-300 hover:scale-105">
+      <div class="flex items-center mb-4">
+        <div class="bg-gradient-to-r from-orange-400 to-amber-500 p-3 rounded-full mr-4 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
         </div>
-
-
+        <h3 class="text-xl font-bold text-amber-700 tracking-wide uppercase dark:text-amber-500">Ubicación</h3>
       </div>
+      <p class="text-gray-700 dark:text-gray-300 mb-4">{{ emprendedor.ubicacion || 'No disponible' }}</p>
+      <div class="mt-2">
+        <iframe *ngIf="emprendedor.servicios && emprendedor.servicios.length > 0"
+          [src]="getMapaUrl(emprendedor.servicios[0].latitud, emprendedor.servicios[0].longitud)" 
+          width="100%" height="150" class="rounded-lg border" style="border:0;" 
+          loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
 
+    <!-- Horario -->
+    <div class="bg-white border-l-4 border-amber-500 rounded-xl shadow-lg p-6 transform transition-transform duration-300 hover:scale-105">
+      <div class="flex items-center mb-4">
+        <div class="bg-gradient-to-r from-orange-400 to-amber-500 p-3 rounded-full mr-4 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-amber-700 tracking-wide uppercase dark:text-amber-500">Horario</h3>
+      </div>
+      <p class="text-gray-700 dark:text-gray-300 mb-4">{{ emprendedor.horario_atencion || 'No disponible' }}</p>
+      <div class="mt-2 bg-gray-50 rounded-lg p-4 border border-gray-200 h-36 flex items-center justify-center">
+        <div class="text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-amber-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p class="text-sm text-gray-500">Disponible en el horario indicado</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contacto -->
+    <div class="bg-white border-l-4 border-amber-500 rounded-xl shadow-lg p-6 transform transition-transform duration-300 hover:scale-105">
+      <div class="flex items-center mb-4">
+        <div class="bg-gradient-to-r from-orange-400 to-amber-500 p-3 rounded-full mr-4 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-amber-700 tracking-wide uppercase dark:text-amber-500">Contacto</h3>
+      </div>
+      <div class="mb-4">
+        <p class="text-gray-700 dark:text-gray-300"><strong>Teléfono:</strong> {{ emprendedor.telefono || 'No disponible' }}</p>
+        <p class="text-gray-700 dark:text-gray-300"><strong>Email:</strong>
+          <a [href]="'mailto:' + emprendedor.email" class="text-orange-600 hover:underline dark:text-amber-500">
+            {{ emprendedor.email || 'No disponible' }}
+          </a>
+        </p>
+      </div>
       
+    </div>
+    
+  </div>
+</div>
 
+  <!-- Servicios ofrecidos -->
+  <div class="container mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-10 text-gray-800 text-center relative pb-3 dark:text-gray-200">
+      Servicios ofrecidos
+      <span class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-amber-500"></span>
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div *ngFor="let servicio of emprendedor?.servicios" 
+           class="bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] dark:bg-gray-800 dark:border dark:border-gray-700">
+        <h3 class="text-xl font-bold text-amber-600 mb-3 dark:text-amber-400">{{ servicio.nombre }}</h3>
+        <p class="text-gray-700 mb-4 dark:text-gray-300">{{ servicio.descripcion }}</p>
+        <div class="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">
+          <span class="text-lg font-medium text-gray-800 dark:text-gray-200">{{ servicio.precio_referencial }}</span>
+          <span class="bg-amber-100 text-amber-800 text-sm py-1 px-3 rounded-full dark:bg-amber-900 dark:text-amber-200">
+            Disponible
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carrusel de fotos -->
+  <div class="bg-gray-100 py-16 dark:bg-gray-900">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-10 text-gray-800 text-center relative pb-3 dark:text-gray-200">
+        Galería
+        <span class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-amber-500"></span>
+      </h2>
       
+      <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide" *ngFor="let img of getImagenesSecundarias()">
+            <div class="rounded-2xl overflow-hidden shadow-lg h-80">
+              <img class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" 
+                   [src]="img" alt="Imagen secundaria" />
+            </div>
+          </div>
+        </div>
+        <div class="swiper-button-next !text-amber-500"></div>
+        <div class="swiper-button-prev !text-amber-500"></div>
+        <div class="swiper-pagination !bottom-[-8px]"></div>
+      </div>
     </div>
   </div>
 
-
-  <!-- Contenedor principal con márgenes adecuados -->
-  <!-- serv -->
-  <div *ngFor="let servicio of servicios" class="px-10 py-8">
-    <h3 class="text-4xl text-amber-600 font-semibold font-merriweather pb-5">Servicios</h3>
-    <!-- Secciones de Servicios -->
-    <div class="mb-16">
-      <!-- Sección 1: Alojamiento -->
-      <div class="mb-12 flex flex-wrap items-center">
-        <!-- Carrusel de imágenes -->
-        <div class="w-full md:w-1/2 p-4">
-          <div class="swiper-container w-full h-80">
-            <div class="swiper-wrapper">
-              <div class="swiper-slide">
-                <img class="w-full h-full object-cover rounded-lg" src="https://placehold.co/300x190"
-                  alt="Alojamiento Imagen 1" />
-              </div>
-
-            </div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
+  <!-- Información adicional -->
+  <div class="container mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-12 text-gray-800 text-center relative pb-3 dark:text-gray-200">
+      Información Adicional
+      <span class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-amber-500"></span>
+    </h2>
+    
+    <div *ngIf="emprendedor" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- Idiomas Hablados -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div class="bg-gradient-to-r from-blue-400 to-blue-600 px-4 py-3">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
+            <h3 class="ml-2 text-white font-medium">Idiomas Hablados</h3>
           </div>
         </div>
-        <!-- Texto de la sección -->
-        <div class="w-full md:w-1/2 p-4">
-          <h2 class="text-3xl text-red-700 font-bold mb-4">Sección 1: {{servicio.nombre}}</h2>
-          <p class="mb-2 text-lg font-semibold">
-            <span class="text-orange-700">Descripción: </span>
-            Hospedaje circular en Ccotos, construido con técnicas tradicionales y materiales locales, proporcionando una
-            experiencia única en medio de la naturaleza.
-          </p>
-          <p class="mb-2 text-lg font-semibold">
-            <span class="text-orange-700">Servicios destacados:</span>
-          </p>
-          <ul class="list-disc ml-6 mb-4 text-lg">
-            <li>Habitación individual o familiar</li>
-            <li>Check-in automático</li>
-            <li>Espacios compartidos para actividades recreativas</li>
-          </ul>
-          <p class="mb-4 text-lg font-semibold">
-            <span class="text-orange-700">Precios y disponibilidad: </span>
-            <span class="text-red-600 font-bold">$50</span> por noche
-          </p>
-          <button class="bg-red-700 hover:bg-red-500 text-white px-6 py-3 rounded-full text-xl transition-all">
-            Reservar alojamiento
-          </button>
+        <div class="p-4">
+          <p class="text-gray-700 dark:text-gray-300">{{ emprendedor.idiomas_hablados || 'No disponible' }}</p>
         </div>
       </div>
 
-      <!-- Sección 2: Gastronomía -->
-      <div class="mb-12 flex flex-wrap items-center">
-        <!-- Carrusel de imágenes -->
-        <div class="w-full md:w-1/2 p-4">
-          <div class="swiper-container w-full h-80">
-            <div class="swiper-wrapper">
-              <div class="swiper-slide">
-                <img class="w-full h-full object-cover rounded-lg" src="https://placehold.co/300x200"
-                  alt="Gastronomía Imagen 1" />
-              </div>
-
-            </div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
+      <!-- Métodos de Pago -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div class="bg-gradient-to-r from-green-400 to-green-600 px-4 py-3">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            <h3 class="ml-2 text-white font-medium">Métodos de Pago</h3>
           </div>
         </div>
-        <!-- Texto de la sección -->
-        <div class="w-full md:w-1/2 p-4">
-          <h2 class="text-3xl text-red-700 font-bold mb-4">Sección 2: Gastronomía</h2>
-          <p class="mb-2 text-lg font-semibold">
-            <span class="text-orange-700">Descripción: </span>
-            Comidas tradicionales preparadas con ingredientes locales como quinua, habas, y papa andina.
-          </p>
-          <p class="mb-2 text-lg font-semibold">
-            <span class="text-orange-700">Platos destacados:</span>
-          </p>
-          <ul class="list-disc ml-6 mb-4 text-lg">
-            <li>Cuy chactado (plato típico)</li>
-            <li>Sopa de quinua</li>
-            <li>Pan casero</li>
-          </ul>
-          <p class="mb-4 text-lg font-semibold">
-            <span class="text-orange-700">Precios: Menú por </span>
-            <span class="text-red-600 font-bold">$15</span>
-          </p>
-          <button class="bg-red-700 hover:bg-red-500 text-white px-6 py-3 rounded-full text-xl transition-all">
-            Ver más sobre el menú y reservar
-          </button>
+        <div class="p-4">
+          <p class="text-gray-700 dark:text-gray-300">{{ emprendedor.metodos_pago || 'No disponible' }}</p>
         </div>
       </div>
 
-      <!-- Sección 3: Actividades -->
-      <div class="mb-12 flex flex-wrap items-center">
-        <!-- Carrusel de imágenes -->
-        <div class="w-full md:w-1/2 p-4">
-          <div class="swiper-container w-full h-80">
-            <div class="swiper-wrapper">
-              <div class="swiper-slide">
-                <img class="w-full h-full object-cover rounded-lg" src="https://placehold.co/300x200"
-                  alt="Actividades Imagen 1" />
-              </div>
-
-            </div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
+      <!-- Certificaciones -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div class="bg-gradient-to-r from-yellow-400 to-yellow-600 px-4 py-3">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="ml-2 text-white font-medium">Certificaciones</h3>
           </div>
         </div>
-        <!-- Texto de la sección -->
-        <div class="w-full md:w-1/2 p-4">
-          <h2 class="text-3xl text-red-700 font-bold mb-4">Sección 3: Actividades</h2>
-          <p class="mb-2 text-lg font-semibold">
-            <span class="text-orange-700">Descripción: </span>
-            Disfruta de paseos en kayak y actividades recreativas organizadas por la familia.
-          </p>
-          <p class="mb-2 text-lg font-semibold">
-            <span class="text-orange-700">Actividades destacadas:</span>
-          </p>
-          <ul class="list-disc ml-6 mb-4 text-lg">
-            <li>Paseo en kayak por el Lago Titicaca</li>
-            <li>Caminatas guiadas por los alrededores</li>
-            <li>Clases de cocina tradicional</li>
-          </ul>
-          <p class="mb-2 text-lg font-semibold">
-            <span class="text-orange-700">Precios:</span>
-          </p>
-          <ul class="list-none ml-6 mb-4 text-lg">
-            <li>Kayak: <span class="text-red-600 font-bold">$20</span> por persona</li>
-            <li>Caminata guiada: <span class="text-red-600 font-bold">$10</span> por persona</li>
-          </ul>
-          <button class="bg-red-700 hover:bg-red-500 text-white px-6 py-3 rounded-full text-xl transition-all">
-            Reservar actividades
-          </button>
+        <div class="p-4">
+          <p class="text-gray-700 dark:text-gray-300">{{ emprendedor.certificaciones || 'No disponible' }}</p>
+        </div>
+      </div>
+
+      <!-- Capacidad de Aforo -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div class="bg-gradient-to-r from-purple-400 to-purple-600 px-4 py-3">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" />
+            </svg>
+            <h3 class="ml-2 text-white font-medium">Capacidad de Aforo</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="text-gray-700 dark:text-gray-300">{{ emprendedor.capacidad_aforo || 'No disponible' }}</p>
+        </div>
+      </div>
+
+      <!-- Rango de Precios -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div class="bg-gradient-to-r from-red-400 to-red-600 px-4 py-3">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="ml-2 text-white font-medium">Rango de Precios</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="text-gray-700 dark:text-gray-300">{{ emprendedor.precio_rango || 'No disponible' }}</p>
+        </div>
+      </div>
+
+      <!-- Opciones de Acceso -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div class="bg-gradient-to-r from-orange-400 to-orange-600 px-4 py-3">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+            <h3 class="ml-2 text-white font-medium">Opciones de Acceso</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="text-gray-700 dark:text-gray-300">{{ emprendedor.opciones_acceso || 'No disponible' }}</p>
+        </div>
+      </div>
+
+      <!-- Facilidades para Discapacidad -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div class="bg-gradient-to-r from-teal-400 to-teal-600 px-4 py-3">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+            <h3 class="ml-2 text-white font-medium">Facilidades para Discapacidad</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="text-gray-700 dark:text-gray-300">{{ emprendedor.facilidades_discapacidad || 'No disponible' }}</p>
         </div>
       </div>
     </div>
   </div>
 
-
-
-
-  <!-- turista-->
-  <!-- Testimonios de Turistas -->
-  <div class="px-10 py-10">
-    <h3 class="text-4xl text-amber-600 font-semibold font-merriweather pb-5">Reseña de turistas</h3>
-
-    <!-- Contenedor para los testimonios -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Testimonio 1 -->
-      <div class="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
-        <div class="flex items-center mb-4">
-          <img class="w-16 h-16 rounded-full mr-4" src="https://placehold.co/69x69" alt="Usuario 1" />
-          <div>
-            <div class="text-yellow-400 text-lg">⭐ ⭐ ⭐ ⭐ ⭐</div>
-            <div class="text-gray-600 text-base">Argentina</div>
-            <div class="text-gray-800 text-xl font-semibold">Mario Miguel</div>
+  <!-- Testimonios de turistas -->
+  <div class="bg-gradient-to-b from-amber-50 to-white py-16 dark:from-gray-900 dark:to-gray-800">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-10 text-gray-800 text-center relative pb-3 dark:text-gray-200">
+        Testimonios de Viajeros
+        <span class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-amber-500"></span>
+      </h2>
+      
+      <div *ngIf="emprendedor" class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="bg-white rounded-2xl shadow-xl p-8 relative transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl dark:bg-gray-800 dark:border dark:border-gray-700">
+          <div class="absolute -top-5 left-8 bg-amber-500 text-white rounded-full p-3 shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          
+          <div class="flex items-center mb-6 pt-4">
+            <img class="w-16 h-16 rounded-full object-cover shadow-md" src="/api/placeholder/64/64" alt="Perfil de Mario Miguel" />
+            <div class="ml-4">
+              <div class="flex gap-1 text-amber-400 mb-1">★★★★★</div>
+              <div class="text-gray-800 text-lg font-semibold dark:text-gray-200">Mario Miguel</div>
+              <div class="text-gray-500 text-sm dark:text-gray-400">Argentina</div>
+            </div>
+          </div>
+          
+          <div class="italic text-gray-700 relative pl-6 dark:text-gray-300">
+            <svg class="absolute left-0 top-0 h-5 w-5 text-amber-300 -translate-y-2 -translate-x-2" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.51.88-3.995 3.356-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.511.88-3.996 3.356-3.996 5.849h4v10h-10z"/>
+            </svg>
+            <p>{{ emprendedor.comentarios_resenas || 'No disponible' }}</p>
           </div>
         </div>
-        <blockquote class="text-gray-800 text-lg italic">
-          "El mejor plato que comí en todo mi viaje fue el cuy chactado que prepararon en la casa de los Apaza. No solo
-          la comida, sino las historias de la familia hicieron que nuestra visita fuera especial."
-        </blockquote>
-      </div>
 
-      <!-- Testimonio 2 -->
-      <div class="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
-        <div class="flex items-center mb-4">
-          <img class="w-16 h-16 rounded-full mr-4" src="https://placehold.co/69x69" alt="Usuario 2" />
-          <div>
-            <div class="text-yellow-400 text-lg">⭐ ⭐ ⭐ ⭐ ⭐</div>
-            <div class="text-gray-600 text-base">España</div>
-            <div class="text-gray-800 text-xl font-semibold">Laura Pérez</div>
+        <div class="bg-white rounded-2xl shadow-xl p-8 relative transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl dark:bg-gray-800 dark:border dark:border-gray-700">
+          <div class="absolute -top-5 left-8 bg-amber-500 text-white rounded-full p-3 shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          
+          <div class="flex items-center mb-6 pt-4">
+            <img class="w-16 h-16 rounded-full object-cover shadow-md" src="/api/placeholder/64/64" alt="Perfil de Mario Miguel" />
+            <div class="ml-4">
+              <div class="flex gap-1 text-amber-400 mb-1">★★★★★</div>
+              <div class="text-gray-800 text-lg font-semibold dark:text-gray-200">Mario Miguel</div>
+              <div class="text-gray-500 text-sm dark:text-gray-400">Argentina</div>
+            </div>
+          </div>
+          
+          <div class="italic text-gray-700 relative pl-6 dark:text-gray-300">
+            <svg class="absolute left-0 top-0 h-5 w-5 text-amber-300 -translate-y-2 -translate-x-2" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.51.88-3.995 3.356-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.511.88-3.996 3.356-3.996 5.849h4v10h-10z"/>
+            </svg>
+            <p>{{ emprendedor.comentarios_resenas || 'No disponible' }}</p>
           </div>
         </div>
-        <blockquote class="text-gray-800 text-lg italic">
-          "La experiencia fue increíble, la calidez de la familia y la deliciosa comida nos hicieron sentir como en
-          casa. ¡Sin duda, uno de los mejores recuerdos de nuestro viaje!"
-        </blockquote>
       </div>
     </div>
   </div>
 
+  <ng-template #cargando>
+    <div class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600"></div>
+    </div>
+  </ng-template>
+
+
+
+  <ng-template #cargando>
+    <p>Cargando información del emprendedor...</p>
+  </ng-template>
+</div>
+
+
+
+
+
+
+
+
+
+<div *ngIf="emprendedor && emprendedor.servicios?.length">
+  <h1>njnj</h1>
+  <div *ngFor="let servicio of emprendedor.servicios">
+    <!-- Horarios del servicio -->
+    <div *ngIf="servicio.horarios && servicio.horarios.length > 0" class="mt-4">
+      <h4 class="font-semibold text-amber-600 dark:text-amber-400">Horarios:</h4>
+      <ul class="mt-2 space-y-1">
+        <li *ngFor="let horario of getOrdenadosHorarios(servicio.horarios)"
+          class="text-gray-700 dark:text-gray-300 flex justify-between">
+          <span class="capitalize">{{ traducirDia(horario.dia_semana) }}:</span>
+          <span>{{ horario.hora_inicio }} - {{ horario.hora_fin }}</span>
+        </li>
+      </ul>
+      <h1>vdf</h1>
+    </div>
+  </div>
+</div>
+
+
+
+<div>
+
+</div>
+
+
+
+
+
+<div>
+
+</div>
 
 
 
@@ -245,18 +382,56 @@
 
 
 
+<!-- Swiper.js -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+  const swiper = new Swiper('.swiper', {
+    slidesPerView: 'auto', // Esto asegura que las imágenes se vean a su tamaño original sin espacio
+    spaceBetween: 0, // Sin espacio entre las imágenes
+    loop: true, // Bucle infinito
+    autoplay: {
+      delay: 3000, // Ritmo de cambio automático (3 segundos por imagen)
+      disableOnInteraction: false, // Permite que el carrusel continúe cuando el usuario interactúe
+    },
+    navigation: {
+      nextEl: '.swiper-button-next', // Botón siguiente
+      prevEl: '.swiper-button-prev', // Botón anterior
+    },
+  });
+</script>
 
 
-  <!-- Swiper.js -->
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script>
-    const Swiper = new Swiper('.swiper-container', {
+
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const swiper = new Swiper('.swiper', {
       slidesPerView: 1,
-      spaceBetween: 10,
+      spaceBetween: 20,
+      loop: true,
+      centeredSlides: true,
+      autoplay: {
+        delay: 4000,
+        disableOnInteraction: false,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
       navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       },
-      loop: true,               // Activa el bucle del carrusel
+      breakpoints: {
+        640: {
+          slidesPerView: 2,
+          spaceBetween: 20,
+        },
+        1024: {
+          slidesPerView: 3,
+          spaceBetween: 30,
+        },
+      }
     });
-  </script>
+  });
+</script>

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use App\reservas\Emprendedores\Models\Emprendedor;
 use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -26,6 +27,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'foto_perfil',
         'google_id',
         'avatar',
+        'country',
+        'birth_date',
+        'address',
+        'gender',
+        'preferred_language',
+        'last_login',
     ];
 
     protected $hidden = [
@@ -38,6 +45,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'active' => 'boolean',
+        'birth_date' => 'date', // Cast birth_date to date
+        'last_login' => 'datetime', // Cast last_login to datetime
     ];
     
     protected $appends = [
@@ -53,7 +62,11 @@ class User extends Authenticatable implements MustVerifyEmail
                     ->withPivot('es_principal', 'rol')
                     ->withTimestamps();
     }
-    
+    public function emprendedores()
+    {
+        return $this->emprendimientos();
+    }
+
     /**
      * Verificar si el usuario administra algún emprendimiento
      */
@@ -99,7 +112,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     /**
@@ -109,6 +122,6 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new \App\Notifications\VerifyEmailNotification);
+        $this->notify(new VerifyEmailNotification);
     }
 }

@@ -3,18 +3,18 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Servicios\Models\Categoria;
-use App\Pagegeneral\Models\Municipalidad;
-use App\Reservas\Asociaciones\Models\Asociacion;
-use App\Servicios\Models\Servicio;
-use App\Servicios\Models\ServicioHorario;
-use App\Reservas\Reserva\Models\Reserva;
-use App\Reservas\Reserva\Models\ReservaServicio;
+use App\Models\Categoria;
+use App\Models\Municipalidad;
+use App\Models\Asociacion;
+use App\Models\Servicio;
+use App\Models\ServicioHorario;
+use App\Models\Reserva;
+use App\Models\ReservaServicio;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\reservas\Emprendedores\Models\Emprendedor;
+use App\Models\Emprendedor;
 
 class DatabaseSeeder extends Seeder
 {
@@ -94,40 +94,52 @@ class DatabaseSeeder extends Seeder
     
     private function createUsers()
     {
-        // Usuario administrador
+        // Admin user
         $admin = User::create([
             'name' => 'Administrador',
-            'first_name' => 'Admin',
-            'last_name' => 'Sistema',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
             'phone' => '123456789',
-            'active' => true
+            'country' => 'Perú',
+            'birth_date' => '1990-01-15',
+            'address' => 'Plaza Principal s/n, Capachica, Puno',
+            'gender' => 'male',
+            'preferred_language' => 'es',
+            'active' => true,
+            'last_login' => now()->subDays(1)
         ]);
         $admin->assignRole('admin');
         
-        // Usuario normal
+        // Normal user
         $user = User::create([
             'name' => 'Usuario Normal',
-            'first_name' => 'Usuario',
-            'last_name' => 'Prueba',
             'email' => 'user@example.com',
             'password' => Hash::make('password'),
             'phone' => '987654321',
-            'active' => true
+            'country' => 'Perú',
+            'birth_date' => '1995-06-20',
+            'address' => 'Av. Arequipa 123, Lima',
+            'gender' => 'female',
+            'preferred_language' => 'es',
+            'active' => true,
+            'last_login' => now()->subDays(3)
         ]);
         $user->assignRole('user');
         
-        // Usuario emprendedor
+        // Entrepreneur user
         $emprendedor = User::create([
             'name' => 'Emprendedor Local',
-            'first_name' => 'Juan',
-            'last_name' => 'Mamani',
             'email' => 'emprendedor@example.com',
             'password' => Hash::make('password'),
             'phone' => '555444333',
-            'active' => true
+            'country' => 'Perú',
+            'birth_date' => '1985-12-10',
+            'address' => 'Comunidad Llachón, Capachica, Puno',
+            'gender' => 'male',
+            'preferred_language' => 'es',
+            'active' => true,
+            'last_login' => now()->subHours(12)
         ]);
         $emprendedor->assignRole('emprendedor');
     }

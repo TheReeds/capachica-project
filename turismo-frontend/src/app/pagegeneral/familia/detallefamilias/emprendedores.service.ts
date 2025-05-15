@@ -54,6 +54,7 @@ export class EmprendedorService {
   // Obtener un emprendedor por ID
   getEmprendedorById(id: number): Observable<Emprendedor> {
     return this.http.get<{ success: boolean; data: Emprendedor }>(`${this.API_URL}/emprendedores/${id}`)
+    
       .pipe(
         map(response => {
           const emprendedor = response.data;

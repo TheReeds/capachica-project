@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent implements OnInit {
   private themeService = inject(ThemeService);
-  
+
   ngOnInit() {
     // Initialize theme when the application starts
     console.log('App component initializing...');

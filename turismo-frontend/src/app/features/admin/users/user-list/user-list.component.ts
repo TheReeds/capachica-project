@@ -137,7 +137,6 @@ import { ThemeService } from '../../../../core/services/theme.service';
                           </div>
                           <div class="ml-4">
                             <div class="text-sm font-medium text-gray-900 dark:text-white">{{ user.name }}</div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.first_name }} {{ user.last_name }}</div>
                           </div>
                         </div>
                       </td>

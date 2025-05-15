@@ -1,26 +1,26 @@
 <?php
 
+use App\Http\Controllers\API\AccessControl\PermissionController;
+use App\Http\Controllers\API\AccessControl\RoleController;
+use App\Http\Controllers\API\AccessControl\UserController;
+use App\Http\Controllers\API\Asociaciones\AsociacionController;
+use App\Http\Controllers\API\Auth\AuthController;
+use App\Http\Controllers\API\Auth\GoogleAuthController;
+use App\Http\Controllers\API\Dashboard\DashboardController;
+use App\Http\Controllers\API\Emprendedores\EmprendedorController;
+use App\Http\Controllers\API\Emprendedores\MisEmprendimientosController;
+use App\Http\Controllers\API\Evento\EventController;
+use App\Http\Controllers\API\PageGeneral\MunicipalidadController;
+use App\Http\Controllers\API\PageGeneral\SliderController;
+use App\Http\Controllers\API\Reservas\ReservaController;
+use App\Http\Controllers\API\Reservas\ReservaServicioController;
+use App\Http\Controllers\API\Servicios\CategoriaController;
+use App\Http\Controllers\API\Servicios\ServicioController;
+use App\Http\Controllers\MenuController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\RoleController;
-use App\Http\Controllers\API\PermissionController;
-use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\DashboardController;
-use App\Http\Controllers\Api\MenuController;
-use App\Pagegeneral\Controller\SliderController;
-use App\Pagegeneral\Controller\MunicipalidadController;
-use App\bussinespage\controller\DocenteController;
-use App\jorge\controller\EstudianteController;
-use App\Reservas\Emprendedores\Http\Controllers\EmprendedorController;
-use App\Reservas\Emprendedores\Http\Controllers\MisEmprendimientosController;
-use App\Reservas\Asociaciones\Http\Controllers\AsociacionController;
-use App\Reservas\Reserva\Controller\ReservaController;
-use App\Reservas\Reservadetalle\Controller\ReservaDetalleController;
-use App\Servicios\Controllers\ServicioController;
-use App\Servicios\Controllers\CategoriaController;
-use App\Http\Controllers\API\GoogleAuthController;
-use App\Http\Controllers\LugarTuristicoController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -102,12 +102,29 @@ Route::prefix('servicios')->group(function () {
     Route::get('/{id}', [ServicioController::class, 'show']);
     Route::get('/emprendedor/{emprendedorId}', [ServicioController::class, 'byEmprendedor']);
     Route::get('/categoria/{categoriaId}', [ServicioController::class, 'byCategoria']);
+    // Nueva ruta para verificar disponibilidad (no requiere autenticación)
+    Route::get('/verificar-disponibilidad', [ServicioController::class, 'verificarDisponibilidad']);
+    // Nueva ruta para obtener servicios por ubicación
+    Route::get('/ubicacion', [ServicioController::class, 'byUbicacion']);
 });
 
 // Categorías
 Route::prefix('categorias')->group(function () {
     Route::get('/', [CategoriaController::class, 'index']);
     Route::get('/{id}', [CategoriaController::class, 'show']);
+});
+
+// Evento
+
+Route::prefix('eventos')->group(function () {
+    Route::get('', [EventController::class, 'index']); // Listar eventos
+    Route::post('', [EventController::class, 'store']); // Crear evento
+
+    Route::get('/{id}', [EventController::class, 'show']); // Mostrar evento específico
+    Route::put('/{id}', [EventController::class, 'update']); // Actualizar evento
+    Route::delete('/{id}', [EventController::class, 'destroy']); // Eliminar evento
+
+    Route::get('/{id}/emprendedor', [EmprendedorController::class, 'getEmprendedores']); // Obtener emprendedor del evento
 });
 
 // ===== RUTAS PROTEGIDAS =====
@@ -118,10 +135,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     // Reenviar correo de verificación
     Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail']);
-
+    
     // Menú dinámico
     Route::get('/menu', [MenuController::class, 'getMenu']);
-
+    
     // Mis Emprendimientos (para usuarios emprendedores)
     Route::prefix('mis-emprendimientos')->group(function () {
         Route::get('/', [MisEmprendimientosController::class, 'index']);
@@ -131,14 +148,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/administradores', [MisEmprendimientosController::class, 'agregarAdministrador']);
         Route::delete('/{id}/administradores/{userId}', [MisEmprendimientosController::class, 'eliminarAdministrador']);
     });
-
+    
     // Municipalidades (rutas protegidas)
     Route::prefix('municipalidad')->group(function () {
         Route::post('/', [MunicipalidadController::class, 'store'])->middleware('permission:municipalidad_update');
         Route::put('/{id}', [MunicipalidadController::class, 'update'])->middleware('permission:municipalidad_update');
         Route::delete('/{id}', [MunicipalidadController::class, 'destroy'])->middleware('permission:municipalidad_update');
     });
-
+    
     // Sliders (rutas protegidas)
     Route::prefix('sliders')->group(function () {
         Route::post('/', [SliderController::class, 'store']);
@@ -146,63 +163,75 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [SliderController::class, 'update']);
         Route::delete('/{id}', [SliderController::class, 'destroy']);
     });
-
+    
     // Asociaciones (rutas protegidas)
     Route::prefix('asociaciones')->group(function () {
         Route::post('/', [AsociacionController::class, 'store']);
         Route::put('/{id}', [AsociacionController::class, 'update']);
         Route::delete('/{id}', [AsociacionController::class, 'destroy']);
     });
-
+    
     // Emprendedores (rutas protegidas)
     Route::prefix('emprendedores')->group(function () {
         Route::post('/', [EmprendedorController::class, 'store'])->middleware('permission:emprendedor_create');
         Route::put('/{id}', [EmprendedorController::class, 'update']);
         Route::delete('/{id}', [EmprendedorController::class, 'destroy']);
         Route::get('/{id}/reservas', [EmprendedorController::class, 'getReservas']);
-
+        
         // Gestión de administradores de emprendimientos
         Route::post('/{id}/administradores', [EmprendedorController::class, 'agregarAdministrador']);
         Route::delete('/{id}/administradores/{userId}', [EmprendedorController::class, 'eliminarAdministrador']);
     });
-
+    
     // Servicios (rutas protegidas)
     Route::prefix('servicios')->group(function () {
         Route::post('/', [ServicioController::class, 'store']);
         Route::put('/{id}', [ServicioController::class, 'update']);
         Route::delete('/{id}', [ServicioController::class, 'destroy']);
     });
-
+    
     // Categorías (rutas protegidas)
     Route::prefix('categorias')->group(function () {
         Route::post('/', [CategoriaController::class, 'store']);
         Route::put('/{id}', [CategoriaController::class, 'update']);
         Route::delete('/{id}', [CategoriaController::class, 'destroy']);
     });
-
-    // Reservas
+    
+    // Reservas (nuevas rutas)
     Route::prefix('reservas')->group(function () {
+        Route::post('/mis-reservas', [ReservaController::class, 'createUserReservation']);
         Route::get('/', [ReservaController::class, 'index']);
         Route::get('/{id}', [ReservaController::class, 'show']);
         Route::post('/', [ReservaController::class, 'store']);
         Route::put('/{id}', [ReservaController::class, 'update']);
         Route::delete('/{id}', [ReservaController::class, 'destroy']);
-        Route::get('/{id}/emprendedores', [ReservaController::class, 'getEmprendedores']);
+        
+        // Cambiar estado de la reserva
+        Route::put('/{id}/estado', [ReservaController::class, 'cambiarEstado']);
+        
+        // Obtener reservas por emprendedor
+        Route::get('/emprendedor/{emprendedorId}', [ReservaController::class, 'byEmprendedor']);
+        
+        // Obtener reservas por servicio
+        Route::get('/servicio/{servicioId}', [ReservaController::class, 'byServicio']);
     });
-
-    // Detalles de Reserva
-    Route::prefix('reserva-detalles')->group(function () {
-        Route::get('/', [ReservaDetalleController::class, 'index']);
-        Route::get('/{id}', [ReservaDetalleController::class, 'show']);
-        Route::post('/', [ReservaDetalleController::class, 'store']);
-        Route::put('/{id}', [ReservaDetalleController::class, 'update']);
-        Route::delete('/{id}', [ReservaDetalleController::class, 'destroy']);
-        Route::get('/reserva/{reservaId}', [ReservaDetalleController::class, 'getByReserva']);
-        Route::get('/emprendedor/{emprendedorId}', [ReservaDetalleController::class, 'getByEmprendedor']);
+    // Reserva Servicios (nuevas rutas)
+    Route::prefix('reserva-servicios')->group(function () {
+        // Obtener servicios por reserva
+        Route::get('/reserva/{reservaId}', [ReservaServicioController::class, 'byReserva']);
+        
+        // Cambiar estado de un servicio reservado
+        Route::put('/{id}/estado', [ReservaServicioController::class, 'cambiarEstado']);
+        
+        // Obtener servicios para calendario
+        Route::get('/calendario', [ReservaServicioController::class, 'calendario']);
+        
+        // Verificar disponibilidad de un servicio
+        Route::get('/verificar-disponibilidad', [ReservaServicioController::class, 'verificarDisponibilidad']);
     });
-
+    
     // ===== RUTAS DE ADMINISTRACIÓN (CON PERMISOS) =====
-
+    
     // Roles
     Route::prefix('roles')->middleware('permission:role_read')->group(function () {
         Route::get('/', [RoleController::class, 'index']);
@@ -211,15 +240,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [RoleController::class, 'update'])->middleware('permission:role_update');
         Route::delete('/{id}', [RoleController::class, 'destroy'])->middleware('permission:role_delete');
     });
-
+    Route::get('/users/{id}/permissions', [PermissionController::class, 'getUserPermissions']);
     // Permisos
     Route::prefix('permissions')->middleware('permission:permission_read')->group(function () {
         Route::get('/', [PermissionController::class, 'index']);
         Route::post('/assign-to-user', [PermissionController::class, 'assignPermissionsToUser'])->middleware('permission:permission_assign');
         Route::post('/assign-to-role', [PermissionController::class, 'assignPermissionsToRole'])->middleware('permission:permission_assign');
-        Route::get('/users/{id}/permissions', [PermissionController::class, 'getUserPermissions']);
+        
     });
-
+    
     // Gestión de Usuarios
     Route::prefix('users')->middleware('permission:user_read')->group(function () {
         Route::get('/', [UserController::class, 'index']);
@@ -231,26 +260,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}/deactivate', [UserController::class, 'deactivate'])->middleware('permission:user_update');
         Route::put('/{id}/roles', [UserController::class, 'assignRoles'])->middleware('permission:user_update');
     });
-
+    
     // Dashboard
     Route::prefix('dashboard')->middleware('permission:user_read')->group(function () {
         Route::get('/summary', [DashboardController::class, 'summary']);
     });
-
-    // Lugares Turísticos (acceso público - solo lectura)
-    Route::get('/lugares-turisticos', [LugarTuristicoController::class, 'index']);
-    Route::get('/lugares-turisticos/{id}', [LugarTuristicoController::class, 'show']);
-
-
-    // Lugares Turísticos (solo para administradores)
-    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-        Route::prefix('lugares-turisticos')->group(function () {
-            Route::get('/', [LugarTuristicoController::class, 'index']);
-            Route::post('/', [LugarTuristicoController::class, 'store']);
-            Route::get('/{id}', [LugarTuristicoController::class, 'show']);
-            Route::put('/{id}', [LugarTuristicoController::class, 'update']);
-            Route::delete('/{id}', [LugarTuristicoController::class, 'destroy']);
-        });
-    });
-
 });
