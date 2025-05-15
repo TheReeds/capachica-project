@@ -2,7 +2,7 @@
 FROM php:8.2-fpm
 
 # Dependencias del sistema
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y supervisor \
     libpq-dev \
     git \
     unzip \
@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
 
 # Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/local/bin/composer
-
+COPY ./supervisord.conf /etc/supervisord.conf
 # Crear carpeta de trabajo
 WORKDIR /var/www/html
 
@@ -51,3 +51,4 @@ EXPOSE 80
 
 # Iniciar supervisord para correr Nginx + PHP-FPM
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+
