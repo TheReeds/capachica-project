@@ -214,69 +214,42 @@ class DatabaseSeeder extends Seeder
     {
         $asociaciones = [
             [
-                'nombre' => 'Asociación de Turismo Vivencial Llachón',
-                'descripcion' => 'Grupo de familias que ofrecen servicios de turismo vivencial en la comunidad de Llachón.',
-                'latitud' => -15.6450,
-                'longitud' => -69.8345,
-                'telefono' => '951234567',
-                'email' => 'turvivllachon@gmail.com',
+                'nombre'           => 'Asociación de Turismo Vivencial Llachón',
+                'descripcion'      => 'Grupo de familias que ofrecen servicios de turismo vivencial en la comunidad de Llachón.',
+                'latitud'          => -15.6450,
+                'longitud'         => -69.8345,
+                'telefono'         => '951234567',
+                'email'            => 'turvivllachon@gmail.com',
                 'municipalidad_id' => 1,
-                'imagen' => 'asociaciones/llachon.jpg'
+                'imagen'           => 'asociaciones/llachon.jpg',
             ],
             [
-                'nombre' => 'Asociación de Artesanos de Capachica',
-                'descripcion' => 'Reúne a artesanos tradicionales que elaboran textiles, cerámica y otros productos artesanales.',
-                'latitud' => -15.6425,
-                'longitud' => -69.8330,
-                'telefono' => '951987654',
-                'email' => 'artesanoscapachica@gmail.com',
+                'nombre'           => 'Asociación de Artesanos de Capachica',
+                'descripcion'      => 'Reúne a artesanos tradicionales que elaboran textiles, cerámica y otros productos artesanales.',
+                'latitud'          => -15.6425,
+                'longitud'         => -69.8330,
+                'telefono'         => '951987654',
+                'email'            => 'artesanoscapachica@gmail.com',
                 'municipalidad_id' => 1,
-                'imagen' => 'asociaciones/artesanos.jpg'
+                'imagen'           => 'asociaciones/artesanos.jpg',
             ],
             [
-                'nombre' => 'Asociación de Turismo Rural Comunitario Isla Ticonata',
-                'descripcion' => 'Familias que ofrecen servicios turísticos en la isla Ticonata.',
-                'latitud' => -15.6410,
-                'longitud' => -69.8320,
-                'telefono' => '952345678',
-                'email' => 'ticonata.trc@gmail.com',
+                'nombre'           => 'Asociación de Turismo Rural Comunitario Isla Ticonata',
+                'descripcion'      => 'Familias que ofrecen servicios turísticos en la isla Ticonata.',
+                'latitud'          => -15.6410,
+                'longitud'         => -69.8320,
+                'telefono'         => '952345678',
+                'email'            => 'ticonata.trc@gmail.com',
                 'municipalidad_id' => 1,
-                'imagen' => 'asociaciones/ticonata.jpg'
-            ]
+                'imagen'           => 'asociaciones/ticonata.jpg',
+            ],
         ];
-        
-        // Directorio para guardar las imágenes
-        $storagePath = storage_path('app/public/asociaciones');
-        if (!file_exists($storagePath)) {
-            mkdir($storagePath, 0755, true);
-        }
-        
-        foreach ($asociaciones as $asociacion) {
-            // Generar una imagen de muestra si no existe
-            $imagePath = $asociacion['imagen'];
-            $fullStoragePath = storage_path('app/public/' . $imagePath);
-            $dirname = dirname($fullStoragePath);
-            
-            if (!file_exists($dirname)) {
-                mkdir($dirname, 0755, true);
-            }
-            
-            if (!file_exists($fullStoragePath)) {
-                // Crear una imagen simple como placeholder
-                $img = imagecreatetruecolor(800, 600);
-                $bgColor = imagecolorallocate($img, rand(100, 255), rand(100, 255), rand(100, 255));
-                $textColor = imagecolorallocate($img, 0, 0, 0);
-                
-                imagefill($img, 0, 0, $bgColor);
-                imagestring($img, 5, 320, 290, $asociacion['nombre'], $textColor);
-                
-                imagejpeg($img, $fullStoragePath, 90);
-                imagedestroy($img);
-            }
-            
-            Asociacion::create($asociacion);
+
+        foreach ($asociaciones as $data) {
+            Asociacion::create($data);
         }
     }
+
     
     private function createEmprendedores()
     {
