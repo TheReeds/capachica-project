@@ -34,17 +34,17 @@ return new class extends Migration
         Schema::dropIfExists('reserva_detalle');
         Schema::dropIfExists('reservas');
         
-        // Nueva tabla de reservas
+        // Nueva tabla de reservas con estado "en_carrito" incluido
         Schema::create('reservas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->string('codigo_reserva')->unique();
-            $table->enum('estado', ['pendiente', 'confirmada', 'cancelada', 'completada'])->default('pendiente');
+            $table->enum('estado', ['en_carrito', 'pendiente', 'confirmada', 'cancelada', 'completada'])->default('pendiente');
             $table->text('notas')->nullable();
             $table->timestamps();
         });
         
-        // Crear tabla para los items de la reserva (servicios reservados)
+        // Crear tabla para los items de la reserva (servicios reservados) con estado "en_carrito" incluido
         Schema::create('reserva_servicios', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reserva_id')->constrained('reservas')->onDelete('cascade');
@@ -57,7 +57,7 @@ return new class extends Migration
             $table->integer('duracion_minutos');
             $table->integer('cantidad')->default(1);
             $table->decimal('precio', 10, 2)->nullable();
-            $table->enum('estado', ['pendiente', 'confirmado', 'cancelado', 'completado'])->default('pendiente');
+            $table->enum('estado', ['en_carrito', 'pendiente', 'confirmado', 'cancelado', 'completado'])->default('pendiente');
             $table->text('notas_cliente')->nullable();
             $table->text('notas_emprendedor')->nullable();
             $table->timestamps();

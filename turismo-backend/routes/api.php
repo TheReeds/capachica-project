@@ -19,6 +19,7 @@ use App\Http\Controllers\API\Servicios\ServicioController;
 use App\Http\Controllers\API\Planes\PlanController;
 use App\Http\Controllers\API\Planes\PlanInscripcionController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\API\Reservas\CarritoReservaController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -224,6 +225,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // Obtener reservas por servicio
         Route::get('/servicio/{servicioId}', [ReservaController::class, 'byServicio']);
     });
+    Route::get('reservas/carrito', [CarritoReservaController::class, 'obtenerCarrito']);
+    Route::post('reservas/carrito/agregar', [CarritoReservaController::class, 'agregarAlCarrito']);
+    Route::delete('reservas/carrito/servicio/{id}', [CarritoReservaController::class, 'eliminarDelCarrito']);
+    Route::post('reservas/carrito/confirmar', [CarritoReservaController::class, 'confirmarCarrito']);
+    Route::delete('reservas/carrito/vaciar', [CarritoReservaController::class, 'vaciarCarrito']);
     // Reserva Servicios (nuevas rutas)
     Route::prefix('reserva-servicios')->group(function () {
         // Obtener servicios por reserva

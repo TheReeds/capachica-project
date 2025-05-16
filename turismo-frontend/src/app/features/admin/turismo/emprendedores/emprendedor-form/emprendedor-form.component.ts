@@ -5,14 +5,20 @@ import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } fr
 import { TurismoService, Emprendedor, Asociacion, Slider } from '../../../../../core/services/turismo.service';
 import { SliderImage, SliderUploadComponent } from '../../../../../shared/components/slider-upload/slider-upload.component';
 import { ThemeService } from '../../../../../core/services/theme.service';
+import { AdminHeaderComponent } from '../../../../../shared/components/admin-header/admin-header.component';
 
 
 @Component({
   selector: 'app-emprendedor-form',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, SliderUploadComponent],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, SliderUploadComponent, AdminHeaderComponent],
   template: `
-    <div class="space-y-6 transition-colors duration-300">
+    <app-admin-header 
+      title="Crear emprendedor" 
+      subtitle="Crea un nuevo emprendedor para tu municipalidad"
+    ></app-admin-header>
+    
+    <div class="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
       <div class="sm:flex sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{{ isEditMode ? 'Editar' : 'Crear' }} Emprendedor</h1>
