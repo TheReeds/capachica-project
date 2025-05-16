@@ -1,3 +1,11 @@
+<!-- Mostrar loading en pantalla completa -->
+<div *ngIf="cargando" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-gray-900">
+  <img src="https://scontent.fjul2-1.fna.fbcdn.net/v/t39.30808-6/497890824_1885022885685780_2780375811426287422_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGNZbSpBp_1xGweQjPOKbN1CSWN0eIYysAJJY3R4hjKwE4T3uEH2C0EUEjrIB5YGcBBLhpIoYQayPvYv7na5WFW&_nc_ohc=ldL78TVrLiYQ7kNvwHIb6kZ&_nc_oc=AdnSG4mAhvGXF2SsXrhB-i7Xsx10NDWe_yiEcVeykVN4XnQo5Jypmi7tUfdrN9M0nxZsrUi5xeh5oEqeaM6MDHen&_nc_zt=23&_nc_ht=scontent.fjul2-1.fna&_nc_gid=JLB3bKbZmMQaCZBFwWk2CA&oh=00_AfI7RQTQei8uR_UFQyUhNOi4X1VXiPBMS8xuUk6xjxj4KA&oe=682C9851" alt="Cargando turismo Capachica" class="w-24 h-24 animate-bounce-slow mb-6">
+  <p class="text-xl text-amber-700 font-semibold dark:text-white">Cargando...</p>
+  <div class="mt-4 animate-spin rounded-full h-12 w-12 border-t-4 border-amber-500"></div>
+</div>
+<div *ngIf="!cargando">
+    
 <!-- Contenedor general -->
 <div class="w-full bg-orange-50 dark:bg-gray-800 overflow-hidden">
 
@@ -19,7 +27,7 @@
 
         <!-- Mensaje de carga -->
         <div *ngIf="!emprendedores || emprendedores.length === 0" class="col-span-3 text-center py-10">
-            <p class="text-lg text-gray-600 dark:text-gray-300">Cargando emprendedoras...</p>
+            <p class="text-lg text-gray-600 dark:text-gray-300">Cargando emprendedores...</p>
         </div>
 
         <!-- Tarjetas dinámicas -->
@@ -54,4 +62,6 @@
 
         </div>
     </div>
+</div>
+
 </div>

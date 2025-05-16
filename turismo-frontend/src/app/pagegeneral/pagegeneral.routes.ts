@@ -12,6 +12,7 @@ import { AlimentacionComponent } from './servicio/alimentacion/alimentacion.comp
 import { ArtesaniaComponent } from './servicio/artesania/artesania.component';
 import { GuiadoComponent } from './servicio/guiado/guiado.component';
 import { TransporteComponent } from './servicio/transporte/transporte.component';
+import { ReservasComponent } from './reservas/reservas.component';
 
 
 export const PAGEGENERAL_ROUTES: Routes = [
@@ -92,7 +93,21 @@ export const PAGEGENERAL_ROUTES: Routes = [
       path: 'detallefamilias/:id',
       component: DetallefamiliasComponent,
       title: 'Detalle de Familias'
-    }],
+    },
+
+    { path: 'contactos', 
+      component: ContactosComponent, 
+      title: 'Contactos' 
+    },
+
+    { path: 'reservas/:id', 
+      component: ReservasComponent, 
+      title: 'Reservas' 
+    },
+  
+  
+  
+  ],
 
 
 
