@@ -88,14 +88,7 @@ export const PAGEGENERAL_ROUTES: Routes = [
       loadChildren: () =>
         import('./servicio/servicios/servicios.routes').then(m => m.SERVICIOS_ROUTES)
     },
-
-    {
-      path: 'detallefamilias/:id',
-      component: DetallefamiliasComponent,
-      title: 'Detalle de Familias'
-    },
-
-    { path: 'contactos', 
+   { path: 'contactos', 
       component: ContactosComponent, 
       title: 'Contactos' 
     },
@@ -104,11 +97,12 @@ export const PAGEGENERAL_ROUTES: Routes = [
       component: ReservasComponent, 
       title: 'Reservas' 
     },
-  
-  
-  
-  ],
-
+    {
+      path: 'detallefamilias/:id',
+      component: DetallefamiliasComponent,
+      title: 'Detalle de Familias'
+    }],
+    
 
 
    }

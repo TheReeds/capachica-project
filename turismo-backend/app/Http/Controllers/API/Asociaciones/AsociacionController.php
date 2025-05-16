@@ -113,7 +113,7 @@ class AsociacionController extends Controller
                 'telefono' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:255',
                 'municipalidad_id' => 'sometimes|required|exists:municipalidad,id',
-                'estado' => 'boolean',
+                'estado' => 'required|in:0,1,true,false',
                 'imagen' => 'nullable|image|max:2048', // 2MB max
             ]);
 

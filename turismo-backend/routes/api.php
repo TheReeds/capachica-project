@@ -117,7 +117,7 @@ Route::prefix('categorias')->group(function () {
     Route::get('/', [CategoriaController::class, 'index']);
     Route::get('/{id}', [CategoriaController::class, 'show']);
 });
-
+Route::get('/users/search', [UserController::class, 'search']);
 // Evento
 
 Route::prefix('eventos')->group(function () {

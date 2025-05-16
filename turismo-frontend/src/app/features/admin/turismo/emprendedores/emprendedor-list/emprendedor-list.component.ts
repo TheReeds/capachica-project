@@ -16,15 +16,15 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
       subtitle="Administra y gestiona los emprendedores de tu organización"
     ></app-admin-header>
     
-    <div class="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Emprendedores</h1>
+    <div class="container mx-auto px-2 sm:px-4 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestión de Emprendedores</h1>
         <div class="mt-4 sm:mt-0">
           <a 
             routerLink="/admin/emprendedores/create" 
-            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
+            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
           >
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             Nuevo Emprendedor
@@ -33,7 +33,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
       </div>
       
       <!-- Filtros -->
-      <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors duration-200">
+      <div class="rounded-lg bg-white dark:bg-gray-800 p-4 sm:p-6 shadow-sm transition-colors duration-200 mb-6">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
@@ -62,6 +62,8 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
                 <option value="Alojamiento">Alojamiento</option>
                 <option value="Guía">Guía</option>
                 <option value="Transporte">Transporte</option>
+                <option value="Actividades">Actividades</option>
+                <option value="Alimentación">Alimentación</option>
                 <option value="Otro">Otro</option>
               </select>
             </div>
@@ -88,9 +90,9 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
             <button 
               type="button" 
               (click)="applyFilters()" 
-              class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
+              class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
             >
-              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
               </svg>
               Filtrar
@@ -127,41 +129,41 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
               <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Emprendedor</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tipo de Servicio</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ubicación</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asociación</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categoría</th>
-                  <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
+                  <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Emprendedor</th>
+                  <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tipo de Servicio</th>
+                  <th scope="col" class="hidden md:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ubicación</th>
+                  <th scope="col" class="hidden lg:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asociación</th>
+                  <th scope="col" class="hidden sm:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categoría</th>
+                  <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
               <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 @for (emprendedor of pagination.data; track emprendedor.id) {
                   <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="px-3 py-4 whitespace-nowrap">
                       <div class="flex items-center">
-                        @if (emprendedor.imagenes && emprendedor.imagenes.length > 0) {
-                          <div class="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
-                            <img [src]="emprendedor.imagenes[0]" alt="Imagen de emprendedor" class="h-full w-full object-cover">
-                          </div>
-                        } @else {
-                          <div class="h-10 w-10 flex-shrink-0 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
-                            <span class="text-primary-800 dark:text-primary-300 font-medium">{{ getEmprendedorInitials(emprendedor) }}</span>
-                          </div>
-                        }
-                        <div class="ml-4">
+                        <div class="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
+                          @if (getEmprendedorImage(emprendedor)) {
+                            <img [src]="getEmprendedorImage(emprendedor)" alt="Imagen de {{ emprendedor.nombre }}" class="h-full w-full object-cover">
+                          } @else {
+                            <div class="h-full w-full flex items-center justify-center bg-primary-100 dark:bg-primary-900/40">
+                              <span class="text-primary-800 dark:text-primary-300 font-medium">{{ getEmprendedorInitials(emprendedor) }}</span>
+                            </div>
+                          }
+                        </div>
+                        <div class="ml-3">
                           <div class="text-sm font-medium text-gray-900 dark:text-white">{{ emprendedor.nombre }}</div>
                           <div class="text-sm text-gray-500 dark:text-gray-400">{{ emprendedor.email }}</div>
                         </div>
                       </div>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="px-3 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900 dark:text-white">{{ emprendedor.tipo_servicio }}</div>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-500 dark:text-gray-400">{{ emprendedor.ubicacion }}</div>
+                    <td class="hidden md:table-cell px-3 py-4">
+                      <div class="text-sm text-gray-500 dark:text-gray-400 max-w-[200px] truncate">{{ emprendedor.ubicacion }}</div>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="hidden lg:table-cell px-3 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900 dark:text-white">
                         @if (emprendedor.asociacion) {
                           {{ emprendedor.asociacion.nombre }}
@@ -170,15 +172,13 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
                         }
                       </div>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="hidden sm:table-cell px-3 py-4 whitespace-nowrap">
                       <span class="inline-flex rounded-full bg-green-100 dark:bg-green-900/40 px-2 py-0.5 text-xs font-medium text-green-800 dark:text-green-300 transition-colors duration-200">
                         {{ emprendedor.categoria }}
                       </span>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="flex items-center justify-end space-x-2">
-                        
-                        
+                    <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div class="flex items-center justify-end space-x-1 sm:space-x-2">
                         <a 
                           [routerLink]="['/admin/emprendedores/edit', emprendedor.id]" 
                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
@@ -198,18 +198,20 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                           </svg>
                         </a>
+                        
                         <a 
-                          [routerLink]="['/admin/emprendedores/asignaradministrador', emprendedor.id]" 
-                          class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 transition-colors duration-200"
+                          [routerLink]="['/admin/emprendedores', emprendedor.id, 'asignaradministrador']" 
+                          class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-200"
                           title="Asignar administrador"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                           </svg>
                         </a>
+                        
                         <a 
                           [routerLink]="['/admin/reservas/emprendedor', emprendedor.id]" 
-                          class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-200"
+                          class="hidden sm:inline-block text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300 transition-colors duration-200"
                           title="Ver reservas"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,14 +238,14 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
           
           <!-- Paginación -->
           @if (pagination) {
-            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 sm:px-6">
-              <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div class="bg-white dark:bg-gray-800 px-3 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 sm:px-4">
+              <div class="flex sm:flex-1 sm:flex sm:items-center sm:justify-between flex-col sm:flex-row">
                 <div>
                   <p class="text-sm text-gray-700 dark:text-gray-300">
                     Mostrando <span class="font-medium">{{ pagination.from || 0 }}</span> a <span class="font-medium">{{ pagination.to || 0 }}</span> de <span class="font-medium">{{ pagination.total }}</span> resultados
                   </p>
                 </div>
-                <div>
+                <div class="mt-2 sm:mt-0">
                   <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                     <button
                       (click)="goToPage(currentPage - 1)"
@@ -259,7 +261,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
                     </button>
                     
                     @for (link of pagination.links; track $index) {
-                      @if (link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;') {
+                      @if (link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;' && isValidPageNumber(link.label)) {
                         <button
                           (click)="goToPage(+link.label)"
                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium transition-colors duration-200"
@@ -338,9 +340,6 @@ export class EmprendedorListComponent implements OnInit {
   loadEmprendedores() {
     this.loading = true;
     
-    // Como el método getEmprendedores no acepta un tercer parámetro para filtros,
-    // tenemos que construir una URL con query params o modificar el service
-    // Por ahora, usaremos solo la paginación básica
     this.turismoService.getEmprendedores(this.currentPage, this.itemsPerPage).subscribe({
       next: (response) => {
         this.pagination = response;
@@ -356,6 +355,48 @@ export class EmprendedorListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+  
+  // Método para obtener la imagen del emprendedor
+  getEmprendedorImage(emprendedor: Emprendedor): string | null {
+    // Primero verificamos si hay sliders principales
+    if (emprendedor.sliders_principales && emprendedor.sliders_principales.length > 0) {
+      return emprendedor.sliders_principales[0].url_completa || null;
+    }
+    
+    // Luego verificamos las imágenes
+    if (emprendedor.imagenes) {
+      // Puede ser un string o un array
+      if (typeof emprendedor.imagenes === 'string') {
+        try {
+          // Intentar parsear como JSON (formato "[\"imagen1.jpg\",\"imagen2.jpg\"]")
+          const imgArray = JSON.parse(emprendedor.imagenes);
+          if (Array.isArray(imgArray) && imgArray.length > 0) {
+            // Si es una ruta relativa, asumimos que necesita prefijo
+            if (imgArray[0].startsWith('http')) {
+              return imgArray[0];
+            } else {
+              // Agregar prefijo de la URL base de imágenes
+              return `${this.getBaseStorageUrl()}/${imgArray[0]}`;
+            }
+          }
+        } catch (e) {
+          // Si no se puede parsear, usar el string directamente
+          return emprendedor.imagenes;
+        }
+      } else if (Array.isArray(emprendedor.imagenes) && emprendedor.imagenes.length > 0) {
+        return emprendedor.imagenes[0];
+      }
+    }
+    
+    return null;
+  }
+  
+  // URL base para imágenes almacenadas
+  getBaseStorageUrl(): string {
+    // Extraer la base URL del API
+    const apiUrl = this.turismoService['API_URL'] || 'http://127.0.0.1:8000';
+    return `${apiUrl}/storage`;
   }
   
   // Método para filtrar resultados localmente
@@ -455,5 +496,8 @@ export class EmprendedorListComponent implements OnInit {
   // Helper method to check if dark mode is active
   isDarkMode(): boolean {
     return this.themeService.isDarkMode();
+  }
+  isValidPageNumber(value: any): boolean {
+    return !isNaN(+value);
   }
 }
