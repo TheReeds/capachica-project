@@ -59,7 +59,27 @@ class UserController extends Controller
             'available_roles' => Role::all(['id', 'name']),
         ]);
     }
-
+    public function search(Request $request)
+    {
+        $query = $request->get('q', '');
+        
+        if (empty($query)) {
+            return response()->json([
+                'success' => true,
+                'data' => []
+            ]);
+        }
+        
+        $users = User::where('email', 'like', "%{$query}%")
+                    ->orWhere('name', 'like', "%{$query}%")
+                    ->limit(10)
+                    ->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => UserResource::collection($users)
+        ]);
+}
     /**
      * Store a newly created user.
      */

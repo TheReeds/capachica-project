@@ -151,13 +151,13 @@ class MenuController extends Controller
                 'children' => [
                     [
                         'id' => 'reserva-list',
-                        'title' => 'Lista de Reservas',
+                        'title' => 'Gestion de Reservas',
                         'path' => '/admin/reservas',
-                        'permissions' => ['user_read'],
+                        'permissions' => ['reserva_create'],
                     ],
                     [
                         'id' => 'reserva-create',
-                        'title' => 'Crear Reserva',
+                        'title' => 'Mis Reservas',
                         'path' => '/admin/reservas/create',
                         'permissions' => ['user_read'],
                     ],

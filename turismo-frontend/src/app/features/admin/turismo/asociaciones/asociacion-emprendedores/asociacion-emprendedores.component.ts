@@ -2,26 +2,32 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { TurismoService, Asociacion, Emprendedor } from '../../../../../core/services/turismo.service';
+import { AdminHeaderComponent } from '../../../../../shared/components/admin-header/admin-header.component';
 
 @Component({
   selector: 'app-asociacion-emprendedores',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AdminHeaderComponent],
   template: `
-    <div class="space-y-6">
-      <div class="sm:flex sm:items-center sm:justify-between">
+    <app-admin-header 
+      title="Gestión de Asociaciones" 
+      subtitle="Administra y gestiona las asociaciones de tu organización"
+    ></app-admin-header>
+
+    <div class="container mx-auto px-2 sm:px-4 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+      <div class="sm:flex sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Emprendedores de {{ asociacion?.nombre }}</h1>
-          <p class="mt-1 text-sm text-gray-500" *ngIf="asociacion">
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">Emprendedores de {{ asociacion?.nombre }}</h1>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200" *ngIf="asociacion">
             Gestione los emprendedores que pertenecen a esta asociación.
           </p>
         </div>
         <div class="mt-4 sm:mt-0 flex space-x-3">
           <a 
             routerLink="/admin/asociaciones" 
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            class="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200"
           >
-            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="-ml-0.5 mr-1.5 h-4 w-4 text-gray-500 dark:text-gray-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
             Volver
@@ -30,9 +36,9 @@ import { TurismoService, Asociacion, Emprendedor } from '../../../../../core/ser
           <a 
             routerLink="/admin/emprendedores/create" 
             [queryParams]="{asociacion_id: asociacionId}"
-            class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200"
           >
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             Nuevo Emprendedor
@@ -41,24 +47,24 @@ import { TurismoService, Asociacion, Emprendedor } from '../../../../../core/ser
       </div>
       
       <!-- Lista de emprendedores -->
-      <div class="rounded-lg bg-white shadow-sm overflow-hidden">
+      <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors duration-200">
         @if (loading) {
           <div class="flex justify-center items-center p-8">
-            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
-            <span class="ml-4">Cargando emprendedores...</span>
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 dark:border-primary-500 border-r-transparent"></div>
+            <span class="ml-4 text-gray-700 dark:text-gray-200 transition-colors duration-200">Cargando emprendedores...</span>
           </div>
         } @else if (emprendedores.length === 0) {
           <div class="p-8 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No hay emprendedores</h3>
-            <p class="mt-1 text-sm text-gray-500">Comience creando un nuevo emprendedor para esta asociación.</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">No hay emprendedores</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">Comience creando un nuevo emprendedor para esta asociación.</p>
             <div class="mt-6">
               <a 
                 routerLink="/admin/emprendedores/create" 
                 [queryParams]="{asociacion_id: asociacionId}"
-                class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200"
               >
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -69,61 +75,65 @@ import { TurismoService, Asociacion, Emprendedor } from '../../../../../core/ser
           </div>
         } @else {
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
+              <thead class="bg-gray-50 dark:bg-gray-700 transition-colors duration-200">
                 <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Servicio</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ubicación</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Nombre</th>
+                  <th scope="col" class="hidden sm:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Tipo de Servicio</th>
+                  <th scope="col" class="hidden md:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Ubicación</th>
+                  <th scope="col" class="hidden lg:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Contacto</th>
+                  <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Categoría</th>
+                  <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
                 @for (emprendedor of emprendedores; track emprendedor.id) {
-                  <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
+                    <td class="px-3 py-4 whitespace-nowrap">
                       <div class="flex items-center">
-                        @if (emprendedor.imagenes && emprendedor.imagenes.length > 0) {
-                          <div class="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-100">
+                        @if (emprendedor.sliders_principales && emprendedor.sliders_principales.length > 0) {
+                          <div class="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 transition-colors duration-200">
+                            <img [src]="emprendedor.sliders_principales[0].url_completa" alt="Imagen de emprendedor" class="h-full w-full object-cover">
+                          </div>
+                        } @else if (emprendedor.imagenes && emprendedor.imagenes.length > 0) {
+                          <div class="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 transition-colors duration-200">
                             <img [src]="emprendedor.imagenes[0]" alt="Imagen de emprendedor" class="h-full w-full object-cover">
                           </div>
                         } @else {
-                          <div class="h-10 w-10 flex-shrink-0 rounded-full bg-primary-100 flex items-center justify-center">
-                            <span class="text-primary-800 font-medium">{{ getEmprendedorInitials(emprendedor) }}</span>
+                          <div class="h-10 w-10 flex-shrink-0 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center transition-colors duration-200">
+                            <span class="text-primary-800 dark:text-primary-300 font-medium transition-colors duration-200">{{ getEmprendedorInitials(emprendedor) }}</span>
                           </div>
                         }
-                        <div class="ml-4">
-                          <div class="text-sm font-medium text-gray-900">{{ emprendedor.nombre }}</div>
-                          <div class="text-sm text-gray-500">{{ emprendedor.email }}</div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">{{ emprendedor.nombre }}</div>
+                          <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">{{ emprendedor.email }}</div>
                         </div>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">{{ emprendedor.tipo_servicio }}</div>
+                    <td class="hidden sm:table-cell px-3 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900 dark:text-white transition-colors duration-200">{{ emprendedor.tipo_servicio }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-500">{{ emprendedor.ubicacion }}</div>
+                    <td class="hidden md:table-cell px-3 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">{{ emprendedor.ubicacion }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-500">
+                    <td class="hidden lg:table-cell px-3 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">
                         <div>{{ emprendedor.telefono }}</div>
                         @if (emprendedor.pagina_web) {
-                          <div class="truncate max-w-xs">{{ emprendedor.pagina_web }}</div>
+                          <div class="truncate max-w-[150px]">{{ emprendedor.pagina_web }}</div>
                         }
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                    <td class="px-3 py-4 whitespace-nowrap">
+                      <span class="inline-flex rounded-full bg-green-100 dark:bg-green-900/40 px-2 py-0.5 text-xs font-medium text-green-800 dark:text-green-300 transition-colors duration-200">
                         {{ emprendedor.categoria }}
                       </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="flex items-center justify-end space-x-2">
+                    <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div class="flex items-center justify-end space-x-1 sm:space-x-2">
                         <a 
                           [routerLink]="['/admin/emprendedores/edit', emprendedor.id]" 
-                          class="text-primary-600 hover:text-primary-900"
+                          class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
                           title="Editar"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +143,7 @@ import { TurismoService, Asociacion, Emprendedor } from '../../../../../core/ser
                         
                         <a 
                           [routerLink]="['/admin/emprendedores', emprendedor.id, 'servicios']" 
-                          class="text-green-600 hover:text-green-900"
+                          class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 transition-colors duration-200"
                           title="Ver servicios"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +153,7 @@ import { TurismoService, Asociacion, Emprendedor } from '../../../../../core/ser
                         
                         <button 
                           (click)="deleteEmprendedor(emprendedor)" 
-                          class="text-red-600 hover:text-red-900"
+                          class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors duration-200"
                           title="Eliminar"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

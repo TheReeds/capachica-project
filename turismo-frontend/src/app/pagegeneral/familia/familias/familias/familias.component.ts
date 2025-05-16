@@ -15,9 +15,13 @@ export class FamiliasComponent implements OnInit {
 
 constructor(private emprendedorService: EmprendedorService) {}
 
+cargando = true;
+
 ngOnInit() {
 
-  
+  setTimeout(() => {
+    this.cargando = false; // cuando termines de cargar los datos
+  }, 2000);
 
   this.emprendedorService.getAllEmprendedores().subscribe(data => {
     this.emprendedores = data;

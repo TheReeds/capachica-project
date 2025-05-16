@@ -112,6 +112,10 @@ export interface Asociacion {
   email?: string;
   municipalidad_id: number;
   estado?: boolean;
+  latitud?: number;
+  longitud?: number;
+  imagen?: File | string | null;
+  imagen_url?: string;
   created_at?: string;
   updated_at?: string;
   municipalidad?: Municipalidad;
@@ -159,6 +163,7 @@ export interface Servicio {
   emprendedor_id: number;
   estado?: boolean;
   // Nuevos campos
+  capacidad?: string;
   latitud?: number;
   longitud?: number;
   ubicacion_referencia?: string;
@@ -529,15 +534,49 @@ export class TurismoService {
   }
 
   createAsociacion(asociacion: Asociacion): Observable<Asociacion> {
-    const formData = this.prepareFormData(asociacion);
+    const formData = new FormData();
+    
+    // Añadir todos los campos al FormData
+    if (asociacion.nombre) formData.append('nombre', asociacion.nombre);
+    if (asociacion.descripcion) formData.append('descripcion', asociacion.descripcion);
+    if (asociacion.telefono) formData.append('telefono', asociacion.telefono);
+    if (asociacion.email) formData.append('email', asociacion.email);
+    if (asociacion.municipalidad_id) formData.append('municipalidad_id', asociacion.municipalidad_id.toString());
+    if (asociacion.estado !== undefined) formData.append('estado', asociacion.estado ? '1' : '0');
+    if (asociacion.latitud) formData.append('latitud', asociacion.latitud.toString());
+    if (asociacion.longitud) formData.append('longitud', asociacion.longitud.toString());
+    
+    // Si hay una imagen como File, adjuntarla
+    if (asociacion.imagen instanceof File) {
+      formData.append('imagen', asociacion.imagen);
+    }
+    
     return this.http.post<{ success: boolean, data: Asociacion, message: string }>(`${this.API_URL}/asociaciones`, formData,
       { headers: this.getHeaders() })
       .pipe(map(response => response.data));
   }
 
   updateAsociacion(id: number, asociacion: Asociacion): Observable<Asociacion> {
-    const formData = this.prepareFormData(asociacion);
+    const formData = new FormData();
+    
+    // Añadir método PUT
     formData.append('_method', 'PUT');
+    
+    // Añadir todos los campos al FormData
+    if (asociacion.nombre) formData.append('nombre', asociacion.nombre);
+    if (asociacion.descripcion) formData.append('descripcion', asociacion.descripcion);
+    if (asociacion.telefono) formData.append('telefono', asociacion.telefono);
+    if (asociacion.email) formData.append('email', asociacion.email);
+    if (asociacion.municipalidad_id) formData.append('municipalidad_id', asociacion.municipalidad_id.toString());
+    if (asociacion.estado !== undefined) formData.append('estado', asociacion.estado ? '1' : '0');
+    if (asociacion.latitud) formData.append('latitud', asociacion.latitud.toString());
+    if (asociacion.longitud) formData.append('longitud', asociacion.longitud.toString());
+    
+    // Si hay una imagen como File, adjuntarla
+    if (asociacion.imagen instanceof File) {
+      formData.append('imagen', asociacion.imagen);
+    }
+    
     return this.http.post<{ success: boolean, data: Asociacion, message: string }>(`${this.API_URL}/asociaciones/${id}`, formData,
       { headers: this.getHeaders() })
       .pipe(map(response => response.data));
