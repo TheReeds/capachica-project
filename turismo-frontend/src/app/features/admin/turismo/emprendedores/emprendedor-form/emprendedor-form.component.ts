@@ -16,7 +16,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
       <div class="sm:flex sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{{ isEditMode ? 'Editar' : 'Crear' }} Emprendedor</h1>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-300 transition-colors duration-300">
             {{ isEditMode ? 'Actualice la información del emprendedor.' : 'Complete el formulario para crear un nuevo emprendedor.' }}
           </p>
         </div>
@@ -108,7 +108,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Tipo de Servicio -->
                       <div class="sm:col-span-2">
-                        <label for="tipo_servicio" class="block text-sm font-medium text-gray-700">Tipo de Servicio</label>
+                        <label for="tipo_servicio" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tipo de Servicio</label>
                         <div class="mt-1">
                           <select
                             id="tipo_servicio"
@@ -131,7 +131,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Descripción -->
                       <div class="sm:col-span-6">
-                        <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+                        <label for="descripcion" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Descripción</label>
                         <div class="mt-1">
                           <textarea
                             id="descripcion"
@@ -147,7 +147,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Categoría -->
                       <div class="sm:col-span-3">
-                        <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
+                        <label for="categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Categoría</label>
                         <div class="mt-1">
                           <select
                             id="categoria"
@@ -171,7 +171,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Asociación -->
                       <div class="sm:col-span-3">
-                        <label for="asociacion_id" class="block text-sm font-medium text-gray-700">Asociación</label>
+                        <label for="asociacion_id" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Asociación</label>
                         <div class="mt-1">
                           <select
                             id="asociacion_id"
@@ -190,11 +190,11 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                   <!-- Información de contacto -->
                   <div class="pt-6 border-t border-gray-200">
-                    <h2 class="text-lg font-medium text-gray-900">Información de Contacto</h2>
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">Información de Contacto</h2>
                     <div class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                       <!-- Ubicación -->
                       <div class="sm:col-span-6">
-                        <label for="ubicacion" class="block text-sm font-medium text-gray-700">Ubicación</label>
+                        <label for="ubicacion" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Ubicación</label>
                         <div class="mt-1">
                           <input
                             type="text"
@@ -210,7 +210,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Teléfono -->
                       <div class="sm:col-span-3">
-                        <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
+                        <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Teléfono</label>
                         <div class="mt-1">
                           <input
                             type="text"
@@ -226,7 +226,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Email -->
                       <div class="sm:col-span-3">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
                         <div class="mt-1">
                           <input
                             type="email"
@@ -242,7 +242,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Página web -->
                       <div class="sm:col-span-3">
-                        <label for="pagina_web" class="block text-sm font-medium text-gray-700">Página Web</label>
+                        <label for="pagina_web" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Página Web</label>
                         <div class="mt-1">
                           <input
                             type="url"
@@ -255,7 +255,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Horario -->
                       <div class="sm:col-span-3">
-                        <label for="horario_atencion" class="block text-sm font-medium text-gray-700">Horario de Atención</label>
+                        <label for="horario_atencion" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Horario de Atención</label>
                         <div class="mt-1">
                           <input
                             type="text"
@@ -275,11 +275,11 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                 <div class="space-y-6">
                   <!-- Detalles del negocio -->
                   <div>
-                    <h2 class="text-lg font-medium text-gray-900">Detalles del Negocio</h2>
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">Detalles del Negocio</h2>
                     <div class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                       <!-- Rango de precios -->
                       <div class="sm:col-span-2">
-                        <label for="precio_rango" class="block text-sm font-medium text-gray-700">Rango de Precios</label>
+                        <label for="precio_rango" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Rango de Precios</label>
                         <div class="mt-1">
                           <input
                             type="text"
@@ -293,7 +293,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Capacidad de aforo -->
                       <div class="sm:col-span-2">
-                        <label for="capacidad_aforo" class="block text-sm font-medium text-gray-700">Capacidad de Aforo</label>
+                        <label for="capacidad_aforo" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Capacidad de Aforo</label>
                         <div class="mt-1">
                           <input
                             type="number"
@@ -307,7 +307,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Número de personas que atiende -->
                       <div class="sm:col-span-2">
-                        <label for="numero_personas_atiende" class="block text-sm font-medium text-gray-700">Personas que Atiende</label>
+                        <label for="numero_personas_atiende" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Personas que Atiende</label>
                         <div class="mt-1">
                           <input
                             type="number"
@@ -321,7 +321,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Métodos de pago -->
                       <div class="sm:col-span-6">
-                        <label class="block text-sm font-medium text-gray-700">Métodos de Pago</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Métodos de Pago</label>
                         <div class="mt-1 space-y-2">
                           <div class="flex items-center">
                             <input
@@ -331,7 +331,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="togglePaymentMethod('Efectivo', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="metodo_efectivo" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Efectivo</label>
+                            <label for="metodo_efectivo" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Efectivo</label>
                           </div>
                           <div class="flex items-center">
                             <input
@@ -341,7 +341,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="togglePaymentMethod('Tarjeta', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="metodo_tarjeta" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Tarjeta de Crédito/Débito</label>
+                            <label for="metodo_tarjeta" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Tarjeta de Crédito/Débito</label>
                           </div>
                           <div class="flex items-center">
                             <input
@@ -351,7 +351,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="togglePaymentMethod('Transferencia', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="metodo_transferencia" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Transferencia Bancaria</label>
+                            <label for="metodo_transferencia" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Transferencia Bancaria</label>
                           </div>
                           <div class="flex items-center">
                             <input
@@ -361,7 +361,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="togglePaymentMethod('Yape', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="metodo_yape" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Yape</label>
+                            <label for="metodo_yape" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Yape</label>
                           </div>
                           <div class="flex items-center">
                             <input
@@ -371,14 +371,14 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="togglePaymentMethod('Plin', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="metodo_plin" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Plin</label>
+                            <label for="metodo_plin" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Plin</label>
                           </div>
                         </div>
                       </div>
 
                       <!-- Idiomas hablados -->
                       <div class="sm:col-span-6">
-                        <label class="block text-sm font-medium text-gray-700">Idiomas Hablados</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Idiomas Hablados</label>
                         <div class="mt-1 space-y-2">
                           <div class="flex items-center">
                             <input
@@ -388,7 +388,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="toggleLanguage('Español', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="idioma_espanol" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Español</label>
+                            <label for="idioma_espanol" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Español</label>
                           </div>
                           <div class="flex items-center">
                             <input
@@ -398,7 +398,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="toggleLanguage('Inglés', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="idioma_ingles" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Inglés</label>
+                            <label for="idioma_ingles" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Inglés</label>
                           </div>
                           <div class="flex items-center">
                             <input
@@ -408,7 +408,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="toggleLanguage('Quechua', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="idioma_quechua" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Quechua</label>
+                            <label for="idioma_quechua" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Quechua</label>
                           </div>
                           <div class="flex items-center">
                             <input
@@ -418,14 +418,14 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               (change)="toggleLanguage('Aymara', $event)"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="idioma_aymara" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">Aymara</label>
+                            <label for="idioma_aymara" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">Aymara</label>
                           </div>
                         </div>
                       </div>
 
                       <!-- Opciones de acceso -->
                       <div class="sm:col-span-3">
-                        <label for="opciones_acceso" class="block text-sm font-medium text-gray-700">Opciones de Acceso</label>
+                        <label for="opciones_acceso" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Opciones de Acceso</label>
                         <div class="mt-1">
                           <input
                             type="text"
@@ -439,7 +439,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 
                       <!-- Facilidades para discapacitados -->
                       <div class="sm:col-span-3">
-                        <label class="block text-sm font-medium text-gray-700">Facilidades para Discapacitados</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Facilidades para Discapacitados</label>
                         <div class="mt-2">
                           <div class="flex items-center">
                             <input
@@ -448,7 +448,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                               formControlName="facilidades_discapacidad"
                               class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300"
                             >
-                            <label for="facilidades_discapacidad" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">
+                            <label for="facilidades_discapacidad" class="ml-2 block text-sm text-gray-700 dark:text-gray-200 transition-colors duration-300">
                               Cuenta con facilidades para personas con discapacidad
                             </label>
                           </div>
@@ -468,6 +468,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                     [slidersFormArray]="slidersPrincipalesArray"
                     [existingSliders]="slidersPrincipales"
                     [isSliderPrincipal]="true"
+                    [isDarkMode]="isDarkMode()"
                     (changeSlidersEvent)="onSlidersPrincipalesChange($event)"
                     (deletedSlidersEvent)="onDeletedSlidersPrincipalesChange($event)"
                   ></app-slider-upload>
@@ -478,6 +479,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                     [slidersFormArray]="slidersSecundariosArray"
                     [existingSliders]="slidersSecundarios"
                     [isSliderPrincipal]="false"
+                    [isDarkMode]="isDarkMode()"
                     (changeSlidersEvent)="onSlidersSecundariosChange($event)"
                     (deletedSlidersEvent)="onDeletedSlidersSecundariosChange($event)"
                   ></app-slider-upload>

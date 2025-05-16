@@ -20,8 +20,8 @@ export interface SliderImage {
   template: `
     <div class="space-y-4">
       <div class="flex justify-between items-center">
-        <h3 class="text-lg font-medium text-gray-900">{{ title }}</h3>
-        <button 
+        <h3 class="text-lg font-medium text-gray-900" [ngClass]="{'dark:text-white': isDarkMode}">{{ title }}</h3>
+        <button
           type="button"
           (click)="addSlider()"
           class="inline-flex items-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -32,7 +32,7 @@ export interface SliderImage {
           Añadir Imagen
         </button>
       </div>
-      
+
       <!-- Vista previa de sliders -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @for (control of sliderControls; track i; let i = $index) {
@@ -50,7 +50,7 @@ export interface SliderImage {
                     <span>Selecciona una imagen</span>
                   </div>
                 }
-                <button 
+                <button
                   type="button"
                   class="absolute top-2 right-2 bg-red-100 text-red-600 p-1 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500"
                   (click)="removeSlider(i)"
@@ -61,15 +61,15 @@ export interface SliderImage {
                   </svg>
                 </button>
               </div>
-              
+
               <div class="p-4 space-y-3">
                 <!-- Nombre -->
                 <div>
                   <label [for]="'slider-nombre-' + i" class="block text-sm font-medium text-gray-700">Nombre</label>
                   <div class="mt-1">
-                    <input 
-                      [id]="'slider-nombre-' + i" 
-                      type="text" 
+                    <input
+                      [id]="'slider-nombre-' + i"
+                      type="text"
                       formControlName="nombre"
                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                       (input)="onInputChange()"
@@ -79,17 +79,17 @@ export interface SliderImage {
                     <p class="mt-1 text-sm text-red-600">El nombre es obligatorio</p>
                   }
                 </div>
-                
+
                 <!-- Tipo de slider (ahora oculto, solo para mantener compatibilidad) -->
                 <input type="hidden" formControlName="es_principal">
-                
+
                 <!-- Orden -->
                 <div>
                   <label [for]="'slider-orden-' + i" class="block text-sm font-medium text-gray-700">Orden</label>
                   <div class="mt-1">
-                    <input 
-                      [id]="'slider-orden-' + i" 
-                      type="number" 
+                    <input
+                      [id]="'slider-orden-' + i"
+                      type="number"
                       formControlName="orden"
                       min="1"
                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -97,13 +97,13 @@ export interface SliderImage {
                     >
                   </div>
                 </div>
-                
+
                 <!-- Subir archivo -->
                 <div>
                   <label [for]="'slider-imagen-' + i" class="block text-sm font-medium text-gray-700">Imagen (máx. 5MB)</label>
                   <div class="mt-1">
-                    <input 
-                      [id]="'slider-imagen-' + i" 
+                    <input
+                      [id]="'slider-imagen-' + i"
                       type="file"
                       accept="image/*"
                       (change)="onFileSelected($event, i)"
@@ -114,15 +114,15 @@ export interface SliderImage {
                     <p class="mt-1 text-sm text-red-600">{{ fileErrors[i] }}</p>
                   }
                 </div>
-                
+
                 @if (!isSliderPrincipal) {
                   <!-- Título (solo para sliders secundarios) -->
                   <div>
                     <label [for]="'slider-titulo-' + i" class="block text-sm font-medium text-gray-700">Título</label>
                     <div class="mt-1">
-                      <input 
-                        [id]="'slider-titulo-' + i" 
-                        type="text" 
+                      <input
+                        [id]="'slider-titulo-' + i"
+                        type="text"
                         formControlName="titulo"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                         (input)="onInputChange()"
@@ -132,13 +132,13 @@ export interface SliderImage {
                       <p class="mt-1 text-sm text-red-600">El título es obligatorio para sliders secundarios</p>
                     }
                   </div>
-                  
+
                   <!-- Descripción (solo para sliders secundarios) -->
                   <div>
                     <label [for]="'slider-descripcion-' + i" class="block text-sm font-medium text-gray-700">Descripción</label>
                     <div class="mt-1">
-                      <textarea 
-                        [id]="'slider-descripcion-' + i" 
+                      <textarea
+                        [id]="'slider-descripcion-' + i"
                         formControlName="descripcion"
                         rows="3"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -151,16 +151,16 @@ export interface SliderImage {
             </div>
           </div>
         }
-        
+
         @if (sliderControls.length === 0) {
           <div class="col-span-full p-6 text-center border-2 border-dashed border-gray-300 rounded-lg">
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No hay imágenes</h3>
+            <h3 class="mt-2 text-sm font-medium" [ngClass]="{'dark:text-gray-300': isDarkMode}" >No hay imágenes</h3>
             <p class="mt-1 text-sm text-gray-500">Añade imágenes para los sliders</p>
             <div class="mt-6">
-              <button 
+              <button
                 type="button"
                 (click)="addSlider()"
                 class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -182,31 +182,32 @@ export class SliderUploadComponent implements OnInit {
   @Input() slidersFormArray!: FormArray;
   @Input() existingSliders: SliderImage[] = [];
   @Input() isSliderPrincipal: boolean = true; // Indicador si este componente maneja sliders principales
+  @Input() isDarkMode: boolean = false;
   @Output() changeSlidersEvent = new EventEmitter<SliderImage[]>();
   @Output() deletedSlidersEvent = new EventEmitter<number[]>();
-  
+
   private filePreviewUrls: {[index: number]: string | ArrayBuffer | null} = {};
   private fileStore: {[index: number]: File | null} = {}; // Almacén para archivos de imagen
   private deletedSliderIds: number[] = [];
   fileErrors: {[index: number]: string} = {}; // Para almacenar errores de archivo
-  
+
   // Constante para el tamaño máximo de archivo (5MB)
   private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
-  
+
   constructor(private fb: FormBuilder) {}
-  
+
   ngOnInit() {
     // Limpiar FormArray existente
     while (this.slidersFormArray.length !== 0) {
       this.slidersFormArray.removeAt(0);
     }
-    
+
     // Limpiar almacenes
     this.filePreviewUrls = {};
     this.fileStore = {};
     this.deletedSliderIds = [];
     this.fileErrors = {};
-    
+
     // Añadir sliders existentes al FormArray
     if (this.existingSliders && this.existingSliders.length > 0) {
       this.existingSliders.forEach((slider, index) => {
@@ -219,10 +220,10 @@ export class SliderUploadComponent implements OnInit {
           titulo: [slider.titulo || '', this.isSliderPrincipal ? [] : [Validators.required]],
           descripcion: [slider.descripcion || '']
         });
-        
+
         // Añadir el FormGroup al FormArray
         this.slidersFormArray.push(sliderGroup);
-        
+
         // Guardar la URL para previsualización
         if (slider.url_completa) {
           this.filePreviewUrls[index] = slider.url_completa;
@@ -230,20 +231,20 @@ export class SliderUploadComponent implements OnInit {
           this.filePreviewUrls[index] = slider.imagen;
         }
       });
-      
+
       // Emitir los sliders iniciales
       this.emitSlidersChange();
     }
   }
-  
+
   get sliderControls() {
     return this.slidersFormArray.controls;
   }
-  
+
   getSliderFormGroup(index: number): FormGroup {
     return this.slidersFormArray.at(index) as FormGroup;
   }
-  
+
   createSliderFormGroup(): FormGroup {
     // Para Angular 19, creamos los controles completos desde el inicio para evitar problemas de tipo
     const controls: {[key: string]: any} = {
@@ -252,7 +253,7 @@ export class SliderUploadComponent implements OnInit {
       es_principal: [this.isSliderPrincipal], // Fijo según el tipo de slider
       orden: [this.slidersFormArray.length + 1, Validators.required]
     };
-    
+
     // Añadir campos adicionales para sliders secundarios
     if (!this.isSliderPrincipal) {
       controls['titulo'] = ['', Validators.required];
@@ -262,39 +263,39 @@ export class SliderUploadComponent implements OnInit {
       controls['titulo'] = [''];
       controls['descripcion'] = [''];
     }
-    
+
     return this.fb.group(controls);
   }
-  
+
   addSlider() {
     const index = this.slidersFormArray.length;
     this.slidersFormArray.push(this.createSliderFormGroup());
-    
+
     // Initialize the image preview and file storage for this index
     this.filePreviewUrls[index] = null;
     this.fileStore[index] = null;
-    
+
     console.log(`Added new slider at index ${index}, total: ${this.slidersFormArray.length}`);
     this.emitSlidersChange(); // Emitir cambio al añadir un nuevo slider
   }
-  
+
   removeSlider(index: number) {
     const sliderId = this.getSliderFormGroup(index).get('id')?.value;
     if (sliderId) {
       this.deletedSliderIds.push(sliderId);
       this.deletedSlidersEvent.emit(this.deletedSliderIds);
     }
-    
+
     this.slidersFormArray.removeAt(index);
     delete this.filePreviewUrls[index];
     delete this.fileStore[index];
     delete this.fileErrors[index];
-    
+
     // Reordenar los indices en filePreviewUrls y fileStore
     const newFilePreviewUrls: {[index: number]: string | ArrayBuffer | null} = {};
     const newFileStore: {[index: number]: File | null} = {};
     const newFileErrors: {[index: number]: string} = {};
-    
+
     Object.keys(this.filePreviewUrls).forEach((key) => {
       const numKey = parseInt(key);
       if (numKey > index) {
@@ -311,19 +312,19 @@ export class SliderUploadComponent implements OnInit {
         }
       }
     });
-    
+
     this.filePreviewUrls = newFilePreviewUrls;
     this.fileStore = newFileStore;
     this.fileErrors = newFileErrors;
-    
+
     this.emitSlidersChange();
   }
-  
+
   onFileSelected(event: Event, index: number) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
       const file = input.files[0];
-      
+
       // Validar tamaño de archivo (máximo 5MB)
       if (file.size > this.MAX_FILE_SIZE) {
         this.fileErrors[index] = `El archivo excede el tamaño máximo de 5MB (Tamaño actual: ${(file.size / (1024 * 1024)).toFixed(2)}MB)`;
@@ -331,13 +332,13 @@ export class SliderUploadComponent implements OnInit {
         input.value = '';
         return;
       }
-      
+
       // Limpiar errores previos si existían
       delete this.fileErrors[index];
-      
+
       // Guardar el archivo en nuestro almacén
       this.fileStore[index] = file;
-      
+
       // Generar vista previa
       const reader = new FileReader();
       reader.onload = () => {
@@ -347,30 +348,30 @@ export class SliderUploadComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
-  
+
   // Método para reaccionar a cambios en los inputs
   onInputChange() {
     this.emitSlidersChange();
   }
-  
+
   getPreviewUrl(index: number): string | null {
     return this.filePreviewUrls[index] as string || null;
   }
-  
+
   emitSlidersChange() {
     // Verificar si el formulario tiene elementos
     if (this.slidersFormArray.length === 0) {
       this.changeSlidersEvent.emit([]);
       return;
     }
-    
+
     const sliders: SliderImage[] = this.slidersFormArray.controls.map((control, index) => {
       const formGroup = control as FormGroup;
       const values = formGroup.value;
-      
-      // Verificar si tenemos un archivo nuevo en el almacén 
+
+      // Verificar si tenemos un archivo nuevo en el almacén
       const imagen = this.fileStore[index] || undefined;
-      
+
       const slider: SliderImage = {
         id: values.id,
         nombre: values.nombre || '',
@@ -380,32 +381,32 @@ export class SliderUploadComponent implements OnInit {
         ...(imagen ? { imagen } : {}),
         url_completa: typeof this.filePreviewUrls[index] === 'string' ? this.filePreviewUrls[index] as string : undefined
       };
-      
+
       // Para sliders secundarios, incluir siempre título y descripción
       if (!this.isSliderPrincipal) {
         // Obtener directamente los valores del formulario
         slider.titulo = formGroup.get('titulo')?.value || '';
         slider.descripcion = formGroup.get('descripcion')?.value || '';
       }
-      
+
       return slider;
     });
-    
+
     this.changeSlidersEvent.emit(sliders);
   }
-  
+
   // Método para validar si hay errores de archivo
   hasFileErrors(): boolean {
     return Object.keys(this.fileErrors).length > 0;
   }
-  
+
   // Método para verificar si todos los sliders son válidos
   areAllSlidersValid(): boolean {
     // Verificar si hay errores de archivo
     if (this.hasFileErrors()) {
       return false;
     }
-    
+
     // Verificar si todos los grupos de formularios son válidos
     for (let i = 0; i < this.slidersFormArray.length; i++) {
       const formGroup = this.getSliderFormGroup(i);
@@ -413,7 +414,7 @@ export class SliderUploadComponent implements OnInit {
         return false;
       }
     }
-    
+
     return true;
   }
 }

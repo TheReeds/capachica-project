@@ -16,10 +16,10 @@ import { AuthService } from '../../../core/services/auth.service';
             <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Bienvenido, {{ userName }}</h2>
             <p class="text-gray-600 dark:text-gray-300 mt-2">Selecciona dónde quieres ir</p>
           </div>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Opción Panel de Administración -->
-            <div 
+            <div
               class="bg-white hover:bg-orange-400 dark:hover:bg-orange-800 dark:bg-gray-700 border dark:border-gray-600 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               (click)="navigateTo('/dashboard')">
               <div class="flex justify-center mb-4">
@@ -32,9 +32,9 @@ import { AuthService } from '../../../core/services/auth.service';
               <h3 class="text-lg font-semibold text-gray-800 dark:text-white text-center mb-2">Panel de Administración</h3>
               <p class="text-gray-600 dark:text-gray-300 text-center">Accede a las funciones completas de administración con todas las herramientas del sistema.</p>
             </div>
-            
+
             <!-- Opción Gestión de Emprendimientos -->
-            <div 
+            <div
               class="bg-white hover:bg-blue-400 dark:hover:bg-blue-800 dark:bg-gray-700 border dark:border-gray-600 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               (click)="navigateTo('/mis-emprendimientos')">
               <div class="flex justify-center mb-4">
@@ -48,7 +48,7 @@ import { AuthService } from '../../../core/services/auth.service';
               <p class="text-gray-600 dark:text-gray-300 text-center">Administra tus emprendimientos, servicios y reservas de forma fácil y eficiente.</p>
             </div>
           </div>
-          
+
           <div class="mt-8 text-center">
             <p class="text-sm text-gray-500 dark:text-gray-400">Puedes cambiar entre paneles en cualquier momento desde el menú lateral</p>
           </div>
@@ -65,12 +65,19 @@ import { AuthService } from '../../../core/services/auth.service';
 export class SeleccionPanelComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
-  
+
   get userName(): string {
     return this.authService.currentUser()?.name || 'Usuario';
   }
-  
+
   navigateTo(path: string): void {
+    // 1) Guardamos qué panel has elegido:
+    if (path === '/dashboard') {
+      localStorage.setItem('panel_seleccionado_id', 'dashboard');
+    } else if (path === '/mis-emprendimientos') {
+      localStorage.setItem('panel_seleccionado_id', 'mis-emprendimientos');
+    }
+    // 2) Ahora sí, navegamos:
     this.router.navigate([path]);
   }
 }

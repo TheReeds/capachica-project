@@ -1,4 +1,3 @@
-// src/app/core/services/auth.service.ts
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -14,7 +13,7 @@ import { ApiResponse } from '../models/api.model';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  
+
   private readonly API_URL = environment.apiUrl;
   private readonly TOKEN_KEY = 'auth_token';
 
@@ -26,7 +25,7 @@ export class AuthService {
   private readonly _emailVerified = signal<boolean>(false);
   private readonly _userRoles = signal<string[]>([]);
   private readonly _userPermissions = signal<string[]>([]);
-  
+
   // Signals específicos para la gestión de emprendimientos
   private readonly _administraEmprendimientos = signal<boolean>(false);
   private readonly _emprendimientos = signal<any[]>([]);
@@ -81,9 +80,9 @@ export class AuthService {
     // Marcamos que estamos cargando
     this.userLoading.next(true);
     this._isLoading.set(true);
-    
+
     console.log('Realizando petición para cargar perfil de usuario...');
-    
+
     // Realiza la petición HTTP con reintentos
     return this.http.get<ProfileResponse>(`${this.API_URL}/profile`).pipe(
       retry({
@@ -96,29 +95,29 @@ export class AuthService {
       tap(response => {
         console.log('Respuesta de perfil recibida:', response);
         this.profileLoadRetryCount = 0; // Reinicia el contador de reintentos
-        
+
         // Actualizar estado de verificación de email
         if (response?.data?.email_verified !== undefined) {
           this._emailVerified.set(response.data.email_verified);
         }
-        
+
         // Actualizar roles y permisos si están disponibles
         if (response?.data?.roles) {
           console.log('Roles recibidos:', response.data.roles);
           this._userRoles.set(response.data.roles);
         }
-        
+
         if (response?.data?.permissions) {
           console.log('Permisos recibidos:', response.data.permissions);
           this._userPermissions.set(response.data.permissions);
         }
-        
+
         // Actualizar información de emprendimientos
         if (response?.data?.administra_emprendimientos !== undefined) {
           console.log('Administra emprendimientos:', response.data.administra_emprendimientos);
           this._administraEmprendimientos.set(response.data.administra_emprendimientos);
         }
-        
+
         if (response?.data?.emprendimientos) {
           console.log('Emprendimientos recibidos:', response.data.emprendimientos);
           this._emprendimientos.set(response.data.emprendimientos);
@@ -127,7 +126,7 @@ export class AuthService {
       map(response => {
         // Extraer usuario de la respuesta según la estructura
         let user: User | null = null;
-        
+
         if (response && response.success && response.data) {
           if (response.data.user) {
             user = response.data.user;
@@ -138,7 +137,7 @@ export class AuthService {
           // Si la respuesta es directamente el usuario
           user = response as any;
         }
-        
+
         console.log('Usuario extraído de la respuesta:', user);
         return user;
       }),
@@ -146,7 +145,7 @@ export class AuthService {
         // Actualiza el estado
         this.userLoadAttempted = true;
         this._profileLoaded.set(true);
-        
+
         if (user) {
           console.log('Actualizando estado con usuario:', user);
           this._currentUser.set(user);
@@ -161,15 +160,15 @@ export class AuthService {
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Error al cargar perfil de usuario:', error);
-        
+
         // Incrementar contador de reintentos
         this.profileLoadRetryCount++;
-        
+
         // Solo limpiamos datos de auth si hemos agotado los reintentos
         if (this.profileLoadRetryCount >= this.maxProfileLoadRetries) {
           console.error(`Se agotaron los reintentos (${this.maxProfileLoadRetries})`);
           this.userLoadAttempted = true;
-          
+
           // Si es un error 401, limpiar datos de auth
           if (error.status === 401) {
             console.error('Token no válido o expirado (401)');
@@ -185,7 +184,7 @@ export class AuthService {
             });
           }, 2000 * this.profileLoadRetryCount); // Incrementamos el tiempo entre reintentos
         }
-        
+
         return of(null);
       }),
       finalize(() => {
@@ -220,10 +219,10 @@ export class AuthService {
     this._userPermissions.set([]);
     this._administraEmprendimientos.set(false);
     this._emprendimientos.set([]);
-    
+
     // No redirigimos automáticamente en este método para evitar redirecciones innecesarias
     // Solo redirige si estamos en una ruta protegida
-    if (window.location.pathname.startsWith('/dashboard') || 
+    if (window.location.pathname.startsWith('/dashboard') ||
         window.location.pathname.startsWith('/admin') ||
         window.location.pathname.startsWith('/profile') ||
         window.location.pathname.startsWith('/mis-emprendimientos') ||
@@ -236,7 +235,7 @@ export class AuthService {
   register(data: RegisterRequest): Observable<AuthResponse> {
     // Convertir a FormData si se incluye foto de perfil
     const formData = new FormData();
-    
+
     // Añadir todos los campos al FormData
     Object.keys(data).forEach(key => {
       if (data[key] !== null && data[key] !== undefined) {
@@ -248,7 +247,7 @@ export class AuthService {
         }
       }
     });
-    
+
     return this.http.post<ApiResponse<AuthResponse>>(`${this.API_URL}/register`, formData)
       .pipe(
         map(response => response.data as AuthResponse),
@@ -269,7 +268,7 @@ export class AuthService {
           if (!response.data) {
             throw new Error("No data in response");
           }
-        
+
           return {
             access_token: response.data.access_token,
             token_type: response.data.token_type,
@@ -283,44 +282,20 @@ export class AuthService {
           if (authResponse.email_verified !== undefined) {
             this._emailVerified.set(authResponse.email_verified);
           }
-          
-          // En lugar de redirigir directamente, usamos el nuevo método
+
+          // ÚNICO lugar donde navegamos
           this.handlePostLoginRedirect();
         }),
         catchError(error => this.handleError(error))
       );
   }
-  
-  // Método para manejar la redirección después del login basado en si el usuario administra emprendimientos
-  handlePostLoginRedirect() {
-    // Verificar si el usuario administra emprendimientos
-    if (this.currentUser() && this._profileLoaded() && this._isLoggedIn()) {
-      // Obtener los datos del perfil actual
-      this.http.get<ProfileResponse>(`${this.API_URL}/profile`).pipe(
-        take(1)
-      ).subscribe({
-        next: (response) => {
-          const administraEmprendimientos = response?.data?.administra_emprendimientos;
-          
-          if (administraEmprendimientos) {
-            // Si administra emprendimientos, redirigir a la selección de panel
-            this.router.navigate(['/seleccion-panel']);
-          } else {
-            // Si no administra emprendimientos, redirigir al dashboard normal
-            this.router.navigate(['/dashboard']);
-          }
-        },
-        error: () => {
-          // En caso de error, redirigir al dashboard por defecto
-          this.router.navigate(['/dashboard']);
-        }
-      });
-    } else {
-      // Por defecto, ir al dashboard
-      this.router.navigate(['/dashboard']);
-    }
+
+  // Método para manejar la redirección después del login
+  private handlePostLoginRedirect() {
+    // Reemplazo de historial para que no puedas "volver" al login/dashboard viejo
+    this.router.navigate(['/seleccion-panel'], { replaceUrl: true });
   }
-  
+
   // Autenticación con Google
   loginWithGoogle(): Observable<string> {
     return this.http.get<ApiResponse<{ url: string }>>(`${this.API_URL}/auth/google`)
@@ -329,13 +304,13 @@ export class AuthService {
           if (!response.data || !response.data.url) {
             throw new Error("No URL in response");
           }
-          
+
           return response.data.url;
         }),
         catchError(error => this.handleError(error))
       );
   }
-  
+
   // Manejar callback de Google
   handleGoogleCallback(token: string, code: string): Observable<AuthResponse> {
     return this.http.get<ApiResponse<AuthResponse>>(`${this.API_URL}/auth/google/callback?code=${code}`)
@@ -344,14 +319,14 @@ export class AuthService {
         tap(authResponse => {
           this.handleAuthResponse(authResponse);
           this._emailVerified.set(true); // Los usuarios de Google siempre están verificados
-          
-          // Usar el método de redirección personalizado
+
+          // Usar el método de redirección simplificado
           this.handlePostLoginRedirect();
         }),
         catchError(error => this.handleError(error))
       );
   }
-  
+
   // Verificar correo electrónico
   verifyEmail(userId: number, hash: string): Observable<any> {
     return this.http.get<ApiResponse<any>>(`${this.API_URL}/email/verify/${userId}/${hash}`)
@@ -362,7 +337,7 @@ export class AuthService {
         catchError(error => this.handleError(error))
       );
   }
-  
+
   // Reenviar correo de verificación
   resendVerificationEmail(): Observable<any> {
     return this.http.post<ApiResponse<any>>(`${this.API_URL}/email/verification-notification`, {})
@@ -370,7 +345,7 @@ export class AuthService {
         catchError(error => this.handleError(error))
       );
   }
-  
+
   // Solicitar recuperación de contraseña
   forgotPassword(email: string): Observable<any> {
     return this.http.post<ApiResponse<any>>(`${this.API_URL}/forgot-password`, { email })
@@ -378,7 +353,7 @@ export class AuthService {
         catchError(error => this.handleError(error))
       );
   }
-  
+
   // Restablecer contraseña
   resetPassword(data: { email: string, token: string, password: string, password_confirmation: string }): Observable<any> {
     return this.http.post<ApiResponse<any>>(`${this.API_URL}/reset-password`, data)
@@ -411,25 +386,25 @@ export class AuthService {
             if (response.data.email_verified !== undefined) {
               this._emailVerified.set(response.data.email_verified);
             }
-            
+
             // Actualizar roles y permisos si están disponibles
             if (response.data.roles) {
               this._userRoles.set(response.data.roles);
             }
-            
+
             if (response.data.permissions) {
               this._userPermissions.set(response.data.permissions);
             }
-            
+
             // Actualizar información de emprendimientos
             if (response.data.administra_emprendimientos !== undefined) {
               this._administraEmprendimientos.set(response.data.administra_emprendimientos);
             }
-            
+
             if (response.data.emprendimientos) {
               this._emprendimientos.set(response.data.emprendimientos);
             }
-            
+
             if (response.data.user) {
               return response.data.user;
             }
@@ -465,14 +440,14 @@ export class AuthService {
 
   private handleError(error: any): Observable<never> {
     console.error('Error en AuthService:', error);
-    
+
     if (error.status === 401) {
       this.clearAuthData();
     }
-    
+
     return throwError(() => error);
   }
-  
+
   /**
  * Verify email with a complete URL
  * @param url Full verification URL
@@ -494,22 +469,22 @@ export class AuthService {
       })
     );
   }
-  
+
   // Método para verificar si el usuario tiene un rol específico
   hasRole(role: string): boolean {
     const roles = this.userRoles();
     return roles.includes(role);
   }
-  
+
   // Método para verificar si el usuario tiene un permiso específico
   hasPermission(permission: string): boolean {
     const permissions = this.userPermissions();
     return permissions.includes(permission);
   }
-  
+
   updateProfile(data: FormData): Observable<User> {
     data.append('_method', 'PUT'); // Esto es clave para Laravel
-  
+
     return this.http.post<ApiResponse<User>>(`${this.API_URL}/profile`, data)
       .pipe(
         map(response => {
@@ -524,4 +499,34 @@ export class AuthService {
         catchError(error => this.handleError(error))
       );
   }
-}
+
+  // AÑADIR AQUÍ EL NUEVO MÉTODO
+  isPanelSelected(): boolean {
+    // Si no administra emprendimientos, no necesita seleccionar panel
+    if (!this.administraEmprendimientos()) {
+      return true;
+    }
+
+  // Leemos directamente el panel que haya guardado el usuario
+    const panelSeleccionadoId = localStorage.getItem('panel_seleccionado_id');
+
+  // *** NUEVO: si seleccionó explícitamente el dashboard, devolvemos true ***
+    if (panelSeleccionadoId === 'dashboard') {
+    return true;
+    }
+
+  // Verificar si hay emprendimientos y si alguno está marcado como seleccionado
+    const emprendimientos = this._emprendimientos();
+    if (!emprendimientos || emprendimientos.length === 0) {
+    return false;
+    }
+
+  // Si hay un ID guardado, verificar que corresponda a un emprendimiento válido
+    if (panelSeleccionadoId) {
+    return emprendimientos.some(emp => emp.id.toString() === panelSeleccionadoId);
+    }
+
+    return false;
+  }
+} // Este es el cierre final de la clase
+
