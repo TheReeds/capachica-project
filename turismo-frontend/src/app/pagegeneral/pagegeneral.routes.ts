@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { EventosComponent } from './eventos/eventos.component';
-import { ContactosComponent } from './contactos/contactos.component';
+import { PlanesComponent } from './contactos/contactos.component';
 import { HomeComponent } from './home/home.component';
 import { FamiliasComponent } from './familia/familias/familias/familias.component';
 import { DetallefamiliasComponent } from './familia/detallefamilias/detallefamilias.component';
@@ -33,7 +33,7 @@ export const PAGEGENERAL_ROUTES: Routes = [
 
     {
       path: 'contactos',
-      component: ContactosComponent,
+      component: PlanesComponent,
       title: 'Contactos'
     },
     {
@@ -96,7 +96,7 @@ export const PAGEGENERAL_ROUTES: Routes = [
     },
 
     { path: 'contactos', 
-      component: ContactosComponent, 
+      component: PlanesComponent, 
       title: 'Contactos' 
     },
 
