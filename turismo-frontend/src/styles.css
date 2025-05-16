@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
-@config "../tailwind.config.js";
-@import "tailwindcss";
+
+@import "../node_modules/angular-calendar/css/angular-calendar.css";
 
 @tailwind base;
 @tailwind components;
@@ -14,7 +14,7 @@
     --color-text-primary: 17 24 39; /* text-gray-900 */
     --color-text-secondary: 75 85 99; /* text-gray-600 */
   }
-  
+
   /* Dark theme variables */
   .dark {
     --color-bg-primary: 17 24 39; /* bg-gray-900 */
@@ -48,7 +48,7 @@
   .card {
     @apply bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 dark:text-white;
   }
-  
+
   /* Dropdown menu customization */
   .max-h-80 {
     max-height: 20rem;

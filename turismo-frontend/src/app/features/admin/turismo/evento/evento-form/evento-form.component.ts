@@ -112,7 +112,7 @@ declare var google: any;
                         formControlName="nombre" 
                         class="pl-10 block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
                         [ngClass]="{'border-red-300 ring-red-300 focus:border-red-500 focus:ring-red-500': isFieldInvalid('nombre')}"
-                        placeholder="Ej: Workshop de Innovación Digital"
+                        placeholder="Ej: Fiesta de San Santiago"
                       />
                     </div>
                     <p *ngIf="isFieldInvalid('nombre')" class="mt-2 text-sm text-red-600">El nombre del evento es obligatorio</p>
@@ -134,57 +134,47 @@ declare var google: any;
                     </div>
                   </div>
 
-                  
-
                   <!-- Tipo de Evento e Idioma -->
                   <div class="space-y-6">
+                    <!-- Tipo de Evento -->
                     <div>
                       <label for="tipo_evento" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Evento <span class="text-red-500">*</span></label>
                       <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                        </div>
-                        <select 
-                          id="tipo_evento" 
-                          formControlName="tipo_evento" 
-                          class="pl-10 block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                          [ngClass]="{'border-red-300 ring-red-300 focus:border-red-500 focus:ring-red-500': isFieldInvalid('tipo_evento')}"
-                        >
-                          <option value="" disabled selected>Seleccione un tipo</option>
-                          <option value="conferencia">Conferencia</option>
-                          <option value="taller">Taller</option>
-                          <option value="networking">Networking</option>
-                          <option value="exposicion">Exposición</option>
-                          <option value="otro">Otro</option>
-                        </select>
                       </div>
+                      <input 
+                        type="text" 
+                        id="tipo_evento" 
+                        formControlName="tipo_evento" 
+                        class="pl-10 block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                        [ngClass]="{'border-red-300 ring-red-300 focus:border-red-500 focus:ring-red-500': isFieldInvalid('tipo_evento')}"
+                        placeholder="Ej: Fiesta Costumbrista"
+                      />
+                    </div>
                       <p *ngIf="isFieldInvalid('tipo_evento')" class="mt-2 text-sm text-red-600">Debe especificar el tipo de evento</p>
                     </div>
 
+                    <!-- Idioma -->
                     <div>
                       <label for="idioma_principal" class="block text-sm font-medium text-gray-700 mb-1">Idioma Principal <span class="text-red-500">*</span></label>
                       <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                           </svg>
-                        </div>
-                        <select 
-                          id="idioma_principal" 
-                          formControlName="idioma_principal" 
-                          class="pl-10 block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                          [ngClass]="{'border-red-300 ring-red-300 focus:border-red-500 focus:ring-red-500': isFieldInvalid('idioma_principal')}"
-                        >
-                          <option value="" disabled selected>Seleccione un idioma</option>
-                          <option value="es">Español</option>
-                          <option value="ay">Aymara</option>
-                          <option value="fr">Francés</option>
-                          <option value="pt">Portugués</option>
-                          <option value="otro">Otro</option>
-                        </select>
                       </div>
+                      <input 
+                        type="text" 
+                        id="idioma_principal" 
+                        formControlName="idioma_principal" 
+                        class="pl-10 block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                        [ngClass]="{'border-red-300 ring-red-300 focus:border-red-500 focus:ring-red-500': isFieldInvalid('idioma_principal')}"
+                        placeholder="Ej: Quechua"
+                      />
+                    </div>
                       <p *ngIf="isFieldInvalid('idioma_principal')" class="mt-2 text-sm text-red-600">Debe indicar el idioma principal del evento</p>
                     </div>
                   </div>
@@ -199,54 +189,21 @@ declare var google: any;
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                         </div>
-                        <select 
-                          id="id_emprendedor" 
-                          formControlName="id_emprendedor" 
-                          class="pl-10 block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                          [ngClass]="{'border-red-300 ring-red-300 focus:border-red-500 focus:ring-red-500': isFieldInvalid('id_emprendedor')}"
-                        >
-                          <option value="" disabled selected>Seleccione un emprendedor</option>
-                          <option value="1">Emprendedor 1</option>
-                          <option value="2">Emprendedor 2</option>
-                          <option value="3">Emprendedor 3</option>
-                          <!-- Aquí irían opciones cargadas dinámicamente desde el backend -->
-                        </select>
+                        <input 
+                        type="number" 
+                        id="id_emprendedor" 
+                        formControlName="id_emprendedor" 
+                        class="pl-10 block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                        [ngClass]="{'border-red-300 ring-red-300 focus:border-red-500 focus:ring-red-500': isFieldInvalid('id_emprendedor')}"
+                        placeholder="Ej: 1"
+                      />
+                        
                       </div>
-                      <p *ngIf="isFieldInvalid('id_emprendedor')" class="mt-2 text-sm text-red-600">Debe seleccionar un emprendedor</p>
+                      <p *ngIf="isFieldInvalid('id_emprendedor')" class="mt-2 text-sm text-red-600">Debe indicar un emprendedor asociado</p>
                     </div>
                   </div>
 
-                  <!-- URL de la imagen -->
-                  <div class="col-span-1 md:col-span-2">
-                    <label for="imagen_url" class="block text-sm font-medium text-gray-700 mb-1">URL de la imagen <span class="text-red-500">*</span></label>
-                    <div class="flex items-center space-x-2">
-                      <div class="relative flex-grow rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <input 
-                          type="url" 
-                          id="imagen_url" 
-                          formControlName="imagen_url" 
-                          class="pl-10 block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
-                          [ngClass]="{'border-red-300 ring-red-300 focus:border-red-500 focus:ring-red-500': isFieldInvalid('imagen_url')}"
-                          placeholder="https://ejemplo.com/imagen.jpg"
-                        />
-                      </div>
-                      <button 
-                        type="button" 
-                        class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        Explorar
-                      </button>
-                    </div>
-                    <p *ngIf="isFieldInvalid('imagen_url')" class="mt-2 text-sm text-red-600">Debe proporcionar una URL válida para la imagen</p>
-                    <div class="mt-3 p-2 border border-gray-300 border-dashed rounded-md bg-gray-50 flex items-center justify-center h-24">
-                      <p class="text-sm text-gray-500">Vista previa de la imagen</p>
-                    </div>
-                  </div>
+                  
                 </div>
               </div>
 
@@ -271,91 +228,39 @@ declare var google: any;
               </div>
 
               <!-- Pestaña Ubicación -->
-            <div *ngSwitchCase="'ubicacion'" class="space-y-8">
-              <!-- Mapa de referencia mejorado en Tailwind -->
-    <div class="relative bg-gray-50 rounded-lg overflow-hidden shadow-inner border border-gray-200">
-      <div class="h-80"> <!-- Tailwind ya define la altura -->
-        <div class="text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-          </svg>
-          <p class="mt-2 text-gray-600 font-medium">Mapa de referencia</p>
-          <p class="text-sm text-gray-500 mt-1">Utilice las coordenadas para indicar la ubicación exact</p>
-        </div>
-      </div>
-    </div>
-              
-              <!-- Coordenadas -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label for="coordenada_x" class="block text-sm font-medium text-gray-700 mb-1">Latitud <span class="text-red-500">*</span></label>
-                  <input type="number" id="coordenada_x" formControlName="coordenada_x" class="block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Ej. 40.7128" step="0.000001" />
+              <div *ngSwitchCase="'ubicacion'" class="space-y-8">
+                <!-- Mapa de referencia mejorado en Tailwind -->
+                <div class="relative bg-gray-50 rounded-lg overflow-hidden shadow-inner border border-gray-200">
+                  <div class="h-80"> <!-- Tailwind ya define la altura -->
+                    <div class="text-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                      <p class="mt-2 text-gray-600 font-medium">Mapa de referencia</p>
+                      <p class="text-sm text-gray-500 mt-1">Utilice las coordenadas para indicar la ubicación exact</p>
+                    </div>
+                  </div>
                 </div>
+                
+                <!-- Coordenadas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label for="coordenada_x" class="block text-sm font-medium text-gray-700 mb-1">Latitud <span class="text-red-500">*</span></label>
+                    <input type="number" id="coordenada_x" formControlName="coordenada_x" class="block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Ej. 40.7128" step="0.000001" />
+                  </div>
 
-                <div>
-                  <label for="coordenada_y" class="block text-sm font-medium text-gray-700 mb-1">Longitud <span class="text-red-500">*</span></label>
-                  <input type="number" id="coordenada_y" formControlName="coordenada_y" class="block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Ej. -74.0060" step="0.000001" />
+                  <div>
+                    <label for="coordenada_y" class="block text-sm font-medium text-gray-700 mb-1">Longitud <span class="text-red-500">*</span></label>
+                    <input type="number" id="coordenada_y" formControlName="coordenada_y" class="block w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Ej. -74.0060" step="0.000001" />
+                  </div>
                 </div>
               </div>
-            </div>
 
 
               <!-- Pestaña Detalles adicionales -->
               <div *ngSwitchCase="'detalles'" class="space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <!-- Calendario de eventos -->
-                  <div class="col-span-1 md:col-span-2 bg-gray-50 rounded-lg p-4 border border-gray-200 mb-2">
-                    <div class="flex items-center justify-between mb-2">
-                      <h3 class="text-sm font-medium text-gray-700">Calendario de eventos</h3>
-                      <div class="flex space-x-1">
-                        <button type="button" class="p-1 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        <button type="button" class="p-1 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    <div class="grid grid-cols-7 gap-2 text-center text-xs">
-                      <div class="text-gray-500 font-medium">Lu</div>
-                      <div class="text-gray-500 font-medium">Ma</div>
-                      <div class="text-gray-500 font-medium">Mi</div>
-                      <div class="text-gray-500 font-medium">Ju</div>
-                      <div class="text-gray-500 font-medium">Vi</div>
-                      <div class="text-gray-500 font-medium">Sa</div>
-                      <div class="text-gray-500 font-medium">Do</div>
-                      
-                      <!-- Días ejemplo -->
-                      <div class="py-1 text-gray-400">30</div>
-                      <div class="py-1 text-gray-400">31</div>
-                      <div class="py-1">1</div>
-                      <div class="py-1">2</div>
-                      <div class="py-1">3</div>
-                      <div class="py-1">4</div>
-                      <div class="py-1">5</div>
-                      
-                      <div class="py-1">6</div>
-                      <div class="py-1">7</div>
-                      <div class="py-1">8</div>
-                      <div class="py-1 bg-indigo-100 rounded-md ring-1 ring-indigo-600">9</div>
-                      <div class="py-1 bg-indigo-600 text-white rounded-md">10</div>
-                      <div class="py-1">11</div>
-                      <div class="py-1">12</div>
-                      <div class="py-1">13</div>
-                      
-                      <div class="py-1">14</div>
-                      <div class="py-1">15</div>
-                      <div class="py-1">16</div>
-                      <div class="py-1">17</div>
-                      <div class="py-1">18</div>
-                      <div class="py-1">19</div>
-                      <div class="py-1">20</div>
-                    </div>
-                  </div>
+                  
                 
                   <!-- Fechas y horas -->
                   <div>
@@ -616,26 +521,30 @@ export class EventoFormComponent implements OnInit, AfterViewInit {
   deletedSlidersPrincipales: number[] = [];
   
   slidersPrincipalesList: SliderImage[] = [];
+  slidersPrincipalesFormData = new FormData();
 
+  onSlidersPrincipalesChange(sliders: SliderImage[]) {
+    console.log('Cambio en sliders principales:', sliders);
+
+    // 1) Creamos un nuevo FormData
+    const fd = new FormData();
+
+    // 2) Por cada slider, leemos el File (si existe) y metadatos
+    
+
+    // 3) Guardamos el FormData en la propiedad de clase
+    this.slidersPrincipalesFormData = fd;
+
+    console.log('FormData slidersPrincipalesFormData preparado:', fd);
+  }
+
+  
 
 onDeletedSlidersPrincipalesChange(deletedIds: number[]) {
     this.deletedSlidersPrincipales = deletedIds;
     console.log('Sliders principales eliminados:', deletedIds);
   }
 
-onSlidersPrincipalesChange(sliders: SliderImage[]) {
-  console.log('Cambio en sliders principales:', sliders);
-    
-    // Ensure all sliders have required fields
-    this.slidersPrincipalesList = sliders.map(slider => ({
-      ...slider,
-      es_principal: true,
-      nombre: slider.nombre || '',
-      orden: slider.orden || this.slidersPrincipales.length + 1
-    }));
-    
-    console.log('Updated sliders principales:', this.slidersPrincipales);
-}
 
 
 
@@ -715,7 +624,6 @@ onSlidersPrincipalesChange(sliders: SliderImage[]) {
       duracion_horas: ['', [Validators.required, Validators.pattern('^[0-9]*(\.[0-9]+)?$')]],
       coordenada_x: ['', [Validators.required, Validators.min(-90), Validators.max(90)]],
       coordenada_y: ['', [Validators.required, Validators.min(-180), Validators.max(180)]],
-      imagen_url: ['', Validators.required],
       que_llevar: [''],
       id_emprendedor: ['', Validators.required],
 
@@ -771,56 +679,76 @@ onSlidersPrincipalesChange(sliders: SliderImage[]) {
 
 
   cargarEvento(id: string): void {
-  console.log('Cargando evento con ID:', id);
-  this.eventoService.getEventoById(id).subscribe({
-    next: (response) => {
-      console.log('Datos del evento recibidos:', response);
-      
-      // Extraemos los datos del evento (puede variar según la estructura de tu API)
-      const evento = response.data || response;
-      
-      
-      // Formateamos las fechas para que funcionen en el input type="date"
-      let fechaInicio = evento.fecha_inicio;
-      let fechaFin = evento.fecha_fin;
-      
-      // Si las fechas vienen en formato timestamp o string, las convertimos a YYYY-MM-DD
-      if (fechaInicio && typeof fechaInicio === 'string' && !fechaInicio.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        fechaInicio = new Date(fechaInicio).toISOString().split('T')[0];
-      }
-      
-      if (fechaFin && typeof fechaFin === 'string' && !fechaFin.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        fechaFin = new Date(fechaFin).toISOString().split('T')[0];
-      }
-      
-      // Actualizamos el formulario con los datos recibidos
-      this.eventoForm.patchValue({
-        nombre: evento.nombre,
-        tipo_evento: evento.tipo_evento,
-        descripcion: evento.descripcion,
-        idioma_principal: evento.idioma_principal,
-        fecha_inicio: fechaInicio,
-        fecha_fin: fechaFin,
-        hora_inicio: evento.hora_inicio,
-        hora_fin: evento.hora_fin,
-        duracion_horas: evento.duracion_horas,
-        coordenada_x: evento.coordenada_x,
-        coordenada_y: evento.coordenada_y,
-        imagen_url: evento.imagen_url,
-        que_llevar: evento.que_llevar,
-        id_emprendedor: evento.id_emprendedor,
+    console.log('Cargando evento con ID:', id);
+    this.eventoService.getEventoById(id).subscribe({
+      next: (response) => {
+        console.log('Datos del evento recibidos:', response);
 
-        sliders_principales: this.fb.array([]),
-      });
-      
-      console.log('Formulario actualizado con datos del evento');
-    },
-    error: (err) => {
-      console.error('Error al cargar el evento:', err);
-      alert('No se pudo cargar la información del evento. Por favor, intente nuevamente.');
-    }
-  });
-}
+        // Extraemos los datos del evento (puede variar según tu API)
+        const evento: any = response.data || response;
+
+        // 1) Parcheamos los campos básicos del formulario
+        //    (ajusta esto a TODOS los campos de tu formGroup)
+        let fechaInicio = evento.fecha_inicio;
+        let fechaFin    = evento.fecha_fin;
+        if (fechaInicio && typeof fechaInicio === 'string' && !fechaInicio.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          fechaInicio = new Date(fechaInicio).toISOString().split('T')[0];
+        }
+        if (fechaFin && typeof fechaFin === 'string' && !fechaFin.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          fechaFin = new Date(fechaFin).toISOString().split('T')[0];
+        }
+
+        this.eventoForm.patchValue({
+          nombre:           evento.nombre,
+          tipo_evento:      evento.tipo_evento,
+          descripcion:      evento.descripcion,
+          idioma_principal: evento.idioma_principal,
+          fecha_inicio:     fechaInicio,
+          fecha_fin:        fechaFin,
+          hora_inicio:      evento.hora_inicio,
+          hora_fin:         evento.hora_fin,
+          duracion_horas:   evento.duracion_horas,
+          coordenada_x:     evento.coordenada_x,
+          coordenada_y:     evento.coordenada_y,
+          que_llevar:       evento.que_llevar,
+          id_emprendedor:   evento.id_emprendedor,
+          // El FormArray lo rellenaremos abajo, así que lo dejamos en blanco
+        });
+
+        // 2) Si vienen sliders_principales, los mapeamos para el preview y el FormArray
+        if (evento.sliders_principales?.length) {
+          // 2.1) Lista de preview que pasa al [existingSliders]
+          this.slidersPrincipalesList = evento.sliders_principales.map((s: any) => ({
+            id:           s.id,
+            nombre:       s.nombre,
+            orden:        s.orden,
+            es_principal: true,
+            imagen:       s.url_completa,  // el child interpreta string como URL
+            url_completa: s.url_completa
+          }));
+
+          // 2.2) Limpiamos y llenamos el FormArray
+          const fa = this.slidersPrincipalesArray;
+          fa.clear();
+          this.slidersPrincipalesList.forEach(slider => {
+            fa.push(this.fb.group({
+              nombre:       [slider.nombre,       Validators.required],
+              orden:        [slider.orden,        Validators.required],
+              es_principal: [true],
+              // Importante: guardamos la URL para que el child lo muestre
+              imagen:       [slider.url_completa]
+            }));
+          });
+        }
+
+        console.log('Formulario y sliders cargados correctamente');
+      },
+      error: (err) => {
+        console.error('Error al cargar el evento:', err);
+        alert('No se pudo cargar la información del evento. Por favor, intente nuevamente.');
+      }
+    });
+  }
 
   isFieldInvalid(field: string): boolean {
     const control = this.eventoForm?.get(field);
@@ -830,6 +758,19 @@ onSlidersPrincipalesChange(sliders: SliderImage[]) {
   onSave(): void {
   this.submitted = true;
   this.error = '';
+
+  this.submitted = true;
+  if (this.eventoForm.invalid) { /* …validación… */ return; }
+
+  
+  
+  this.slidersPrincipalesFormData.forEach((value, key) => {
+    payload.append(key, value);
+  });
+
+  this.saving = true;
+
+  
 
   if (this.eventoForm.invalid) {
     console.log('Formulario inválido: faltan los siguientes campos obligatorios:');
@@ -850,6 +791,32 @@ onSlidersPrincipalesChange(sliders: SliderImage[]) {
   const formData = this.eventoForm.value;
   console.log('Datos a enviar:', formData);
   this.saving = true;
+
+  
+  const payload = new FormData();
+  const f = this.eventoForm.value;
+  payload.append('nombre',           f.nombre);
+  payload.append('descripcion',      f.descripcion);
+
+  const sliders = this.slidersPrincipalesArray.value as any[];
+  sliders.forEach((slider, idx) => {
+    if (slider.imagen instanceof File) {
+      // Si el usuario subió un archivo nuevo
+      payload.append(`sliders_principales[${idx}][imagen]`, slider.imagen);
+    } else {
+      // Si es una URL previa y no se cambió la imagen
+      payload.append(`sliders_principales[${idx}][url]`, slider.imagen);
+    }
+    payload.append(`sliders_principales[${idx}][nombre]`, slider.nombre);
+    payload.append(`sliders_principales[${idx}][orden]`, slider.orden.toString());
+  });
+
+  this.saving = true;
+  if (this.isEditMode) {
+    this.eventoService.updateEvento(this.eventoId, payload).subscribe(/*…*/);
+  } else {
+    this.eventoService.createEvento(payload).subscribe(/*…*/);
+  }
 
   if (this.isEditMode) {
     console.log('Actualizando evento con ID:', this.eventoId);
@@ -882,6 +849,15 @@ onSlidersPrincipalesChange(sliders: SliderImage[]) {
       }
     });
   }
+
+  this.slidersPrincipalesFormData.forEach((value, key) => {
+      payload.append(key, value);
+    });
+    if (this.isEditMode) {
+      this.eventoService.updateEvento(this.eventoId, payload).subscribe(/* … */);
+    } else {
+      this.eventoService.createEvento(payload).subscribe(/* … */);
+    }
 }
 
 
@@ -924,8 +900,8 @@ onSlidersPrincipalesChange(sliders: SliderImage[]) {
       return; // No hacer nada si el formulario es inválido
     }
 
-    const formData = this.eventoForm.value;
-    console.log('Datos a enviar:', formData);
+    
+    console.log('Datos a enviar:', FormData);
 
     this.saving = true;
 

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Evento } from '../../../../../core/services/turismo.service';
 import { EventoService } from '../evento.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-evento-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   template: `
     <div class="space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -46,6 +47,57 @@ import { EventoService } from '../evento.service';
           </button>
         </div>
 
+        <!-- Filtros -->
+        <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors duration-200">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div>
+              <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
+              <div class="mt-1">
+                <input 
+                  type="text" 
+                  id="search" 
+                  [(ngModel)]="searchTerm" 
+                  placeholder="Nombre o descripción" 
+                  class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                >
+              </div>
+            </div>
+            
+            <div>
+              <label for="evento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Evento</label>
+              <div class="mt-1">
+                <select 
+                  id="evento" 
+                  [(ngModel)]="selectedEventoId" 
+                  class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                >
+                  <option [ngValue]="null">Todos</option>
+                  <option *ngFor="let evento of eventos" [ngValue]="evento.id">
+                    {{ evento.nombre }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            
+           
+            
+            
+            
+            <div class="flex items-end md:col-span-4">
+              <button 
+                type="button" 
+                (click)="applyFilters()" 
+                class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
+              >
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                Filtrar
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Tabla con datos -->
         <div *ngIf="!loading && eventos.length > 0" class="overflow-hidden">
           
@@ -53,20 +105,7 @@ import { EventoService } from '../evento.service';
           <!-- Controles y búsqueda -->
           <div class="bg-white border-b border-indigo-100 p-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-              <span class="text-indigo-700 font-medium">{{ eventos.length }} eventos</span>
-              <span class="text-gray-400">|</span>
-              <button class="text-indigo-600 hover:text-indigo-800 flex items-center">
-                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                </svg>
-                Filtrar
-              </button>
-            </div>
-            <div class="relative">
-              <input type="text" placeholder="Buscar evento..." class="pl-10 pr-4 py-2 rounded-full border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-64">
-              <svg class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
+              <span class="text-indigo-700 font-medium">{{ eventos.length }} eventos</span>            
             </div>
           </div>
 
@@ -78,7 +117,6 @@ import { EventoService } from '../evento.service';
                   <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">Descripción</th>
                   <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">Fecha de Inicio</th>
                   <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">Fecha Fin</th>
-                  <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">Imagen</th>
                   <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
@@ -112,14 +150,8 @@ import { EventoService } from '../evento.service';
                       {{ evento.fecha_fin | date: 'dd/MM/yyyy' }}
                     </div>
                   </td>
-                  <!-- iamgen -->
-                  <td class="px-6 py-4">
-                    <div class="relative group">
-                      <img [src]="evento.imagen_url" alt="Imagen de evento" 
-                          class="w-20 h-20 object-cover rounded-lg   transition-all duration-300" />
-                      
-                    </div>
-                  </td>
+                  
+                  <!-- acciones -->
                   <td class="px-6 py-4">
                     <div class="flex items-center space-x-3">
                       <a [routerLink]="['/admin/evento/edit', evento.id]" 
@@ -136,14 +168,7 @@ import { EventoService } from '../evento.service';
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                       </button>
-                      <button 
-                              class="flex items-center justify-center h-8 w-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors duration-300"
-                              title="Ver detalles">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                      </button>
+                      
                     </div>
                   </td>
                 </tr>
@@ -213,6 +238,13 @@ export class EventoListComponent implements OnInit {
   eventos: Evento[] = [];
   loading = true;
 
+  // Paginación
+  currentPage = 1;
+
+  // Filtros
+  searchTerm = '';
+  selectedEventoId: number | null = null;
+  allEventos: Evento[] = []; 
   
 
   ngOnInit() {
@@ -220,18 +252,33 @@ export class EventoListComponent implements OnInit {
   }
 
   loadEventos() {
-    this.loading = true;
-    this.eventoService.getEventos().subscribe({
-      next: (eventos) => {
-        this.eventos = eventos!.data.data;
-        console.log(this.eventos);
-        this.loading = false;  // No necesitas 'data' si 'eventos' ya es un arreglo
-      },
-      error: (err) => {
-        console.error('Error al cargar eventos:', err);
-      }
-    });
-  }
+  this.loading = true;
+  this.eventoService.getEventos().subscribe({
+    next: (resp) => {
+      const data = resp.data.data; 
+      this.eventos    = data;
+      this.allEventos = data;           // ← aquí
+      this.loading    = false;
+    },
+  
+  });
+}
+
+
+  applyFilters() {
+  this.eventos = this.allEventos.filter(evento => {
+    const matchesSearch = this.searchTerm
+      ? evento.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+        || evento.descripcion.toLowerCase().includes(this.searchTerm.toLowerCase())
+      : true;
+    const matchesEvento = this.selectedEventoId
+      ? evento.id === this.selectedEventoId
+      : true;
+    return matchesSearch && matchesEvento;
+  });
+}
+
+
 
 
   deleteEvento(evento: Evento) {

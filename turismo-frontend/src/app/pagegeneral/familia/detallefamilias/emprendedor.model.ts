@@ -32,7 +32,14 @@ export interface Emprendedor {
     url_completa: string;
     nombre: string;
     es_principal: boolean;
-    // otros campos según tu backend
+    
+    // Agregado:
+    descripcion?: {
+    id: number;
+    slider_id: number;
+    titulo: string;
+    descripcion: string;
+  };
   }
 
   export interface Servicio {
