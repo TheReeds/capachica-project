@@ -43,5 +43,11 @@ export const ADMIN_EMPRENDEDORES_ROUTES: Routes = [
     loadComponent: () => import('./administradores-list/administradores-list.component').then(c => c.AdministradoresListComponent),
     canActivate: [authGuard],
     title: 'Administradores del Emprendimiento'
+  },
+  {
+    path: 'emprendimiento/:id/moderacion-resenas',
+    loadComponent: () => import('./emprendimiento-detalle/moderacion-resenas/moderacion-resenas.component').then(c => c.ModeracionResenasComponent),
+    canActivate: [authGuard],
+    title: 'Moderación de Reseñas'
   }
 ];

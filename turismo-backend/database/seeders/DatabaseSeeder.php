@@ -25,32 +25,32 @@ class DatabaseSeeder extends Seeder
     {
         // Crear roles y permisos
         $this->createRolesAndPermissions();
-        
+
         // Crear usuarios admin y usuario normal
         $this->createUsers();
-        
+
         // Crear datos de municipalidad
         $this->createMunicipalidad();
-        
+
         // Crear categorías
         $this->createCategorias();
-        
+
         // Crear asociaciones
         $this->createAsociaciones();
-        
+
         // Crear emprendedores
         $this->createEmprendedores();
-        
+
         // Crear servicios y sus horarios
         $this->createServicios();
-        
+
         // Crear reservas de ejemplo
         $this->createReservas();
-        
+
         // Ejecutar el seeder para asociar usuarios con emprendimientos
         $this->call(UserEmprendedorSeeder::class);
     }
-    
+
     private function createRolesAndPermissions()
     {
         // Crear permisos
@@ -63,35 +63,39 @@ class DatabaseSeeder extends Seeder
             'categoria_create', 'categoria_read', 'categoria_update', 'categoria_delete',
             'asociacion_create', 'asociacion_read', 'asociacion_update', 'asociacion_delete',
             'municipalidad_update', 'municipalidad_read',
-            'reserva_create', 'reserva_read', 'reserva_update', 'reserva_delete'
+            'reserva_create', 'reserva_read', 'reserva_update', 'reserva_delete',
+            // Permisos de reseñas
+            'resena_read', 'resena_create', 'resena_update', 'resena_delete', 'resena_manage'
         ];
-        
+
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
         }
-        
+
         // Crear roles
         $adminRole = Role::create(['name' => 'admin']);
         $userRole = Role::create(['name' => 'user']);
         $emprendedorRole = Role::create(['name' => 'emprendedor']);
-        
+
         // Asignar todos los permisos al rol admin
         $adminRole->givePermissionTo(Permission::all());
-        
+
         // Asignar permisos limitados al rol user
         $userRole->givePermissionTo([
-            'user_read', 'emprendedor_read', 'servicio_read', 
+            'user_read', 'emprendedor_read', 'servicio_read',
             'categoria_read', 'asociacion_read', 'municipalidad_read',
-            'reserva_create', 'reserva_read', 'reserva_update'
+            'reserva_create', 'reserva_read', 'reserva_update',
+            'resena_read', 'resena_create' // Agregamos permisos básicos de reseñas para usuarios
         ]);
-        
+
         // Asignar permisos de emprendedor
         $emprendedorRole->givePermissionTo([
-            'emprendedor_read', 'servicio_create', 'servicio_read', 
-            'servicio_update', 'servicio_delete', 'reserva_read'
+            'emprendedor_read', 'servicio_create', 'servicio_read',
+            'servicio_update', 'servicio_delete', 'reserva_read',
+            'resena_read', 'resena_manage' // Agregamos permisos de gestión de reseñas para emprendedores
         ]);
     }
-    
+
     private function createUsers()
     {
         // Admin user
@@ -110,7 +114,7 @@ class DatabaseSeeder extends Seeder
             'last_login' => now()->subDays(1)
         ]);
         $admin->assignRole('admin');
-        
+
         // Normal user
         $user = User::create([
             'name' => 'Usuario Normal',
@@ -126,7 +130,7 @@ class DatabaseSeeder extends Seeder
             'last_login' => now()->subDays(3)
         ]);
         $user->assignRole('user');
-        
+
         // Entrepreneur user
         $emprendedor = User::create([
             'name' => 'Emprendedor Local',
@@ -143,7 +147,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $emprendedor->assignRole('emprendedor');
     }
-    
+
     private function createMunicipalidad()
     {
         Municipalidad::create([
@@ -168,7 +172,7 @@ class DatabaseSeeder extends Seeder
             'horariodeatencion' => 'Lunes a Viernes: 8:00 am - 4:00 pm'
         ]);
     }
-    
+
     private function createCategorias()
     {
         $categorias = [
@@ -203,12 +207,12 @@ class DatabaseSeeder extends Seeder
                 'icono_url' => 'icons/guiado.svg'
             ]
         ];
-        
+
         foreach ($categorias as $categoria) {
             Categoria::create($categoria);
         }
     }
-    
+
     private function createAsociaciones()
     {
         $asociaciones = [
@@ -237,12 +241,12 @@ class DatabaseSeeder extends Seeder
                 'municipalidad_id' => 1
             ]
         ];
-        
+
         foreach ($asociaciones as $asociacion) {
             Asociacion::create($asociacion);
         }
     }
-    
+
     private function createEmprendedores()
     {
         $emprendedores = [
@@ -259,7 +263,7 @@ class DatabaseSeeder extends Seeder
                 'metodos_pago' => json_encode(['Efectivo', 'Transferencia', 'Yape']),
                 'capacidad_aforo' => 12,
                 'numero_personas_atiende' => 3,
-                'comentarios_resenas' => 'Excelente servicio, habitaciones limpias y comida deliciosa. Muy recomendado.',
+                //'comentarios_resenas' => 'Excelente servicio, habitaciones limpias y comida deliciosa. Muy recomendado.',
                 'imagenes' => json_encode(['samary1.jpg', 'samary2.jpg', 'samary3.jpg']),
                 'categoria' => 'Alojamiento',
                 'certificaciones' => 'TRC MINCETUR',
@@ -282,7 +286,7 @@ class DatabaseSeeder extends Seeder
                 'metodos_pago' => json_encode(['Efectivo', 'Yape']),
                 'capacidad_aforo' => 30,
                 'numero_personas_atiende' => 5,
-                'comentarios_resenas' => 'La trucha frita es espectacular. Ambiente familiar y precios accesibles.',
+                //'comentarios_resenas' => 'La trucha frita es espectacular. Ambiente familiar y precios accesibles.',
                 'imagenes' => json_encode(['sumaq1.jpg', 'sumaq2.jpg']),
                 'categoria' => 'Alimentación',
                 'certificaciones' => 'Restaurante Saludable Municipal',
@@ -305,7 +309,7 @@ class DatabaseSeeder extends Seeder
                 'metodos_pago' => json_encode(['Efectivo', 'Transferencia']),
                 'capacidad_aforo' => 10,
                 'numero_personas_atiende' => 2,
-                'comentarios_resenas' => 'Hermosos trabajos textiles. Ofrecen demostraciones del proceso de tejido.',
+                //'comentarios_resenas' => 'Hermosos trabajos textiles. Ofrecen demostraciones del proceso de tejido.',
                 'imagenes' => json_encode(['artesania1.jpg', 'artesania2.jpg']),
                 'categoria' => 'Artesanía',
                 'certificaciones' => 'Marca Perú',
@@ -328,7 +332,7 @@ class DatabaseSeeder extends Seeder
                 'metodos_pago' => json_encode(['Efectivo', 'Transferencia', 'Yape', 'Tarjeta']),
                 'capacidad_aforo' => 15,
                 'numero_personas_atiende' => 2,
-                'comentarios_resenas' => 'Botes en buen estado y guías conocedores. Muy seguro y puntual.',
+                //'comentarios_resenas' => 'Botes en buen estado y guías conocedores. Muy seguro y puntual.',
                 'imagenes' => json_encode(['transporte1.jpg', 'transporte2.jpg']),
                 'categoria' => 'Transporte',
                 'certificaciones' => 'MTC, Capitanía de Puertos',
@@ -351,7 +355,7 @@ class DatabaseSeeder extends Seeder
                 'metodos_pago' => json_encode(['Efectivo', 'Transferencia', 'Tarjeta']),
                 'capacidad_aforo' => 20,
                 'numero_personas_atiende' => 4,
-                'comentarios_resenas' => 'Increíble experiencia de kayak al amanecer. Equipos en buen estado y guías profesionales.',
+                //'comentarios_resenas' => 'Increíble experiencia de kayak al amanecer. Equipos en buen estado y guías profesionales.',
                 'imagenes' => json_encode(['aventuras1.jpg', 'aventuras2.jpg', 'aventuras3.jpg']),
                 'categoria' => 'Actividades',
                 'certificaciones' => 'DIRCETUR, Primeros Auxilios',
@@ -362,12 +366,12 @@ class DatabaseSeeder extends Seeder
                 'estado' => true
             ]
         ];
-        
+
         foreach ($emprendedores as $emprendedor) {
             Emprendedor::create($emprendedor);
         }
     }
-    
+
     private function createServicios()
     {
         $servicios = [
@@ -510,7 +514,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]
             ],
-            
+
             // Servicios para Restaurante Sumaq Mijuna
             [
                 'nombre' => 'Almuerzo típico',
@@ -590,7 +594,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]
             ],
-            
+
             // Servicios para Artesanías Titicaca
             [
                 'nombre' => 'Chullo tradicional',
@@ -670,7 +674,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]
             ],
-            
+
             // Servicios para Transportes Lacustres Titicaca
             [
                 'nombre' => 'Tour a Isla Ticonata',
@@ -762,7 +766,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]
             ],
-            
+
             // Servicios para Aventuras Titicaca
             [
                 'nombre' => 'Kayak al amanecer',
@@ -849,19 +853,19 @@ class DatabaseSeeder extends Seeder
                 ]
             ]
         ];
-        
+
         foreach ($servicios as $servicio) {
             $categorias = $servicio['categorias'];
             $horarios = $servicio['horarios'];
-            
+
             unset($servicio['categorias']);
             unset($servicio['horarios']);
-            
+
             $nuevoServicio = Servicio::create($servicio);
-            
+
             // Asociar categorías
             $nuevoServicio->categorias()->attach($categorias);
-            
+
             // Crear horarios para el servicio
             foreach ($horarios as $horario) {
                 $horario['servicio_id'] = $nuevoServicio->id;
@@ -869,7 +873,7 @@ class DatabaseSeeder extends Seeder
             }
         }
     }
-    
+
     private function createReservas()
     {
         // Crear algunas reservas de ejemplo
@@ -956,13 +960,13 @@ class DatabaseSeeder extends Seeder
                 ]
             ]
         ];
-        
+
         foreach ($reservas as $reservaData) {
             $servicios = $reservaData['servicios'];
             unset($reservaData['servicios']);
-            
+
             $reserva = Reserva::create($reservaData);
-            
+
             // Crear servicios para la reserva
             foreach ($servicios as $servicioData) {
                 $servicioData['reserva_id'] = $reserva->id;

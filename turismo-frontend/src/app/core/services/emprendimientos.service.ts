@@ -86,11 +86,11 @@ export interface Slider {
   orden: number;
   activo?: boolean;
   titulo?: string;
-  descripcion?: string | { 
-    id?: number; 
-    slider_id?: number; 
-    titulo?: string; 
-    descripcion?: string; 
+  descripcion?: string | {
+    id?: number;
+    slider_id?: number;
+    titulo?: string;
+    descripcion?: string;
   };
   imagen?: File;
   created_at?: string;
@@ -103,103 +103,133 @@ export interface AdminRequest {
   es_principal: boolean;
 }
 
+export interface Resena {
+  id: number;
+  emprendedor_id: number;
+  user_id: number;
+  nombre_autor: string;
+  comentario: string;
+  puntuacion: number;
+  imagenes?: string[];
+  estado: 'pendiente' | 'aprobado' | 'rechazado';
+  created_at: string;
+  updated_at: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class EmprendimientosService {
   private http = inject(HttpClient);
   private readonly API_URL = environment.apiUrl;
-  
+
   constructor() { }
-  
+
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Accept': 'application/json'
     });
   }
-  
+
   // Obtener todos los emprendimientos del usuario actual
   getMisEmprendimientos(): Observable<Emprendimiento[]> {
     return this.http.get<ApiResponse<Emprendimiento[]>>(`${this.API_URL}/mis-emprendimientos`)
       .pipe(map(response => response.data || []));
   }
-  
+
   // Obtener un emprendimiento específico
   getEmprendimiento(id: number): Observable<Emprendimiento> {
     return this.http.get<ApiResponse<Emprendimiento>>(`${this.API_URL}/mis-emprendimientos/${id}`)
       .pipe(map(response => response.data!));
   }
-  
+
   // Actualizar un emprendimiento
   updateEmprendimiento(id: number, data: any): Observable<Emprendimiento> {
     const formData = this.prepareFormData(data);
     formData.append('_method', 'PUT');
-    
+
     return this.http.post<ApiResponse<Emprendimiento>>(`${this.API_URL}/emprendedores/${id}`, formData)
       .pipe(map(response => response.data!));
   }
-  
+
   // Agregar un administrador al emprendimiento
   addAdministrador(emprendimientoId: number, data: AdminRequest): Observable<any> {
     return this.http.post<ApiResponse<any>>(`${this.API_URL}/mis-emprendimientos/${emprendimientoId}/administradores`, data)
       .pipe(map(response => response.data));
   }
-  
+
   // Eliminar un administrador del emprendimiento
   removeAdministrador(emprendimientoId: number, userId: number): Observable<any> {
     return this.http.delete<ApiResponse<any>>(`${this.API_URL}/mis-emprendimientos/${emprendimientoId}/administradores/${userId}`);
   }
-  
+
   // Obtener servicios de un emprendimiento
   getServicios(emprendimientoId: number): Observable<Servicio[]> {
     return this.http.get<ApiResponse<Servicio[]>>(`${this.API_URL}/emprendedores/${emprendimientoId}/servicios`)
       .pipe(map(response => response.data || []));
   }
-  
+
   // Obtener un servicio específico por ID
   getServicio(id: number): Observable<Servicio> {
     return this.http.get<ApiResponse<Servicio>>(`${this.API_URL}/servicios/${id}`)
       .pipe(map(response => response.data!));
   }
-  
+
   // Crear un servicio
   createServicio(data: Servicio): Observable<Servicio> {
     const formData = this.prepareFormData(data);
     return this.http.post<ApiResponse<Servicio>>(`${this.API_URL}/servicios`, formData)
       .pipe(map(response => response.data!));
   }
-  
+
   // Actualizar un servicio
   updateServicio(id: number, data: Servicio): Observable<Servicio> {
     const formData = this.prepareFormData(data);
     formData.append('_method', 'PUT');
-    
+
     return this.http.post<ApiResponse<Servicio>>(`${this.API_URL}/servicios/${id}`, formData)
       .pipe(map(response => response.data!));
   }
-  
+
   // Eliminar un servicio
   deleteServicio(id: number): Observable<any> {
     return this.http.delete<ApiResponse<any>>(`${this.API_URL}/servicios/${id}`);
   }
-  
+
   // Verificar disponibilidad de un servicio
   checkDisponibilidad(data: any): Observable<any> {
     return this.http.get<ApiResponse<any>>(`${this.API_URL}/servicios/verificar-disponibilidad`, { params: data })
       .pipe(map(response => response.data));
   }
-  
+
+  // Obtener reseñas de un emprendimiento
+  getResenas(emprendedorId: number): Observable<Resena[]> {
+    return this.http.get<ApiResponse<Resena[]>>(`${this.API_URL}/resenas/emprendedor/${emprendedorId}`)
+      .pipe(map(response => response.data || []));
+  }
+
+  // Actualizar estado de una reseña
+  updateResenaEstado(emprendedorId: number, resenaId: number, estado: string): Observable<Resena> {
+    return this.http.put<ApiResponse<Resena>>(`${this.API_URL}/emprendedores/${emprendedorId}/resenas/${resenaId}/estado`, { estado })
+      .pipe(map(response => response.data!));
+  }
+
+  // Eliminar una reseña
+  deleteResena(emprendedorId: number, resenaId: number): Observable<any> {
+    return this.http.delete<ApiResponse<any>>(`${this.API_URL}/emprendedores/${emprendedorId}/resenas/${resenaId}`);
+  }
+
   // Método para preparar FormData para subir archivos
   private prepareFormData(data: any): FormData {
     const formData = new FormData();
-    
+
     // Procesar campos básicos
     Object.keys(data).forEach(key => {
-      if (key !== 'sliders_principales' && key !== 'sliders_secundarios' && 
-          key !== 'sliders' && key !== 'deleted_sliders' && 
-          key !== 'administradores' && key !== 'servicios' && 
+      if (key !== 'sliders_principales' && key !== 'sliders_secundarios' &&
+          key !== 'sliders' && key !== 'deleted_sliders' &&
+          key !== 'administradores' && key !== 'servicios' &&
           key !== 'horarios' && key !== 'categorias') {
-        
+
         if (data[key] !== null && data[key] !== undefined) {
           // Si es un array, convertirlo a JSON
           if (Array.isArray(data[key])) {
@@ -212,7 +242,7 @@ export class EmprendimientosService {
         }
       }
     });
-    
+
     // Procesar sliders principales
     if (data.sliders_principales && Array.isArray(data.sliders_principales)) {
       data.sliders_principales.forEach((slider: any, index: number) => {
@@ -220,13 +250,13 @@ export class EmprendimientosService {
         formData.append(`sliders_principales[${index}][nombre]`, slider.nombre);
         formData.append(`sliders_principales[${index}][orden]`, slider.orden);
         formData.append(`sliders_principales[${index}][es_principal]`, 'true');
-        
+
         if (slider.imagen instanceof File) {
           formData.append(`sliders_principales[${index}][imagen]`, slider.imagen);
         }
       });
     }
-    
+
     // Procesar sliders secundarios
     if (data.sliders_secundarios && Array.isArray(data.sliders_secundarios)) {
       data.sliders_secundarios.forEach((slider: any, index: number) => {
@@ -236,13 +266,13 @@ export class EmprendimientosService {
         formData.append(`sliders_secundarios[${index}][es_principal]`, 'false');
         formData.append(`sliders_secundarios[${index}][titulo]`, slider.titulo || '');
         formData.append(`sliders_secundarios[${index}][descripcion]`, slider.descripcion || '');
-        
+
         if (slider.imagen instanceof File) {
           formData.append(`sliders_secundarios[${index}][imagen]`, slider.imagen);
         }
       });
     }
-    
+
     // Procesar sliders generales
     if (data.sliders && Array.isArray(data.sliders)) {
       data.sliders.forEach((slider: any, index: number) => {
@@ -258,13 +288,13 @@ export class EmprendimientosService {
         if (slider.descripcion !== undefined) {
           formData.append(`sliders[${index}][descripcion]`, slider.descripcion || '');
         }
-        
+
         if (slider.imagen instanceof File) {
           formData.append(`sliders[${index}][imagen]`, slider.imagen);
         }
       });
     }
-    
+
     // Procesar horarios
     if (data.horarios && Array.isArray(data.horarios)) {
       data.horarios.forEach((horario: any, index: number) => {
@@ -277,21 +307,21 @@ export class EmprendimientosService {
         }
       });
     }
-    
+
     // Procesar categorías
     if (data.categorias && Array.isArray(data.categorias)) {
       data.categorias.forEach((categoriaId: number) => {
         formData.append('categorias[]', categoriaId.toString());
       });
     }
-    
+
     // Procesar ids de sliders eliminados
     if (data.deleted_sliders && Array.isArray(data.deleted_sliders)) {
       data.deleted_sliders.forEach((id: number) => {
         formData.append('deleted_sliders[]', id.toString());
       });
     }
-    
+
     return formData;
   }
 }

@@ -47,11 +47,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'birth_date' => 'date', // Cast birth_date to date
         'last_login' => 'datetime', // Cast last_login to datetime
     ];
-    
+
     protected $appends = [
         'foto_perfil_url',
     ];
-    
+
     /**
      * Obtener los emprendimientos administrados por el usuario
      */
@@ -61,7 +61,7 @@ class User extends Authenticatable implements MustVerifyEmail
                     ->withPivot('es_principal', 'rol')
                     ->withTimestamps();
     }
-    
+
     /**
      * Verificar si el usuario administra algún emprendimiento
      */
@@ -69,7 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->emprendimientos()->exists();
     }
-    
+
     /**
      * Obtener la URL completa de la foto de perfil
      */
@@ -78,20 +78,20 @@ class User extends Authenticatable implements MustVerifyEmail
         if (!$this->foto_perfil && !$this->avatar) {
             return null;
         }
-        
+
         // Priorizar la foto de perfil cargada sobre el avatar de Google
         if ($this->foto_perfil) {
             if (filter_var($this->foto_perfil, FILTER_VALIDATE_URL)) {
                 return $this->foto_perfil;
             }
-            
+
             return url(Storage::url($this->foto_perfil));
         }
-        
+
         // Si no hay foto de perfil pero hay avatar de Google, usar ese
         return $this->avatar;
     }
-    
+
     /**
      * Verificar si el usuario se registró mediante Google
      */

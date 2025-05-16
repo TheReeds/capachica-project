@@ -27,7 +27,7 @@ class EmprendedoresService
     public function getAll(int $perPage = 15, bool $soloDelUsuarioActual = false): LengthAwarePaginator
     {
         $query = Emprendedor::with('asociacion');
-        
+
         // Si se solicita filtrar por usuario actual
         if ($soloDelUsuarioActual && Auth::check()) {
             $userId = Auth::id();
@@ -35,7 +35,7 @@ class EmprendedoresService
                 $q->where('users.id', $userId);
             });
         }
-        
+
         return $query->paginate($perPage);
     }
 
@@ -58,18 +58,18 @@ class EmprendedoresService
             // Extraer datos de sliders si existen
             $slidersPrincipales = $data['sliders_principales'] ?? [];
             $slidersSecundarios = $data['sliders_secundarios'] ?? [];
-            
+
             // Eliminar datos de sliders del array principal
             unset($data['sliders_principales']);
             unset($data['sliders_secundarios']);
 
             $emprendedor = new Emprendedor();
             $emprendedor->fill($data);
-            
+
             if (!$emprendedor->save()) {
                 throw new Exception('Error al guardar el registro en la base de datos');
             }
-            
+
             // Crear sliders principales si existen
             if (!empty($slidersPrincipales)) {
                 foreach ($slidersPrincipales as &$slider) {
@@ -77,7 +77,7 @@ class EmprendedoresService
                 }
                 $this->sliderRepository->createMultiple('emprendedor', $emprendedor->id, $slidersPrincipales);
             }
-            
+
             // Crear sliders secundarios si existen
             if (!empty($slidersSecundarios)) {
                 foreach ($slidersSecundarios as &$slider) {
@@ -85,7 +85,7 @@ class EmprendedoresService
                 }
                 $this->sliderRepository->createMultiple('emprendedor', $emprendedor->id, $slidersSecundarios);
             }
-            
+
             DB::commit();
             return $emprendedor->fresh(['slidersPrincipales', 'slidersSecundarios']);
         } catch (\Exception $e) {
@@ -100,38 +100,38 @@ class EmprendedoresService
     public function update(int $id, array $data): ?Emprendedor
     {
         try {
-            DB::beginTransaction(); 
-            
+            DB::beginTransaction();
+
             $emprendedor = Emprendedor::find($id);
-            
+
             if (!$emprendedor) {
                 DB::rollBack();
                 return null;
             }
-            
+
             // Extraer datos de sliders si existen
             $slidersPrincipales = $data['sliders_principales'] ?? [];
             $slidersSecundarios = $data['sliders_secundarios'] ?? [];
             $deletedSliderIds = $data['deleted_sliders'] ?? [];
-            
+
             // Eliminar datos de sliders del array principal
             unset($data['sliders_principales']);
             unset($data['sliders_secundarios']);
             unset($data['deleted_sliders']);
-            
+
             $emprendedor->fill($data);
-            
+
             if (!$emprendedor->save()) {
                 throw new Exception('Error al actualizar el registro en la base de datos');
             }
-            
+
             // Eliminar sliders marcados para eliminación
             if (!empty($deletedSliderIds)) {
                 foreach ($deletedSliderIds as $sliderId) {
                     $this->sliderRepository->delete((int)$sliderId);
                 }
             }
-            
+
             // Actualizar sliders principales si existen
             if (!empty($slidersPrincipales)) {
                 foreach ($slidersPrincipales as &$slider) {
@@ -139,7 +139,7 @@ class EmprendedoresService
                 }
                 $this->sliderRepository->updateEntitySliders('emprendedor', $emprendedor->id, $slidersPrincipales);
             }
-            
+
             // Actualizar sliders secundarios si existen
             if (!empty($slidersSecundarios)) {
                 foreach ($slidersSecundarios as &$slider) {
@@ -147,7 +147,7 @@ class EmprendedoresService
                 }
                 $this->sliderRepository->updateEntitySliders('emprendedor', $emprendedor->id, $slidersSecundarios);
             }
-            
+
             DB::commit();
             return $emprendedor->fresh(['slidersPrincipales', 'slidersSecundarios']);
         } catch (Exception $e) {
@@ -155,7 +155,7 @@ class EmprendedoresService
             throw $e;
         }
     }
-    
+
     /**
      * Eliminar un emprendedor
      */
@@ -163,7 +163,7 @@ class EmprendedoresService
     {
         try {
             DB::beginTransaction();
-            
+
             $emprendedor = Emprendedor::with(['sliders'])->find($id);
 
             if (!$emprendedor) {
@@ -175,13 +175,13 @@ class EmprendedoresService
             $emprendedor->sliders->each(function ($slider) {
                 $this->sliderRepository->delete($slider->id);
             });
-            
+
             // Eliminar relaciones con administradores
             $emprendedor->administradores()->detach();
-            
+
             // Eliminar el emprendedor
             $deleted = $emprendedor->delete();
-            
+
             DB::commit();
             return $deleted;
         } catch (Exception $e) {
@@ -189,7 +189,7 @@ class EmprendedoresService
             throw $e;
         }
     }
-    
+
     /**
      * Buscar emprendedores por categoría
      */
@@ -215,7 +215,7 @@ class EmprendedoresService
             ->orWhere('descripcion', 'like', "%{$query}%")
             ->get();
     }
-    
+
     /**
      * Obtener emprendedor con todas sus relaciones
      */
@@ -230,7 +230,7 @@ class EmprendedoresService
             'reservas.user'
         ])->find($id);
     }
-    
+
     /**
      * Obtener todos los emprendimientos administrados por un usuario específico
      */
@@ -246,7 +246,7 @@ class EmprendedoresService
             'administradores'
         ])->get();
     }
-    
+
     /**
      * Verificar si un usuario es administrador de un emprendimiento
      */
@@ -258,7 +258,7 @@ class EmprendedoresService
             })
             ->exists();
     }
-    
+
     /**
      * Verificar si un usuario es administrador principal de un emprendimiento
      */

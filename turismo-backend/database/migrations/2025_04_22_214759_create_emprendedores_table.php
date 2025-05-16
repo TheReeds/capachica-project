@@ -22,7 +22,7 @@ class CreateEmprendedoresTable extends Migration
             $table->json('metodos_pago')->nullable();
             $table->integer('capacidad_aforo')->nullable();
             $table->integer('numero_personas_atiende')->nullable();
-            $table->text('comentarios_resenas')->nullable();
+            //$table->text('comentarios_resenas')->nullable();
             $table->json('imagenes')->nullable();
             $table->string('categoria');
             $table->string('certificaciones')->nullable();

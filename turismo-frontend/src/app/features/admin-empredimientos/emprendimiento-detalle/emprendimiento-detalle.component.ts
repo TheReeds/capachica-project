@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location} from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { EmprendimientosService, Emprendimiento } from '../../../core/services/emprendimientos.service';
@@ -19,9 +19,10 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
             </h1>
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Actualiza la información de tu emprendimiento</p>
           </div>
-          <div class="flex items-center space-x-4">
-            <a routerLink="/mis-emprendimientos" class="text-sm text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="flex items-center">
+            <a (click)="volver()"
+              class="flex items-center px-4 py-2 bg-orange-50 dark:bg-gray-700 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-gray-600 border border-orange-300 dark:border-orange-500 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition-all duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
               </svg>
               Volver
@@ -29,14 +30,14 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
           </div>
         </div>
       </header>
-      
+
       <!-- Contenido Principal -->
       <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <!-- Estado de Carga -->
         <div *ngIf="loading" class="flex justify-center py-12">
           <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
         </div>
-        
+
         <!-- Error -->
         <div *ngIf="error" class="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
           <div class="flex">
@@ -55,7 +56,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
             </div>
           </div>
         </div>
-        
+
         <!-- Formulario de Edición -->
         <form *ngIf="emprendimientoForm && !loading" [formGroup]="emprendimientoForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
           <!-- Secciones del Formulario -->
@@ -63,8 +64,8 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
             <!-- Panel de Navegación -->
             <div class="bg-gray-50 dark:bg-gray-900 p-4 border-r dark:border-gray-700">
               <nav class="space-y-1">
-                <a (click)="activeSection = 'general'" 
-                   [class.bg-white]="activeSection === 'general'" 
+                <a (click)="activeSection = 'general'"
+                   [class.bg-white]="activeSection === 'general'"
                    [class.dark:bg-gray-800]="activeSection === 'general'"
                    [class.text-orange-600]="activeSection === 'general'"
                    class="cursor-pointer group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
@@ -73,8 +74,8 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                   </svg>
                   Información General
                 </a>
-                <a (click)="activeSection = 'contacto'" 
-                   [class.bg-white]="activeSection === 'contacto'" 
+                <a (click)="activeSection = 'contacto'"
+                   [class.bg-white]="activeSection === 'contacto'"
                    [class.dark:bg-gray-800]="activeSection === 'contacto'"
                    [class.text-orange-600]="activeSection === 'contacto'"
                    class="cursor-pointer group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
@@ -83,8 +84,8 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                   </svg>
                   Contacto y Ubicación
                 </a>
-                <a (click)="activeSection = 'detalles'" 
-                   [class.bg-white]="activeSection === 'detalles'" 
+                <a (click)="activeSection = 'detalles'"
+                   [class.bg-white]="activeSection === 'detalles'"
                    [class.dark:bg-gray-800]="activeSection === 'detalles'"
                    [class.text-orange-600]="activeSection === 'detalles'"
                    class="cursor-pointer group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
@@ -93,8 +94,8 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                   </svg>
                   Detalles de Servicio
                 </a>
-                <a (click)="activeSection = 'imagenes'" 
-                   [class.bg-white]="activeSection === 'imagenes'" 
+                <a (click)="activeSection = 'imagenes'"
+                   [class.bg-white]="activeSection === 'imagenes'"
                    [class.dark:bg-gray-800]="activeSection === 'imagenes'"
                    [class.text-orange-600]="activeSection === 'imagenes'"
                    class="cursor-pointer group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
@@ -104,7 +105,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                   Imágenes
                 </a>
               </nav>
-              
+
               <div class="mt-8">
                 <div class="space-y-1">
                   <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -122,16 +123,22 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                     </svg>
                     Gestionar Administradores
                   </a>
+                  <a [routerLink]="['/emprendimiento', emprendimientoId, 'moderacion-resenas']" class="group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Gestionar Reseñas
+                  </a>
                 </div>
               </div>
             </div>
-            
+
             <!-- Contenido del Formulario -->
             <div class="col-span-2 p-6">
               <!-- Información General -->
               <div *ngIf="activeSection === 'general'" class="space-y-6">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white">Información General</h2>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div class="col-span-2">
                     <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre del Emprendimiento *</label>
@@ -140,7 +147,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                       <span *ngIf="f['nombre'].errors['required']">El nombre es requerido</span>
                     </div>
                   </div>
-                
+
                   <div>
                     <label for="tipo_servicio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Servicio *</label>
                     <input type="text" id="tipo_servicio" formControlName="tipo_servicio" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
@@ -148,7 +155,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                       <span *ngIf="f['tipo_servicio'].errors['required']">El tipo de servicio es requerido</span>
                     </div>
                   </div>
-                
+
                   <div>
                     <label for="categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría *</label>
                     <input type="text" id="categoria" formControlName="categoria" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
@@ -156,7 +163,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                       <span *ngIf="f['categoria'].errors['required']">La categoría es requerida</span>
                     </div>
                   </div>
-                
+
                   <div class="col-span-2">
                     <label for="descripcion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción *</label>
                     <textarea id="descripcion" formControlName="descripcion" rows="4" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500"></textarea>
@@ -164,18 +171,18 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                       <span *ngIf="f['descripcion'].errors['required']">La descripción es requerida</span>
                     </div>
                   </div>
-                
+
                   <div class="flex items-center">
                     <input type="checkbox" id="estado" formControlName="estado" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
                     <label for="estado" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Emprendimiento activo</label>
                   </div>
                 </div>
               </div>
-              
+
               <!-- Contacto y Ubicación -->
               <div *ngIf="activeSection === 'contacto'" class="space-y-6">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white">Contacto y Ubicación</h2>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono *</label>
@@ -184,7 +191,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                       <span *ngIf="f['telefono'].errors['required']">El teléfono es requerido</span>
                     </div>
                   </div>
-                
+
                   <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email *</label>
                     <input type="email" id="email" formControlName="email" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
@@ -193,12 +200,12 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                       <span *ngIf="f['email'].errors['email']">El email debe ser válido</span>
                     </div>
                   </div>
-                
+
                   <div>
                     <label for="pagina_web" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Página Web</label>
                     <input type="text" id="pagina_web" formControlName="pagina_web" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                   </div>
-                
+
                   <div>
                     <label for="ubicacion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ubicación *</label>
                     <input type="text" id="ubicacion" formControlName="ubicacion" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
@@ -206,79 +213,79 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                       <span *ngIf="f['ubicacion'].errors['required']">La ubicación es requerida</span>
                     </div>
                   </div>
-                
+
                   <div>
                     <label for="opciones_acceso" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Opciones de Acceso</label>
                     <input type="text" id="opciones_acceso" formControlName="opciones_acceso" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: A pie, transporte público, taxi</p>
                   </div>
-                
+
                   <div class="flex items-center">
                     <input type="checkbox" id="facilidades_discapacidad" formControlName="facilidades_discapacidad" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
                     <label for="facilidades_discapacidad" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Cuenta con facilidades para personas con discapacidad</label>
                   </div>
                 </div>
               </div>
-              
+
               <!-- Detalles de Servicio -->
               <div *ngIf="activeSection === 'detalles'" class="space-y-6">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white">Detalles de Servicio</h2>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label for="horario_atencion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Horario de Atención</label>
                     <input type="text" id="horario_atencion" formControlName="horario_atencion" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: Lunes a Domingo: 8:00 am - 8:00 pm</p>
                   </div>
-                
+
                   <div>
                     <label for="precio_rango" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rango de Precios</label>
                     <input type="text" id="precio_rango" formControlName="precio_rango" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: S/. 15 - S/. 35</p>
                   </div>
-                
+
                   <div>
                     <label for="capacidad_aforo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Capacidad/Aforo</label>
                     <input type="number" id="capacidad_aforo" formControlName="capacidad_aforo" min="0" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                   </div>
-                
+
                   <div>
                     <label for="numero_personas_atiende" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Personas que Atienden</label>
                     <input type="number" id="numero_personas_atiende" formControlName="numero_personas_atiende" min="0" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                   </div>
-                
+
                   <div>
                     <label for="metodos_pago" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Métodos de Pago</label>
                     <input type="text" id="metodos_pago" formControlName="metodos_pago" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: Efectivo, Yape, Tarjetas (separados por coma)</p>
                   </div>
-                
+
                   <div>
                     <label for="idiomas_hablados" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Idiomas Hablados</label>
                     <input type="text" id="idiomas_hablados" formControlName="idiomas_hablados" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: Español, Quechua, Inglés (separados por coma)</p>
                   </div>
-                
+
                   <div>
                     <label for="certificaciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Certificaciones</label>
                     <input type="text" id="certificaciones" formControlName="certificaciones" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
                   </div>
-                
+
                   <div class="col-span-2">
                     <label for="comentarios_resenas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Comentarios y Reseñas</label>
                     <textarea id="comentarios_resenas" formControlName="comentarios_resenas" rows="3" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500"></textarea>
                   </div>
                 </div>
               </div>
-              
+
               <!-- Imágenes -->
               <div *ngIf="activeSection === 'imagenes'" class="space-y-6">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white">Imágenes</h2>
-                
+
                 <div class="space-y-4">
                   <div>
                     <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imagen Principal</h3>
-                    
+
                     <div *ngIf="emprendimiento?.sliders_principales?.length" class="mb-4">
                       <div *ngFor="let slider of emprendimiento?.sliders_principales" class="border border-gray-300 dark:border-gray-600 rounded-lg p-2 mb-2 flex items-center">
                         <img [src]="slider.url_completa" [alt]="slider.nombre" class="h-16 w-24 object-cover rounded mr-4">
@@ -287,7 +294,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-dashed border-gray-300 dark:border-gray-600">
                       <div class="text-center">
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -302,10 +309,10 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imágenes Secundarias</h3>
-                    
+
                     <div *ngIf="emprendimiento?.sliders_secundarios?.length" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                       <div *ngFor="let slider of emprendimiento?.sliders_secundarios" class="border border-gray-300 dark:border-gray-600 rounded-lg p-2 flex items-center">
                         <img [src]="slider.url_completa" [alt]="slider.nombre" class="h-16 w-24 object-cover rounded mr-4">
@@ -317,7 +324,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-dashed border-gray-300 dark:border-gray-600">
                       <div class="text-center">
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -334,7 +341,7 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
                   </div>
                 </div>
               </div>
-              
+
               <!-- Botones de Acción -->
               <div class="mt-8 pt-5 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex justify-between">
@@ -360,38 +367,39 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
   `]
 })
 export class EmprendimientoDetalleComponent implements OnInit {
+  constructor(private location: Location) {}
   private emprendimientosService = inject(EmprendimientosService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
-  
+
   emprendimientoId: number = 0;
   emprendimiento: Emprendimiento | null = null;
   emprendimientoForm: FormGroup | null = null;
-  
+
   loading = true;
   submitting = false;
   submitted = false;
   error = '';
   success = '';
-  
+
   activeSection = 'general';
-  
+
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.emprendimientoId = +params['id'];
       this.loadEmprendimiento();
     });
   }
-  
+
   get f() {
     return this.emprendimientoForm?.controls || {};
   }
-  
+
   loadEmprendimiento(): void {
     this.loading = true;
     this.error = '';
-    
+
     this.emprendimientosService.getEmprendimiento(this.emprendimientoId).subscribe({
       next: (data) => {
         this.emprendimiento = data;
@@ -405,10 +413,10 @@ export class EmprendimientoDetalleComponent implements OnInit {
       }
     });
   }
-  
+
   initForm(): void {
     if (!this.emprendimiento) return;
-    
+
     // Preparar los valores de los arrays
     let metodosPago = this.emprendimiento.metodos_pago;
     if (typeof metodosPago === 'string' && metodosPago.startsWith('[')) {
@@ -418,7 +426,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
         console.error('Error parsing metodos_pago:', e);
       }
     }
-    
+
     let idiomasHablados = this.emprendimiento.idiomas_hablados;
     if (typeof idiomasHablados === 'string' && idiomasHablados.includes(',')) {
       idiomasHablados = idiomasHablados; // Ya está en formato string separado por comas
@@ -429,7 +437,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
         console.error('Error parsing idiomas_hablados:', e);
       }
     }
-    
+
     this.emprendimientoForm = this.fb.group({
       nombre: [this.emprendimiento.nombre, [Validators.required]],
       tipo_servicio: [this.emprendimiento.tipo_servicio, [Validators.required]],
@@ -453,13 +461,13 @@ export class EmprendimientoDetalleComponent implements OnInit {
       asociacion_id: [this.emprendimiento.asociacion_id]
     });
   }
-  
+
   onSubmit(): void {
     this.submitted = true;
-    
+
     if (this.emprendimientoForm?.invalid) {
       // Ir a la primera sección con errores
-      if (this.f['nombre'].errors || this.f['tipo_servicio'].errors || 
+      if (this.f['nombre'].errors || this.f['tipo_servicio'].errors ||
           this.f['categoria'].errors || this.f['descripcion'].errors) {
         this.activeSection = 'general';
       } else if (this.f['telefono'].errors || this.f['email'].errors || this.f['ubicacion'].errors) {
@@ -467,16 +475,16 @@ export class EmprendimientoDetalleComponent implements OnInit {
       }
       return;
     }
-    
+
     this.submitting = true;
     const formData = this.prepareFormData();
-    
+
     this.emprendimientosService.updateEmprendimiento(this.emprendimientoId, formData).subscribe({
       next: (data) => {
         this.emprendimiento = data;
         this.success = 'Emprendimiento actualizado correctamente';
         this.submitting = false;
-        
+
         // Mostrar mensaje de éxito y redirigir a la lista
         alert('Emprendimiento actualizado correctamente');
         this.router.navigate(['/mis-emprendimientos']);
@@ -488,34 +496,40 @@ export class EmprendimientoDetalleComponent implements OnInit {
       }
     });
   }
-  
+
   prepareFormData(): any {
     if (!this.emprendimientoForm) return {};
-    
+
     const formData = { ...this.emprendimientoForm.value };
-    
+
     // Convertir strings separados por comas a arrays
     if (formData.metodos_pago && typeof formData.metodos_pago === 'string') {
       formData.metodos_pago = formData.metodos_pago.split(',').map((item: string) => item.trim());
     }
-    
+
     if (formData.idiomas_hablados && typeof formData.idiomas_hablados === 'string') {
       formData.idiomas_hablados = formData.idiomas_hablados.split(',').map((item: string) => item.trim());
     }
-    
+
     return formData;
   }
   getSliderDescripcion(slider: any): string {
     if (!slider.descripcion) return '';
-    
+
     if (typeof slider.descripcion === 'string') {
       return slider.descripcion;
     } else {
       return slider.descripcion.descripcion || '';
     }
   }
-  
+
   cancel(): void {
     this.router.navigate(['/mis-emprendimientos']);
   }
+
+  volver() {
+    console.log('Volviendo a la página anterior');
+    this.location.back();
+  }
+
 }

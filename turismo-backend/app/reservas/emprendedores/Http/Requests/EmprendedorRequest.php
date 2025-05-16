@@ -25,7 +25,7 @@ class EmprendedorRequest extends FormRequest
                 ]);
             }
         }
-        
+
         // Convertir idiomas_hablados que viene como string a array
         if ($this->has('idiomas_hablados') && is_string($this->idiomas_hablados)) {
             $idiomas = array_map('trim', explode(',', $this->idiomas_hablados));
@@ -33,14 +33,14 @@ class EmprendedorRequest extends FormRequest
                 'idiomas_hablados' => $idiomas
             ]);
         }
-        
+
         // Asegurar que facilidades_discapacidad sea booleano
         if ($this->has('facilidades_discapacidad')) {
             $this->merge([
                 'facilidades_discapacidad' => filter_var($this->facilidades_discapacidad, FILTER_VALIDATE_BOOLEAN)
             ]);
         }
-        
+
         // Asegurar que estado sea booleano
         if ($this->has('estado')) {
             $this->merge([
@@ -57,25 +57,25 @@ class EmprendedorRequest extends FormRequest
         // Para crear un nuevo emprendedor, el usuario debe tener permiso
         if ($this->isMethod('POST')) {
             return Auth::check() && (
-                Auth::user()->hasPermissionTo('emprendedor_create') || 
+                Auth::user()->hasPermissionTo('emprendedor_create') ||
                 Auth::user()->hasRole('admin')
             );
         }
-        
+
         // Para actualizar un emprendedor existente
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
             // Si tiene permiso general de actualización, está autorizado
             if (Auth::user()->hasPermissionTo('emprendedor_update') || Auth::user()->hasRole('admin')) {
                 return true;
             }
-            
+
             // Si no tiene permiso general, verificar si es administrador de este emprendimiento
             $emprendedorId = $this->route('id');
             return Auth::user()->emprendimientos()
                 ->where('emprendedores.id', $emprendedorId)
                 ->exists();
         }
-        
+
         return false;
     }
 
@@ -97,7 +97,7 @@ class EmprendedorRequest extends FormRequest
             'metodos_pago' => 'nullable|array',
             'capacidad_aforo' => 'nullable|integer|min:0',
             'numero_personas_atiende' => 'nullable|integer|min:0',
-            'comentarios_resenas' => 'nullable|string',
+            //'comentarios_resenas' => 'nullable|string',
             'imagenes' => 'nullable|array',
             'categoria' => 'required|string|max:100',
             'certificaciones' => 'nullable|array',
@@ -106,14 +106,14 @@ class EmprendedorRequest extends FormRequest
             'facilidades_discapacidad' => 'nullable|boolean',
             'asociacion_id' => 'nullable|exists:asociaciones,id',
             'estado' => 'nullable|boolean',
-            
+
             // Validaciones para sliders
             'sliders_principales' => 'nullable|array',
             'sliders_principales.*.id' => 'nullable|integer|exists:sliders,id',
             'sliders_principales.*.nombre' => 'required|string|max:255',
             'sliders_principales.*.orden' => 'required|integer|min:1',
             'sliders_principales.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:5120',
-            
+
             'sliders_secundarios' => 'nullable|array',
             'sliders_secundarios.*.id' => 'nullable|integer|exists:sliders,id',
             'sliders_secundarios.*.nombre' => 'required|string|max:255',
@@ -121,17 +121,17 @@ class EmprendedorRequest extends FormRequest
             'sliders_secundarios.*.titulo' => 'required|string|max:255',
             'sliders_secundarios.*.descripcion' => 'nullable|string',
             'sliders_secundarios.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:5120',
-            
+
             'deleted_sliders' => 'nullable|array',
             'deleted_sliders.*' => 'integer|exists:sliders,id',
-            
+
             // Administradores (solo para creación inicial)
             'administradores' => 'nullable|array',
             'administradores.*.user_id' => 'required|exists:users,id',
             'administradores.*.es_principal' => 'nullable|boolean',
             'administradores.*.rol' => 'required|in:administrador,colaborador',
         ];
-        
+
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
             foreach ($rules as $field => $rule) {
                 // No aplicar 'sometimes' a reglas de arreglos anidados
@@ -140,10 +140,10 @@ class EmprendedorRequest extends FormRequest
                 }
             }
         }
-        
+
         return $rules;
     }
-    
+
     /**
      * Get custom error messages
      */
@@ -165,7 +165,7 @@ class EmprendedorRequest extends FormRequest
             'sliders_secundarios.*.titulo.required' => 'El título del slider secundario es obligatorio',
         ];
     }
-    
+
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
@@ -176,7 +176,7 @@ class EmprendedorRequest extends FormRequest
             ], Response::HTTP_UNPROCESSABLE_ENTITY)
         );
     }
-    
+
     /**
      * Handle a failed authorization attempt.
      *

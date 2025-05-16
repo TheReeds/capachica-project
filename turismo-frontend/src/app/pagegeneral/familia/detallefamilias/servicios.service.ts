@@ -14,7 +14,7 @@ export class ServicioService {
   constructor(private http: HttpClient) {}
 
   obtenerServicios(): Observable<Servicio[]> {
-    return this.http.get<Servicio[]>(this.API_URL);
+    return this.http.get<Servicio[]>(`${this.API_URL}/servicios`);
   }
 
   

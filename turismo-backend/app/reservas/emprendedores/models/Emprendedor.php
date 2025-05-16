@@ -33,7 +33,7 @@ class Emprendedor extends Model
         'metodos_pago',
         'capacidad_aforo',
         'numero_personas_atiende',
-        'comentarios_resenas',
+        //'comentarios_resenas',
         'imagenes',
         'categoria',
         'certificaciones',
@@ -49,7 +49,7 @@ class Emprendedor extends Model
         'imagenes' => 'array',
         'certificaciones' => 'array',
         'idiomas_hablados' => 'array',
-        'opciones_acceso' => 'array', 
+        'opciones_acceso' => 'array',
         'facilidades_discapacidad' => 'boolean',
         'estado' => 'boolean'
     ];
@@ -113,5 +113,18 @@ class Emprendedor extends Model
                     ->where('es_principal', false)
                     ->with('descripcion')
                     ->orderBy('orden');
+    }
+
+    public function resenas()
+    {
+        return $this->hasMany(\App\Resenas\Model\Resenas::class)
+                    ->where('estado', 'aprobado')
+                    ->latest();
+    }
+
+    public function resenasPendientes()
+    {
+        return $this->hasMany(\App\Resenas\Model\Resenas::class)
+                    ->where('estado', 'pendiente');
     }
 }

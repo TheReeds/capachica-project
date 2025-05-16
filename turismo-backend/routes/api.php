@@ -20,6 +20,7 @@ use App\reservas\reservadetalle\Controller\ReservaDetalleController;
 use App\Servicios\Controllers\ServicioController;
 use App\Servicios\Controllers\CategoriaController;
 use App\Http\Controllers\API\GoogleAuthController;
+use App\Resenas\Controllers\ResenasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,11 @@ Route::prefix('municipalidad')->group(function () {
     Route::get('/{id}/relaciones', [MunicipalidadController::class, 'getWithRelations']);
     Route::get('/{id}/asociaciones', [MunicipalidadController::class, 'getWithAsociaciones']);
     Route::get('/{id}/asociaciones/emprendedores', [MunicipalidadController::class, 'getWithAsociacionesAndEmprendedores']);
+});
+
+// Reseñas (rutas públicas)
+Route::prefix('resenas')->group(function () {
+    Route::get('/emprendedor/{id}', [ResenasController::class, 'index']);
 });
 
 // Sliders
@@ -121,10 +127,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     // Reenviar correo de verificación
     Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail']);
-    
+
     // Menú dinámico
     Route::get('/menu', [MenuController::class, 'getMenu']);
-    
+
     // Mis Emprendimientos (para usuarios emprendedores)
     Route::prefix('mis-emprendimientos')->group(function () {
         Route::get('/', [MisEmprendimientosController::class, 'index']);
@@ -134,14 +140,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/administradores', [MisEmprendimientosController::class, 'agregarAdministrador']);
         Route::delete('/{id}/administradores/{userId}', [MisEmprendimientosController::class, 'eliminarAdministrador']);
     });
-    
+
     // Municipalidades (rutas protegidas)
     Route::prefix('municipalidad')->group(function () {
         Route::post('/', [MunicipalidadController::class, 'store'])->middleware('permission:municipalidad_update');
         Route::put('/{id}', [MunicipalidadController::class, 'update'])->middleware('permission:municipalidad_update');
         Route::delete('/{id}', [MunicipalidadController::class, 'destroy'])->middleware('permission:municipalidad_update');
     });
-    
+
     // Sliders (rutas protegidas)
     Route::prefix('sliders')->group(function () {
         Route::post('/', [SliderController::class, 'store']);
@@ -149,40 +155,44 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [SliderController::class, 'update']);
         Route::delete('/{id}', [SliderController::class, 'destroy']);
     });
-    
+
     // Asociaciones (rutas protegidas)
     Route::prefix('asociaciones')->group(function () {
         Route::post('/', [AsociacionController::class, 'store']);
         Route::put('/{id}', [AsociacionController::class, 'update']);
         Route::delete('/{id}', [AsociacionController::class, 'destroy']);
     });
-    
+
     // Emprendedores (rutas protegidas)
     Route::prefix('emprendedores')->group(function () {
         Route::post('/', [EmprendedorController::class, 'store'])->middleware('permission:emprendedor_create');
         Route::put('/{id}', [EmprendedorController::class, 'update']);
         Route::delete('/{id}', [EmprendedorController::class, 'destroy']);
         Route::get('/{id}/reservas', [EmprendedorController::class, 'getReservas']);
-        
+
         // Gestión de administradores de emprendimientos
         Route::post('/{id}/administradores', [EmprendedorController::class, 'agregarAdministrador']);
         Route::delete('/{id}/administradores/{userId}', [EmprendedorController::class, 'eliminarAdministrador']);
+
+        // Nueva ruta para actualizar estado de reseñas
+        Route::put('/{emprendedorId}/resenas/{resenaId}/estado', [\App\Resenas\Controllers\ResenasController::class, 'updateEstado']);
+        Route::delete('/{emprendedorId}/resenas/{resenaId}', [\App\Resenas\Controllers\ResenasController::class, 'destroy']);
     });
-    
+
     // Servicios (rutas protegidas)
     Route::prefix('servicios')->group(function () {
         Route::post('/', [ServicioController::class, 'store']);
         Route::put('/{id}', [ServicioController::class, 'update']);
         Route::delete('/{id}', [ServicioController::class, 'destroy']);
     });
-    
+
     // Categorías (rutas protegidas)
     Route::prefix('categorias')->group(function () {
         Route::post('/', [CategoriaController::class, 'store']);
         Route::put('/{id}', [CategoriaController::class, 'update']);
         Route::delete('/{id}', [CategoriaController::class, 'destroy']);
     });
-    
+
     // Reservas (nuevas rutas)
     Route::prefix('reservas')->group(function () {
         Route::get('/', [ReservaController::class, 'index']);
@@ -190,13 +200,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [ReservaController::class, 'store']);
         Route::put('/{id}', [ReservaController::class, 'update']);
         Route::delete('/{id}', [ReservaController::class, 'destroy']);
-        
+
         // Cambiar estado de la reserva
         Route::put('/{id}/estado', [ReservaController::class, 'cambiarEstado']);
-        
+
         // Obtener reservas por emprendedor
         Route::get('/emprendedor/{emprendedorId}', [ReservaController::class, 'byEmprendedor']);
-        
+
         // Obtener reservas por servicio
         Route::get('/servicio/{servicioId}', [ReservaController::class, 'byServicio']);
     });
@@ -204,19 +214,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('reserva-servicios')->group(function () {
         // Obtener servicios por reserva
         Route::get('/reserva/{reservaId}', [ReservaServicioController::class, 'byReserva']);
-        
+
         // Cambiar estado de un servicio reservado
         Route::put('/{id}/estado', [ReservaServicioController::class, 'cambiarEstado']);
-        
+
         // Obtener servicios para calendario
         Route::get('/calendario', [ReservaServicioController::class, 'calendario']);
-        
+
         // Verificar disponibilidad de un servicio
         Route::get('/verificar-disponibilidad', [ReservaServicioController::class, 'verificarDisponibilidad']);
     });
-    
+
     // ===== RUTAS DE ADMINISTRACIÓN (CON PERMISOS) =====
-    
+
     // Roles
     Route::prefix('roles')->middleware('permission:role_read')->group(function () {
         Route::get('/', [RoleController::class, 'index']);
@@ -225,7 +235,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [RoleController::class, 'update'])->middleware('permission:role_update');
         Route::delete('/{id}', [RoleController::class, 'destroy'])->middleware('permission:role_delete');
     });
-    
+
     // Permisos
     Route::prefix('permissions')->middleware('permission:permission_read')->group(function () {
         Route::get('/', [PermissionController::class, 'index']);
@@ -233,7 +243,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/assign-to-role', [PermissionController::class, 'assignPermissionsToRole'])->middleware('permission:permission_assign');
         Route::get('/users/{id}/permissions', [PermissionController::class, 'getUserPermissions']);
     });
-    
+
     // Gestión de Usuarios
     Route::prefix('users')->middleware('permission:user_read')->group(function () {
         Route::get('/', [UserController::class, 'index']);
@@ -245,7 +255,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}/deactivate', [UserController::class, 'deactivate'])->middleware('permission:user_update');
         Route::put('/{id}/roles', [UserController::class, 'assignRoles'])->middleware('permission:user_update');
     });
-    
+
+    // Reseñas (rutas protegidas)
+    Route::prefix('resenas')->group(function () {
+        Route::post('/', [ResenasController::class, 'store']);
+    });
+
     // Dashboard
     Route::prefix('dashboard')->middleware('permission:user_read')->group(function () {
         Route::get('/summary', [DashboardController::class, 'summary']);

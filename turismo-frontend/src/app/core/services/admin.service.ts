@@ -95,15 +95,15 @@ export class AdminService {
   }
 
   activateUser(id: number): Observable<User> {
-    return this.http.put<User>(`${this.API_URL}/users/${id}/activate`, {});
+    return this.http.post<User>(`${this.API_URL}/users/${id}/activate`, {});
   }
 
   deactivateUser(id: number): Observable<User> {
-    return this.http.put<User>(`${this.API_URL}/users/${id}/deactivate`, {});
+    return this.http.post<User>(`${this.API_URL}/users/${id}/deactivate`, {});
   }
 
   assignRolesToUser(userId: number, roles: string[]): Observable<any> {
-    return this.http.put(`${this.API_URL}/users/${userId}/roles`, { roles });
+    return this.http.post(`${this.API_URL}/users/${userId}/roles`, { roles });
   }
 
   getUserPermissions(userId: number): Observable<any> {

@@ -21,9 +21,9 @@ export class EventosService {
     {
       id: 1,
       titulo: '¡Celebra el Día de la Madre!',
-      descripcion: 'Este evento especial está diseñado para celebrar a todas las mamás. Disfruta de actividades y sorpresas en un ambiente lleno de cariño y amor.',
-      fecha: '14/05/2024', // Mantén tus fechas actualizadas
-      imagen: 'https://marketplace.canva.com/EAFwiYPsxqI/1/0/1600w/canva-tarjeta-feliz-d%C3%ADa-de-la-madre-delicado-floral-beige-46hQdKcgZ6c.jpg',
+      descripcion: 'Rinde homenaje a las mujeres que nos dieron la vida con actividades especiales, música, reconocimientos y mucha emoción.',
+      fecha: '11/05/2024', // Mantén tus fechas actualizadas
+      imagen: 'https://elcomercio.pe/resizer/v2/R7XFQBIEOJHCVNSHRY4PW65CFM.jpg?auth=315e63ed3c51c5074fd1f1e0702236259ba7c70b24225684a2d957c8d645c882&width=1200&height=810&quality=90&smart=true',
       lugar: 'Parque Central de la Ciudad',
       organizador: 'Comité Festivo Municipal',
       detallesAdicionales: 'Habrá música en vivo, sorteos y un pequeño refrigerio para las mamás asistentes. Cupos limitados, ¡regístrate pronto!'
@@ -57,8 +57,28 @@ export class EventosService {
       lugar: 'Campo Ferial de la Ciudad',
       organizador: 'Asociación de Restauradores Unidos',
       detallesAdicionales: 'Más de 50 stands de comida, postres y bebidas. Shows de cocina en vivo y concursos.'
-    }
+    },
     // Agrega más eventos aquí según necesites
+    {
+      id: 5,
+      titulo: 'Gran Feria Gastronómica Regional',
+      descripcion: 'Disfruta de la mejor gastronomía local de la región, con platos innovadores y tradicionales que deleitarán tu paladar.',
+      fecha: '10/09/2025', // Ejemplo de fecha futura
+      imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJjTLeUPcxkk64eT21OnjsBy__fFofUO_xroxdiXxiSynRmuLnI7Nw8zKY6bqBCWRI_88&usqp=CAU',
+      lugar: 'Campo Ferial de la Ciudad',
+      organizador: 'Asociación de Restauradores Unidos',
+      detallesAdicionales: 'Más de 50 stands de comida, postres y bebidas. Shows de cocina en vivo y concursos.'
+    },
+    {
+      id: 6,
+      titulo: 'Gran Feria Gastronómica Regional',
+      descripcion: 'Disfruta de la mejor gastronomía local de la región, con platos innovadores y tradicionales que deleitarán tu paladar.',
+      fecha: '10/09/2025', // Ejemplo de fecha futura
+      imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJjTLeUPcxkk64eT21OnjsBy__fFofUO_xroxdiXxiSynRmuLnI7Nw8zKY6bqBCWRI_88&usqp=CAU',
+      lugar: 'Campo Ferial de la Ciudad',
+      organizador: 'Asociación de Restauradores Unidos',
+      detallesAdicionales: 'Más de 50 stands de comida, postres y bebidas. Shows de cocina en vivo y concursos.'
+    }
   ];
 
   constructor() { }

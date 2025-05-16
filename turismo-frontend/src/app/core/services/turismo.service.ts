@@ -85,6 +85,24 @@ export interface Municipalidad {
   sliders_secundarios?: Slider[];
 }
 
+export interface Evento {
+  id?: number;
+  nombre: string;
+  descripcion: string;
+  tipo_evento: string;
+  idioma_principal: string;
+  fecha_inicio: string;
+  hora_inicio?: number;
+  fecha_fin: string;
+  hora_fin?: number;
+  duracion_horas?: number;
+  coordenada_x?: number;
+  coordenada_y?: number;
+  imagen_url: Slider[];
+  id_emprendedor?: Emprendedor[];
+  que_llevar: string;
+}
+
 export interface Asociacion {
   id?: number;
   nombre: string;
@@ -443,6 +461,41 @@ export class TurismoService {
 
   deleteMunicipalidad(id: number): Observable<any> {
     return this.http.delete<{ success: boolean, message: string }>(`${this.API_URL}/municipalidad/${id}`,
+      { headers: this.getSimpleHeaders() });
+  }
+   // Evento
+   getEventos(): Observable<Evento[]> {
+    return this.http.get<{ success: boolean, data: Evento[] }>(`${this.API_URL}/evento`, 
+      { headers: this.getSimpleHeaders() })
+      .pipe(map(response => response.data));
+  }
+
+  getEvento(id: number): Observable<Evento> {
+    return this.http.get<{ success: boolean, data: Evento }>(`${this.API_URL}/evento/${id}`,
+      { headers: this.getSimpleHeaders() })
+      .pipe(map(response => response.data));
+  }
+
+  
+
+  createEvento(evento: Evento): Observable<Evento> {
+    const formData = this.prepareFormData(evento);
+    return this.http.post<{ success: boolean, data: Evento }>(`${this.API_URL}/evento`, formData,
+      { headers: this.getHeaders() })
+      .pipe(map(response => response.data));
+  }
+
+  updateEvento(id: number, evento: Evento): Observable<Evento> {
+    const formData = this.prepareFormData(evento);
+    // Añadir el método PUT usando _method
+    formData.append('_method', 'PUT');
+    return this.http.post<{ success: boolean, data: Evento }>(`${this.API_URL}/evento/${id}`, formData,
+      { headers: this.getHeaders() })
+      .pipe(map(response => response.data));
+  }
+
+  deleteEvento(id: number): Observable<any> {
+    return this.http.delete<{ success: boolean, message: string }>(`${this.API_URL}/evento/${id}`,
       { headers: this.getSimpleHeaders() });
   }
 

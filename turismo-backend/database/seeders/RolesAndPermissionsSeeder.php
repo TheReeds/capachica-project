@@ -41,7 +41,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $operatorRole->givePermissionTo(['user_read', 'role_read', 'permission_read']);
 
         $userRole = Role::create(['name' => 'user']);
-        
+
         // Crear usuario admin
         $admin = User::create([
             'name' => 'Admin',
@@ -50,7 +50,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'email' => 'admin@turismo.com',
             'password' => Hash::make('password123'),
         ]);
-        
+
         $admin->assignRole('admin');
     }
 }
