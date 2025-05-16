@@ -22,7 +22,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ],
   template: `
     <div class="space-y-6">
-      <!-- Alerta de Éxito -->
+      <!-- Alertas de éxito (creación y edición) -->
       @if (successMessage) {
         <div @fadeInOut class="rounded-lg bg-green-50 p-4 border-l-4 border-green-500 shadow-lg relative" role="alert">
           <div class="flex items-center">
@@ -51,6 +51,39 @@ import { trigger, transition, style, animate } from '@angular/animations';
           </div>
           <!-- Barra de progreso animada -->
           <div class="absolute bottom-0 left-0 h-1 bg-green-300 animate-pulse" style="width: 100%; animation: progress-bar 5s linear forwards;">
+          </div>
+        </div>
+      }
+
+      <!-- Alerta de edición exitosa -->
+      @if (editSuccessMessage) {
+        <div @fadeInOut class="rounded-lg bg-blue-50 p-4 border-l-4 border-blue-500 shadow-lg relative" role="alert">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-blue-800">{{ editSuccessMessage }}</p>
+            </div>
+            <div class="ml-auto pl-3">
+              <div class="-mx-1.5 -my-1.5">
+                <button
+                  type="button"
+                  (click)="editSuccessMessage = ''"
+                  class="inline-flex rounded-md p-1.5 text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <span class="sr-only">Cerrar</span>
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Barra de progreso animada -->
+          <div class="absolute bottom-0 left-0 h-1 bg-blue-300 animate-pulse" style="width: 100%; animation: progress-bar 5s linear forwards;">
           </div>
         </div>
       }
@@ -233,7 +266,9 @@ export class LugarFormComponent implements OnInit {
   submitted = false;
   error = '';
   successMessage = '';
+  editSuccessMessage = '';
   alertTimeout: any = null;
+  editAlertTimeout: any = null;
 
   get isEditMode(): boolean {
     return this.lugarId !== null;
@@ -253,7 +288,12 @@ export class LugarFormComponent implements OnInit {
     // Verificar si hay mensaje de éxito en los query params
     const success = this.route.snapshot.queryParamMap.get('success');
     if (success) {
-      this.showSuccessMessage(success);
+      // Determinar qué tipo de alerta mostrar según el contexto
+      if (success.includes('edit') || success.includes('actualiz')) {
+        this.showEditSuccessMessage(success);
+      } else {
+        this.showSuccessMessage(success);
+      }
     }
   }
 
@@ -383,12 +423,12 @@ export class LugarFormComponent implements OnInit {
       this.turismoService.updateLugarTuristico(this.lugarId, updateData).subscribe({
         next: () => {
           this.saving = false;
-          // Mostrar alerta en lugar de redirigir
-          this.showSuccessMessage('Lugar turístico actualizado correctamente');
+          // Mostrar alerta específica para edición
+          this.showEditSuccessMessage('Lugar turístico actualizado correctamente');
           // Redirigir después de que se muestre la alerta
           setTimeout(() => {
             this.router.navigate(['/admin/lugares-turisticos']);
-          }, 2000);
+          }, 3000);
         },
         error: (error) => {
           this.handleError(error);
@@ -405,7 +445,7 @@ export class LugarFormComponent implements OnInit {
           // Redirigir después de que se muestre la alerta
           setTimeout(() => {
             this.router.navigate(['/admin/lugares-turisticos']);
-          }, 2000);
+          }, 3000);
         },
         error: (error) => {
           this.handleError(error);
@@ -417,6 +457,8 @@ export class LugarFormComponent implements OnInit {
 
   showSuccessMessage(message: string) {
     this.successMessage = message;
+    // Limpiar la otra alerta para evitar mostrar ambas a la vez
+    this.editSuccessMessage = '';
 
     // Auto-cerrar la alerta después de 5 segundos
     if (this.alertTimeout) {
@@ -425,6 +467,21 @@ export class LugarFormComponent implements OnInit {
 
     this.alertTimeout = setTimeout(() => {
       this.successMessage = '';
+    }, 5000);
+  }
+
+  showEditSuccessMessage(message: string) {
+    this.editSuccessMessage = message;
+    // Limpiar la otra alerta para evitar mostrar ambas a la vez
+    this.successMessage = '';
+
+    // Auto-cerrar la alerta después de 5 segundos
+    if (this.editAlertTimeout) {
+      clearTimeout(this.editAlertTimeout);
+    }
+
+    this.editAlertTimeout = setTimeout(() => {
+      this.editSuccessMessage = '';
     }, 5000);
   }
 
