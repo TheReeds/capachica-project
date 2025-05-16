@@ -132,7 +132,7 @@ Content-Type: {{contentType}}
 
 {
     "email": "usuario@ejemplo.com",
-    "password": "new_password123",
+    "password": "new_password",
     "password_confirmation": "new_password123",
     "token": "example_reset_token"
 }
