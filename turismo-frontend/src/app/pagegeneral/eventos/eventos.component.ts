@@ -1,62 +1,78 @@
-import { Component, importProvidersFrom, OnInit } from '@angular/core';
-import { Evento, EventosService } from './evento.service';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CalendarEvent, CalendarModule, CalendarUtils, DateAdapter } from 'angular-calendar';
+import { CalendarEvent, CalendarModule, CalendarUtils } from 'angular-calendar';
+import { Evento, EventosService } from './evento.service';
 
 @Component({
   selector: 'app-eventos',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule,
-
- CalendarModule
-
-  ],
+  imports: [CommonModule, RouterLink, FormsModule, CalendarModule],
   providers: [CalendarUtils],
   templateUrl: './eventos.component.html',
   styleUrls: ['./eventos.component.css']
 })
 export class EventosComponent implements OnInit {
-
   eventos: Evento[] = [];
-   viewDate: Date = new Date();
-
+  viewDate: Date = new Date();
   calendarEvents: CalendarEvent[] = [];
-  eventoDestacado: Evento | undefined; // Para el evento principal en la cabecera
+  eventoDestacado: Evento | undefined;
 
-  constructor(private eventosService: EventosService) { }
+  // Filtros seleccionados por el usuario
+  filtroAnio: string = 'todos';
+  filtroMes: string = 'proximos';
+  filtroTipo: string = 'todos';
+
+  mostrarModalCalendario = false;
+
+  constructor(private eventosService: EventosService) {}
 
   ngOnInit(): void {
     this.cargarEventos();
+  }
 
+cargarEventos(): void {
+  this.eventosService.getEventos().subscribe((eventos) => {
+    this.eventos = eventos;
 
-      // Simula JSON de eventos
-    const eventosJson = [
-      { id: 1, titulo: 'Evento 1', fecha: '2025-05-15' },
-      { id: 2, titulo: 'Evento 2', fecha: '2025-05-18' },
-      { id: 3, titulo: 'Evento 3', fecha: '2025-05-20' }
-    ];
+    if (this.eventos.length > 0) {
+      this.eventoDestacado = this.eventos.find(e => e.id === 1) || this.eventos[0];
+    }
 
-    this.calendarEvents = eventosJson.map(e => ({
+    this.actualizarCalendario();
+  });
+}
+
+  get eventosFiltrados(): Evento[] {
+    const hoy = new Date();
+
+    return this.eventos.filter(e => {
+      const fecha = new Date(e.fecha);
+      const anio = fecha.getFullYear().toString();
+      const mes = fecha.toLocaleString('es-PE', { month: 'long' }).toLowerCase();
+
+      const cumpleAnio = this.filtroAnio === 'todos' || this.filtroAnio === anio;
+      const cumpleMes =
+        this.filtroMes === 'proximos'
+          ? fecha >= hoy
+          : mes === this.filtroMes.toLowerCase();
+      const cumpleTipo =
+        this.filtroTipo === 'todos' || (e.tipo?.toLowerCase() === this.filtroTipo.toLowerCase());
+
+      return cumpleAnio && cumpleMes && cumpleTipo;
+    });
+  }
+
+  actualizarCalendario(): void {
+    this.calendarEvents = this.eventosFiltrados.map(e => ({
       start: new Date(e.fecha),
       title: e.titulo,
       allDay: true
     }));
-
   }
-openCalendar(){
-  console.log("=====");
-}
- cargarEventos(): void {
-    this.eventos = this.eventosService.getEventos();
-    if (this.eventos.length > 0) {
-      this.eventoDestacado = this.eventos.find(e => e.id === 1) || this.eventos[0];
-    }
-  }
-  toggleDarkMode() {
-  document.documentElement.classList.toggle('dark');
-}
-mostrarModalCalendario = false;
 
+  openCalendar() {
+    this.mostrarModalCalendario = false;
+  }
 }

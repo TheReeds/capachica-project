@@ -34,16 +34,26 @@ export class EventosdetalleComponent implements OnInit {
   }
 
   cargarDetalleEvento(id: number): void {
-    this.isLoading = true;
-    this.errorMessage = null;
-    setTimeout(() => {
-      this.evento = this.eventosService.getEventoById(id);
+  this.isLoading = true;
+  this.errorMessage = null;
+
+  this.eventosService.getEventoById(id).subscribe({
+    next: (evento) => {
+      this.evento = evento;
       this.isLoading = false;
+
       if (!this.evento) {
         this.errorMessage = 'Evento no encontrado.';
       }
-    }, 500);
-  }
+    },
+    error: (err) => {
+      this.errorMessage = 'Error al cargar el evento.';
+      this.isLoading = false;
+      console.error(err);
+    }
+  });
+}
+
 
   private showErrorAndRedirect(message: string): void {
     this.errorMessage = message;
