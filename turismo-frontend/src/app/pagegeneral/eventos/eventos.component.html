@@ -63,20 +63,38 @@
         <option value="gastronomia">Gastronomía</option>
       </select>
     </div>
-    <button (click)="mostrarModalCalendario = true"
-      class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-md transition" title="Ver calendario">
+    <!--<button (click)="mostrarModalCalendario = true"
+      class="p-3 rounded-full shadow-md transition" title="Ver calendario">
       <i class="fa-solid fa-calendar-days text-xl"></i>
-    </button>
+    </button>-->
+
+
+<button type="button"
+  class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2" (click)="mostrarModalCalendario = true">
+  <svg class="icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" role="img" style="width: 1.25rem; height: 1.25rem;">
+    <path d="M7 11h5v5H7z" />
+    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h1V1h2v2h6V1h2v2h1a1 1 0 011 1v16a2 2 0 01-2 2H5a2 2 0 01-2-2V4zm1 2v12h14V6H4z" clip-rule="evenodd"/>
+  </svg>
+</button>
+
+
+
     <!-- Modal flotante -->
 <div *ngIf="mostrarModalCalendario" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
   <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative">
-    <button (click)="mostrarModalCalendario = false"
+    <button (click)="openCalendar()"
       class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl">
       &times;
     </button>
     <h2 class="text-xl font-bold mb-4">Calendario de eventos</h2>
     <!-- Aquí puedes poner tu contenido de calendario -->
     <p>Contenido del calendario aquí...</p>
+    <mwl-calendar-month-view
+    [viewDate]="viewDate"
+    [events]="calendarEvents"
+  >
+  </mwl-calendar-month-view>
+
   </div>
 </div>
 
