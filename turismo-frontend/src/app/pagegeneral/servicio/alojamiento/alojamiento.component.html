@@ -1,96 +1,90 @@
-<!-- Encabezado con imagen de fondo -->
-<div class="relative w-full h-[40vh] overflow-hidden">
-    <img
-      src="https://losviajesdeali.com/wp-content/uploads/2015/01/pen%C3%ADnsula-de-capachica-1.jpg"
-      alt="Península de Capachica"
-      class="w-full h-full object-cover absolute inset-0 z-10"
-    />
-    <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70 z-20"></div>
-    <div class="absolute inset-0 flex items-center justify-center text-center z-30 px-6">
-      <div class="max-w-4xl">
-        <h1 class="text-3xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
-          Península de Capachica
-        </h1>
-        <p class="text-lg md:text-xl text-white mb-6 drop-shadow-md">
-          Un lugar mágico lleno de cultura y naturaleza.
-        </p>
-      </div>
-    </div>
-  </div>
-  
-  
 <!-- Sección de Alojamientos -->
 <section class="px-6 py-16 bg-white dark:bg-gray-900 transition-colors duration-500">
-    <h2 class="text-4xl font-extrabold text-orange-600 dark:text-orange-400 mb-4 text-center">
-      Alojamientos
-    </h2>
-    <p class="text-lg text-yellow-600 dark:text-yellow-400 mb-10 text-center">
-      Vive Capachica al mejor precio
-    </p>
-  
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-      <div
-        *ngFor="let aloj of alojamientos"
-        class="relative bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 flex flex-col"
-      >
-        <!-- Imagen principal -->
-        <img
-          [src]="aloj.imagenPrincipal"
-          alt="{{ aloj.nombre }}"
-          class="w-full h-96 object-cover"
-        />
-  
-        <!-- Contenido -->
-        <div class="p-4 flex flex-col flex-grow justify-between">
-          <div>
-            <h3 class="text-lg font-bold text-indigo-800 dark:text-indigo-300 mb-1">
-              {{ aloj.nombre }}
-            </h3>
-            <p class="text-sm text-gray-700 dark:text-gray-300">
-              Emprendedor: {{ aloj.emprendedor?.nombre || 'Sin emprendedor' }}
-            </p>
-          </div>
-  
-          <div class="mt-4 flex justify-between items-center">
-            <span class="text-orange-600 dark:text-orange-400 font-bold text-base">
-              S/. {{ aloj.precio_referencial || '---' }}
-            </span>
-            <button class="..." (click)="abrirModal(aloj)" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-semibold transition duration-300" >
-              Reservar
-            </button>
-          </div>
+  <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-2 text-center">
+    Alojamiento
+  </h2>
+  <p class="text-sm text-gray-500 dark:text-gray-300 mb-10 text-center">
+    Diferentes opciones de hospedaje, desde casas rurales hasta ecológicas.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+    <div
+      *ngFor="let aloj of alojamientos"
+      class="border-2 border-teal-200 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition duration-300"
+    >
+      <!-- Imagen -->
+      <img
+        [src]="aloj.imagenPrincipal"
+        [alt]="aloj.nombre"
+        class="w-full h-64 object-cover rounded-t-2xl"
+      />
+
+      <!-- Contenido -->
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-gray-800 dark:text-white mb-1">
+          {{ aloj.nombre }}
+        </h3>
+        <p class="text-xs text-gray-500 dark:text-gray-300 mb-2">
+          Emprendedor: {{ aloj.emprendedor?.nombre || 'Sin emprendedor' }}
+        </p>
+
+        <!-- Precio y botón -->
+        <div class="flex justify-between items-center mt-4">
+          <span class="text-gray-800 dark:text-white font-bold text-sm">
+            S/. {{ aloj.precio_referencial || '---' }}
+          </span>
+          <button (click)="abrirModal(aloj)"
+                  class="bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition">
+            RESERVAR
+          </button>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
 <!-- MODAL -->
-<!-- MODAL -->
-<div *ngIf="mostrarModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-gray-900 w-full max-w-2xl p-6 rounded-xl shadow-lg relative">
-    <!-- Cerrar -->
-    <button (click)="cerrarModal()" class="absolute top-3 right-3 text-gray-600 dark:text-gray-300 hover:text-red-500 text-xl font-bold">&times;</button>
+<!-- Modal -->
+<div *ngIf="mostrarModal"
+     class="fixed inset-0 z-50 bg-black bg-opacity-60 overflow-y-auto">
+  <div class="relative top-20 mx-auto w-full max-w-2xl p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-xl
+              max-h-[80vh] overflow-y-auto">
+
+    <!-- Botón cerrar -->
+    <button (click)="cerrarModal()"
+            class="absolute top-3 right-4 text-gray-600 dark:text-gray-300 hover:text-red-500 text-2xl font-bold">
+      &times;
+    </button>
 
     <!-- Título -->
-    <h2 class="text-2xl font-bold mb-4 text-orange-600 dark:text-orange-400">
-      {{ selectedServicio?.nombre }}
-    </h2>
+    <div class="text-center mb-6">
+      <span class="inline-block bg-gray-800 dark:bg-gray-700 text-white px-4 py-1 rounded-full text-sm">
+        {{ selectedServicio?.nombre }}
+      </span>
+    </div>
 
-    <!-- Descripción -->
-    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
-      {{ selectedServicio?.descripcion }}
-    </p>
+    <!-- Detalles -->
+    <div class="text-sm text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+      <p class="font-semibold mb-1">Incluye:</p>
+      <ul class="list-disc list-inside space-y-1">
+        <li>cama matrimonial</li>
+        <li>baño privado</li>
+        <li>vista al lago</li>
+      </ul>
+    </div>
 
     <!-- Emprendedor -->
-    <p class="text-sm mb-4">
-      <strong class="text-indigo-600 dark:text-indigo-300">Emprendedor:</strong>
-      {{ selectedServicio?.emprendedor?.nombre || 'Sin nombre' }}
+    <p class="text-sm mb-4 text-gray-700 dark:text-gray-300">
+      <strong>Emprendedor:</strong> {{ selectedServicio?.emprendedor?.nombre || 'Sin nombre' }}
     </p>
 
-    <!-- Select de Horarios -->
+    <!-- Selector de horario -->
     <div *ngIf="selectedServicio?.horarios?.length > 0" class="mb-4">
-      <label for="horario" class="block font-semibold text-gray-800 dark:text-gray-200 mb-2">Selecciona un horario:</label>
+      <label for="horario" class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+        Selecciona un horario:
+      </label>
       <select id="horario" [(ngModel)]="horarioSeleccionado"
-              class="w-full border px-3 py-2 rounded dark:bg-gray-800 dark:text-white">
+              class="w-full border border-gray-300 dark:border-gray-700 bg-gray-800 text-white px-4 py-2 rounded">
         <option *ngFor="let h of selectedServicio.horarios" [ngValue]="h">
           {{ h.dia_semana }}: {{ h.hora_inicio }} - {{ h.hora_fin }}
         </option>
@@ -102,29 +96,26 @@
       <iframe
         [src]="getMapaUrl(selectedServicio.latitud, selectedServicio.longitud)"
         width="100%"
-        height="300"
+        height="250"
         class="rounded-xl border"
         style="border:0;"
         loading="lazy"
         allowfullscreen
-        referrerpolicy="no-referrer-when-downgrade"
-      ></iframe>
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
     </div>
 
-    <!-- Botón Agregar a Paquete -->
-
-    <!-- Botón Agregar a Paquete -->
-<div class="text-right">
-  <button
-    (click)="agregarAPaquete()"
-    class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-semibold transition duration-300"
-  >
-    Agregar a paquete
-  </button>
-</div>
-
+    <!-- Botón -->
+    <div class="text-right">
+      <button
+        (click)="agregarAPaquete()"
+        class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-full text-sm font-semibold transition">
+        Agregar a paquete
+      </button>
+    </div>
   </div>
 </div>
+
 
 
   

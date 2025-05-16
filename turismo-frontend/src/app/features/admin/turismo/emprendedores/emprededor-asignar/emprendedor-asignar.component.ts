@@ -6,7 +6,7 @@ import { TurismoService, Emprendedor, Servicio } from '../../../../../core/servi
 @Component({
   selector: 'app-emprendedor-servicios',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   template: `
     a
   `,

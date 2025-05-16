@@ -1,6 +1,4 @@
-<!-- Fondo global con soporte dark/light -->
-<div class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-    <!-- Carrusel estilo Home -->
+
     <div class="relative w-full h-[40vh] overflow-hidden">
         <img
           src="https://losviajesdeali.com/wp-content/uploads/2015/01/pen%C3%ADnsula-de-capachica-1.jpg"
@@ -19,37 +17,33 @@
           </div>
         </div>
       </div>
-      
-  
-      <section class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Título -->
-        <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-800 dark:text-white mb-10">
-          Servicios Turísticos
-        </h2>
-      
-        <!-- Grid de tarjetas -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <ng-container *ngFor="let categoria of categorias">
-            <a [routerLink]="'/servicios/' + categoria.nombre.toLowerCase()"
-               class="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 p-6 flex flex-col justify-between border-t-4"
-               [ngClass]="obtenerColorBorde(categoria.nombre)">
-              <div>
-                <h3 class="text-xl font-bold mb-2"
-                    [ngClass]="obtenerColorTexto(categoria.nombre)">
-                  {{ obtenerEmoji(categoria.nombre) }} {{ categoria.nombre }}
-                </h3>
-                <p class="text-gray-700 dark:text-gray-300 text-sm">{{ categoria.descripcion }}</p>
-              </div>
-              <div class="text-right text-sm font-semibold mt-4"
-                   [ngClass]="obtenerColorTexto(categoria.nombre)">
-                Ver más →
-              </div>
-            </a>
-          </ng-container>
-        </div>
-      </section>
-      
 
-    
-  </div>
-  
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300 py-12">
+  <section class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-800 dark:text-white mb-10">
+      
+    </h2>
+
+    <div *ngFor="let categoria of categorias" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-12">
+      <div>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          {{ obtenerEmoji(categoria.nombre) }} {{ categoria.nombre }}
+        </h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">
+          {{ categoria.descripcion }}
+        </p>
+        <a [routerLink]="'/servicios/' + categoria.nombre.toLowerCase()"
+           class="inline-block bg-yellow-400 text-black font-semibold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+          Ver más
+        </a>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <ng-container *ngFor="let img of categoria.imagenes">
+          <img [src]="img" alt="{{ categoria.nombre }}"
+               class="rounded-lg object-cover w-full h-32 sm:h-40 lg:h-48 shadow-md" />
+        </ng-container>
+      </div>
+    </div>
+  </section>
+</div>
