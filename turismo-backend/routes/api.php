@@ -179,6 +179,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{emprendedorId}/resenas/{resenaId}', [\App\Resenas\Controllers\ResenasController::class, 'destroy']);
     });
 
+    // Reseñas (rutas protegidas)
+    Route::prefix('resenas')->group(function () {
+        Route::post('/', [ResenasController::class, 'store']);
+    });
+
     // Servicios (rutas protegidas)
     Route::prefix('servicios')->group(function () {
         Route::post('/', [ServicioController::class, 'store']);
@@ -254,11 +259,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}/activate', [UserController::class, 'activate'])->middleware('permission:user_update');
         Route::put('/{id}/deactivate', [UserController::class, 'deactivate'])->middleware('permission:user_update');
         Route::put('/{id}/roles', [UserController::class, 'assignRoles'])->middleware('permission:user_update');
-    });
-
-    // Reseñas (rutas protegidas)
-    Route::prefix('resenas')->group(function () {
-        Route::post('/', [ResenasController::class, 'store']);
     });
 
     // Dashboard

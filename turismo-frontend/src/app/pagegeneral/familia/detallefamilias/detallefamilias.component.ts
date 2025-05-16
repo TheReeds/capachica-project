@@ -14,6 +14,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { FormArray, FormGroup } from '@angular/forms';
 import { environment } from '../../../../environments/environments';
+import { FormularioResenaComponent } from './formulario-resena/formulario-resena.component';
 
 Swiper.use([Navigation, Pagination]);
 
@@ -22,7 +23,7 @@ Swiper.use([Navigation, Pagination]);
   templateUrl: './detallefamilias.component.html',
   styleUrls: ['./detallefamilias.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule, FormularioResenaComponent]
 })
 export class DetallefamiliasComponent implements OnInit {
   emprendedor!: Emprendedor | null;
@@ -58,6 +59,8 @@ export class DetallefamiliasComponent implements OnInit {
     'sabado': 'Sábado',
     'domingo': 'Domingo'
   };
+
+  mostrarFormularioResena = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -196,5 +199,18 @@ export class DetallefamiliasComponent implements OnInit {
         },
       });
     }, 100); // Pequeño delay para asegurar que el DOM está listo
+  }
+
+  toggleFormularioResena(): void {
+    this.mostrarFormularioResena = !this.mostrarFormularioResena;
+  }
+
+  onResenaCreada(): void {
+    this.cargarResenas();
+    this.mostrarFormularioResena = false;
+  }
+
+  onCancelarResena(): void {
+    this.mostrarFormularioResena = false;
   }
 }
