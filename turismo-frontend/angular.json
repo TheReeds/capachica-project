@@ -24,7 +24,7 @@
               "src/assets",
               "src/favicon.ico"
             ],
-            
+
 
             "styles": [
               "node_modules/swiper/swiper-bundle.min.css",

@@ -30,30 +30,30 @@ export class EventosService {
     },
     {
       id: 2,
-      titulo: 'Festival Cultural "Raíces Vivas"',
-      descripcion: 'Un encuentro con las tradiciones ancestrales, música, danza y arte de nuestra región.',
-      fecha: '20/07/2025', // Ejemplo de fecha futura
-      imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRi1uTTR0Irw12-e0NN9BJGtUv4HPT0TKNELQ&s',
+      titulo: '¡Día de la Bandera!',
+      descripcion: 'Jornada cívica con desfiles escolares, actos protocolares y renovación del juramento a la bandera, fomentando el amor por la patria.',
+      fecha: '10/07/2025', // Ejemplo de fecha futura
+      imagen: 'https://www.peru.travel/Contenido/Uploads/dia-bandera-peru_637616931537281725.jpg',
+      lugar: 'Cerro Mirador "El Cóndor"',
+      organizador: 'Club de Montañismo Andino',
+      detallesAdicionales: 'Requiere inscripción previa. Incluye guía especializado y equipo básico de seguridad. Nivel de dificultad: moderado.'
+    },
+        {
+      id: 3,
+      titulo: '¡Celebra el Día del Padre!',
+      descripcion: 'Una jornada dedicada a todos los padres de Capachica, con concursos, presentaciones artísticas y sorpresas preparadas con mucho cariño.',
+      fecha: '15/06/2025', // Ejemplo de fecha futura
+      imagen: 'https://www.sancristobalsl.com/archivos/blog/2805/20190313105451.celebrando_el_dia_del_padre_ideas_para_regalar_colegio_san_cristobal_castellon-1370.jpg',
       lugar: 'Plaza de la Cultura',
       organizador: 'Asociación Cultural Sol Naciente',
       detallesAdicionales: 'Ingreso libre. Talleres participativos de artesanía y gastronomía típica durante todo el día.'
     },
     {
-      id: 3,
-      titulo: 'Aventura Nocturna: Caminata bajo las Estrellas',
-      descripcion: 'Una experiencia mágica de senderismo nocturno, observando el cielo y descubriendo la naturaleza de noche.',
-      fecha: '15/08/2025', // Ejemplo de fecha futura
-      imagen: 'https://titicacatravelperu.com/wp-content/uploads/2016/06/llachon-full-day-4.jpg',
-      lugar: 'Cerro Mirador "El Cóndor"',
-      organizador: 'Club de Montañismo Andino',
-      detallesAdicionales: 'Requiere inscripción previa. Incluye guía especializado y equipo básico de seguridad. Nivel de dificultad: moderado.'
-    },
-    {
       id: 4,
-      titulo: 'Gran Feria Gastronómica Regional',
-      descripcion: 'Disfruta de la mejor gastronomía local de la región, con platos innovadores y tradicionales que deleitarán tu paladar.',
-      fecha: '10/09/2025', // Ejemplo de fecha futura
-      imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJjTLeUPcxkk64eT21OnjsBy__fFofUO_xroxdiXxiSynRmuLnI7Nw8zKY6bqBCWRI_88&usqp=CAU',
+      titulo: '¡Fiambrada!',
+      descripcion: 'Tradición popular que reúne a familias en espacios naturales para compartir fiambres (platos fríos típicos), acompañado de música, baile y encuentro comunitario.',
+      fecha: '07/08/2025', // Ejemplo de fecha futura
+      imagen: 'https://ladecana.pe/wp-content/uploads/2021/08/Municipalidad-de-Puno-participa-de-caminata-por-el-Qhapaq-Nan-1-1024x768.jpeg',
       lugar: 'Campo Ferial de la Ciudad',
       organizador: 'Asociación de Restauradores Unidos',
       detallesAdicionales: 'Más de 50 stands de comida, postres y bebidas. Shows de cocina en vivo y concursos.'
@@ -61,20 +61,20 @@ export class EventosService {
     // Agrega más eventos aquí según necesites
     {
       id: 5,
-      titulo: 'Gran Feria Gastronómica Regional',
-      descripcion: 'Disfruta de la mejor gastronomía local de la región, con platos innovadores y tradicionales que deleitarán tu paladar.',
-      fecha: '10/09/2025', // Ejemplo de fecha futura
-      imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJjTLeUPcxkk64eT21OnjsBy__fFofUO_xroxdiXxiSynRmuLnI7Nw8zKY6bqBCWRI_88&usqp=CAU',
+      titulo: '¡Festividad Patronal del Niño San Salvador de Capachica!',
+      descripcion: 'Acompáñanos en nuestra festividad más representativa, donde la fe y la tradición se unen con danzas, procesiones y expresiones culturales únicas que llenan de orgullo a nuestro pueblo.',
+      fecha: '07/08/2025', // Ejemplo de fecha futura
+      imagen: 'https://diariocorreo.pe/resizer/Run_2VxLinZd4NYAnnsyitxIcgk=/980x0/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/4BUL7NBYAFDTBIKTHFMM4H27HU.jpg',
       lugar: 'Campo Ferial de la Ciudad',
       organizador: 'Asociación de Restauradores Unidos',
       detallesAdicionales: 'Más de 50 stands de comida, postres y bebidas. Shows de cocina en vivo y concursos.'
     },
     {
       id: 6,
-      titulo: 'Gran Feria Gastronómica Regional',
-      descripcion: 'Disfruta de la mejor gastronomía local de la región, con platos innovadores y tradicionales que deleitarán tu paladar.',
-      fecha: '10/09/2025', // Ejemplo de fecha futura
-      imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJjTLeUPcxkk64eT21OnjsBy__fFofUO_xroxdiXxiSynRmuLnI7Nw8zKY6bqBCWRI_88&usqp=CAU',
+      titulo: 'Festividad Patronal del Niño San Salvador de Capachica',
+      descripcion: 'Acompáñanos en nuestra festividad más representativa, donde la fe y la tradición se unen con danzas, procesiones y expresiones culturales únicas que llenan de orgullo a nuestro pueblo.',
+      fecha: '07/08/2025', // Ejemplo de fecha futura
+      imagen: 'https://diariocorreo.pe/resizer/Run_2VxLinZd4NYAnnsyitxIcgk=/980x0/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/4BUL7NBYAFDTBIKTHFMM4H27HU.jpg',
       lugar: 'Campo Ferial de la Ciudad',
       organizador: 'Asociación de Restauradores Unidos',
       detallesAdicionales: 'Más de 50 stands de comida, postres y bebidas. Shows de cocina en vivo y concursos.'
