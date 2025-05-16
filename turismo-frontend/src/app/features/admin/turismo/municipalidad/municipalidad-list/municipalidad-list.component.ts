@@ -3,15 +3,22 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TurismoService, Municipalidad } from '../../../../../core/services/turismo.service';
 import { ThemeService } from '../../../../../core/services/theme.service';
+import { AdminHeaderComponent } from '../../../../../shared/components/admin-header/admin-header.component';
 
 @Component({
   selector: 'app-municipalidad-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AdminHeaderComponent],
   template: `
+    <app-admin-header 
+      title="Gestión de Municipalidad" 
+      subtitle="Administra la información general de la municipalidad"
+    ></app-admin-header>
+    
+    <div class="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
     <div class="space-y-6 transition-colors duration-300">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">Gestión de Municipalidad</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">Municipalidad</h1>
         <div class="mt-4 sm:mt-0">
           <a
             routerLink="/admin/municipalidad/create"
