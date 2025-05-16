@@ -91,7 +91,7 @@ class MenuController extends Controller
                 'title' => 'Municipalidad',
                 'icon' => 'building',
                 'path' => '/admin/municipalidad',
-                'permissions' => ['municipalidad_create'],
+                'permissions' => ['municipalidad_update'],
             ],
             [
                 'id' => 'evento',
