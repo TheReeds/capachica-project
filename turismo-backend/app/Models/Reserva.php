@@ -18,6 +18,7 @@ class Reserva extends Model
     ];
     
     // Estados de la reserva
+    const ESTADO_EN_CARRITO = 'en_carrito'; 
     const ESTADO_PENDIENTE = 'pendiente';
     const ESTADO_CONFIRMADA = 'confirmada';
     const ESTADO_CANCELADA = 'cancelada';
@@ -72,5 +73,14 @@ class Reserva extends Model
     {
         $ultimoServicio = $this->servicios()->orderBy('fecha_fin', 'desc')->first();
         return $ultimoServicio ? $ultimoServicio->fecha_fin ?? $ultimoServicio->fecha_inicio : null;
+    }
+    /**
+     * Calcula el precio total de la reserva
+     */
+    public function getPrecioTotalAttribute(): float
+    {
+        return $this->servicios->sum(function($servicio) {
+            return ($servicio->precio ?? 0) * ($servicio->cantidad ?? 1);
+        });
     }
 }

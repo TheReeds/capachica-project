@@ -17,19 +17,23 @@ class ReservaRepository
     }
 
     /**
-     * Obtener todas las reservas
+     * Obtener todas las reservas (excluyendo las que están en carrito)
      */
     public function getAll(): Collection
     {
-        return $this->model->with(['usuario', 'servicios.servicio', 'servicios.emprendedor'])->get();
+        return $this->model->where('estado', '!=', Reserva::ESTADO_EN_CARRITO)
+            ->with(['usuario', 'servicios.servicio', 'servicios.emprendedor'])
+            ->get();
     }
 
     /**
-     * Obtener reservas paginadas
+     * Obtener reservas paginadas (excluyendo las que están en carrito)
      */
     public function getPaginated(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->model->with(['usuario', 'servicios.servicio', 'servicios.emprendedor'])->paginate($perPage);
+        return $this->model->where('estado', '!=', Reserva::ESTADO_EN_CARRITO)
+            ->with(['usuario', 'servicios.servicio', 'servicios.emprendedor'])
+            ->paginate($perPage);
     }
 
     /**
@@ -38,6 +42,36 @@ class ReservaRepository
     public function findById(int $id): ?Reserva
     {
         return $this->model->with(['usuario', 'servicios.servicio', 'servicios.emprendedor'])->find($id);
+    }
+
+    /**
+     * Obtener el carrito del usuario
+     */
+    public function getCarritoByUsuario(int $usuarioId): ?Reserva
+    {
+        return $this->model->where('usuario_id', $usuarioId)
+            ->where('estado', Reserva::ESTADO_EN_CARRITO)
+            ->with(['servicios.servicio', 'servicios.emprendedor'])
+            ->first();
+    }
+
+    /**
+     * Crear o recuperar el carrito del usuario
+     */
+    public function getOrCreateCarrito(int $usuarioId): Reserva
+    {
+        $carrito = $this->getCarritoByUsuario($usuarioId);
+        
+        if (!$carrito) {
+            $carrito = $this->model->create([
+                'usuario_id' => $usuarioId,
+                'codigo_reserva' => Reserva::generarCodigoReserva(),
+                'estado' => Reserva::ESTADO_EN_CARRITO,
+                'notas' => null
+            ]);
+        }
+        
+        return $carrito;
     }
 
     /**
@@ -153,11 +187,12 @@ class ReservaRepository
     }
 
     /**
-     * Obtener reservas por usuario
+     * Obtener reservas por usuario (excluyendo las que están en carrito)
      */
     public function getByUsuario(int $usuarioId): Collection
     {
         return $this->model->where('usuario_id', $usuarioId)
+            ->where('estado', '!=', Reserva::ESTADO_EN_CARRITO)
             ->with(['servicios.servicio', 'servicios.emprendedor'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -174,26 +209,30 @@ class ReservaRepository
     }
     
     /**
-     * Obtener reservas por emprendedor
+     * Obtener reservas por emprendedor (excluyendo las que están en carrito)
      */
     public function getByEmprendedor(int $emprendedorId): Collection
     {
         return $this->model->whereHas('servicios', function ($query) use ($emprendedorId) {
             $query->where('emprendedor_id', $emprendedorId);
-        })->with(['usuario', 'servicios' => function ($query) use ($emprendedorId) {
+        })
+        ->where('estado', '!=', Reserva::ESTADO_EN_CARRITO)
+        ->with(['usuario', 'servicios' => function ($query) use ($emprendedorId) {
             $query->where('emprendedor_id', $emprendedorId)
                   ->with(['servicio', 'emprendedor']);
         }])->get();
     }
     
     /**
-     * Obtener reservas por servicio
+     * Obtener reservas por servicio (excluyendo las que están en carrito)
      */
     public function getByServicio(int $servicioId): Collection
     {
         return $this->model->whereHas('servicios', function ($query) use ($servicioId) {
             $query->where('servicio_id', $servicioId);
-        })->with(['usuario', 'servicios' => function ($query) use ($servicioId) {
+        })
+        ->where('estado', '!=', Reserva::ESTADO_EN_CARRITO)
+        ->with(['usuario', 'servicios' => function ($query) use ($servicioId) {
             $query->where('servicio_id', $servicioId)
                   ->with(['servicio', 'emprendedor']);
         }])->get();
@@ -229,6 +268,9 @@ class ReservaRepository
                     case Reserva::ESTADO_COMPLETADA:
                         $estadoServicio = ReservaServicio::ESTADO_COMPLETADO;
                         break;
+                    case Reserva::ESTADO_EN_CARRITO:
+                        $estadoServicio = ReservaServicio::ESTADO_EN_CARRITO;
+                        break;
                     default:
                         $estadoServicio = ReservaServicio::ESTADO_PENDIENTE;
                 }
@@ -238,6 +280,76 @@ class ReservaRepository
             
             DB::commit();
             return $updated;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+    
+    /**
+     * Confirmar un carrito y convertirlo en reserva pendiente
+     */
+    public function confirmarCarrito(int $id, ?string $notas = null): ?Reserva
+    {
+        try {
+            DB::beginTransaction();
+            
+            $carrito = $this->findById($id);
+            
+            if (!$carrito || $carrito->estado !== Reserva::ESTADO_EN_CARRITO) {
+                DB::rollBack();
+                return null;
+            }
+            
+            // Verificar que tenga servicios
+            if ($carrito->servicios->isEmpty()) {
+                DB::rollBack();
+                return null;
+            }
+            
+            // Actualizar estado a pendiente
+            $carrito->estado = Reserva::ESTADO_PENDIENTE;
+            if ($notas !== null) {
+                $carrito->notas = $notas;
+            }
+            $carrito->save();
+            
+            // Actualizar estado de los servicios
+            foreach ($carrito->servicios as $servicio) {
+                $servicio->estado = ReservaServicio::ESTADO_PENDIENTE;
+                $servicio->save();
+            }
+            
+            DB::commit();
+            
+            return $carrito->fresh(['usuario', 'servicios.servicio', 'servicios.emprendedor']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+    
+    /**
+     * Vaciar un carrito (eliminar todos sus servicios)
+     */
+    public function vaciarCarrito(int $id): bool
+    {
+        try {
+            DB::beginTransaction();
+            
+            $carrito = $this->findById($id);
+            
+            if (!$carrito || $carrito->estado !== Reserva::ESTADO_EN_CARRITO) {
+                DB::rollBack();
+                return false;
+            }
+            
+            // Eliminar todos los servicios
+            $carrito->servicios()->delete();
+            
+            DB::commit();
+            
+            return true;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

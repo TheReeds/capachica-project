@@ -35,6 +35,7 @@ class ReservaServicio extends Model
     ];
     
     // Estados del servicio reservado
+    const ESTADO_EN_CARRITO = 'en_carrito';  
     const ESTADO_PENDIENTE = 'pendiente';
     const ESTADO_CONFIRMADO = 'confirmado';
     const ESTADO_CANCELADO = 'cancelado';
@@ -116,6 +117,7 @@ class ReservaServicio extends Model
                           ->where('hora_fin', '>=', $horaFin);
                 });
             })
+            // Excluir servicios en estado de carrito al verificar solapamiento
             ->whereIn('estado', [self::ESTADO_PENDIENTE, self::ESTADO_CONFIRMADO]);
         
         // Excluir la reserva actual si estamos actualizando
@@ -124,5 +126,12 @@ class ReservaServicio extends Model
         }
         
         return $query->exists();
+    }
+    /**
+     * Obtiene el subtotal de este servicio reservado (precio * cantidad)
+     */
+    public function getSubtotalAttribute(): float
+    {
+        return ($this->precio ?? 0) * ($this->cantidad ?? 1);
     }
 }

@@ -8,21 +8,26 @@
     <div class="swiper-wrapper">
       <div class="swiper-slide h-screen" *ngFor="let slider of municipalidad?.sliders_principales">
         <div class="relative w-full h-full">
+          <!-- Imagen de fondo -->
           <img [src]="slider.url_completa"
                [alt]="slider.nombre"
                class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out" />
-          <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70"></div>
-          <div class="absolute inset-0 flex items-center justify-center px-6 text-center">
-            <div class="max-w-4xl">
-              <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-                {{ slider.nombre }}
+
+          <!-- ✅ Tu sombreado original (de arriba hacia abajo) -->
+          <div class="absolute inset-0 bg-gradient-to-b from-white/100 via-transparent to-white/10 z-10"></div>
+
+          <!-- Contenido alineado a la derecha -->
+          <div class="absolute inset-0 flex items-center justify-end px-6 md:px-20 z-20">
+            <div class="max-w-lg text-right">
+              <h1 class="text-3xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+                Explora <br /> {{ slider.nombre }}
               </h1>
-              <p class="text-xl md:text-2xl text-white mb-8 drop-shadow-md">
-                Capachica te espera con experiencias únicas.
+              <p class="text-base md:text-lg text-white mb-6 drop-shadow">
+                Naturaleza, cultura y tradición en un solo destino
               </p>
               <a href="#explorar"
-                 class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-full font-medium text-lg transition-all duration-300 inline-block">
-                Explorar Ahora
+                 class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-md font-semibold text-base shadow-[0_0_10px_rgba(255,255,255,0.6)] transition duration-300">
+                Explorar ahora
               </a>
             </div>
           </div>
@@ -30,16 +35,38 @@
       </div>
     </div>
 
-    <!-- Pagination -->
+    <!-- Paginación -->
     <div class="swiper-pagination absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30"></div>
 
-    <!-- Navigation Buttons -->
+    <!-- Flechas -->
     <div class="swiper-button-prev"></div>
     <div class="swiper-button-next"></div>
   </div>
 </div>
 
 
+  <section *ngIf="municipalidad" class="px-6 py-12 bg-[#fffdf5] dark:bg-gray-900">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
+      
+      <!-- Nombre (Izquierda) con estilo manuscrito y subrayado -->
+      <div class="w-full md:w-1/2 text-left">
+        <h1 class="text-3xl md:text-3xl font-medium text-sky-600 leading-snug" style="font-family: 'Lucida Handwriting'">
+          {{ municipalidad.nombre }}
+        </h1>
+      </div>
+
+      <!-- Frase + Descripción (Derecha) -->
+      <div class="w-full md:w-1/2 text-right">
+        <p class="text-md md:text-lg text-cyan-700 italic font-semibold mb-2 text-center">
+          "{{ municipalidad.frase }}"
+        </p>
+        <p class="text-base md:text-lg text-gray-800 dark:text-gray-300 text-justify">
+          {{ municipalidad.descripcion }}
+        </p>
+      </div>
+
+    </div>
+  </section>
 
 <!-- Galería de Imágenes Secundarias -->
 <section class="px-6 py-8 bg-white dark:bg-gray-900">
@@ -76,146 +103,46 @@
 
 </div>
 
-<!-- Search Bar Section - Now with dark mode support -->
-<div id="explorar" class="bg-amber-50 dark:bg-gray-800 py-4 px-6 transition-colors duration-300">
-  <div class="flex flex-col md:flex-row md:justify-between md:items-center py-4 px-6 gap-4">
-    <!-- Texto a la izquierda -->
-    <div class="text-lg text-gray-700 dark:text-gray-200 font-medium">
-      ¿Qué Destino o Actividad quieres disfrutar?
-    </div>
 
-    <!-- Buscador y Dropdown -->
-    <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
-      <!-- Buscador -->
-      <div class="w-full sm:max-w-lg flex items-center border border-gray-300 dark:border-gray-600 rounded-full p-3 bg-white dark:bg-gray-700">
-        <input type="text" [(ngModel)]="searchTerm"
-          class="w-full py-2 px-4 text-gray-700 dark:text-gray-200 rounded-l-full focus:outline-none bg-transparent"
-          placeholder="¿Qué quieres hacer hoy?" />
-        <button (click)="searchEmprendedores()"
-          class="bg-amber-600 dark:bg-amber-700 text-white px-4 py-2 rounded-r-full hover:bg-amber-700 dark:hover:bg-amber-800 transition-colors duration-200">
-          Buscar
-        </button>
-      </div>
-
-      <!-- Dropdown personalizado -->
-      <div class="relative dropdown-container">
-        <button (click)="toggleDropdown()"
-          class="text-white bg-amber-600 dark:bg-amber-700 hover:bg-amber-700 dark:hover:bg-amber-800 focus:ring-4 focus:outline-none focus:ring-amber-300 dark:focus:ring-amber-800 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center transition-colors duration-200"
-          type="button">
-          Filtrar
-          <svg class="w-2.5 h-2.5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="m1 1 4 4 4-4" />
-          </svg>
-        </button>
-
-        <!-- Menú desplegable -->
-        <div *ngIf="isDropdownOpen"
-          class="z-10 absolute right-0 mt-2 bg-white dark:bg-gray-700 divide-y divide-gray-100 dark:divide-gray-600 rounded-lg shadow-lg w-44 transition-all duration-200">
-          <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
-            <li><a href="#"
-                class="block px-4 py-2 hover:bg-amber-100 dark:hover:bg-gray-600 transition-colors duration-200">ccotos</a>
-            </li>
-            <li><a href="#"
-                class="block px-4 py-2 hover:bg-amber-100 dark:hover:bg-gray-600 transition-colors duration-200">llachon</a></li>
-            <li><a href="#"
-                class="block px-4 py-2 hover:bg-amber-100 dark:hover:bg-gray-600 transition-colors duration-200">capachica</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Información de Municipalidad -->
 <div *ngIf="municipalidad" class="bg-amber-50 dark:bg-gray-800 py-12 px-6 transition-colors duration-300">
-  <div class="max-w-7xl mx-auto">
-    <!-- Título y Subtítulo -->
-    <div class="text-center mb-12">
-      <h1 class="text-4xl font-bold text-amber-600 dark:text-amber-500 mb-4">
-        {{ municipalidad.nombre }}
-      </h1>
-      <p class="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-        {{ municipalidad.descripcion }}
-      </p>
-      <p class="text-xl font-semibold text-amber-600 dark:text-amber-500 mt-4 italic">
-        "{{ municipalidad.frase }}"
-      </p>
-    </div>
+  <div class="max-w-7xl mx-auto flex flex-col gap-10">
+    
+    <!-- Card 1: Historia de Capachica -->
+    <div class="relative w-full h-[420px] rounded-2xl overflow-hidden shadow-xl">
+      <!-- Imagen de fondo -->
+      <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/ce/73/23/island-amantani.jpg?w=400&h=300&s=1"
+           alt="Historia de Capachica"
+           class="w-full h-full object-cover">
 
-    <div class="flex flex-col gap-12 mb-12">
-      <!-- Historia de Capachica Card - Enhanced for dark mode -->
-      <div class="w-full h-[500px] bg-cover bg-center rounded-xl relative overflow-hidden shadow-xl"
-        style="background-image: url('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/ce/73/23/island-amantani.jpg?w=400&h=300&s=1');">
-        
-        <!-- Capa oscura al 50% -->
-        <div class="absolute inset-0 bg-black/50 rounded-xl"></div>
-      
-        <!-- Contenido centrado sobre la imagen -->
-        <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-          <h2 class="text-3xl font-bold text-white mb-6 drop-shadow-lg">Historia de Capachica</h2>
-          <p class="text-white text-lg max-w-2xl drop-shadow-md leading-relaxed">
+      <!-- Capa oscura en la mitad derecha -->
+      <div class="absolute inset-y-0 right-0 w-1/2 bg-black/60 flex items-center px-8">
+        <div class="text-white">
+          <h3 class="text-3xl font-bold mb-3">Historia de <span class="uppercase">Capachica</span></h3>
+          <p class="text-base leading-relaxed">
             {{ municipalidad.historiacapachica }}
           </p>
         </div>
       </div>
- 
-      <!-- Historia de las Familias Card - Enhanced for dark mode -->
-      <div class="w-full h-[500px] bg-cover bg-center rounded-xl relative overflow-hidden shadow-xl"
-        style="background-image: url('https://losviajesdeali.com/wp-content/uploads/2015/01/pen%C3%ADnsula-de-capachica-1-18.jpg');">
-    
-        <!-- Capa oscura al 50% -->
-        <div class="absolute inset-0 bg-black/50 rounded-xl"></div>
-      
-        <!-- Contenido centrado sobre la imagen -->
-        <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-          <h2 class="text-3xl font-bold text-white mb-6 drop-shadow-lg">Historia de las Familias</h2>
-          <p class="text-white text-lg max-w-2xl drop-shadow-md leading-relaxed">
+    </div>
+
+    <!-- Card 2: Historia de las Familias -->
+    <div class="relative w-full h-[420px] rounded-2xl overflow-hidden shadow-xl">
+      <!-- Imagen de fondo -->
+      <img src="https://losviajesdeali.com/wp-content/uploads/2015/01/pen%C3%ADnsula-de-capachica-1-18.jpg"
+           alt="Historia de las Familias"
+           class="w-full h-full object-cover">
+
+      <!-- Capa oscura en la mitad izquierda -->
+      <div class="absolute inset-y-0 left-0 w-1/2 bg-black/60 flex items-center px-8">
+        <div class="text-white">
+          <h3 class="text-3xl font-bold mb-3">Historias de <span class="uppercase">Familias</span></h3>
+          <p class="text-base leading-relaxed">
             {{ municipalidad.historiafamilias }}
           </p>
         </div>
       </div>
     </div>
-  
-    <!-- Valores y Ordenanza - Improved cards with dark mode -->
-    <div class="flex flex-col md:flex-row gap-8 mb-12">
-      <!-- Valores -->
-      <div class="w-full md:w-1/2">
-        <div class="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-md h-full flex flex-col justify-center text-center transition-colors duration-300">
-          <h2 class="text-2xl font-bold text-amber-600 dark:text-amber-500 mb-6">Nuestros Valores</h2>
-          <ul class="text-gray-800 dark:text-gray-200 space-y-3 text-left mx-auto w-fit">
-            <li class="flex items-center gap-2">
-              <span class="text-amber-500">✔</span> <span>Honestidad</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="text-amber-500">✔</span> <span>Transparencia</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="text-amber-500">✔</span> <span>Respeto al medio ambiente</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="text-amber-500">✔</span> <span>Identidad cultural</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="text-amber-500">✔</span> <span>Trabajo en equipo</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="text-amber-500">✔</span> <span>Compromiso social</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    
-      <!-- Ordenanza Municipal -->
-      <div class="w-full md:w-1/2">
-        <div class="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-md h-full flex flex-col justify-center transition-colors duration-300">
-          <h2 class="text-2xl font-bold text-amber-600 dark:text-amber-500 mb-6 text-center">Ordenanza Municipal</h2>
-          <p class="text-gray-800 dark:text-gray-200 leading-relaxed">
-            {{ municipalidad.ordenanzamunicipal }}
-          </p>
-        </div>
-      </div>
-    </div>
+
   </div>
 </div>
 
@@ -319,7 +246,75 @@
   </div>
 </div>
 
-<!-- Sección de Testimonios - Enhanced for dark mode -->
+<!--CATEGORIAS JALADAS DE GET - Enhanced for dark mode -->
+<div class="py-16 px-6 bg-amber-50 dark:bg-gray-900 transition-colors duration-300">
+  <div class="text-center mb-10">
+    <h2 class="text-3xl font-bold text-blue-800 dark:text-blue-400 uppercase">Categorías</h2>
+    <p class="text-gray-700 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
+      Explora las diversas experiencias que puedes vivir en Capachica
+    </p>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 max-w-7xl mx-auto">
+    <div
+      *ngFor="let cat of categorias"
+      class="flex flex-col items-center text-center px-4"
+    >
+      <!-- Ícono (puedes usar un campo icono o una condición según el nombre) -->
+      <div class="w-16 h-16 mb-4">
+        <img [src]="cat.icono" [alt]="cat.nombre" class="w-full h-full object-contain" />
+      </div>
+
+      <!-- Nombre con color por categoría -->
+      <h3
+        class="text-sm font-bold mb-1"
+        [ngClass]="{
+          'text-orange-700': cat.nombre === 'Alojamiento',
+          'text-teal-700': cat.nombre === 'Alimentacion',
+          'text-red-700': cat.nombre === 'Artesanía',
+          'text-yellow-600': cat.nombre === 'Transporte',
+          'text-green-600': cat.nombre === 'Actividades',
+          'text-gray-700': cat.nombre === 'Guiado'
+        }"
+      >
+        {{ cat.nombre }}
+      </h3>
+
+      <!-- Descripción -->
+      <p class="text-xs text-gray-600 dark:text-gray-300">
+        {{ cat.descripcion }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Sección de Ubicación con límite de ancho -->
+<div class="bg-amber-50 dark:bg-gray-800 py-16 px-4 transition-colors duration-300">
+  <div class="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+
+    <!-- Texto -->
+    <div class="w-full md:w-1/2 md:pr-10 text-start">
+      <h2 class="text-3xl font-bold mb-4" style="color: #8B1E1E;">¿Cómo llegar<br />a Capachica?</h2>
+      <p class="text-base font-semibold leading-relaxed" style="color: #005072;">
+        Estamos ubicados en la hermosa península de Capachica, en las orillas del lago Titicaca, en el
+        departamento de Puno, Perú. Visítanos para disfrutar de paisajes impresionantes y una cultura rica
+        y auténtica.
+      </p>
+    </div>
+
+    <!-- Mapa -->
+    <div class="w-full md:w-1/2 h-[300px] rounded-xl overflow-hidden shadow-lg">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12590.106066335879!2d-69.8417794!3d-15.6446622!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915d7c95db9aeed9%3A0xa6d88f0376391024!2sCapachica%2C%20Per%C3%BA!5e0!3m2!1ses-419!2spe!4v1617738498032!5m2!1ses-419!2spe"
+        class="w-full h-full border-0"
+        allowfullscreen=""
+        loading="lazy">
+      </iframe>
+    </div>
+
+  </div>
+</div>
+
 <div class="px-10 py-16 bg-amber-300 dark:bg-amber-900 transition-colors duration-300">
   <h3 class="text-4xl text-white font-semibold pb-8 text-center">Reseñas de Turistas</h3>
 
@@ -376,45 +371,6 @@
         <div class="text-amber-800 dark:text-amber-200 font-semibold">Laura T</div>
       </div>
     </div>
-  </div>
-</div>
-
-<!--CATEGORIAS JALADAS DE GET - Enhanced for dark mode -->
-<div class="py-16 px-6 bg-amber-50 dark:bg-gray-900 transition-colors duration-300">
-  <div class="text-center mb-10">
-    <h2 class="text-3xl font-bold text-amber-600 dark:text-amber-500">Categorías</h2>
-    <p class="text-gray-700 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
-      Explora las diversas experiencias que puedes vivir en Capachica
-    </p>
-  </div>
-
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 justify-center items-stretch max-w-7xl mx-auto">
-    <div *ngFor="let cat of categorias" class="bg-white dark:bg-gray-700 p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center transform hover:scale-105">
-      <!-- Nombre -->
-      <h3 class="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-2">{{ cat.nombre }}</h3>
-
-      <!-- Descripción -->
-      <p class="text-xs text-gray-600 dark:text-gray-300">{{ cat.descripcion }}</p>
-    </div>
-  </div>
-</div>
-
-<!-- Sección de Ubicación - Enhanced for dark mode -->
-<div class="flex flex-col md:flex-row justify-between items-center py-16 px-6 bg-white dark:bg-gray-800 transition-colors duration-300">
-  <div class="w-full md:w-1/2 mb-10 md:mb-0 md:pr-12">
-    <h2 class="text-3xl font-bold text-amber-600 dark:text-amber-500 mb-6">¿Dónde nos ubicamos?</h2>
-    <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-      Estamos ubicados en la hermosa península de Capachica, en las orillas del lago Titicaca, en el
-      departamento de Puno, Perú. Visítanos para disfrutar de paisajes impresionantes y una cultura rica
-      y auténtica.
-    </p>
-  </div>
-
-  <div class="w-full md:w-1/2 h-96 rounded-xl overflow-hidden shadow-xl">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12590.106066335879!2d-69.8417794!3d-15.6446622!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915d7c95db9aeed9%3A0xa6d88f0376391024!2sCapachica%2C%20Per%C3%BA!5e0!3m2!1ses-419!2spe!4v1617738498032!5m2!1ses-419!2spe"
-      class="w-full h-full border-0" allowfullscreen="" loading="lazy">
-    </iframe>
   </div>
 </div>
 

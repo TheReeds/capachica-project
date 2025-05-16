@@ -6,13 +6,19 @@ import { TurismoService, Servicio, Categoria, Emprendedor, ServicioHorario } fro
 import { SliderImage, SliderUploadComponent } from '../../../../../shared/components/slider-upload/slider-upload.component';
 import { UbicacionMapComponent } from '../../../../../shared/components/ubicacion-map/ubicacion-map.component';
 import { ThemeService } from '../../../../../core/services/theme.service';
+import { AdminHeaderComponent } from '../../../../../shared/components/admin-header/admin-header.component';
 
 @Component({
   selector: 'app-servicio-form',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, SliderUploadComponent, UbicacionMapComponent],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, SliderUploadComponent, UbicacionMapComponent, AdminHeaderComponent],
   template: `
-    <div class="space-y-6">
+    <app-admin-header 
+      title="Gestión de servicios" 
+      subtitle="Administra y gestiona los servicios de tu organización"
+    ></app-admin-header>
+    
+    <div class="container mx-auto px-2 sm:px-4 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
       <div class="sm:flex sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors">{{ isEditMode ? 'Editar' : 'Crear' }} Servicio</h1>
@@ -78,6 +84,21 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                         min="0"
                         step="0.01"
                         class="block w-full pl-9 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                      >
+                    </div>
+                  </div>
+
+                  <!-- Capacidad -->
+                  <div class="sm:col-span-2">
+                    <label for="capacidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Capacidad</label>
+                    <div class="mt-1">
+                      <input
+                        type="number"
+                        id="capacidad"
+                        formControlName="capacidad"
+                        min="1"
+                        step="1"
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors"
                       >
                     </div>
                   </div>
@@ -369,10 +390,10 @@ import { ThemeService } from '../../../../../core/services/theme.service';
               </button>
               <button
                 type="submit"
-                [disabled]="servicioForm.invalid || invalidHorarios() || isSubmitting"
+                [disabled]="isSubmitting || (servicioForm.invalid && !isFormValid())"
                 class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                [class.opacity-50]="servicioForm.invalid || invalidHorarios() || isSubmitting"
-                [class.cursor-not-allowed]="servicioForm.invalid || invalidHorarios() || isSubmitting"
+                [class.opacity-50]="isSubmitting || (servicioForm.invalid && !isFormValid())"
+                [class.cursor-not-allowed]="isSubmitting || (servicioForm.invalid && !isFormValid())"
               >
                 <ng-container *ngIf="isSubmitting; else textoNormal">
                   <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -444,6 +465,7 @@ export class ServicioFormComponent implements OnInit {
       nombre: ['', [Validators.required]],
       descripcion: [''],
       precio_referencial: [0],
+      capacidad: [1, [Validators.required, Validators.min(1)]], // Nuevo campo de capacidad con valor predeterminado de 1
       emprendedor_id: ['', [Validators.required]],
       estado: [true],
       latitud: [null],
@@ -500,11 +522,17 @@ export class ServicioFormComponent implements OnInit {
           estado: servicio.estado,
           latitud: servicio.latitud,
           longitud: servicio.longitud,
-          ubicacion_referencia: servicio.ubicacion_referencia
+          ubicacion_referencia: servicio.ubicacion_referencia,
+          capacidad: servicio.capacidad || 1 // Asignar el valor de capacidad o un valor predeterminado
         });
 
         // Cargar horarios
         if (servicio.horarios && servicio.horarios.length > 0) {
+          // Limpiar primero el array de horarios para evitar duplicados
+          while (this.horariosArray.length !== 0) {
+            this.horariosArray.removeAt(0);
+          }
+          // Añadir los horarios existentes
           servicio.horarios.forEach(horario => {
             this.addHorario(horario);
           });
@@ -688,6 +716,33 @@ export class ServicioFormComponent implements OnInit {
         }
       });
     }
+  }
+  // Método para verificar si el formulario es válido independientemente de las validaciones normales
+  isFormValid(): boolean {
+    // Verificar campos básicos obligatorios
+    if (!this.servicioForm.get('nombre')?.value || !this.servicioForm.get('emprendedor_id')?.value) {
+      return false;
+    }
+
+    // En modo edición, permitir enviar si no hay cambios en los horarios
+    if (this.isEditMode && this.horariosArray.length > 0) {
+      return true;
+    }
+
+    // Verificar si los horarios son válidos - solo si hay horarios
+    if (this.horariosArray.length > 0) {
+      for (let i = 0; i < this.horariosArray.length; i++) {
+        const group = this.getHorarioFormGroup(i);
+        const inicio = group.get('hora_inicio')?.value;
+        const fin = group.get('hora_fin')?.value;
+
+        if (!inicio || !fin || inicio >= fin) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   cancel() {

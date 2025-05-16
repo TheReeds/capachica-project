@@ -12,6 +12,7 @@ import { SwiperOptions } from 'swiper/types';
 import { Navigation, Pagination } from 'swiper/modules';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { FormArray, FormGroup } from '@angular/forms';
+import { UbicacionMapComponent } from '../../../shared/components/ubicacion-map/ubicacion-map.component';
 
 Swiper.use([Navigation, Pagination]);
 
@@ -20,7 +21,7 @@ Swiper.use([Navigation, Pagination]);
   templateUrl: './detallefamilias.component.html',
   styleUrls: ['./detallefamilias.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule, UbicacionMapComponent ]
 })
 export class DetallefamiliasComponent implements OnInit {
   emprendedor!: Emprendedor | null;
@@ -30,6 +31,15 @@ export class DetallefamiliasComponent implements OnInit {
   selectedServicio: Servicio | null = null;
   mostrarModal: boolean = false;
   servicioForm!: FormGroup;
+
+  latitud: number = -15.6417;   
+  longitud: number = -69.8306;  
+
+  // Recibir nueva ubicación seleccionada
+  actualizarUbicacion(e: {lat: number, lng: number}) {
+    this.latitud = e.lat;
+    this.longitud = e.lng;
+  }
 
   // Orden de días de la semana (empezando por lunes)
   diasOrden: { [key: string]: number } = {
@@ -60,6 +70,8 @@ export class DetallefamiliasComponent implements OnInit {
     private sanitizer: DomSanitizer
   ) {}
 
+  cargando = true;
+
   ngOnInit(): void {
     // Captura el ID de la URL
     this.route.paramMap.subscribe(params => {
@@ -67,6 +79,11 @@ export class DetallefamiliasComponent implements OnInit {
       this.cargarEmprendedor();
       this.cargarServicios();
     });
+
+    setTimeout(() => {
+    this.cargando = false; // cuando termines de cargar los datos
+  }, 2000);
+
   }
 
   cargarEmprendedor() {
@@ -115,15 +132,21 @@ export class DetallefamiliasComponent implements OnInit {
 
 
 
-  getImagenesSecundarias(): string[] {
+  getImagenesSecundarias():  any[] {
     // Devuelve las imágenes secundarias si existen
-    return this.emprendedor?.sliders_secundarios?.map(s => s.url_completa) || [];
+    return this.emprendedor?.sliders_secundarios || [];
+    
   }
 
   getImagenesPrincipal(): string[] {
     // Devuelve las imágenes principales si existen
     return this.emprendedor?.sliders_principales?.map(s => s.url_completa) || [];
   }
+
+  getSlidersSecundarios(): any[] {
+  return this.emprendedor?.sliders_secundarios || [];
+}
+
 
 
 
@@ -153,6 +176,7 @@ export class DetallefamiliasComponent implements OnInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
+      
       new Swiper('.mySwiper', {
         slidesPerView: 1,
         spaceBetween: 20,

@@ -4,13 +4,19 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TurismoService, Reserva, PaginatedResponse } from '../../../../../core/services/turismo.service';
 import { ThemeService } from '../../../../../core/services/theme.service';
+import { AdminHeaderComponent } from '../../../../../shared/components/admin-header/admin-header.component';
 
 @Component({
   selector: 'app-reserva-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, AdminHeaderComponent],
   template: `
-    <div class="space-y-6">
+    <app-admin-header 
+      title="Gestionar Reservas" 
+      subtitle="Panel general de administración de reservas"
+    ></app-admin-header>
+
+    <div class="container mx-auto px-2 sm:px-4 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">Gestión de Reservas</h1>
@@ -35,7 +41,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
       <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm dark:shadow-gray-900 transition-colors duration-200">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
-            <label for="codigo" class="block text-sm font-medium text-gray-700">Código de Reserva</label>
+            <label for="codigo" class="block text-sm font-medium text-gray-700 dark:text-gray-100">Código de Reserva</label>
             <div class="mt-1">
               <input
                 type="text"
@@ -94,7 +100,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
       <!-- Vista Calendario -->
       <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm dark:shadow-gray-900 transition-colors duration-200">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-medium text-gray-900">Reservas</h2>
+          <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Reservas</h2>
           <a
             routerLink="/admin/reservas/calendario"
             class="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-800"

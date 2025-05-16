@@ -4,21 +4,27 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TurismoService, Servicio, Categoria, PaginatedResponse, Emprendedor } from '../../../../../core/services/turismo.service';
 import { ThemeService } from '../../../../../core/services/theme.service';
+import { AdminHeaderComponent } from '../../../../../shared/components/admin-header/admin-header.component';
 
 @Component({
   selector: 'app-servicio-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, AdminHeaderComponent],
   template: `
-    <div class="space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Servicios</h1>
+    <app-admin-header 
+      title="Gestión de Servicios" 
+      subtitle="Administra y gestiona los servicios de tu organización"
+    ></app-admin-header>
+
+    <div class="container mx-auto px-2 sm:px-4 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestión de Servicios</h1>
         <div class="mt-4 sm:mt-0">
           <a 
             routerLink="/admin/servicios/create" 
-            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
+            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
           >
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             Nuevo Servicio
@@ -27,7 +33,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
       </div>
       
       <!-- Filtros -->
-      <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors duration-200">
+      <div class="rounded-lg bg-white dark:bg-gray-800 p-4 sm:p-6 shadow-sm transition-colors duration-200 mb-6">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
@@ -89,13 +95,13 @@ import { ThemeService } from '../../../../../core/services/theme.service';
             </div>
           </div>
           
-          <div class="flex items-end md:col-span-4">
+          <div class="flex items-end">
             <button 
               type="button" 
               (click)="applyFilters()" 
-              class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
+              class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors duration-200"
             >
-              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
               </svg>
               Filtrar
@@ -132,29 +138,29 @@ import { ThemeService } from '../../../../../core/services/theme.service';
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
               <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nombre</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Descripción</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Precio</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Emprendedor</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categorías</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Horarios</th>
-                  <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
+                  <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nombre</th>
+                  <th scope="col" class="hidden md:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Descripción</th>
+                  <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Precio</th>
+                  <th scope="col" class="hidden sm:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Emprendedor</th>
+                  <th scope="col" class="hidden lg:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categorías</th>
+                  <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
+                  <th scope="col" class="hidden md:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Horarios</th>
+                  <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
               <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 @for (servicio of pagination.data; track servicio.id) {
                   <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="px-3 py-4 whitespace-nowrap">
                       <div class="text-sm font-medium text-gray-900 dark:text-white">{{ servicio.nombre }}</div>
                     </td>
-                    <td class="px-4 py-4">
-                      <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">{{ servicio.descripcion || 'Sin descripción' }}</div>
+                    <td class="hidden md:table-cell px-3 py-4">
+                      <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[200px]">{{ servicio.descripcion || 'Sin descripción' }}</div>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="px-3 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900 dark:text-white">S/. {{ servicio.precio_referencial || '0.00' }}</div>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="hidden sm:table-cell px-3 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900 dark:text-white">
                         @if (servicio.emprendedor) {
                           <a [routerLink]="['/admin/emprendedores', servicio.emprendedor_id, 'servicios']" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200">
@@ -165,7 +171,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                         }
                       </div>
                     </td>
-                    <td class="px-4 py-4">
+                    <td class="hidden lg:table-cell px-3 py-4">
                       <div class="flex flex-wrap gap-1">
                         @for (categoria of servicio.categorias; track categoria.id) {
                           <span class="inline-flex rounded-full bg-primary-100 dark:bg-primary-900/40 px-2 py-0.5 text-xs font-medium text-primary-800 dark:text-primary-300 transition-colors duration-200">
@@ -177,7 +183,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                         }
                       </div>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="px-3 py-4 whitespace-nowrap">
                       @if (servicio.estado) {
                         <span class="inline-flex rounded-full bg-green-100 dark:bg-green-900/40 px-2 py-0.5 text-xs font-medium text-green-800 dark:text-green-300 transition-colors duration-200">
                           Activo
@@ -188,7 +194,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                         </span>
                       }
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
+                    <td class="hidden md:table-cell px-3 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-500 dark:text-gray-400">
                         @if (servicio.horarios && servicio.horarios.length > 0) {
                           <div class="flex items-center">
@@ -207,10 +213,8 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                         }
                       </div>
                     </td>
-                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="flex items-center justify-end space-x-2">
-                        
-                        
+                    <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div class="flex items-center justify-end space-x-1 sm:space-x-2">
                         <a 
                           [routerLink]="['/admin/servicios/edit', servicio.id]" 
                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
@@ -267,14 +271,14 @@ import { ThemeService } from '../../../../../core/services/theme.service';
           
           <!-- Paginación -->
           @if (pagination) {
-            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 sm:px-6">
-              <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div class="bg-white dark:bg-gray-800 px-3 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 sm:px-4">
+              <div class="flex sm:flex-1 sm:flex sm:items-center sm:justify-between flex-col sm:flex-row">
                 <div>
                   <p class="text-sm text-gray-700 dark:text-gray-300">
                     Mostrando <span class="font-medium">{{ pagination.from || 0 }}</span> a <span class="font-medium">{{ pagination.to || 0 }}</span> de <span class="font-medium">{{ pagination.total }}</span> resultados
                   </p>
                 </div>
-                <div>
+                <div class="mt-2 sm:mt-0">
                   <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                     <button
                       (click)="goToPage(currentPage - 1)"
@@ -290,7 +294,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
                     </button>
                     
                     @for (link of pagination.links; track $index) {
-                      @if (link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;') {
+                      @if (link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;' && isValidPageNumber(link.label)) {
                         <button
                           (click)="goToPage(+link.label)"
                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium transition-colors duration-200"
@@ -417,6 +421,9 @@ export class ServicioListComponent implements OnInit {
   applyFilters() {
     this.currentPage = 1;
     this.loadServicios();
+  }
+  isValidPageNumber(value: any): boolean {
+    return !isNaN(+value);
   }
   
   toggleServicioEstado(servicio: Servicio) {

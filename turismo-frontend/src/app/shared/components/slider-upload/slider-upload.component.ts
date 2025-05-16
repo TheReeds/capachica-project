@@ -20,11 +20,11 @@ export interface SliderImage {
   template: `
     <div class="space-y-4">
       <div class="flex justify-between items-center">
-        <h3 class="text-lg font-medium text-gray-900">{{ title }}</h3>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">{{ title }}</h3>
         <button 
           type="button"
           (click)="addSlider()"
-          class="inline-flex items-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+          class="inline-flex items-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200"
         >
           <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -36,14 +36,14 @@ export interface SliderImage {
       <!-- Vista previa de sliders -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @for (control of sliderControls; track i; let i = $index) {
-          <div class="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors duration-200">
             <div [formGroup]="getSliderFormGroup(i)">
               <!-- Previsualización de la imagen -->
-              <div class="relative aspect-video bg-gray-100 flex items-center justify-center overflow-hidden">
+              <div class="relative aspect-video bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden transition-colors duration-200">
                 @if (getPreviewUrl(i)) {
                   <img [src]="getPreviewUrl(i)" class="h-full w-full object-cover" alt="Vista previa de slider">
                 } @else {
-                  <div class="text-gray-400 flex flex-col items-center justify-center p-4 text-center">
+                  <div class="text-gray-400 dark:text-gray-500 flex flex-col items-center justify-center p-4 text-center transition-colors duration-200">
                     <svg class="h-10 w-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
@@ -52,7 +52,7 @@ export interface SliderImage {
                 }
                 <button 
                   type="button"
-                  class="absolute top-2 right-2 bg-red-100 text-red-600 p-1 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  class="absolute top-2 right-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-1 rounded-full hover:bg-red-200 dark:hover:bg-red-800/30 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200"
                   (click)="removeSlider(i)"
                   title="Eliminar slider"
                 >
@@ -65,18 +65,19 @@ export interface SliderImage {
               <div class="p-4 space-y-3">
                 <!-- Nombre -->
                 <div>
-                  <label [for]="'slider-nombre-' + i" class="block text-sm font-medium text-gray-700">Nombre</label>
-                  <div class="mt-1">
+                  <label [for]="'slider-nombre-' + i" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">Nombre</label>
+                  <div class="mt-2">
                     <input 
                       [id]="'slider-nombre-' + i" 
                       type="text" 
                       formControlName="nombre"
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                      class="block w-full h-10 px-3 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors duration-200"
                       (input)="onInputChange()"
+                      [ngClass]="{'border-red-300 dark:border-red-700 focus:border-red-500 focus:ring-red-500': getSliderFormGroup(i).get('nombre')?.invalid && getSliderFormGroup(i).get('nombre')?.touched}"
                     >
                   </div>
                   @if (getSliderFormGroup(i).get('nombre')?.invalid && getSliderFormGroup(i).get('nombre')?.touched) {
-                    <p class="mt-1 text-sm text-red-600">El nombre es obligatorio</p>
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-200">El nombre es obligatorio</p>
                   }
                 </div>
                 
@@ -85,14 +86,14 @@ export interface SliderImage {
                 
                 <!-- Orden -->
                 <div>
-                  <label [for]="'slider-orden-' + i" class="block text-sm font-medium text-gray-700">Orden</label>
-                  <div class="mt-1">
+                  <label [for]="'slider-orden-' + i" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">Orden</label>
+                  <div class="mt-2">
                     <input 
                       [id]="'slider-orden-' + i" 
                       type="number" 
                       formControlName="orden"
                       min="1"
-                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                      class="block w-full h-10 px-3 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors duration-200"
                       (input)="onInputChange()"
                     >
                   </div>
@@ -100,48 +101,49 @@ export interface SliderImage {
                 
                 <!-- Subir archivo -->
                 <div>
-                  <label [for]="'slider-imagen-' + i" class="block text-sm font-medium text-gray-700">Imagen (máx. 5MB)</label>
-                  <div class="mt-1">
+                  <label [for]="'slider-imagen-' + i" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">Imagen (máx. 5MB)</label>
+                  <div class="mt-2">
                     <input 
                       [id]="'slider-imagen-' + i" 
                       type="file"
                       accept="image/*"
                       (change)="onFileSelected($event, i)"
-                      class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                      class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 dark:file:bg-primary-900/20 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-primary-800/30 transition-colors duration-200"
                     >
                   </div>
                   @if (fileErrors[i]) {
-                    <p class="mt-1 text-sm text-red-600">{{ fileErrors[i] }}</p>
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-200">{{ fileErrors[i] }}</p>
                   }
                 </div>
                 
                 @if (!isSliderPrincipal) {
                   <!-- Título (solo para sliders secundarios) -->
                   <div>
-                    <label [for]="'slider-titulo-' + i" class="block text-sm font-medium text-gray-700">Título</label>
-                    <div class="mt-1">
+                    <label [for]="'slider-titulo-' + i" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">Título</label>
+                    <div class="mt-2">
                       <input 
                         [id]="'slider-titulo-' + i" 
                         type="text" 
                         formControlName="titulo"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        class="block w-full h-10 px-3 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors duration-200"
                         (input)="onInputChange()"
+                        [ngClass]="{'border-red-300 dark:border-red-700 focus:border-red-500 focus:ring-red-500': !isSliderPrincipal && getSliderFormGroup(i).get('titulo')?.invalid && getSliderFormGroup(i).get('titulo')?.touched}"
                       >
                     </div>
                     @if (!isSliderPrincipal && getSliderFormGroup(i).get('titulo')?.invalid && getSliderFormGroup(i).get('titulo')?.touched) {
-                      <p class="mt-1 text-sm text-red-600">El título es obligatorio para sliders secundarios</p>
+                      <p class="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-200">El título es obligatorio para sliders secundarios</p>
                     }
                   </div>
                   
                   <!-- Descripción (solo para sliders secundarios) -->
                   <div>
-                    <label [for]="'slider-descripcion-' + i" class="block text-sm font-medium text-gray-700">Descripción</label>
-                    <div class="mt-1">
+                    <label [for]="'slider-descripcion-' + i" class="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">Descripción</label>
+                    <div class="mt-2">
                       <textarea 
                         [id]="'slider-descripcion-' + i" 
                         formControlName="descripcion"
                         rows="3"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        class="block w-full px-3 py-2 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors duration-200"
                         (input)="onInputChange()"
                       ></textarea>
                     </div>
@@ -153,17 +155,17 @@ export interface SliderImage {
         }
         
         @if (sliderControls.length === 0) {
-          <div class="col-span-full p-6 text-center border-2 border-dashed border-gray-300 rounded-lg">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="col-span-full p-6 text-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg transition-colors duration-200">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No hay imágenes</h3>
-            <p class="mt-1 text-sm text-gray-500">Añade imágenes para los sliders</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">No hay imágenes</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">Añade imágenes para los sliders</p>
             <div class="mt-6">
               <button 
                 type="button"
                 (click)="addSlider()"
-                class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200"
               >
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
