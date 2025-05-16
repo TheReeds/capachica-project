@@ -603,4 +603,38 @@ public function store(ReservaRequest $request): JsonResponse
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    /**
+     * @OA\Get(
+     *     path="/api/reservas/mis-reservas",
+     *     summary="Obtener todas las reservas del usuario autenticado",
+     *     tags={"Reservas"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de reservas del usuario autenticado"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error del servidor"
+     *     )
+     * )
+     */
+    public function misReservas(): JsonResponse
+    {
+        try {
+            // Obtener las reservas del usuario autenticado utilizando el método existente del repositorio
+            $reservas = $this->repository->getByUsuario(Auth::id());
+            
+            return response()->json([
+                'success' => true,
+                'data' => $reservas
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener mis reservas: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

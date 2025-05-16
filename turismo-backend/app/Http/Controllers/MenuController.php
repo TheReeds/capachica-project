@@ -172,51 +172,7 @@ class MenuController extends Controller
             ],
         ];
         
-        // Si el usuario administra emprendimientos, añadir esas opciones al menú
-        if ($incluyeMenuEmprendedor) {
-            $menuEmprendedor = [
-                'id' => 'mis-emprendimientos',
-                'title' => 'Mis Emprendimientos',
-                'icon' => 'shop',
-                'path' => '/admin/mis-emprendimientos',
-                'permissions' => ['user_read'], // Todos los usuarios pueden acceder a sus emprendimientos
-                'children' => [
-                    [
-                        'id' => 'emprendimiento-list',
-                        'title' => 'Lista de Emprendimientos',
-                        'path' => '/admin/mis-emprendimientos',
-                        'permissions' => ['user_read'],
-                    ],
-                    [
-                        'id' => 'emprendimiento-servicios',
-                        'title' => 'Mis Servicios',
-                        'path' => '/admin/mis-emprendimientos/servicios',
-                        'permissions' => ['user_read', 'servicio_read'],
-                    ],
-                    [
-                        'id' => 'emprendimiento-reservas',
-                        'title' => 'Mis Reservas',
-                        'path' => '/admin/mis-emprendimientos/reservas',
-                        'permissions' => ['user_read'],
-                    ],
-                    [
-                        'id' => 'emprendimiento-estadisticas',
-                        'title' => 'Estadísticas',
-                        'path' => '/admin/mis-emprendimientos/estadisticas',
-                        'permissions' => ['user_read'],
-                    ],
-                    [
-                        'id' => 'emprendimiento-administradores',
-                        'title' => 'Administradores',
-                        'path' => '/admin/mis-emprendimientos/administradores',
-                        'permissions' => ['user_read'],
-                    ],
-                ]
-            ];
-            
-            // Insertar después del dashboard
-            array_splice($menu, 1, 0, [$menuEmprendedor]);
-        }
+    
         
         return $menu;
     }

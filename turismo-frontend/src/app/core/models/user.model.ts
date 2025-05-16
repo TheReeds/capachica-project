@@ -133,3 +133,57 @@ export interface RoleWithPermissions {
   };
   permissions: string[];
 }
+export interface RoleInfo {
+  id: number;
+  name: string;
+  display_name: string;
+  permissions_count: number;
+}
+
+// Extensión del modelo User existente para incluir los nuevos campos
+export interface ExtendedUser extends User {
+  country?: string;
+  birth_date?: string;
+  address?: string;
+  gender?: string;
+  preferred_language?: string;
+  last_login?: string;
+  roles_info?: RoleInfo[];
+  is_admin?: boolean;
+  has_permissions?: boolean;
+  administra_emprendimientos?: boolean;
+  emprendimientos_count?: number;
+  emprendimientos?: UserEnterprise[];
+}
+export interface UserEnterprise {
+  id: number;
+  nombre: string;
+  es_principal: boolean;
+  rol: string;
+}
+export interface UserResponse {
+  success: boolean;
+  data: {
+    current_page: number;
+    data: User[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+  };
+  available_roles: {
+    id: number;
+    name: string;
+  }[];
+}

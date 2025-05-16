@@ -120,7 +120,7 @@ class EventController extends Controller
                 'sliders.*.nombre' => 'sometimes|string|max:255',
                 'sliders.*.orden' => 'sometimes|integer',
                 'sliders.*.activo' => 'sometimes|boolean',
-                'sliders.*.es_principal' => 'sometimes|boolean',
+                'sliders.*.es_principal' => 'nullable',
                 'sliders.*.imagen' => 'sometimes|file|image',
                 'deleted_sliders' => 'sometimes|array',
                 'deleted_sliders.*' => 'required|integer|exists:sliders,id',

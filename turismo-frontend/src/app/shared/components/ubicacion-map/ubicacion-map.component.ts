@@ -23,6 +23,7 @@ import { CommonModule } from '@angular/common';
 export class UbicacionMapComponent implements OnInit, OnChanges {
   @Input() latitud?: number | null;
   @Input() longitud?: number | null;
+  @Input() readOnly: boolean = false; 
   @Output() ubicacionChange = new EventEmitter<{lat: number, lng: number}>();
   
   private map: any;

@@ -47,17 +47,17 @@ class EventoRequest extends FormRequest
         'sliders.*.titulo' => 'nullable|string|max:255',
         'sliders.*.descripcion' => 'nullable|string',
         'sliders.*.nombre' => 'nullable|string|max:255',
-        'sliders.*.es_principal' => 'nullable|boolean',
+        'sliders.*.es_principal' => 'nullable',
 
         'deleted_sliders' => 'sometimes|array',
         'deleted_sliders.*' => 'integer|exists:sliders,id',
 
         'horarios' => 'sometimes|array',
-        'horarios.*.id' => 'nullable|integer|exists:evento_horarios,id',
+        'horarios.*.id' => 'nullable|integer|exists:servicio_horarios,id',
         'horarios.*.dia_semana' => ['required', Rule::in(['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'])],
         'horarios.*.hora_inicio' => 'required|date_format:H:i:s',
         'horarios.*.hora_fin' => 'required|date_format:H:i:s|after:horarios.*.hora_inicio',
-        'horarios.*.activo' => 'sometimes|boolean',
+        'horarios.*.activo' => 'sometimes',
         ];
 
         // Si es una solicitud de creación, modificamos las reglas para los archivos
