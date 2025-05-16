@@ -16,7 +16,7 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $userData = [
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
@@ -32,6 +32,45 @@ class UserResource extends JsonResource
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
+        
+        // Incluir información de roles si la relación está cargada
+        if ($this->relationLoaded('roles')) {
+            $userData['roles'] = $this->getRoleNames();
+            $userData['is_admin'] = $this->hasRole('admin');
+            
+            // Incluir información más detallada sobre los roles
+            $userData['roles_info'] = $this->roles->map(function($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'display_name' => ucfirst($role->name),
+                    'permissions_count' => $role->relationLoaded('permissions') ? $role->permissions->count() : null,
+                ];
+            });
+        }
+        
+        // Incluir información de permisos si la relación está cargada
+        if ($this->relationLoaded('permissions')) {
+            $userData['permissions'] = $this->getAllPermissions()->pluck('name');
+            $userData['has_permissions'] = $this->getAllPermissions()->isNotEmpty();
+        }
+        
+        // Incluir información de emprendimientos si la relación está cargada
+        if ($this->relationLoaded('emprendimientos')) {
+            $userData['administra_emprendimientos'] = $this->administraEmprendimientos();
+            $userData['emprendimientos_count'] = $this->emprendimientos->count();
+            
+            $userData['emprendimientos'] = $this->emprendimientos->map(function($emprendimiento) {
+                return [
+                    'id' => $emprendimiento->id,
+                    'nombre' => $emprendimiento->nombre,
+                    'es_principal' => $emprendimiento->pivot->es_principal,
+                    'rol' => $emprendimiento->pivot->rol,
+                ];
+            });
+        }
+        
+        return $userData;
     }
     
     /**

@@ -42,20 +42,21 @@ class UserController extends Controller
             });
         }
         
-        // Paginate results
+        // Paginate results with eager loading of relationships
         $perPage = $request->get('per_page', 15);
-        $users = $query->with('roles')->paginate($perPage);
+        $users = $query->with(['roles.permissions', 'permissions', 'emprendimientos'])->paginate($perPage);
         
-        // Transform users using UserResource
-        $userCollection = $users->getCollection()->map(function ($user) {
-            return new UserResource($user);
-        });
-        
-        $users->setCollection($userCollection);
+        // Transform the collection using the enhanced UserResource
+        $users->setCollection(
+            $users->getCollection()->map(function ($user) {
+                return new UserResource($user);
+            })
+        );
         
         return response()->json([
             'success' => true,
-            'data' => $users
+            'data' => $users,
+            'available_roles' => Role::all(['id', 'name']),
         ]);
     }
 
@@ -128,19 +129,14 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::with('roles', 'permissions')->findOrFail($id);
+        $user = User::with(['roles.permissions', 'permissions', 'emprendimientos'])->findOrFail($id);
         
         return response()->json([
             'success' => true,
-            'data' => [
-                'user' => new UserResource($user),
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-                'administra_emprendimientos' => $user->administraEmprendimientos(),
-            ]
+            'data' => new UserResource($user),
+            'available_roles' => Role::all(['id', 'name']),
         ]);
     }
-
     /**
      * Update the specified user.
      */

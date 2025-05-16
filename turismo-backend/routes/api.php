@@ -207,6 +207,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Reservas (nuevas rutas)
     Route::prefix('reservas')->group(function () {
+        Route::get('/mis-reservas', [ReservaController::class, 'misReservas']);
         Route::post('/mis-reservas', [ReservaController::class, 'createUserReservation']);
         Route::get('/', [ReservaController::class, 'index']);
         Route::get('/{id}', [ReservaController::class, 'show']);

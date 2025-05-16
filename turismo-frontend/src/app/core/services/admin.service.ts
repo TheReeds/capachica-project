@@ -1,4 +1,3 @@
-// src/app/core/services/admin.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environments';
@@ -78,16 +77,18 @@ export class AdminService {
     );
   }
 
-  getUser(id: number): Observable<any> {  // Cambia el tipo de retorno a 'any' por ahora
+  getUser(id: number): Observable<any> {
     return this.http.get<{success: boolean, data: any}>(`${this.API_URL}/users/${id}`);
   }
 
-  createUser(user: any): Observable<User> {
-    return this.http.post<User>(`${this.API_URL}/users`, user);
+  // Método actualizado para usar FormData y manejar archivos
+  createUser(userData: FormData): Observable<any> {
+    return this.http.post<{success: boolean, message: string, data: User}>(`${this.API_URL}/users`, userData);
   }
 
-  updateUser(id: number, user: any): Observable<User> {
-    return this.http.put<User>(`${this.API_URL}/users/${id}`, user);
+  // Método actualizado para usar FormData y manejar archivos
+  updateUser(id: number, userData: FormData): Observable<any> {
+    return this.http.post<{success: boolean, message: string, data: User}>(`${this.API_URL}/users/${id}?_method=PUT`, userData);
   }
 
   deleteUser(id: number): Observable<any> {
@@ -95,15 +96,25 @@ export class AdminService {
   }
 
   activateUser(id: number): Observable<User> {
-    return this.http.post<User>(`${this.API_URL}/users/${id}/activate`, {});
+    return this.http.patch<User>(`${this.API_URL}/users/${id}/activate`, {});
   }
 
   deactivateUser(id: number): Observable<User> {
-    return this.http.post<User>(`${this.API_URL}/users/${id}/deactivate`, {});
+    return this.http.patch<User>(`${this.API_URL}/users/${id}/deactivate`, {});
   }
 
   assignRolesToUser(userId: number, roles: string[]): Observable<any> {
     return this.http.post(`${this.API_URL}/users/${userId}/roles`, { roles });
+  }
+
+  // Método para actualizar la foto de perfil
+  updateUserProfilePhoto(userId: number, photoData: FormData): Observable<any> {
+    return this.http.post(`${this.API_URL}/users/${userId}/profile-photo`, photoData);
+  }
+
+  // Método para eliminar la foto de perfil
+  deleteUserProfilePhoto(userId: number): Observable<any> {
+    return this.http.delete(`${this.API_URL}/users/${userId}/profile-photo`);
   }
 
   getUserPermissions(userId: number): Observable<any> {
@@ -142,7 +153,6 @@ export class AdminService {
     );
   }
   
-
   assignPermissionsToUser(userId: number, permissions: string[]): Observable<any> {
     return this.http.post(`${this.API_URL}/permissions/assign-to-user`, {
       user_id: userId,
