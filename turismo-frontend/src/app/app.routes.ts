@@ -29,7 +29,7 @@ export const routes: Routes = [
         path: '',
         loadChildren: () => import('./features/admin-empredimientos/admin-emprendimientos.routes').then(m => m.ADMIN_EMPRENDEDORES_ROUTES)
     },
-    
+
 
     // Todas las rutas protegidas por autenticación
     {
