@@ -96,11 +96,11 @@ export class AdminService {
   }
 
   activateUser(id: number): Observable<User> {
-    return this.http.patch<User>(`${this.API_URL}/users/${id}/activate`, {});
+    return this.http.post<User>(`${this.API_URL}/users/${id}/activate`, {});
   }
 
   deactivateUser(id: number): Observable<User> {
-    return this.http.patch<User>(`${this.API_URL}/users/${id}/deactivate`, {});
+    return this.http.post<User>(`${this.API_URL}/users/${id}/deactivate`, {});
   }
 
   assignRolesToUser(userId: number, roles: string[]): Observable<any> {

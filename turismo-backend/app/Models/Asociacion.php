@@ -17,7 +17,6 @@ class Asociacion extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'ubicacion',
         'telefono',
         'email',
         'municipalidad_id',

@@ -17,11 +17,11 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
 
     <div class="container mx-auto px-2 sm:px-4 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">Gestión de Categorías</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">Gestión de Categorías</h1>
         <div class="mt-4 sm:mt-0">
           <a
             routerLink="/admin/categorias/create"
-            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-300"
+            class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-200"
           >
             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -32,21 +32,21 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
       </div>
 
       <!-- Tabla de categorías -->
-      <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-colors duration-300">
+      <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden mt-6 transition-colors duration-200">
         @if (loading) {
           <div class="flex justify-center items-center p-8">
             <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent"></div>
-            <span class="ml-4 dark:text-white transition-colors duration-300">Cargando categorías...</span>
+            <span class="ml-4 text-gray-700 dark:text-gray-300 transition-colors duration-200">Cargando categorías...</span>
           </div>
         } @else if (categorias.length === 0) {
           <div class="p-8 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300">No se encontraron categorías</h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Comienza creando una nueva categoría.</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">No se encontraron categorías</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">Comienza creando una nueva categoría.</p>
             <div class="mt-6">
-              <a routerLink="/admin/categorias/create" class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-300">
+              <a routerLink="/admin/categorias/create" class="inline-flex items-center rounded-md bg-primary-600 dark:bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-200">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -56,40 +56,40 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
           </div>
         } @else {
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-300">
-              <thead class="bg-gray-50 dark:bg-gray-700 transition-colors duration-300">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
+              <thead class="bg-gray-50 dark:bg-gray-700 transition-colors duration-200">
                 <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-300">Nombre</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-300">Descripción</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-300">Icono</th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-300">Acciones</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Nombre</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Descripción</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Icono</th>
+                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-300">
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-200">
                 @for (categoria of categorias; track categoria.id) {
-                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300">
+                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300">{{ categoria.nombre }}</div>
+                      <div class="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">{{ categoria.nombre }}</div>
                     </td>
                     <td class="px-6 py-4">
-                      <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs transition-colors duration-300">{{ categoria.descripcion || 'Sin descripción' }}</div>
+                      <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs transition-colors duration-200">{{ categoria.descripcion || 'Sin descripción' }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       @if (categoria.icono_url) {
                         <div class="flex items-center">
-                          <div class="h-10 w-10 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden transition-colors duration-300">
+                          <div class="h-10 w-10 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600 transition-colors duration-200">
                             <img [src]="categoria.icono_url" alt="Icono de categoría" class="h-full w-full object-cover">
                           </div>
                         </div>
                       } @else {
-                        <span class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Sin icono</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">Sin icono</span>
                       }
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="flex items-center justify-end space-x-2">
+                      <div class="flex items-center justify-end space-x-3">
                         <a
                           [routerLink]="['/admin/categorias/edit', categoria.id]"
-                          class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-300"
+                          class="p-2 rounded-full text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-200"
                           title="Editar"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,7 +99,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
 
                         <button
                           (click)="deleteCategoria(categoria)"
-                          class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors duration-300"
+                          class="p-2 rounded-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-900 dark:hover:text-red-300 transition-colors duration-200"
                           title="Eliminar"
                         >
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

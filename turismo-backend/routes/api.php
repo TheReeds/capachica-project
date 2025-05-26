@@ -87,6 +87,7 @@ Route::prefix('asociaciones')->group(function () {
     Route::get('/{id}', [AsociacionController::class, 'show']);
     Route::get('/{id}/emprendedores', [AsociacionController::class, 'getEmprendedores']);
     Route::get('/municipalidad/{municipalidadId}', [AsociacionController::class, 'getByMunicipalidad']);
+    Route::get('/ubicacion/buscar', [AsociacionController::class, 'getByUbicacion']);
 });
 
 // Emprendedores (rutas públicas)
@@ -175,9 +176,19 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Asociaciones (rutas protegidas)
     Route::prefix('asociaciones')->group(function () {
-        Route::post('/', [AsociacionController::class, 'store']);
-        Route::put('/{id}', [AsociacionController::class, 'update']);
-        Route::delete('/{id}', [AsociacionController::class, 'destroy']);
+        Route::post('/', [AsociacionController::class, 'store'])->middleware('permission:asociacion_create');
+        Route::put('/{id}', [AsociacionController::class, 'update'])->middleware('permission:asociacion_update');
+        Route::delete('/{id}', [AsociacionController::class, 'destroy'])->middleware('permission:asociacion_delete');
+        Route::get('/{id}/emprendedores/detallado', [AsociacionController::class, 'getEmprendedores'])
+            ->middleware('permission:asociacion_read');
+            
+        // Obtener asociaciones por municipalidad (versión protegida)
+        Route::get('/municipalidad/{municipalidadId}/admin', [AsociacionController::class, 'getByMunicipalidad'])
+            ->middleware('permission:asociacion_read');
+            
+        // Búsqueda por ubicación (versión protegida con más opciones)
+        Route::post('/ubicacion/buscar-avanzada', [AsociacionController::class, 'getByUbicacion'])
+            ->middleware('permission:asociacion_read');
     });
     
     // Emprendedores (rutas protegidas)
