@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,25 +25,25 @@ class MenuController extends Controller
                 'data' => []
             ], 401);
         }
-        
+
         // Obtener todos los permisos del usuario (incluyendo los heredados a través de roles)
         $permissions = $user->getAllPermissions()->pluck('name')->toArray();
-        
+
         // Verificar si el usuario administra emprendimientos
         $administraEmprendimientos = $user->administraEmprendimientos();
-        
+
         // Definir la estructura del menú completo
         $fullMenu = $this->getFullMenuStructure($administraEmprendimientos);
-        
+
         // Filtrar el menú según los permisos del usuario
         $filteredMenu = $this->filterMenuByPermissions($fullMenu, $permissions);
-        
+
         return response()->json([
             'success' => true,
             'data' => $filteredMenu
         ]);
     }
-    
+
     /**
      * Define la estructura completa del menú
      *
@@ -64,7 +65,7 @@ class MenuController extends Controller
                 'title' => 'Usuarios',
                 'icon' => 'users',
                 'path' => '/admin/users',
-                'permissions' => ['user_create'],
+                'permissions' => ['user_read'],
                 'children' => [
                     [
                         'id' => 'user-list',
@@ -91,21 +92,14 @@ class MenuController extends Controller
                 'title' => 'Municipalidad',
                 'icon' => 'building',
                 'path' => '/admin/municipalidad',
-                'permissions' => ['municipalidad_create'],
-            ],
-            [
-                'id' => 'evento',
-                'title' => 'Evento',
-                'icon' => 'events',
-                'path' => '/admin/evento',
-                'permissions' => ['user_create'],
+                'permissions' => ['municipalidad_read'],
             ],
             [
                 'id' => 'emprendedores',
                 'title' => 'Emprendedores',
                 'icon' => 'store',
                 'path' => '/admin/emprendedores',
-                'permissions' => ['emprendedor_create'],
+                'permissions' => ['emprendedor_read'],
                 'children' => [
                     [
                         'id' => 'emprendedor-list',
@@ -122,11 +116,38 @@ class MenuController extends Controller
                 ]
             ],
             [
+                'id' => 'lugares_turisticos',
+                'title' => 'Lugares Turísticos',
+                'icon' => 'map-marker',
+                'path' => '/admin/lugares-turisticos',
+                'permissions' => ['lugar_turistico_read'],
+                'children' => [
+                    [
+                        'id' => 'lugar-turistico-list',
+                        'title' => 'Gestión de Lugares',
+                        'path' => '/admin/lugares-turisticos',
+                        'permissions' => ['lugar_turistico_read'],
+                    ],
+                    [
+                        'id' => 'tipo-lugar',
+                        'title' => 'Tipos de Lugares',
+                        'path' => '/admin/lugares-turisticos/tipos',
+                        'permissions' => ['lugar_turistico_tipo_read'],
+                    ],
+                    [
+                        'id' => 'rutas-turisticas',
+                        'title' => 'Rutas Turísticas',
+                        'path' => '/admin/lugares-turisticos/rutas',
+                        'permissions' => ['lugar_turistico_ruta_read'],
+                    ],
+                ]
+            ],
+            [
                 'id' => 'servicios',
                 'title' => 'Servicios',
                 'icon' => 'briefcase',
                 'path' => '/admin/servicios',
-                'permissions' => ['servicio_create'],
+                'permissions' => ['servicio_read'],
                 'children' => [
                     [
                         'id' => 'servicio-list',
@@ -164,6 +185,46 @@ class MenuController extends Controller
                 ]
             ],
             [
+                'id' => 'reportes',
+                'title' => 'reportes',
+                'icon' => 'chart-bar',
+                'path' => '/admin/reportes',
+                'permissions' => ['reporte_read'],
+                'children' => [
+                    [
+                        'id' => 'reporte-emprendedores',
+                        'title' => 'Reporte de Emprendedores',
+                        'path' => '/admin/reportes/emprendedores',
+                        'permissions' => ['reporte_read'],
+                    ],
+                    [
+                        'id' => 'reporte-asociaciones',
+                        'title' => 'Reporte de Asociaciones',
+                        'path' => '/admin/reportes/asociaciones',
+                        'permissions' => ['reporte_read'],
+                    ],
+                    [
+                        'id' => 'reporte-lugares',
+                        'title' => 'Lugares Turísticos',
+                        'path' => '/admin/reportes/lugares',
+                        'permissions' => ['reporte_read'],
+                    ],
+                    [
+                        'id' => 'reporte-reservas',
+                        'title' => 'Reservas y Ventas',
+                        'path' => '/admin/reportes/reservas',
+                        'permissions' => ['reporte_read'],
+                    ],
+                    [
+                        'id' => 'reporte-exportar',
+                        'title' => 'Exportar Datos',
+                        'path' => '/admin/reportes/exportar',
+                        'permissions' => ['reporte_exportar']
+                    ],
+
+                ]
+            ],
+            [
                 'id' => 'profile',
                 'title' => 'Mi Perfil',
                 'icon' => 'user',
@@ -171,7 +232,7 @@ class MenuController extends Controller
                 'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
             ],
         ];
-        
+
         // Si el usuario administra emprendimientos, añadir esas opciones al menú
         if ($incluyeMenuEmprendedor) {
             $menuEmprendedor = [
@@ -213,14 +274,14 @@ class MenuController extends Controller
                     ],
                 ]
             ];
-            
+
             // Insertar después del dashboard
             array_splice($menu, 1, 0, [$menuEmprendedor]);
         }
-        
+
         return $menu;
     }
-    
+
     /**
      * Filtra el menú según los permisos del usuario
      *
@@ -231,11 +292,11 @@ class MenuController extends Controller
     private function filterMenuByPermissions($menu, $userPermissions)
     {
         $filteredMenu = [];
-        
+
         foreach ($menu as $item) {
             // Verificar si el usuario tiene al menos uno de los permisos requeridos para este elemento
             $hasPermission = count(array_intersect($item['permissions'], $userPermissions)) > 0;
-            
+
             // Si tiene permiso, procesar este ítem del menú
             if ($hasPermission) {
                 $menuItem = [
@@ -244,14 +305,14 @@ class MenuController extends Controller
                     'icon' => $item['icon'],
                     'path' => $item['path'],
                 ];
-                
+
                 // Si tiene hijos, filtrarlos también
                 if (isset($item['children']) && !empty($item['children'])) {
                     $filteredChildren = [];
-                    
+
                     foreach ($item['children'] as $child) {
                         $hasChildPermission = count(array_intersect($child['permissions'], $userPermissions)) > 0;
-                        
+
                         if ($hasChildPermission) {
                             $filteredChildren[] = [
                                 'id' => $child['id'],
@@ -260,17 +321,17 @@ class MenuController extends Controller
                             ];
                         }
                     }
-                    
+
                     // Solo añadir children si hay elementos
                     if (!empty($filteredChildren)) {
                         $menuItem['children'] = $filteredChildren;
                     }
                 }
-                
+
                 $filteredMenu[] = $menuItem;
             }
         }
-        
+
         return $filteredMenu;
     }
 }
