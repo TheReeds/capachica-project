@@ -1,15 +1,16 @@
-// general-header.component.ts
 import { Component, inject, OnInit, signal, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { CarritoService } from '../../../core/services/carrito.service';
+import { MiniCarritoComponent } from '../carrito/mini-carrito/mini-carrito.component';
 import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-general-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive, RouterOutlet, MiniCarritoComponent],
   template: `
     <div class="flex flex-col min-h-screen">
       <!-- Header - Transparent with scroll class -->
@@ -91,6 +92,9 @@ import { Subscription, filter } from 'rxjs';
 
             <!-- Botones de acción - sólo visible en escritorio cuando no hay menú móvil abierto -->
             <div class="items-center space-x-3 hidden md:flex">
+              <!-- Carrito de reservas - Solo si está logueado -->
+              <app-mini-carrito *ngIf="isLoggedIn()"></app-mini-carrito>
+
               <!-- Theme toggle button -->
               <button 
                 (click)="toggleDarkMode()" 
@@ -134,6 +138,21 @@ import { Subscription, filter } from 'rxjs';
 
             <!-- Botones de acción en móvil - solo visible cuando NO hay menú abierto -->
             <div class="flex items-center space-x-3 md:hidden" *ngIf="!mobileMenuOpen()">
+              <!-- Carrito en móvil -->
+              <button *ngIf="isLoggedIn()" 
+                routerLink="/carrito" 
+                class="relative p-2 rounded-full text-gray-800 dark:text-gray-200 hover:bg-amber-100 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200"
+              >
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0v0M17 21v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6"></path>
+                </svg>
+                <span *ngIf="getTotalItemsCarrito() > 0" 
+                  class="absolute -top-1 -right-1 bg-amber-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium"
+                >
+                  {{ getTotalItemsCarrito() }}
+                </span>
+              </button>
+
               <!-- Theme toggle button -->
               <button 
                 (click)="toggleDarkMode()" 
@@ -147,32 +166,13 @@ import { Subscription, filter } from 'rxjs';
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </button>
-              
 
-              <!-- Auth buttons -->
+              <!-- Auth buttons móvil - Solo mostrar login si no está autenticado -->
               <button *ngIf="!isLoggedIn()" 
                 routerLink="/login" 
-                class="bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
+                class="bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
               >
-                Iniciar sesión
-              </button>
-              <button *ngIf="!isLoggedIn()" 
-                routerLink="/register" 
-                class="bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
-              >
-                Registrarse
-              </button>
-              <button *ngIf="isLoggedIn()" 
-                routerLink="/dashboard" 
-                class="bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
-              >
-                Mi cuenta
-              </button>
-              <button *ngIf="isLoggedIn()" 
-                (click)="logout()" 
-                class="bg-amber-700 hover:bg-amber-800 dark:bg-amber-700 dark:hover:bg-amber-800 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
-              >
-                Salir
+                Login
               </button>
             </div>
 
@@ -244,6 +244,19 @@ import { Subscription, filter } from 'rxjs';
                 <span>Contacto</span>
               </a>
               
+              <!-- Carrito en menú móvil - Solo si está logueado -->
+              <a *ngIf="isLoggedIn()" 
+                routerLink="/carrito" 
+                routerLinkActive="text-amber-800 dark:text-amber-400 font-medium" 
+                class="flex items-center text-gray-800 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-400 py-2 px-1 transition-colors duration-200" 
+                (click)="closeMobileMenu()"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0v0M17 21v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6"></path>
+                </svg>
+                <span>Mi Carrito ({{ getTotalItemsCarrito() }})</span>
+              </a>
+              
               <!-- Theme toggle in mobile menu -->
               <a 
                 (click)="toggleDarkMode(); $event.preventDefault();" 
@@ -293,7 +306,6 @@ import { Subscription, filter } from 'rxjs';
         </div>
       </header>
 
-
       <!-- Contenido principal -->
       <main class="relative z-0 transition-all duration-300">
         <router-outlet></router-outlet>
@@ -333,11 +345,32 @@ import { Subscription, filter } from 'rxjs';
     .scrolled-header {
       animation: fadeInDown 0.3s ease-out forwards;
     }
+
+    /* Badge animation */
+    .badge-bounce {
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 53%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40%, 43% {
+        transform: translateY(-3px);
+      }
+      70% {
+        transform: translateY(-2px);
+      }
+      90% {
+        transform: translateY(-1px);
+      }
+    }
   `]
 })
 export class GeneralHeaderComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private themeService = inject(ThemeService);
+  private carritoService = inject(CarritoService);
   private router = inject(Router);
   private routerSubscription: Subscription | null = null;
   
@@ -347,6 +380,11 @@ export class GeneralHeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Initialize the theme
     this.themeService.initializeTheme();
+    
+    // Inicializar carrito si está logueado
+    if (this.isLoggedIn()) {
+      this.carritoService.inicializarCarrito();
+    }
     
     // Reset scroll position on navigation
     this.routerSubscription = this.router.events.pipe(
@@ -369,7 +407,7 @@ export class GeneralHeaderComponent implements OnInit, OnDestroy {
   @HostListener('window:scroll', [])
   onWindowScroll() {
     const scrollPosition = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    this.scrolled.set(scrollPosition > 10); // Reduced threshold to make it more responsive
+    this.scrolled.set(scrollPosition > 10);
   }
   
   isLoggedIn(): boolean {
@@ -387,11 +425,15 @@ export class GeneralHeaderComponent implements OnInit, OnDestroy {
   logout() {
     this.authService.logout().subscribe({
       next: () => {
+        // Limpiar carrito al cerrar sesión
+        this.carritoService.limpiarCarritoAlCerrarSesion();
         // Redirect to home after logout
         window.location.href = '/home';
       },
       error: (err) => {
         console.error('Error al cerrar sesión:', err);
+        // Limpiar carrito incluso si hay error
+        this.carritoService.limpiarCarritoAlCerrarSesion();
       }
     });
   }
@@ -402,5 +444,14 @@ export class GeneralHeaderComponent implements OnInit, OnDestroy {
   
   isDarkMode(): boolean {
     return this.themeService.isDarkMode();
+  }
+  
+  // Métodos para el carrito
+  getTotalItemsCarrito(): number {
+    return this.carritoService.getTotalItems();
+  }
+  
+  tieneItemsEnCarrito(): boolean {
+    return this.carritoService.tieneItems();
   }
 }
