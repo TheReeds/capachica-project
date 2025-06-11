@@ -96,4 +96,12 @@ export class ServiciosComponent implements OnInit {
     this.emprendedorSeleccionado = null;
   }
   
+  limpiarNombreRuta(nombre: string): string {
+  return nombre
+    .toLowerCase()
+    .normalize('NFD') // descompone caracteres acentuados
+    .replace(/[\u0300-\u036f]/g, ''); // elimina los signos diacríticos
+}
+
+
 }

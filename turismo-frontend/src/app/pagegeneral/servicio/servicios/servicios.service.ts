@@ -25,6 +25,9 @@ export class ServiciosService {
   obtenerServiciosDeAlojamiento(): Observable<any> {
     return this.http.get('/api/servicios/categoria/1'); // 1 = ID de Alojamiento
   }
+  obtenerServiciosDeAlimentacion(): Observable<any> {
+    return this.http.get('/api/servicios/categoria/1'); // 1 = ID de Alojamiento
+  }
   obtenerServiciosPorCategoria(categoriaId: number): Observable<any> {
     return this.http.get(`http://127.0.0.1:8000/api/servicios/categoria/${categoriaId}`);
   }

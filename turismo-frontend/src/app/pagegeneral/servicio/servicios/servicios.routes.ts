@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { ServiciosComponent } from './servicios.component';
 import { AlojamientoComponent } from '../alojamiento/alojamiento.component';
+import { AlimentacionComponent } from '../alimentacion/alimentacion.component';
 
 export const SERVICIOS_ROUTES: Routes = [
   

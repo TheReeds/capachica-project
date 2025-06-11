@@ -41,36 +41,7 @@ export const PAGEGENERAL_ROUTES: Routes = [
       component: ServiciosComponent,
       title: 'Servicios'
     },
-    {
-      path: 'servicios/actividades',
-      component: ActividadesComponent,
-      title: 'Actividades'
-    },
-    {
-      path: 'servicios/alimentacion',
-      component: AlimentacionComponent,
-      title: 'Alimentacion'
-    },
-    {
-      path: 'servicio/alojamiento',
-      component: AlojamientoComponent,
-      title: 'Alojamiento'
-    },
-    {
-      path: 'servicios/artesania',
-      component: ArtesaniaComponent,
-      title: 'Artesanía'
-    },
-    {
-      path: 'servicios/transporte',
-      component: TransporteComponent,
-      title: 'Transporte'
-    },
-    {
-      path: 'servicios/guiado',
-      component: GuiadoComponent,
-      title: 'Guiado'
-    },
+    
     {
       path: 'familias',
       component: FamiliasComponent,
@@ -79,15 +50,13 @@ export const PAGEGENERAL_ROUTES: Routes = [
 
     {
       path: 'servicios',
-      loadChildren: () => import('./servicio/servicios/servicios.routes').then(m => m.SERVICIOS_ROUTES)
-    },
-
-
-    {
-      path: 'servicios',
-      loadChildren: () =>
+      loadChildren: () => 
         import('./servicio/servicios/servicios.routes').then(m => m.SERVICIOS_ROUTES)
     },
+
+    { path: 'servicio/alojamiento', component: AlojamientoComponent, title: 'Alojamiento' },
+    { path: 'servicio/alimentacion', component: AlimentacionComponent, title: 'Alimentacion' },
+
 
     {
       path: 'detallefamilias/:id',
