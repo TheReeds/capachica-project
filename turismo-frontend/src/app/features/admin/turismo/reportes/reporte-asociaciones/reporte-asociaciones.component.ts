@@ -774,8 +774,6 @@ export class ReporteAsociacionesComponent implements OnInit {
     return Math.min(this.paginaActual * this.itemsPorPagina, this.asociacionesFiltradas.length);
   }
 
-
-
 }
 //
 // // Función auxiliar para el gráfico de radar

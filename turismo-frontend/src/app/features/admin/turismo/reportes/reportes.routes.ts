@@ -1,46 +1,34 @@
-import { Routes } from '@angular/router';
-import { ReporteListComponent } from './reporte-list/reporte-list.component';
-// import { ReporteGeneralComponent } from './reporte-general/reporte-general.component';
-import { ReporteEmprendedoresComponent } from './reporte-emprendedores/reporte-emprendedores.component';
-import { ReporteAsociacionesComponent } from './reporte-asociaciones/reporte-asociaciones.component';
-// import { ReporteCategoriasServiciosComponent } from './reporte-categorias-servicios/reporte-categorias-servicios.component';
-import { ReporteLugaresComponent } from './reporte-lugares/reporte-lugares.component';
-// import { ReporteMunicipalidadesComponent } from './reporte-municipalidades/reporte-municipalidades.component';
-// import { ReporteReservasComponent } from './reporte-reservas/reporte-reservas.component';
-// import { ReporteVisitasComponent } from './reporte-visitas/reporte-visitas.component';
-// import { ReporteExportarComponent } from './reporte-exportar/reporte-exportar.component';
+/**
+ * Nombre del archivo: reportes.routes.ts
+ *
+ * Propósito: Definir las rutas para los diferentes componentes de reportes en el módulo correspondiente.
+ *
+ * Autor: Eliazar Noa Llascanoa
+ *
+ * Fecha de creación: 01-06-2025
+ */
 
+import { Routes } from '@angular/router';
+
+import { ReporteEmprendedoresComponent } from './reporte-emprendedoress/reporte-emprendedores.component';
+import { ReporteAsociacionesComponent } from './reporte-asociaciones/reporte-asociaciones.component';
+import { ReporteLugaresComponent } from './reporte-lugares/reporte-lugares.component';
+
+/**
+ * Arreglo de rutas para la sección de reportes.
+ * Cada ruta está asociada a un componente específico encargado de renderizar el contenido correspondiente.
+ */
 export const REPORTES_ROUTES: Routes = [
   {
-    path: '',
-    component: ReporteListComponent
-  },
-  {
-    path: 'emprendedores',
+    path: 'emprendedores', // Muestra el reporte de emprendedores
     component: ReporteEmprendedoresComponent
   },
   {
-    path: 'asociaciones',
+    path: 'asociaciones', // Muestra el reporte de asociaciones
     component: ReporteAsociacionesComponent
   },
   {
-    path: 'lugares',
+    path: 'lugares', // Muestra el reporte de lugares turísticos
     component: ReporteLugaresComponent
-  },
-  // {
-  //   path: 'municipalidades',
-  //   component: ReporteMunicipalidadesComponent
-  // },
-  // {
-  //   path: 'reservas',
-  //   component: ReporteReservasComponent
-  // },
-  // {
-  //   path: 'visitas',
-  //   component: ReporteVisitasComponent
-  // },
-  // {
-  //   path: 'exportar',
-  //   component: ReporteExportarComponent
-  // }
+  }
 ];

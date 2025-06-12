@@ -1,8 +1,10 @@
-
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+import {Component, inject, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterLink} from '@angular/router';
+import {NgxChartsModule} from '@swimlane/ngx-charts';
+import {TurismoService} from '../../../../../core/services/turismo.service';
+import {ReportesService} from '../../../../../core/services/reportes.service';
+import {saveAs} from 'file-saver';
 
 @Component({
   selector: 'app-reporte-emprendedores',
@@ -14,7 +16,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
       <div class="mb-8 bg-white rounded-2xl shadow-lg p-8">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            <h1
+              class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
               Dashboard de Emprendedores
             </h1>
             <p class="text-xl text-gray-600 font-medium">
@@ -24,11 +27,58 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
               Análisis integral del turismo comunitario en {{ asociacion?.comunidad || 'la asociación' }}
             </p>
           </div>
-          <div class="hidden lg:block">
-            <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
+          <!-- Botones de exportación -->
+          <div class="flex flex-col lg:flex-row items-center gap-4">
+            <div class="flex flex-wrap gap-2">
+              <button
+                (click)="imprimirReporte()"
+                class="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 shadow-md">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                </svg>
+                Imprimir
+              </button>
+
+              <button
+                (click)="exportarPDF()"
+                class="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-md">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                PDF
+              </button>
+
+              <button
+                (click)="exportarExcel()"
+                class="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-md">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Excel
+              </button>
+
+              <button
+                (click)="exportarCSV()"
+                class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                CSV
+              </button>
+            </div>
+
+            <div class="hidden lg:block">
+              <div
+                class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -37,7 +87,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
       <!-- Métricas principales con diseño moderno -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Emprendedores -->
-        <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-xl transition-shadow duration-300">
+        <div
+          class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-xl transition-shadow duration-300">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600 mb-1">Total Emprendedores</p>
@@ -58,12 +109,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
         </div>
 
         <!-- Emprendedores Activos -->
-        <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500 hover:shadow-xl transition-shadow duration-300">
+        <div
+          class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500 hover:shadow-xl transition-shadow duration-300">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600 mb-1">Emprendedores Activos</p>
               <p class="text-3xl font-bold text-green-600">{{ metrics.activos }}</p>
-              <p class="text-xs text-gray-500 mt-1">{{ (metrics.activos / metrics.total * 100).toFixed(1) }}% del total</p>
+              <p class="text-xs text-gray-500 mt-1">{{ (metrics.activos / metrics.total * 100).toFixed(1) }}% del
+                total</p>
               <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
                 <div class="bg-green-500 h-2 rounded-full transition-all duration-500"
                      [style.width.%]="(metrics.activos / metrics.total * 100)"></div>
@@ -79,12 +132,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
         </div>
 
         <!-- Con Certificaciones -->
-        <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500 hover:shadow-xl transition-shadow duration-300">
+        <div
+          class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500 hover:shadow-xl transition-shadow duration-300">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600 mb-1">Con Certificaciones</p>
               <p class="text-3xl font-bold text-yellow-600">{{ metrics.conCertificaciones }}</p>
-              <p class="text-xs text-gray-500 mt-1">{{ (metrics.conCertificaciones / metrics.total * 100).toFixed(1) }}% del total</p>
+              <p class="text-xs text-gray-500 mt-1">{{ (metrics.conCertificaciones / metrics.total * 100).toFixed(1) }}%
+                del total</p>
               <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
                 <div class="bg-yellow-500 h-2 rounded-full transition-all duration-500"
                      [style.width.%]="(metrics.conCertificaciones / metrics.total * 100)"></div>
@@ -100,7 +155,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
         </div>
 
         <!-- Accesibles -->
-        <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-500 hover:shadow-xl transition-shadow duration-300">
+        <div
+          class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-500 hover:shadow-xl transition-shadow duration-300">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600 mb-1">Accesibles</p>
@@ -185,7 +241,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
             <h3 class="text-xl font-bold text-gray-900">Emprendedores por Categoría</h3>
             <div class="p-2 bg-blue-100 rounded-lg">
               <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
             </div>
           </div>
@@ -211,7 +268,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
             <h3 class="text-xl font-bold text-gray-900">Distribución por Comunidad</h3>
             <div class="p-2 bg-green-100 rounded-lg">
               <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
               </svg>
             </div>
           </div>
@@ -239,7 +297,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
             <h3 class="text-xl font-bold text-gray-900">Distribución por Rangos de Precio</h3>
             <div class="p-2 bg-yellow-100 rounded-lg">
               <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>
             </div>
           </div>
@@ -265,7 +324,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
             <h3 class="text-xl font-bold text-gray-900">Métodos de Pago Aceptados</h3>
             <div class="p-2 bg-purple-100 rounded-lg">
               <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
               </svg>
             </div>
           </div>
@@ -295,7 +355,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
             <h3 class="text-xl font-bold text-gray-900">Reservas por Categoría</h3>
             <div class="p-2 bg-indigo-100 rounded-lg">
               <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
             </div>
           </div>
@@ -322,7 +383,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
             <h3 class="text-xl font-bold text-gray-900">Estado de Emprendedores</h3>
             <div class="p-2 bg-green-100 rounded-lg">
               <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
             </div>
           </div>
@@ -342,21 +404,24 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 
             <!-- Estadísticas detalladas -->
             <div class="grid grid-cols-1 gap-3">
-              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border-l-4 border-green-500">
+              <div
+                class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border-l-4 border-green-500">
                 <div class="flex items-center">
                   <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
                   <span class="font-semibold text-green-800">Activos</span>
                 </div>
                 <span class="text-2xl font-bold text-green-600">{{ metrics.activos }}</span>
               </div>
-              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl border-l-4 border-red-500">
+              <div
+                class="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl border-l-4 border-red-500">
                 <div class="flex items-center">
                   <div class="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
                   <span class="font-semibold text-red-800">Inactivos</span>
                 </div>
                 <span class="text-2xl font-bold text-red-600">{{ metrics.inactivos }}</span>
               </div>
-              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border-l-4 border-blue-500">
+              <div
+                class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border-l-4 border-blue-500">
                 <div class="flex items-center">
                   <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
                   <span class="font-semibold text-blue-800">Tasa de Actividad</span>
@@ -468,6 +533,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 })
 
 export class ReporteEmprendedoresComponent {
+  private turismoService = inject(TurismoService);
+  private reporteService = inject(ReportesService);
   // Datos de ejemplo para la asociación
   asociacion = {
     nombre: "Asociación Turística Capachica",
@@ -619,14 +686,19 @@ export class ReporteEmprendedoresComponent {
     conFacilidadesDiscapacidad: this.emprendedores.filter(e => e.facilidades_discapacidad).length,
     totalServicios: this.emprendedores.reduce((sum, e) => sum + (e.servicios_count || 0), 0),
     totalReservas: this.emprendedores.reduce((sum, e) => sum + (e.reservas_mes || 0), 0),
-    get promedioServicios() { return (this.totalServicios / this.total).toFixed(1); },
-    get promedioReservas() { return (this.totalReservas / this.total).toFixed(1); }
+    get promedioServicios() {
+      return (this.totalServicios / this.total).toFixed(1);
+    },
+    get promedioReservas() {
+      return (this.totalReservas / this.total).toFixed(1);
+    }
   };
 
   // Datos para gráficos
   colorScheme = {
     domain: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D']
   };
+
   // Datos para el gráfico de estado de emprendedores
   get estadoEmprendedoresData() {
     return [
@@ -650,7 +722,7 @@ export class ReporteEmprendedoresComponent {
     return Object.entries(categorias).map(([name, value]) => ({
       name,
       value,
-      extra: { porcentaje: ((value / this.metrics.total) * 100).toFixed(1) + '%' }
+      extra: {porcentaje: ((value / this.metrics.total) * 100).toFixed(1) + '%'}
     }));
   }
 
@@ -659,7 +731,7 @@ export class ReporteEmprendedoresComponent {
     this.emprendedores.forEach(emp => {
       comunidades[emp.comunidad] = (comunidades[emp.comunidad] || 0) + 1;
     });
-    return Object.entries(comunidades).map(([name, value]) => ({ name, value }));
+    return Object.entries(comunidades).map(([name, value]) => ({name, value}));
   }
 
   get rangosPrecioData() {
@@ -679,7 +751,7 @@ export class ReporteEmprendedoresComponent {
       else if (precio?.includes('10-80')) rangos['S/. 61-80']++;
     });
 
-    return Object.entries(rangos).map(([name, value]) => ({ name, value }));
+    return Object.entries(rangos).map(([name, value]) => ({name, value}));
   }
 
   get metodosPagoData() {
@@ -689,7 +761,7 @@ export class ReporteEmprendedoresComponent {
         metodos[metodo] = (metodos[metodo] || 0) + 1;
       });
     });
-    return Object.entries(metodos).map(([name, value]) => ({ name, value }));
+    return Object.entries(metodos).map(([name, value]) => ({name, value}));
   }
 
   get reservasPorCategoriaData() {
@@ -701,6 +773,286 @@ export class ReporteEmprendedoresComponent {
       reservasPorCategoria[emp.categoria] += emp.reservas_mes || 0;
     });
 
-    return Object.entries(reservasPorCategoria).map(([name, value]) => ({ name, value }));
+    return Object.entries(reservasPorCategoria).map(([name, value]) => ({name, value}));
+  }
+
+  // NUEVOS MÉTODOS PARA EXPORTACIÓN E IMPRESIÓN
+
+  /**
+   * Función para imprimir el reporte
+   */
+  /**
+   * Función para imprimir el reporte usando el servicio Laravel
+   */
+  imprimirReporte(): void {
+    this.turismoService.generarReporteEmprendedoresPDF({
+      incluir_estadisticas: true,
+      incluir_graficos: false, // Los gráficos no se imprimen bien generalmente
+      orientacion: 'portrait'
+    }).subscribe({
+      next: (pdfBlob: Blob) => {
+        // Crear una URL para el blob del PDF
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        // Crear un iframe para la impresión
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = pdfUrl;
+
+        // Cuando el PDF esté cargado, imprimirlo
+        iframe.onload = () => {
+          setTimeout(() => {
+            iframe.contentWindow?.print();
+
+            // Limpiar después de imprimir
+            setTimeout(() => {
+              document.body.removeChild(iframe);
+              URL.revokeObjectURL(pdfUrl);
+            }, 100);
+          }, 500);
+        };
+
+        document.body.appendChild(iframe);
+      },
+      error: (err) => {
+        console.error('Error al generar el PDF para impresión:', err);
+        // Mostrar mensaje de error y volver al método antiguo como fallback
+        alert('No se pudo generar el PDF automáticamente. Se abrirá una versión simplificada para imprimir.');
+        this.imprimirReporteFallback();
+      }
+    });
+  }
+
+  /**
+   * Método de fallback para imprimir cuando el servicio falla
+   */
+  private imprimirReporteFallback(): void {
+    // Crear estilos CSS para impresión
+    const printStyles = `
+    <style>
+      @media print {
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .no-print { display: none !important; }
+        .print-only { display: block !important; }
+        .page-break { page-break-before: always; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+        th { background-color: #f5f5f5; font-weight: bold; }
+        .metric-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; }
+        .metric-title { font-weight: bold; color: #333; }
+        .metric-value { font-size: 24px; font-weight: bold; color: #2563eb; }
+        h1, h2, h3 { color: #1f2937; }
+        .header { text-align: center; margin-bottom: 30px; }
+      }
+    </style>
+  `;
+
+    // Crear contenido HTML para impresión
+    const printContent = `
+    ${printStyles}
+    <div class="header">
+      <h1>Dashboard de Emprendedores</h1>
+      <h2>${this.asociacion.nombre}</h2>
+      <p>Análisis integral del turismo comunitario en ${this.asociacion.comunidad}</p>
+      <p><strong>Fecha del reporte:</strong> ${new Date().toLocaleDateString('es-PE')}</p>
+    </div>
+
+    <div class="metrics-summary">
+      <h3>Resumen de Métricas</h3>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        <div class="metric-card">
+          <div class="metric-title">Total Emprendedores</div>
+          <div class="metric-value">${this.metrics.total}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Emprendedores Activos</div>
+          <div class="metric-value">${this.metrics.activos}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Con Certificaciones</div>
+          <div class="metric-value">${this.metrics.conCertificaciones}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Accesibles</div>
+          <div class="metric-value">${this.metrics.conFacilidadesDiscapacidad}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Listado Detallado de Emprendedores</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Emprendedor</th>
+          <th>Categoría</th>
+          <th>Comunidad</th>
+          <th>Servicios</th>
+          <th>Reservas/Mes</th>
+          <th>Estado</th>
+          <th>Accesible</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${this.emprendedores.map(emp => `
+          <tr>
+            <td>
+              <strong>${emp.nombre}</strong><br>
+              <small>${emp.tipo_servicio}</small>
+            </td>
+            <td>${emp.categoria}</td>
+            <td>${emp.comunidad}</td>
+            <td>${emp.servicios_count}</td>
+            <td>${emp.reservas_mes}</td>
+            <td>${emp.estado ? 'Activo' : 'Inactivo'}</td>
+            <td>${emp.facilidades_discapacidad ? '✓' : '-'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+
+    // Abrir ventana de impresión
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Reporte de Emprendedores - ${this.asociacion.nombre}</title>
+        <meta charset="utf-8">
+      </head>
+      <body>
+        ${printContent}
+      </body>
+      </html>
+    `);
+      printWindow.document.close();
+      printWindow.focus();
+
+      // Esperar a que se cargue y luego imprimir
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+    }
+  }
+
+  /**
+   * Función para exportar a PDF usando el servicio Laravel
+   */
+  exportarPDF(): void {
+    this.turismoService.generarReporteEmprendedoresPDF({
+      incluir_estadisticas: true,
+      incluir_graficos: true,
+      orientacion: 'portrait'
+    }).subscribe({
+      next: (pdfBlob: Blob) => {
+        // Usamos file-saver para descargar el PDF
+        saveAs(pdfBlob, `reporte-emprendedores-${this.asociacion.nombre}-${new Date().toISOString().split('T')[0]}.pdf`);
+      },
+      error: (err) => {
+        console.error('Error al descargar el PDF:', err);
+        // Opcional: Mostrar mensaje de error al usuario
+        alert('No se pudo generar el reporte PDF. Por favor, inténtelo nuevamente.');
+      }
+    });
+  }
+
+  /**
+   * Función para exportar a Excel
+   * Nota: Requiere instalar xlsx: npm install xlsx
+   */
+  exportarExcel(): void {
+    // Preparar datos para Excel
+    const excelData = this.emprendedores.map(emp => ({
+      'Nombre': emp.nombre,
+      'Tipo de Servicio': emp.tipo_servicio,
+      'Descripcion': emp.descripcion,
+      'Categoria': emp.categoria,
+      'Comunidad': emp.comunidad,
+      'Ubicacion': emp.ubicacion,
+      'Telefono': emp.telefono,
+      'Email': emp.email,
+      'Pagina Web': emp.pagina_web || '',
+      'Horario': emp.horario_atencion,
+      'Rango de Precio': emp.precio_rango,
+      'Metodos de Pago': emp.metodos_pago?.join(', ') || '',
+      'Capacidad': emp.capacidad_aforo,
+      'Personal': emp.numero_personas_atiende,
+      'Certificaciones': emp.certificaciones?.join(', ') || '',
+      'Idiomas': emp.idiomas_hablados?.join(', ') || '',
+      'Accesible': emp.facilidades_discapacidad ? 'Sí' : 'No',
+      'Estado': emp.estado ? 'Activo' : 'Inactivo',
+      'Servicios Count': emp.servicios_count,
+      'Reservas/Mes': emp.reservas_mes,
+      'Fecha Creacion': emp.created_at
+    }));
+
+    // Implementación alternativa sin librería externa
+    this.downloadAsCSV(excelData, `reporte-emprendedores-${this.asociacion.nombre}-${new Date().toISOString().split('T')[0]}.csv`);
+
+    console.log('Para una mejor exportación a Excel, considera instalar la librería xlsx: npm install xlsx');
+  }
+
+  /**
+   * Función para exportar a CSV
+   */
+  exportarCSV(): void {
+    const csvData = this.emprendedores.map(emp => ({
+      'Nombre': emp.nombre,
+      'Tipo de Servicio': emp.tipo_servicio,
+      'Categoria': emp.categoria,
+      'Comunidad': emp.comunidad,
+      'Telefono': emp.telefono,
+      'Email': emp.email,
+      'Rango de Precio': emp.precio_rango,
+      'Estado': emp.estado ? 'Activo' : 'Inactivo',
+      'Accesible': emp.facilidades_discapacidad ? 'Sí' : 'No',
+      'Servicios': emp.servicios_count,
+      'Reservas Mes': emp.reservas_mes
+    }));
+
+    this.downloadAsCSV(csvData, `emprendedores-${this.asociacion.nombre}-${new Date().toISOString().split('T')[0]}.csv`);
+  }
+
+  /**
+   * Función auxiliar para descargar datos como CSV
+   */
+  private downloadAsCSV(data: any[], filename: string): void {
+    if (data.length === 0) return;
+
+    // Obtener headers
+    const headers = Object.keys(data[0]);
+
+    // Crear contenido CSV
+    const csvContent = [
+      headers.join(','), // Headers
+      ...data.map(row =>
+        headers.map(header => {
+          const value = row[header] || '';
+          // Escapar comillas y envolver en comillas si contiene comas
+          return typeof value === 'string' && (value.includes(',') || value.includes('"'))
+            ? `"${value.replace(/"/g, '""')}"`
+            : value;
+        }).join(',')
+      )
+    ].join('\n');
+
+    // Crear Blob y descargar
+    const blob = new Blob(['\ufeff' + csvContent], {type: 'text/csv;charset=utf-8;'});
+    const link = document.createElement('a');
+
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
 }
+

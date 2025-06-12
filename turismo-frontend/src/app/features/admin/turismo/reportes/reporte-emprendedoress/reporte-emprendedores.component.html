@@ -1,0 +1,186 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
+  <!-- Header Mejorado -->
+  <div class="mb-8 bg-white rounded-2xl shadow-lg p-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          Generador de Reportes
+        </h1>
+        <p class="text-xl text-gray-600 font-medium">
+          {{ asociacion?.nombre || 'Asociación' }}
+        </p>
+        <p class="text-gray-500 mt-2">
+          Sistema integral de reportes para emprendedores de {{ asociacion?.comunidad || 'la asociación' }}
+        </p>
+      </div>
+
+      <!-- Botones de acción principales -->
+      <div class="flex flex-col lg:flex-row items-center gap-4">
+        <div class="flex flex-wrap gap-2">
+          <button
+            (click)="imprimirReporte()"
+            [disabled]="!previewReporte || (loading$ | async)"
+            class="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-md">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+            </svg>
+            Imprimir
+          </button>
+
+          <button
+            (click)="generarPDF()"
+            [disabled]="!previewReporte || generandoPDF || (loading$ | async)"
+            class="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-md">
+            <svg *ngIf="!generandoPDF" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            <div *ngIf="generandoPDF" class="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            {{ generandoPDF ? 'Generando...' : 'Descargar PDF' }}
+          </button>
+
+          <button
+            (click)="exportarExcel()"
+            [disabled]="!previewReporte || (loading$ | async)"
+            class="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-md">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Excel
+          </button>
+
+          <button
+            (click)="exportarCSV()"
+            [disabled]="!previewReporte || (loading$ | async)"
+            class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-md">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 2 0 01-2 2z"></path>
+            </svg>
+            CSV
+          </button>
+        </div>
+
+        <div class="hidden lg:block">
+          <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de Error -->
+  <div *ngIf="errorMessage" class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+    <div class="flex">
+      <svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+      </svg>
+      <div>
+        <p class="text-sm text-red-700">{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Componente de Filtros -->
+  <app-filtros-reporte
+    [datosFiltros]="datosFiltros"
+    [previsualizando]="previsualizando"
+    (filtrosChange)="onFiltrosChange($event)"
+    (previsualizar)="onPrevisualizar($event)">
+  </app-filtros-reporte>
+
+  <!-- Opciones del Reporte -->
+  <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+      <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+      </svg>
+      Opciones del Reporte
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="flex items-center">
+          <input
+            type="checkbox"
+            [checked]="opcionesReporte.incluir_estadisticas"
+            (change)="onIncluirEstadisticasChange($event)"
+            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+          <span class="ml-2 text-sm font-medium text-gray-700">Incluir Estadísticas</span>
+        </label>
+      </div>
+
+      <div>
+        <label class="flex items-center">
+          <input
+            type="checkbox"
+            [checked]="opcionesReporte.incluir_graficos"
+            (change)="onIncluirGraficosChange($event)"
+            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+          <span class="ml-2 text-sm font-medium text-gray-700">Incluir Gráficos</span>
+        </label>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Orientación</label>
+        <select
+          [value]="opcionesReporte.orientacion"
+          (change)="onOrientacionChange($event)"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="portrait">Vertical</option>
+          <option value="landscape">Horizontal</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Componente de Preview -->
+  <app-preview-reporte [preview]="previewReporte"></app-preview-reporte>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading$ | async" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4">
+      <app-loading-spinner
+        [size]="48"
+        [showInner]="true"
+        text="Procesando solicitud..."
+        subtext="Por favor espere mientras generamos su reporte"
+        containerClass="text-center">
+      </app-loading-spinner>
+    </div>
+  </div>
+
+  <!-- Instrucciones de uso -->
+  <div *ngIf="!previewReporte" class="bg-blue-50 rounded-2xl p-8 text-center">
+    <svg class="w-16 h-16 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <h3 class="text-xl font-semibold text-blue-900 mb-2">¿Cómo generar un reporte?</h3>
+    <div class="text-blue-800 space-y-2 max-w-2xl mx-auto">
+      <p>1. <strong>Configure los filtros</strong> según sus necesidades (categoría, ubicación, fechas, etc.)</p>
+      <p>2. <strong>Haga clic en "Previsualizar"</strong> para ver un resumen de los datos</p>
+      <p>3. <strong>Ajuste las opciones del reporte</strong> (estadísticas, gráficos, orientación)</p>
+      <p>4. <strong>Genere su reporte</strong> en el formato deseado (PDF, Excel, CSV)</p>
+    </div>
+  </div>
+
+  <!-- Footer informativo -->
+  <div class="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+    <h4 class="font-semibold text-gray-900 mb-2">
+      Sistema de Reportes - {{ asociacion?.municipalidad || 'Turismo Comunitario' }}
+    </h4>
+    <p class="text-gray-700 text-sm">
+      Herramienta integral para el análisis y seguimiento de emprendimientos turísticos comunitarios.
+      Genera reportes detallados con estadísticas, gráficos y análisis de datos para la toma de decisiones estratégicas.
+    </p>
+  </div>
+</div>

@@ -22,6 +22,7 @@ use App\reservas\reserva\Controller\ReservaServicioController; //Agregando contr
 use App\Servicios\Controllers\CategoriaController;
 use App\Http\Controllers\API\GoogleAuthController;
 use App\Http\Controllers\LugarTuristicoController;
+use App\Reportes\Emprendedores\Http\Controllers\EmprendedoresReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -265,7 +266,17 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}', [LugarTuristicoController::class, 'show']);
             Route::put('/{id}', [LugarTuristicoController::class, 'update']);
             Route::delete('/{id}', [LugarTuristicoController::class, 'destroy']);
+
         });
     });
+    Route::prefix('reportes')->middleware(['auth:sanctum'])->group(function () {
+        // 📄 PDF - Reporte de Emprendedores
+        Route::post('/emprendedores/pdf', [EmprendedoresReportController::class, 'generarPDF']);
 
+        // 📊 Datos para filtros
+        Route::get('/emprendedores/filtros', [EmprendedoresReportController::class, 'obtenerDatosFiltros']);
+
+        // 👁️ Previsualización del reporte
+        Route::post('/emprendedores/preview', [EmprendedoresReportController::class, 'previsualizarReporte']);
+    });
 });
