@@ -22,4 +22,5 @@ class Categoria extends Model
         return $this->belongsToMany(Servicio::class, 'categoria_servicio')
             ->withTimestamps();
     }
+    
 }

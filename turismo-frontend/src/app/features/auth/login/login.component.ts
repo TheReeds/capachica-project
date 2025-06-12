@@ -110,8 +110,20 @@ export class LoginComponent implements OnInit {
           this.loading = false;
           return;
         }
-        
-        this.router.navigate(['/dashboard']);
+        // Esperar a que el perfil esté cargado y el rol disponible
+        this.authService.loadUserProfile(true).subscribe({
+          next: () => {
+            if (this.authService.administraEmprendimientos()) {
+              this.router.navigate(['/seleccion-panel']);
+            } else {
+              this.router.navigate(['/dashboard']);
+            }
+          },
+          error: () => {
+            this.error = 'Error al cargar el perfil de usuario';
+            this.loading = false;
+          }
+        });
       },
       error: err => {
         this.error = err.error?.message || 'Credenciales inválidas';
