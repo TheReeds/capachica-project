@@ -122,17 +122,22 @@ Route::get('/users/search', [UserController::class, 'search']);
 // Evento
 
 Route::prefix('eventos')->group(function () {
-        Route::get('/', [EventController::class, 'index']);
-        Route::get('/{id}', [EventController::class, 'show']);
-        Route::get('/emprendedor/{emprendedorId}', [EventController::class, 'byEmprendedor']);
-        Route::get('/activos', [EventController::class, 'eventosActivos']);
-        Route::get('/proximos', [EventController::class, 'proximosEventos']);
-        
-        // Crear, actualizar y eliminar (requieren autenticación)
-        Route::post('/', [EventController::class, 'store']);
-        Route::put('/{id}', [EventController::class, 'update']);
-        Route::delete('/{id}', [EventController::class, 'destroy']);
-    });
+    Route::get('/', [EventController::class, 'index']);
+    
+    // Rutas específicas primero
+    Route::get('/proximos', [EventController::class, 'proximosEventos']);
+    Route::get('/activos', [EventController::class, 'eventosActivos']);
+    Route::get('/emprendedor/{emprendedorId}', [EventController::class, 'byEmprendedor']);
+    
+    // Rutas con ID después
+    Route::get('/{id}', [EventController::class, 'show']);
+    Route::put('/{id}', [EventController::class, 'update']);
+    Route::delete('/{id}', [EventController::class, 'destroy']);
+
+    // Crear
+    Route::post('/', [EventController::class, 'store']);
+});
+
 Route::prefix('planes')->group(function () {
     Route::get('/publicos', [PlanController::class, 'getPublicPlanes']);
     Route::get('/{id}', [PlanController::class, 'show']);

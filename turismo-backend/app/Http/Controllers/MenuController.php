@@ -170,6 +170,13 @@ class MenuController extends Controller
                 'path' => '/admin/profile',
                 'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
             ],
+            [
+                'id' => 'planes',
+                'title' => 'Gestionar planes',
+                'icon' => 'user',
+                'path' => '/admin/planes',
+                'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
+            ],
         ];
         
     
