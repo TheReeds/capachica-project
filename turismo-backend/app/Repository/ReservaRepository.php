@@ -193,7 +193,7 @@ class ReservaRepository
     {
         return $this->model->where('usuario_id', $usuarioId)
             ->where('estado', '!=', Reserva::ESTADO_EN_CARRITO)
-            ->with(['servicios.servicio', 'servicios.emprendedor'])
+            ->with(['servicios.servicio', 'servicios.emprendedor', 'servicios.servicio.sliders'])
             ->orderBy('created_at', 'desc')
             ->get();
     }

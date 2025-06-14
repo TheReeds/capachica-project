@@ -4,6 +4,7 @@ import { ReservaFormComponent } from './reserva-form/reserva-form.component';
 import { ReservaDetailComponent } from './reserva-detalles/reserva-detalles.component';
 import { ReservaCalendarioComponent } from './reserva-calendario/reserva-calendario.component';
 import { ReservaServicioComponent } from './reserva-servicio/reserva-servicio.component';
+import { MisReservasComponent } from './mis-reservas/mis-reservas.component';
 
 export const RESERVAS_ROUTES: Routes = [
   {
@@ -33,5 +34,9 @@ export const RESERVAS_ROUTES: Routes = [
   {
     path: 'emprendedor/:id',
     component: ReservaListComponent
+  },
+  {
+    path: 'mis-reservas',
+    component: MisReservasComponent
   }
 ];

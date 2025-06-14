@@ -156,9 +156,9 @@ class MenuController extends Controller
                         'permissions' => ['reserva_create'],
                     ],
                     [
-                        'id' => 'reserva-create',
+                        'id' => 'mis-reservas',
                         'title' => 'Mis Reservas',
-                        'path' => '/admin/reservas/create',
+                        'path' => '/admin/reservas/mis-reservas',
                         'permissions' => ['user_read'],
                     ],
                 ]

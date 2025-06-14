@@ -104,13 +104,13 @@ Route::prefix('emprendedores')->group(function () {
 // Servicios
 Route::prefix('servicios')->group(function () {
     Route::get('/', [ServicioController::class, 'index']);
-    Route::get('/{id}', [ServicioController::class, 'show']);
     Route::get('/emprendedor/{emprendedorId}', [ServicioController::class, 'byEmprendedor']);
     Route::get('/categoria/{categoriaId}', [ServicioController::class, 'byCategoria']);
     // Nueva ruta para verificar disponibilidad (no requiere autenticación)
     Route::get('/verificar-disponibilidad', [ServicioController::class, 'verificarDisponibilidad']);
     // Nueva ruta para obtener servicios por ubicación
     Route::get('/ubicacion', [ServicioController::class, 'byUbicacion']);
+    Route::get('/{id}', [ServicioController::class, 'show']);
 });
 
 // Categorías
@@ -223,29 +223,30 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     
     // Reservas (nuevas rutas)
+    // Reservas
     Route::prefix('reservas')->group(function () {
-        Route::get('/mis-reservas', [ReservaController::class, 'misReservas']);
-        Route::post('/mis-reservas', [ReservaController::class, 'createUserReservation']);
+        // Rutas específicas (deben ir primero)
+        Route::get('carrito', [CarritoReservaController::class, 'obtenerCarrito']);
+        Route::post('carrito/agregar', [CarritoReservaController::class, 'agregarAlCarrito']);
+        Route::delete('carrito/servicio/{id}', [CarritoReservaController::class, 'eliminarDelCarrito']);
+        Route::post('carrito/confirmar', [CarritoReservaController::class, 'confirmarCarrito']);
+        Route::delete('carrito/vaciar', [CarritoReservaController::class, 'vaciarCarrito']);
+
+        // Otras rutas fijas
+        Route::get('mis-reservas', [ReservaController::class, 'misReservas']);
+        Route::post('mis-reservas', [ReservaController::class, 'createUserReservation']);
+        Route::get('emprendedor/{emprendedorId}', [ReservaController::class, 'byEmprendedor']);
+        Route::get('servicio/{servicioId}', [ReservaController::class, 'byServicio']);
+
+        // Rutas REST convencionales
         Route::get('/', [ReservaController::class, 'index']);
-        Route::get('/{id}', [ReservaController::class, 'show']);
         Route::post('/', [ReservaController::class, 'store']);
-        Route::put('/{id}', [ReservaController::class, 'update']);
-        Route::delete('/{id}', [ReservaController::class, 'destroy']);
-        
-        // Cambiar estado de la reserva
-        Route::put('/{id}/estado', [ReservaController::class, 'cambiarEstado']);
-        
-        // Obtener reservas por emprendedor
-        Route::get('/emprendedor/{emprendedorId}', [ReservaController::class, 'byEmprendedor']);
-        
-        // Obtener reservas por servicio
-        Route::get('/servicio/{servicioId}', [ReservaController::class, 'byServicio']);
+        Route::get('{id}', [ReservaController::class, 'show']);
+        Route::put('{id}', [ReservaController::class, 'update']);
+        Route::delete('{id}', [ReservaController::class, 'destroy']);
+        Route::put('{id}/estado', [ReservaController::class, 'cambiarEstado']);
     });
-    Route::get('reservas/carrito', [CarritoReservaController::class, 'obtenerCarrito']);
-    Route::post('reservas/carrito/agregar', [CarritoReservaController::class, 'agregarAlCarrito']);
-    Route::delete('reservas/carrito/servicio/{id}', [CarritoReservaController::class, 'eliminarDelCarrito']);
-    Route::post('reservas/carrito/confirmar', [CarritoReservaController::class, 'confirmarCarrito']);
-    Route::delete('reservas/carrito/vaciar', [CarritoReservaController::class, 'vaciarCarrito']);
+
     // Reserva Servicios (nuevas rutas)
     Route::prefix('reserva-servicios')->group(function () {
         // Obtener servicios por reserva
