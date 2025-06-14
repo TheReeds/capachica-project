@@ -187,3 +187,226 @@ export interface UserResponse {
     name: string;
   }[];
 }
+
+// extras
+
+export interface Slider {
+  id?: number;
+  url?: string;
+  url_completa?: string;
+  nombre: string;
+  es_principal: boolean;
+  tipo_entidad: string;
+  entidad_id: number;
+  orden: number;
+  activo?: boolean;
+  titulo?: string;
+  descripcion?: string | {
+    id?: number;
+    slider_id?: number;
+    titulo?: string;
+    descripcion?: string;
+    created_at?: string;
+    updated_at?: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SliderDescription {
+  id?: number;
+  slider_id: number;
+  titulo: string;
+  descripcion: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Municipalidad {
+  id?: number;
+  nombre: string;
+  descripcion: string;
+  red_facebook?: string;
+  red_instagram?: string;
+  red_youtube?: string;
+  coordenadas_x?: number;
+  coordenadas_y?: number;
+  frase?: string;
+  comunidades?: string;
+  historiafamilias?: string;
+  historiacapachica?: string;
+  comite?: string;
+  mision?: string;
+  vision?: string;
+  valores?: string;
+  ordenanzamunicipal?: string;
+  alianzas?: string;
+  correo?: string;
+  horariodeatencion?: string;
+  created_at?: string;
+  updated_at?: string;
+  asociaciones?: Asociacion[];
+  sliders_principales?: Slider[];
+  sliders_secundarios?: Slider[];
+}
+
+export interface Evento {
+  id?: number;
+  nombre: string;
+  descripcion: string;
+  tipo_evento: string;
+  idioma_principal: string;
+  fecha_inicio: string;
+  hora_inicio?: number;
+  fecha_fin: string;
+  hora_fin?: number;
+  duracion_horas?: number;
+  coordenada_x?: number;
+  coordenada_y?: number;
+  imagen_url: Slider[];
+  id_emprendedor?: Emprendedor[];
+  que_llevar: string;
+}
+
+export interface Asociacion {
+  id?: number;
+  nombre: string;
+  descripcion: string;
+  ubicacion?: string;
+  telefono?: string;
+  email?: string;
+  municipalidad_id: number;
+  estado?: boolean;
+  latitud?: number;
+  longitud?: number;
+  imagen?: File | string | null;
+  imagen_url?: string;
+  created_at?: string;
+  updated_at?: string;
+  municipalidad?: Municipalidad;
+  emprendedores?: Emprendedor[];
+}
+
+export interface Emprendedor {
+  id?: number;
+  nombre: string;
+  tipo_servicio: string;
+  descripcion: string;
+  ubicacion: string;
+  telefono: string;
+  email: string;
+  pagina_web?: string;
+  horario_atencion?: string;
+  precio_rango?: string;
+  metodos_pago?: string[];
+  capacidad_aforo?: number;
+  numero_personas_atiende?: number;
+  comentarios_resenas?: string;
+  imagenes?: string[];
+  categoria: string;
+  certificaciones?: string[];
+  idiomas_hablados?: string[];
+  opciones_acceso?: string[];
+  facilidades_discapacidad?: boolean;
+  asociacion_id?: number;
+  created_at?: string;
+  updated_at?: string;
+  asociacion?: Asociacion;
+  servicios?: Servicio[];
+  slidersPrincipales?: Slider[];
+  slidersSecundarios?: Slider[];
+  // Añadir propiedades en snake_case para compatibilidad con la API
+  sliders_principales?: Slider[];
+  sliders_secundarios?: Slider[];
+}
+
+export interface Servicio {
+  id?: number;
+  nombre: string;
+  descripcion?: string;
+  precio_referencial?: number;
+  emprendedor_id: number;
+  estado?: boolean;
+  // Nuevos campos
+  capacidad?: string;
+  latitud?: number;
+  longitud?: number;
+  ubicacion_referencia?: string;
+  horarios?: ServicioHorario[];
+  // Relaciones
+  emprendedor?: Emprendedor;
+  categorias?: Categoria[];
+  sliders?: Slider[];
+  created_at?: string;
+  updated_at?: string;
+}
+// Nuevo modelo para los horarios
+export interface ServicioHorario {
+  id?: number;
+  servicio_id?: number;
+  dia_semana: string; // 'lunes', 'martes', etc.
+  hora_inicio: string; // Formato 'HH:MM:SS'
+  hora_fin: string;    // Formato 'HH:MM:SS'
+  activo?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Categoria {
+  id?: number;
+  nombre: string;
+  descripcion?: string;
+  icono_url?: string;
+  created_at?: string;
+  updated_at?: string;
+  servicios?: Servicio[];
+}
+
+export interface Reserva {
+  id?: number;
+  usuario_id: number;
+  codigo_reserva: string;
+  estado: 'pendiente' | 'confirmada' | 'cancelada' | 'completada';
+  notas?: string;
+  servicios?: ReservaServicio[];
+  usuario?: User;
+  created_at?: string;
+  updated_at?: string;
+  // Propiedades calculadas
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  total_servicios?: number;
+}
+export interface ReservaServicio {
+  id?: number;
+  reserva_id: number;
+  servicio_id: number;
+  emprendedor_id: number;
+  fecha_inicio: string;
+  fecha_fin?: string;
+  hora_inicio: string;
+  hora_fin: string;
+  duracion_minutos: number;
+  cantidad?: number;
+  precio?: number;
+  estado: 'pendiente' | 'confirmado' | 'cancelado' | 'completado';
+  notas_cliente?: string;
+  notas_emprendedor?: string;
+  servicio?: Servicio;
+  emprendedor?: Emprendedor;
+  reserva?: Reserva;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ReservaDetalle {
+  id?: number;
+  reserva_id: number;
+  emprendedor_id: number;
+  descripcion: string;
+  cantidad: number;
+  created_at?: string;
+  updated_at?: string;
+  reserva?: Reserva;
+  emprendedor?: Emprendedor;
+}

@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard, nonAuthGuard } from './core/guards/auth.guard';
 import { AdminLayoutComponent } from './shared/layouts/admin-layout/admin-layout.component';
-import { AlojamientoComponent, ServiciosComponent } from './pagegeneral/pagegeneral.routes';
+import { ServiciosComponent } from './pagegeneral/pagegeneral.routes';
 
 export const routes: Routes = [
     // Ruta por defecto
@@ -51,7 +51,11 @@ export const routes: Routes = [
             }
         ]
     },
-
+    {
+        path: 'pagos',
+        loadChildren: () => import('./features/pagos/pagos.routes').then(m => m.PAGOS_ROUTES),
+        canActivate: [authGuard]
+    },
     // Ruta para manejar rutas no encontradas
     {
         path: '**',

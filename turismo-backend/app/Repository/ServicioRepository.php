@@ -223,16 +223,30 @@ class ServicioRepository
      */
     public function getServiciosByUbicacion(float $latitud, float $longitud, float $distanciaKm = 10): Collection
     {
-        // Fórmula haversine para cálculo de distancia
-        $haversine = "(6371 * acos(cos(radians($latitud)) * cos(radians(latitud)) * cos(radians(longitud) - radians($longitud)) + sin(radians($latitud)) * sin(radians(latitud))))";
-        
-        return $this->model->where('estado', true)
+        $haversine = "(
+            6371 * acos(
+                cos(radians(?)) * cos(radians(latitud)) *
+                cos(radians(longitud) - radians(?)) +
+                sin(radians(?)) * sin(radians(latitud))
+            )
+        )";
+
+        $baseQuery = $this->model->where('estado', true)
             ->whereNotNull('latitud')
             ->whereNotNull('longitud')
-            ->selectRaw("*, $haversine AS distancia")
-            ->havingRaw("distancia < ?", [$distanciaKm])
+            ->selectRaw("*, $haversine AS distancia", [$latitud, $longitud, $latitud]);
+
+        $rawResults = DB::table(DB::raw("({$baseQuery->toSql()}) as sub"))
+            ->mergeBindings($baseQuery->getQuery())
+            ->where('distancia', '<=', $distanciaKm)
             ->orderBy('distancia')
-            ->with(['emprendedor', 'categorias', 'horarios'])
             ->get();
+
+        $servicios = Servicio::hydrate($rawResults->toArray());
+
+        // ⚠️ Si quieres ver la distancia en el JSON, debes agregar un accessor en el modelo
+        return $servicios->load(['emprendedor', 'categorias', 'horarios']);
     }
+
+
 }

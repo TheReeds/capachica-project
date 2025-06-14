@@ -156,9 +156,9 @@ class MenuController extends Controller
                         'permissions' => ['reserva_create'],
                     ],
                     [
-                        'id' => 'reserva-create',
+                        'id' => 'mis-reservas',
                         'title' => 'Mis Reservas',
-                        'path' => '/admin/reservas/create',
+                        'path' => '/admin/reservas/mis-reservas',
                         'permissions' => ['user_read'],
                     ],
                 ]
@@ -168,6 +168,13 @@ class MenuController extends Controller
                 'title' => 'Mi Perfil',
                 'icon' => 'user',
                 'path' => '/admin/profile',
+                'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
+            ],
+            [
+                'id' => 'planes',
+                'title' => 'Gestionar planes',
+                'icon' => 'user',
+                'path' => '/admin/planes',
                 'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
             ],
         ];

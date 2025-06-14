@@ -1,15 +1,16 @@
-// general-header.component.ts
 import { Component, inject, OnInit, signal, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { CarritoService } from '../../../core/services/carrito.service';
+import { MiniCarritoComponent } from '../carrito/mini-carrito/mini-carrito.component';
 import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-general-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive, RouterOutlet, MiniCarritoComponent],
   template: `
     <div class="flex flex-col min-h-screen">
       <!-- Header - Transparent with scroll class -->
@@ -91,6 +92,9 @@ import { Subscription, filter } from 'rxjs';
 
             <!-- Botones de acción - sólo visible en escritorio cuando no hay menú móvil abierto -->
             <div class="items-center space-x-3 hidden md:flex">
+              <!-- Carrito de reservas - Solo si está logueado -->
+              <app-mini-carrito *ngIf="isLoggedIn()"></app-mini-carrito>
+
               <!-- Theme toggle button -->
               <button 
                 (click)="toggleDarkMode()" 
@@ -134,6 +138,21 @@ import { Subscription, filter } from 'rxjs';
 
             <!-- Botones de acción en móvil - solo visible cuando NO hay menú abierto -->
             <div class="flex items-center space-x-3 md:hidden" *ngIf="!mobileMenuOpen()">
+              <!-- Carrito en móvil -->
+              <button *ngIf="isLoggedIn()" 
+                routerLink="/carrito" 
+                class="relative p-2 rounded-full text-gray-800 dark:text-gray-200 hover:bg-amber-100 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200"
+              >
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0v0M17 21v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6"></path>
+                </svg>
+                <span *ngIf="getTotalItemsCarrito() > 0" 
+                  class="absolute -top-1 -right-1 bg-amber-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium"
+                >
+                  {{ getTotalItemsCarrito() }}
+                </span>
+              </button>
+
               <!-- Theme toggle button -->
               <button 
                 (click)="toggleDarkMode()" 
@@ -147,32 +166,13 @@ import { Subscription, filter } from 'rxjs';
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </button>
-              
 
-              <!-- Auth buttons -->
+              <!-- Auth buttons móvil - Solo mostrar login si no está autenticado -->
               <button *ngIf="!isLoggedIn()" 
                 routerLink="/login" 
-                class="bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
+                class="bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
               >
-                Iniciar sesión
-              </button>
-              <button *ngIf="!isLoggedIn()" 
-                routerLink="/register" 
-                class="bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
-              >
-                Registrarse
-              </button>
-              <button *ngIf="isLoggedIn()" 
-                routerLink="/dashboard" 
-                class="bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
-              >
-                Mi cuenta
-              </button>
-              <button *ngIf="isLoggedIn()" 
-                (click)="logout()" 
-                class="bg-amber-700 hover:bg-amber-800 dark:bg-amber-700 dark:hover:bg-amber-800 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
-              >
-                Salir
+                Login
               </button>
             </div>
 
@@ -219,7 +219,7 @@ import { Subscription, filter } from 'rxjs';
                 (click)="closeMobileMenu()"
               >
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
                 <span>Servicios</span>
               </a>
@@ -244,6 +244,19 @@ import { Subscription, filter } from 'rxjs';
                 <span>Contacto</span>
               </a>
               
+              <!-- Carrito en menú móvil - Solo si está logueado -->
+              <a *ngIf="isLoggedIn()" 
+                routerLink="/carrito" 
+                routerLinkActive="text-amber-800 dark:text-amber-400 font-medium" 
+                class="flex items-center text-gray-800 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-400 py-2 px-1 transition-colors duration-200" 
+                (click)="closeMobileMenu()"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0v0M17 21v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6"></path>
+                </svg>
+                <span>Mi Carrito ({{ getTotalItemsCarrito() }})</span>
+              </a>
+              
               <!-- Theme toggle in mobile menu -->
               <a 
                 (click)="toggleDarkMode(); $event.preventDefault();" 
@@ -256,6 +269,17 @@ import { Subscription, filter } from 'rxjs';
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
                 <span>{{ isDarkMode() ? 'Modo claro' : 'Modo oscuro' }}</span>
+              </a>
+
+              <!-- Chatbot en menú móvil -->
+              <a 
+                (click)="toggleChatbot(); $event.preventDefault();" 
+                class="flex items-center text-gray-800 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-400 py-2 px-1 transition-colors duration-200 cursor-pointer"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <span>Asistente Virtual</span>
               </a>
             </nav>
 
@@ -293,6 +317,109 @@ import { Subscription, filter } from 'rxjs';
         </div>
       </header>
 
+      <!-- Botón flotante del chatbot - Fijo en la parte inferior derecha -->
+      <div class="fixed bottom-6 right-6 z-50">
+        <button 
+          (click)="toggleChatbot()" 
+          class="group relative bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 dark:from-amber-600 dark:to-amber-700 dark:hover:from-amber-700 dark:hover:to-amber-800 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-600"
+          [class.animate-pulse]="!chatbotOpened()"
+          [title]="chatbotOpened() ? 'Cerrar asistente' : 'Abrir asistente virtual'"
+        >
+          <!-- Icono del chatbot cuando está cerrado -->
+          <svg *ngIf="!chatbotOpened()" 
+            class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          
+          <!-- Icono de cerrar cuando está abierto -->
+          <svg *ngIf="chatbotOpened()" 
+            class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+
+          <!-- Indicador de notificación (opcional) -->
+          <span *ngIf="!chatbotOpened() && hasNewChatMessages()" 
+            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold animate-bounce"
+          >
+            !
+          </span>
+
+          <!-- Tooltip personalizado -->
+          <div class="absolute bottom-full right-0 mb-3 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+            {{ chatbotOpened() ? 'Cerrar asistente' : '¡Pregúntame algo!' }}
+            <div class="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Ventana del chatbot (se mostrará cuando esté abierto) -->
+      <div *ngIf="chatbotOpened()" 
+        class="fixed bottom-24 right-6 w-96 h-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-40 flex flex-col overflow-hidden transition-all duration-300 transform"
+        [@slideInOut]
+      >
+        <!-- Header del chatbot -->
+        <div class="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-600 dark:to-amber-700 text-white p-4 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 1.68.41 3.267 1.138 4.668L2 22l5.332-1.138C8.733 21.59 10.32 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-sm">Asistente Virtual</h3>
+              <p class="text-xs opacity-90">¿En qué puedo ayudarte?</p>
+            </div>
+          </div>
+          <button 
+            (click)="toggleChatbot()" 
+            class="text-white/80 hover:text-white transition-colors duration-200 p-1 rounded"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Contenido del chatbot -->
+        <div class="flex-1 p-4 bg-gray-50 dark:bg-gray-900">
+          <!-- Aquí irá el contenido de tu chatbot -->
+          <div class="text-center text-gray-500 dark:text-gray-400 mt-8">
+            <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <p class="text-sm">El chatbot se integrará aquí</p>
+            <p class="text-xs mt-2">Próximamente...</p>
+          </div>
+        </div>
+
+        <!-- Footer del chatbot con input -->
+        <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div class="flex space-x-2">
+            <input 
+              type="text" 
+              placeholder="Escribe tu mensaje..." 
+              class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+              (keyup.enter)="sendMessage($event)"
+            >
+            <button 
+              class="bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400"
+              (click)="sendMessage($event)"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Contenido principal -->
       <main class="relative z-0 transition-all duration-300">
@@ -333,20 +460,81 @@ import { Subscription, filter } from 'rxjs';
     .scrolled-header {
       animation: fadeInDown 0.3s ease-out forwards;
     }
-  `]
+
+    /* Badge animation */
+    .badge-bounce {
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 53%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40%, 43% {
+        transform: translateY(-3px);
+      }
+      70% {
+        transform: translateY(-2px);
+      }
+      90% {
+        transform: translateY(-1px);
+      }
+    }
+
+    /* Chatbot animations */
+    @keyframes slideInOut {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Responsive adjustments for chatbot */
+    @media (max-width: 640px) {
+      .chatbot-window {
+        width: calc(100vw - 3rem);
+        height: 70vh;
+        right: 1.5rem;
+        bottom: 6rem;
+      }
+    }
+  `],
+  animations: [
+    // Agregar esta importación al inicio del archivo: import { trigger, transition, style, animate } from '@angular/animations';
+    // trigger('slideInOut', [
+    //   transition(':enter', [
+    //     style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+    //     animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
+    //   ]),
+    //   transition(':leave', [
+    //     animate('200ms ease-in', style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }))
+    //   ])
+    // ])
+  ]
 })
 export class GeneralHeaderComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private themeService = inject(ThemeService);
+  private carritoService = inject(CarritoService);
   private router = inject(Router);
   private routerSubscription: Subscription | null = null;
   
   mobileMenuOpen = signal(false);
   scrolled = signal(false);
+  chatbotOpened = signal(false); // Nuevo signal para el estado del chatbot
   
   ngOnInit() {
     // Initialize the theme
     this.themeService.initializeTheme();
+    
+    // Inicializar carrito si está logueado
+    if (this.isLoggedIn()) {
+      this.carritoService.inicializarCarrito();
+    }
     
     // Reset scroll position on navigation
     this.routerSubscription = this.router.events.pipe(
@@ -369,7 +557,7 @@ export class GeneralHeaderComponent implements OnInit, OnDestroy {
   @HostListener('window:scroll', [])
   onWindowScroll() {
     const scrollPosition = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    this.scrolled.set(scrollPosition > 10); // Reduced threshold to make it more responsive
+    this.scrolled.set(scrollPosition > 10);
   }
   
   isLoggedIn(): boolean {
@@ -387,11 +575,15 @@ export class GeneralHeaderComponent implements OnInit, OnDestroy {
   logout() {
     this.authService.logout().subscribe({
       next: () => {
+        // Limpiar carrito al cerrar sesión
+        this.carritoService.limpiarCarritoAlCerrarSesion();
         // Redirect to home after logout
         window.location.href = '/home';
       },
       error: (err) => {
         console.error('Error al cerrar sesión:', err);
+        // Limpiar carrito incluso si hay error
+        this.carritoService.limpiarCarritoAlCerrarSesion();
       }
     });
   }
@@ -402,5 +594,46 @@ export class GeneralHeaderComponent implements OnInit, OnDestroy {
   
   isDarkMode(): boolean {
     return this.themeService.isDarkMode();
+  }
+  
+  // Métodos para el carrito
+  getTotalItemsCarrito(): number {
+    return this.carritoService.getTotalItems();
+  }
+  
+  tieneItemsEnCarrito(): boolean {
+    return this.carritoService.tieneItems();
+  }
+
+  // Métodos para el chatbot
+  toggleChatbot() {
+    this.chatbotOpened.update(value => !value);
+    // Cerrar menú móvil si está abierto
+    if (this.mobileMenuOpen()) {
+      this.closeMobileMenu();
+    }
+  }
+
+  sendMessage(event: any) {
+    // Aquí implementarás la lógica para enviar mensajes al chatbot
+    const input = event.target;
+    const message = input.value?.trim();
+    
+    if (message) {
+      console.log('Mensaje enviado:', message);
+      // Limpiar el input
+      if (input.tagName === 'INPUT') {
+        input.value = '';
+      }
+      
+      // Aquí llamarás a tu servicio de chatbot
+      // this.chatbotService.sendMessage(message);
+    }
+  }
+
+  hasNewChatMessages(): boolean {
+    // Aquí implementarás la lógica para verificar si hay mensajes nuevos
+    // Por ahora retorna false, pero puedes conectarlo con tu servicio de chatbot
+    return false;
   }
 }
