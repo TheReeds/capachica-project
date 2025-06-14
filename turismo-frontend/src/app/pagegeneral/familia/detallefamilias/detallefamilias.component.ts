@@ -21,7 +21,7 @@ Swiper.use([Navigation, Pagination]);
   templateUrl: './detallefamilias.component.html',
   styleUrls: ['./detallefamilias.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule, UbicacionMapComponent ]
+  imports: [CommonModule, RouterModule, UbicacionMapComponent]
 })
 export class DetallefamiliasComponent implements OnInit {
   emprendedor!: Emprendedor | null;
@@ -32,11 +32,11 @@ export class DetallefamiliasComponent implements OnInit {
   mostrarModal: boolean = false;
   servicioForm!: FormGroup;
 
-  latitud: number = -15.6417;   
-  longitud: number = -69.8306;  
+  latitud: number = -15.6417;
+  longitud: number = -69.8306;
 
   // Recibir nueva ubicación seleccionada
-  actualizarUbicacion(e: {lat: number, lng: number}) {
+  actualizarUbicacion(e: { lat: number, lng: number }) {
     this.latitud = e.lat;
     this.longitud = e.lng;
   }
@@ -68,7 +68,7 @@ export class DetallefamiliasComponent implements OnInit {
     private emprendedorService: EmprendedorService,
     private servicioService: ServicioService,
     private sanitizer: DomSanitizer
-  ) {}
+  ) { }
 
   cargando = true;
 
@@ -81,8 +81,8 @@ export class DetallefamiliasComponent implements OnInit {
     });
 
     setTimeout(() => {
-    this.cargando = false; // cuando termines de cargar los datos
-  }, 2000);
+      this.cargando = false; // cuando termines de cargar los datos
+    }, 2000);
 
   }
 
@@ -99,27 +99,27 @@ export class DetallefamiliasComponent implements OnInit {
   }
 
   cargarServicios() {
-  this.servicioService.obtenerServicios().subscribe((resp: any) => {
-    // resp es el objeto completo
-    const serviciosArray = resp.data?.data; // Aquí está el array real
+    this.servicioService.obtenerServicios().subscribe((resp: any) => {
+      // resp es el objeto completo
+      const serviciosArray = resp.data?.data; // Aquí está el array real
 
-    if (Array.isArray(serviciosArray)) {
-      this.servicios = serviciosArray.filter(s => s.emprendedor_id === this.id);
-    } else {
-      console.error('La propiedad data.data no es un array:', serviciosArray);
-      this.servicios = [];
-    }
-  }, error => {
-    console.error('Error en obtenerServicios:', error);
-  });
-}
+      if (Array.isArray(serviciosArray)) {
+        this.servicios = serviciosArray.filter(s => s.emprendedor_id === this.id);
+      } else {
+        console.error('La propiedad data.data no es un array:', serviciosArray);
+        this.servicios = [];
+      }
+    }, error => {
+      console.error('Error en obtenerServicios:', error);
+    });
+  }
 
 
 
   // Ordena los horarios por día de la semana
   getOrdenadosHorarios(horarios: any[] | undefined): any[] {
     if (!horarios || !Array.isArray(horarios)) return [];
-    
+
     return [...horarios].sort((a, b) => {
       return this.diasOrden[a.dia_semana] - this.diasOrden[b.dia_semana];
     });
@@ -132,10 +132,10 @@ export class DetallefamiliasComponent implements OnInit {
 
 
 
-  getImagenesSecundarias():  any[] {
+  getImagenesSecundarias(): any[] {
     // Devuelve las imágenes secundarias si existen
     return this.emprendedor?.sliders_secundarios || [];
-    
+
   }
 
   getImagenesPrincipal(): string[] {
@@ -144,25 +144,25 @@ export class DetallefamiliasComponent implements OnInit {
   }
 
   getSlidersSecundarios(): any[] {
-  return this.emprendedor?.sliders_secundarios || [];
-}
-
-
-
-
-  
-
-  
-  //Método para sanitizar URLs de mapas de Google
-  getMapaUrl(lat: number | string, lng: number | string): SafeResourceUrl {
-  if (!lat || !lng || isNaN(Number(lat)) || isNaN(Number(lng))) {
-    console.warn('Latitud o longitud inválida:', lat, lng);
-    return this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
+    return this.emprendedor?.sliders_secundarios || [];
   }
 
-  const url = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-}
+
+
+
+
+
+
+  //Método para sanitizar URLs de mapas de Google
+  getMapaUrl(lat: number | string, lng: number | string): SafeResourceUrl {
+    if (!lat || !lng || isNaN(Number(lat)) || isNaN(Number(lng))) {
+      console.warn('Latitud o longitud inválida:', lat, lng);
+      return this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
+    }
+
+    const url = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 
 
 
@@ -170,13 +170,13 @@ export class DetallefamiliasComponent implements OnInit {
     return this.servicioForm.get('horarios') as FormArray;
   }
 
-  
 
-  
+
+
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      
+
       new Swiper('.mySwiper', {
         slidesPerView: 1,
         spaceBetween: 20,
