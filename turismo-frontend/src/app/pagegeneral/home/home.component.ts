@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   eventos: Evento[] = [];
   eventoMasCercano: Evento | null = null;
-  currentIndex: number = 0;
+  currentIndex: number = 1;
 
   
   homes: Home[] = [];
@@ -49,7 +49,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
   mostrarTodo = false;
   maxVisible = 4;
 
+  intervalId: any;
 
+
+imagenSeleccionada: string | null = null;
+imagenActualIndex: number = 0;
+sliders: any[] = []; // tu lista original completa de imágenes
 
   get visibleSliders() {
     const sliders = this.municipalidad?.sliders_secundarios ?? [];
@@ -138,6 +143,22 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
 
+  ngOnDestroy(): void {
+  this.stopAutoSlide();
+}
+
+startAutoSlide(): void {
+  this.intervalId = setInterval(() => {
+    this.nextSlide();
+  }, 3000); // Cada 3 segundos
+}
+
+stopAutoSlide(): void {
+  if (this.intervalId) {
+    clearInterval(this.intervalId);
+  }
+}
+
   encontrarEventoMasCercano() {
     const hoy = new Date();
 
@@ -151,6 +172,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.eventoMasCercano = eventosFuturos[0] || null;
     console.log('Evento más cercano:', this.eventoMasCercano);
   }
+
+  
 
 
   toggleMostrarTodo(galeria: HTMLElement) {
@@ -186,24 +209,76 @@ navegarImagen(direccion: 'anterior' | 'siguiente') {
   // Año actual para el footer
   currentYear = new Date().getFullYear();
 
-  imagenSeleccionada: string | null = null;
 
-  abrirImagen(url: string) {
-    this.imagenSeleccionada = url;
-  }
 
-  cerrarImagen() {
-    this.imagenSeleccionada = null;
-  }
+  transitionEnabled = true;
 
+  disableTransitionTemporarily() {
+  this.transitionEnabled = false;
+  setTimeout(() => {
+    this.transitionEnabled = true;
+  });
+}
   cargando = true;
   historiaCapachicaSlider?: any;
+
+  
+
+calcularDuracion(fechaInicio: string, fechaFin: string): string {
+  const inicio = new Date(fechaInicio);
+  const fin = new Date(fechaFin);
+  const diferencia = fin.getTime() - inicio.getTime();
+  const dias = Math.ceil(diferencia / (1000 * 3600 * 24));
+  
+  if (dias === 0) {
+    return 'Mismo día';
+  } else if (dias === 1) {
+    return '1 día';
+  } else if (dias < 7) {
+    return `${dias} días`;
+  } else if (dias < 30) {
+    const semanas = Math.floor(dias / 7);
+    const diasRestantes = dias % 7;
+    if (diasRestantes === 0) {
+      return `${semanas} semana${semanas > 1 ? 's' : ''}`;
+    } else {
+      return `${semanas} semana${semanas > 1 ? 's' : ''} y ${diasRestantes} día${diasRestantes > 1 ? 's' : ''}`;
+    }
+  } else {
+    const meses = Math.floor(dias / 30);
+    return `${meses} mes${meses > 1 ? 'es' : ''}`;
+  }
+}
+
+abrirImagen(url: string) {
+  this.imagenSeleccionada = url;
+  this.imagenActualIndex = this.sliders.findIndex(img => img.url_completa === url);
+}
+
+cerrarImagen() {
+  this.imagenSeleccionada = null;
+}
+
+irASiguienteImagen() {
+  if (this.imagenActualIndex < this.sliders.length - 1) {
+    this.imagenActualIndex++;
+    this.imagenSeleccionada = this.sliders[this.imagenActualIndex].url_completa;
+  }
+}
+
+irAImagenAnterior() {
+  if (this.imagenActualIndex > 0) {
+    this.imagenActualIndex--;
+    this.imagenSeleccionada = this.sliders[this.imagenActualIndex].url_completa;
+  }
+}
 
   ngOnInit() {
     this.loadEmprendedores();
     this.loadReservas();
     this.loadCategorias();
 
+    this.startAutoSlide();
     this.cargarEventos();
 
     this.homeService.getMunicipalidad().subscribe({

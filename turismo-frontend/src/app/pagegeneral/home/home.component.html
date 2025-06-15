@@ -1,91 +1,98 @@
-<!-- PARTE 1: HERO/CARRUSEL MEJORADO -->
+<!-- Animacion de carga  -->
+<div *ngIf="cargando" class="fixed inset-0 z-50 flex flex-col items-center justify-center
+         bg-gradient-to-br from-orange-50 to-orange-100
+         dark:from-gray-900 dark:to-gray-800">
 
-<!-- Loading mejorado -->
-<div *ngIf="cargando"
-  class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
   <div class="text-center">
-    <p class="text-2xl text-orange-700 font-semibold mb-6">Descubriendo Capachica...</p>
-    <div class="relative">
-      <div class="animate-spin rounded-full h-16 w-16 border-4 border-orange-200"></div>
-      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-orange-500 absolute top-0"></div>
+    <p class="text-2xl text-orange-700 font-semibold mb-6 dark:text-orange-400">
+      Descubriendo Capachica...
+    </p>
+
+    <!-- Spinner centrado -->
+    <div class="flex justify-center">
+      <div class="relative">
+        <div class="animate-spin rounded-full h-16 w-16 border-4 border-orange-200 dark:border-neutral-600"></div>
+        <div
+          class="animate-spin rounded-full h-16 w-16 border-t-4 border-orange-500 absolute top-0 dark:border-neutral-500">
+        </div>
+      </div>
     </div>
-    <div class="mt-4 flex space-x-1">
-      <div class="w-3 h-3 bg-orange-400 rounded-full animate-bounce"></div>
-      <div class="w-3 h-3 bg-orange-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-      <div class="w-3 h-3 bg-orange-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+
+    <!-- Puntos animados -->
+    <div class="mt-4 flex justify-center space-x-1">
+      <div class="w-3 h-3 bg-orange-400 rounded-full animate-bounce dark:bg-orange-300"></div>
+      <div class="w-3 h-3 bg-orange-500  dark:bg-orange-600 rounded-full animate-bounce" style="animation-delay: 0.1s">
+      </div>
+      <div class="w-3 h-3 bg-orange-600 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
     </div>
   </div>
 </div>
 
-<div *ngIf="!cargando">
-  <div class="relative">
 
-    <!-- CARRUSEL HERO MEJORADO -->
+
+<div *ngIf="!cargando">
+  <!-- PARTE 1: CARRUSEL HERO  -->
+  <div class="relative">
     <div class="overflow-hidden relative min-h-screen">
       <div class="flex transition-all duration-700 ease-in-out"
         [ngStyle]="{'transform': 'translateX(' + -currentIndex * 100 + '%)'}">
-
+        <!-- Contenido de carrusel bg  -->
         <div *ngFor="let slider of getImagenesmuni(); let i = index" class="flex-none w-full relative min-h-screen">
 
           <!-- Gradiente mejorado con tonos naranjas -->
-          <div class="absolute inset-0 bg-gradient-to-br from-orange-900/80 via-orange-800/60 to-orange-600/40 z-10">
+          <div class="absolute inset-0 bg-gradient-to-br from-amber-900/80 via-orange-800/60 to-amber-800/40 z-10">
           </div>
 
-          <!-- Overlay pattern sutil -->
+          <!-- sombreado bg -->
           <div class="absolute inset-0 opacity-10 z-10"
             style="background-image: radial-gradient(circle at 20% 50%, white 1px, transparent 1px); background-size: 40px 40px;">
           </div>
 
-          <!-- Imagen con efecto parallax -->
+          <!-- Imagen bg -->
           <img [src]="slider.url_completa" [alt]="slider.nombre"
             class="w-full h-screen object-cover transition-transform duration-1000 hover:scale-105" />
 
-          <!-- Contenido mejorado -->
-          <div class="absolute inset-0 flex items-center justify-end px-6 md:px-20 z-20">
+          <!-- Contenido de bg txt -->
+          <div class="absolute inset-0 flex items-center justify-end px-6 md:px-20 z-20 mr-10">
             <div class="max-w-xl text-right transform transition-all duration-1000"
               [class.animate-slide-in-right]="currentIndex === i">
 
-
-
-              <!-- Título principal con efecto -->
+              <!-- Título de la img bg -->
               <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
                 <span class="bg-gradient-to-r from-white to-orange-100 bg-clip-text text-transparent drop-shadow-2xl">
                   {{ slider.nombre }}
                 </span>
               </h1>
 
-              <!-- Descripción mejorada -->
+              <!-- Descripción -->
               <p class="text-lg md:text-xl text-orange-100 mb-8 leading-relaxed drop-shadow-lg max-w-lg">
                 Un paraíso donde la naturaleza, cultura y tradición se fusionan en una experiencia única e inolvidable
               </p>
 
-              <!-- Botones de acción -->
+              <!-- Botones de explorar ahora-->
               <div class="flex flex-col sm:flex-row gap-4 justify-end">
                 <a [routerLink]="['/contactos']"
                   class="group relative px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                   <span class="relative z-10">Explorar Ahora</span>
-                  <div
-                    class="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  </div>
                 </a>
-
-
               </div>
 
             </div>
           </div>
+
         </div>
       </div>
 
-      <!-- Botones de navegación mejorados -->
-      <button (click)="prevSlide()"
-        class="absolute left-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-orange-500/80 hover:bg-orange-500 backdrop-blur-sm text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-30 group">
+      <!-- Botones  -->
+      <!-- Botones de prev  -->
+      <button (click)="prevSlide()" class="absolute left-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-orange-500/80 hover:bg-orange-500 backdrop-blur-sm 
+          text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-30 group">
         <svg class="w-6 h-6 mx-auto group-hover:-translate-x-0.5 transition-transform duration-200" fill="none"
           stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
-
+      <!-- Botones de next  -->
       <button (click)="nextSlide()"
         class="absolute right-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-orange-500/80 hover:bg-orange-500 backdrop-blur-sm text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-30 group">
         <svg class="w-6 h-6 mx-auto group-hover:translate-x-0.5 transition-transform duration-200" fill="none"
@@ -94,17 +101,19 @@
         </svg>
       </button>
 
-      <!-- Paginación mejorada -->
+
+      <!-- Boton de paginación  -->
       <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
         <button *ngFor="let slider of getImagenesmuni(); let i = index" (click)="goToSlide(i)"
           class="relative w-12 h-3 rounded-full transition-all duration-300 overflow-hidden"
           [class]="currentIndex === i ? 'bg-orange-400 shadow-lg' : 'bg-white/30 hover:bg-white/50'">
           <div *ngIf="currentIndex === i"
-            class="absolute inset-0 bg-gradient-to-r from-orange-300 to-orange-500 animate-pulse"></div>
+            class="absolute inset-0 bg-gradient-to-r from-orange-300 to-orange-500 animate-pulse">
+          </div>
         </button>
       </div>
 
-      <!-- Indicador de scroll -->
+      <!-- Indicador de paginacion -->
       <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-white/70 animate-bounce z-30">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -114,61 +123,704 @@
     </div>
   </div>
 
-  <!-- Resto de tu contenido aquí... -->
-</div>
-
-<!-- ESTILOS CSS ADICIONALES PARA EL COMPONENTE -->
-<style>
-  @keyframes slide-in-right {
-    from {
-      opacity: 0;
-      transform: translateX(30px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  .animate-slide-in-right {
-    animation: slide-in-right 0.8s ease-out;
-  }
-</style>
-
-<!-- PARTE 2: SECCIÓN DE INFORMACIÓN Y GALERÍA -->
-
-<!-- Sección de Información de la Municipalidad -->
-<section *ngIf="municipalidad"
-  class="relative px-6 py-20 bg-gradient-to-br from-orange-50 via-white to-orange-100/50 overflow-hidden">
-
-  <!-- Elementos decorativos de fondo -->
-  <div class="absolute top-0 left-0 w-72 h-72 bg-orange-200/20 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-  <div class="absolute bottom-0 right-0 w-96 h-96 bg-orange-300/20 rounded-full translate-x-1/3 translate-y-1/3"></div>
-
-  <div class="max-w-7xl mx-auto relative z-10">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-
-      <!-- Lado Izquierdo: Nombre con diseño elegante -->
+  <!-- PARTE 2: SECCIÓN DE INFORMACIÓN de la Municipalidad -->
+  <section *ngIf="municipalidad" class="relative px-6 py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
+    <!-- Elementos decorativos de fondo (EL CIRCULO) -->
+    <div class="absolute top-0 left-0 w-72 h-72 bg-orange-200/20 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+    <!-- Frase -->
+    <div class="max-w-7xl mx-auto relative z-10 px-7">
       <div class="relative">
-        <!-- Badge superior -->
-        <div class="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/10 border border-orange-200 mb-8">
-          <svg class="w-5 h-5 text-orange-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd"
-              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-              clip-rule="evenodd" />
-          </svg>
-          <span class="text-orange-800 font-medium">Municipalidad Distrital</span>
+        <!-- Frase de bienvenida -->
+        <div class="relative">
+          <blockquote
+            class="text-xl dark:text-orange-400 lg:text-4xl font-semibold text-orange-500 italic leading-relaxed text-center px-10">
+            "{{ municipalidad.frase }}"
+          </blockquote>
+          <!-- Decoración bajo el título -->
+          <div class="flex items-center justify-center mt-4">
+            <div class="h-1 w-20 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
+            <div class="w-3 h-3 bg-orange-500 rounded-full mx-3"></div>
+            <div class="h-1 w-12 bg-orange-300 rounded-full"></div>
+          </div>
         </div>
 
-        <!-- Título principal -->
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTE 5: EVENTOS -->
+  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+    <div class="max-w-6xl mx-auto relative z-10">
+
+      <!-- Encabezado -->
+      <div class="text-center mb-12 px-4">
+        <!-- Boton arriba de titulo -->
+        <div
+          class="inline-flex items-center px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-bold rounded-full mb-4 shadow-md">
+          EXPERIENCIAS EN CAPACHICA
+        </div>
+        <!-- titulo -->
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white leading-snug mb-3">
+          PRÓXIMO <span
+            class="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">EVENTO</span>
+        </h2>
+        <!-- pequeña des -->
+        <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
+          Descubre las maravillas naturales, culturales y festivas de la península de Capachica.
+        </p>
+      </div>
+
+      <!-- Evento turístico destacado -->
+      <div *ngIf="eventoMasCercano"
+        class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-xl border border-orange-100 dark:border-orange-800/30  transition-all duration-700 group">
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-0">
+          <!-- Imagen del evento IZQUIERDO-->
+          <div class="lg:col-span-2 relative">
+            <div class="aspect-[4/3] relative">
+
+              <img [src]="getSliderImage(eventoMasCercano)" [alt]="eventoMasCercano.nombre"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 rounded-l-2xl lg:rounded-none">
+
+              <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+
+              <!-- Badge -->
+              <div class="absolute top-4 left-4">
+                <div class="px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full shadow-md">
+                  EVENTO ESPECIAL
+                </div>
+              </div>
+
+              <!-- Fecha -->
+              <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-xl p-2 shadow-md text-center">
+                <div class="text-5xl font-black text-orange-600">
+                  {{ eventoMasCercano.fecha_inicio | date:'dd' }}
+                </div>
+                <div class="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                  {{ eventoMasCercano.fecha_inicio | date:'MMM' }}
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <!-- DERECHO info-->
+          <div class="lg:col-span-3 h-full flex flex-col justify-center items-center text-center space-y-4 p-4">
+            <!-- Título principal -->
+            <div class="relative z-10 space-y-2">
+              <!-- Título principal -->
+              <h3 class="text-xl font-bold text-gray-800 dark:text-white leading-tight line-clamp-2">
+                {{ eventoMasCercano.nombre }}
+              </h3>
+            </div>
+
+            <!-- IZQUIERDO Fechas del evento -->
+            <div class="relative z-10 w-full max-w-4xl">
+              <div class="grid lg:grid-cols-2 gap-6">
+                <!-- Fecha de inicio -->
+                <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl py-2 px-5 backdrop-blur-sm">
+                  <div class="flex items-start gap-4">
+                    <div
+                      class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div class="text-left flex-1">
+                      <p class="text-base font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+
+                        Fecha de Inicio
+                      </p>
+                      <div class="space-y-2">
+                        <p class="text-gray-700 dark:text-gray-300 font-medium">
+                          {{ eventoMasCercano.fecha_inicio | date:'EEEE, d \'de\' MMMM \'de\' yyyy' : 'es-ES' |
+                          titlecase }}
+                        </p>
+                        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>{{ eventoMasCercano.hora_inicio }} horas</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fecha de fin -->
+                <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl p-2 backdrop-blur-sm"
+                  *ngIf="eventoMasCercano.fecha_fin">
+                  <div class="flex items-start gap-4">
+                    <div
+                      class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                      </svg>
+                    </div>
+                    <div class="text-left flex-1">
+                      <h4 class="text-base font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+
+                        Fecha de Finalización
+                      </h4>
+                      <div class="space-y-2">
+                        <p class="text-gray-700 dark:text-gray-300 font-medium">
+                          {{ eventoMasCercano.fecha_fin | date:'EEEE, d \'de\' MMMM \'de\' yyyy' : 'es-ES' | titlecase
+                          }}
+                        </p>
+                        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>{{ eventoMasCercano.hora_fin }} horas</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Duración del evento -->
+              <div class="mt-6 flex justify-center" *ngIf="eventoMasCercano.fecha_fin">
+                <div
+                  class="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-100 to-amber-100 dark:from-amber-900/40 dark:to-amber-900/40 rounded-xl border border-gray-200 dark:border-gray-700/30">
+                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <span class="text-xs font-semibold text-amber-700 dark:text-gray-300">
+                    Duración del evento: {{ calcularDuracion(eventoMasCercano.fecha_inicio, eventoMasCercano.fecha_fin)
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón de ver mas -->
+            <div class="relative z-10 w-full sm:w-auto pt-4">
+              <a [routerLink]="['/eventos/eventosdetalle', eventoMasCercano.id]" class="block w-full sm:w-auto">
+                <button
+                  class="group w-full sm:w-auto py-4 px-8 bg-gradient-to-r from-amber-600 to-amber-600 hover:from-amber-700
+                   hover:to-amber-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 
+                   transition-all duration-300 flex items-center justify-center gap-3 text-base min-w-[280px] dark:bg-amber-100 ">
+
+                  <span>Ver Información Completa</span>
+                  <svg class="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-300"
+                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </button>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Sin eventos -->
+        <div *ngIf="!eventoMasCercano"
+          class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-orange-100 dark:border-orange-800/30 mt-6">
+
+          <div
+            class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-xl">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            ¡Próximamente eventos en Capachica!
+          </h3>
+          <p class="text-base text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
+            Estamos organizando experiencias turísticas increíbles. Mantente atento.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              class="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium rounded-md hover:shadow-md transition">
+              🔔 Notificarme
+            </button>
+            <button
+              class="px-6 py-2 border border-orange-300 dark:border-orange-600 text-orange-600 dark:text-orange-400 font-medium rounded-md hover:bg-orange-50 dark:hover:bg-orange-900/10 transition">
+              🏝️ Explorar Capachica
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTE 6: Galeria -->
+  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+    <section #galeria
+      class="px-6 py-20 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+
+      <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Encabezado mejorado -->
+        <div class="text-center mb-16">
+          <h3
+            class="text-4xl dark:text-orange-400 lg:text-5xl font-black bg-gradient-to-r from-orange-600 via-orange-700 to-amber-600 bg-clip-text text-transparent mb-6 tracking-tight pb-4">
+            Momentos Mágicos </h3>
+          <p class="text-xl dark:text-gray-200 text-gray-600 max-w-3xl mx-auto leading-relaxed"> Sumérgete en la belleza
+            natural y cultural
+            de
+            Capachica. Cada imagen cuenta una historia única de nuestra península
+          </p>
+        </div>
+
+        <!-- Grid de Galería Masonry Mejorado -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+          <div *ngFor="let slider of visibleSliders; let i = index"
+            class="aspect-[4/] group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-700 transform hover:-translate-y-4 hover:rotate-1 cursor-pointer border border-orange-100/50"
+            [class.lg:col-span-1]="i === 0" [class.lg:row-span-1]="i === 0" [class.xl:col-span-1]="i === 1"
+            (click)="abrirImagen(slider.url_completa)">
+
+            <!-- Imagen con efectos mejorados -->
+            <div class="relative overflow-hidden">
+              <img [src]="slider.url_completa" [alt]="slider.nombre"
+                class="aspect-[4/3] w-full h-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:rotate-2" />
+              <!-- Overlay interactivo con gradiente -->
+              <div
+                class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-3xl">
+                <h4 class="text-2xl font-bold text-white mb-2">{{ slider.nombre }}</h4>
+              </div>
+
+
+
+              <!-- Botones de acción mejorados -->
+              <div
+                class="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                <!-- Botón de zoom -->
+                <button
+                  class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all duration-200 shadow-lg">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
+                </button>
+
+              </div>
+
+
+            </div>
+            <!-- Contenido mejorado -->
+            <div class="p-6 lg:p-8">
+
+              <p class="text-gray-600 leading-relaxed mb-4 line-clamp-3"> {{ slider.descripcion.descripcion }} </p>
+
+            </div> <!-- Borde de hover animado -->
+            <div
+              class="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-orange-400/50 transition-all duration-500 pointer-events-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Ver más/menos mejorado -->
+        <div class="mt-20 text-center" *ngIf="totalSliders > 4">
+          <button (click)="toggleMostrarTodo(galeria)"
+            class="group relative inline-flex items-center px-10 py-5 bg-gradient-to-r from-orange-500 via-orange-500 to-amber-500 hover:from-orange-600 hover:via-orange-700 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+            <!-- Efecto de brillo -->
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
+            </div>
+            <span class="relative z-10 text-lg">{{ mostrarTodo ? 'Ver menos lugares' : 'Descubrir más'
+              }}</span>
+            <svg class="relative z-10 w-6 h-6 ml-3 transition-transform duration-300 group-hover:scale-110"
+              [class.rotate-180]="mostrarTodo" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Modal de Imagen Ampliada Super Mejorado -->
+      <div *ngIf="imagenSeleccionada"
+        class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4 animate-fade-in"
+        (click)="cerrarImagen()">
+
+        <!-- Contenedor de imagen con zoom -->
+        <div class="relative p-5 group" (click)="$event.stopPropagation()">
+          <!-- Imagen principal con zoom interactivo -->
+          <div class="relative overflow-hidden rounded-3xl shadow-2xl"> <img [src]="imagenSeleccionada"
+              alt="Imagen ampliada"
+              class="max-w-full max-h-[90vh] object-contain transition-transform duration-500 hover:scale-110 cursor-zoom-in rounded-3xl"
+              #imagenModal (click)="toggleZoom($event)" />
+
+            <!-- Overlay de información -->
+            <div *ngFor="let slider of visibleSliders; let i = index"
+              class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p class="text-gray-200">{{ slider.descripcion.descripcion }}</p>
+            </div>
+          </div>
+
+          <!-- Controles mejorados -->
+          <div class="absolute -top-6 -right-6 flex space-x-3">
+            <!-- Botón de descarga -->
+            <button
+              class="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-110">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
+
+            <!-- Botón de cerrar -->
+            <button (click)="cerrarImagen()"
+              class="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-110 hover:rotate-90">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Navegación entre imágenes -->
+          <!-- Botón para ir a la imagen anterior -->
+<button (click)="navegarImagen('anterior')"
+  class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 flex items-center justify-center hover:scale-110">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+  </svg>
+</button>
+
+<!-- Botón para ir a la imagen siguiente -->
+<button (click)="navegarImagen('siguiente')"
+  class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 flex items-center justify-center hover:scale-110">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+  </svg>
+</button>
+
+
+        </div> <!-- Indicador de zoom -->
+
+      </div>
+    </section>
+  </div>
+
+  <!-- PARTE 7: Historias -->
+  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+
+    <div *ngIf="municipalidad" class="py-16 px-6">
+      <div class="max-w-7xl mx-auto">
+
+
+        <div class="flex flex-col gap-12">
+          <!-- Card 1: Historia de Capachica -->
+          <div *ngIf="imagenHistoriacapachica"
+            class="group relative w-full h-[500px] rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-[1.02]">
+
+            <!-- Imagen de fondo con overlay -->
+            <img [src]="imagenHistoriacapachica.url_completa"
+              [alt]="imagenHistoriacapachica.descripcion?.titulo || 'Historia de Capachica'"
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+
+            <!-- Overlay con gradiente -->
+            <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+
+            <!-- Contenido -->
+            <div class="absolute inset-0 flex items-center px-8 md:px-12">
+              <div class="text-white max-w-2xl">
+                <div class="mb-4">
+
+                </div>
+                <h3 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                  Historia de
+                  <span class="text-orange-400">CAPACHICA</span>
+                </h3>
+                <p class="text-lg md:text-xl leading-relaxed text-gray-200 line-clamp-4">
+                  {{ municipalidad.historiacapachica }}
+                </p>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Historia de las Familias -->
+          <div *ngIf="imagenHistoriafamilia"
+            class="group relative w-full h-[500px] rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-[1.02]">
+
+            <!-- Imagen de fondo -->
+            <img [src]="imagenHistoriafamilia.url_completa"
+              [alt]="imagenHistoriafamilia.descripcion?.titulo || 'Historia de las Familias'"
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+
+            <!-- Overlay invertido (contenido a la derecha) -->
+            <div class="absolute inset-0 bg-gradient-to-l from-black/80 via-black/40 to-transparent"></div>
+
+            <!-- Contenido alineado a la derecha -->
+            <div class="absolute inset-0 flex items-center justify-end px-8 md:px-12">
+              <div class="text-white max-w-2xl text-right">
+                <div class="mb-4">
+
+                </div>
+                <h3 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                  Historia de los
+                  <span class="text-orange-400">EMPRENDEDORES</span>
+                </h3>
+                <p class="text-lg md:text-xl leading-relaxed text-gray-200 line-clamp-4">
+                  {{ municipalidad.historiacapachica || municipalidad.historiacapachica }}
+                </p>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTE 8: Comunidades -->
+  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+    <div *ngIf="slidersComunidad.length > 0"
+      class="py-20 px-6 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+
+
+      <div class="relative z-10 max-w-7xl mx-auto">
+        <!-- Encabezado mejorado -->
+        <div class="text-center mb-16">
+          <span
+            class="inline-block px-6 py-2 bg-orange-100 dark:bg-orange-500 text-orange-600 dark:text-gray-100 text-sm font-semibold rounded-full mb-4">
+            Nuestras Comunidades
+          </span>
+          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            Comunidades de
+            <span class="text-orange-500">Capachica</span>
+          </h2>
+          <p class="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
+            Descubre la riqueza cultural de nuestras comunidades ancestrales y los servicios únicos que ofrecen a los
+            visitantes
+          </p>
+        </div>
+
+        <!-- Grid de comunidades mejorado -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div *ngFor="let slider of slidersComunidad"
+            class="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-all duration-500 transform hover:-translate-y-2">
+
+            <!-- Imagen con overlay -->
+            <div class="relative h-56 overflow-hidden">
+              <img [src]="slider.url_completa" [alt]="slider.descripcion.titulo || slider.nombre"
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+
+              <!-- Overlay sutil -->
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              </div>
+
+              <!-- Badge de comunidad -->
+              <div class="absolute top-4 right-4 px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full">
+                Comunidad
+              </div>
+            </div>
+
+            <!-- Contenido -->
+            <div class="p-6">
+              <h3
+                class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-orange-500 text-center transition-colors duration-300">
+                {{ slider.nombre }}
+              </h3>
+              <p class="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-4">
+                {{ slider.descripcion.descripcion }}
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTE 9: Ubicacion -->
+  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+    <div *ngIf="selectedEmprendedor"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+
+      <div
+        class="bg-white dark:bg-gray-800 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl transition-colors duration-300 animate-slideUp">
+
+        <!-- Header del modal -->
+        <div class="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 p-6 rounded-t-3xl">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-white">{{ selectedEmprendedor.nombre }}</h2>
+            <button (click)="closeEmprendedorDetails()"
+              class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-all duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Contenido del modal -->
+        <div class="p-8">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+            <!-- Columna izquierda: Imagen y contacto -->
+            <div class="space-y-6">
+              <div class="relative overflow-hidden rounded-2xl shadow-lg">
+                <img src="https://www.dzoom.org.es/wp-content/uploads/2017/07/seebensee-2384369-810x540.jpg"
+                  [alt]="'Imagen de ' + selectedEmprendedor.nombre" class="w-full h-64 object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+              </div>
+
+              <!-- Información de contacto -->
+              <div class="bg-orange-50 dark:bg-gray-700 p-6 rounded-2xl border border-orange-100 dark:border-gray-600">
+                <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-4 flex items-center">
+                  <span class="mr-2">📞</span>
+                  Información de contacto
+                </h3>
+                <div class="space-y-3 text-gray-700 dark:text-gray-200">
+                  <p><strong>Teléfono:</strong> {{ selectedEmprendedor.telefono }}</p>
+                  <p><strong>Email:</strong> {{ selectedEmprendedor.email }}</p>
+                  <p><strong>Ubicación:</strong> {{ selectedEmprendedor.ubicacion }}</p>
+                  <p><strong>Horario:</strong> {{ selectedEmprendedor.horario_atencion }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna derecha: Información detallada -->
+            <div class="space-y-6">
+
+              <!-- Descripción -->
+              <div>
+                <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Descripción</h3>
+                <p class="text-gray-700 dark:text-gray-200 leading-relaxed">
+                  {{ selectedEmprendedor.descripcion }}
+                </p>
+              </div>
+
+              <!-- Tipo de servicio -->
+              <div>
+                <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Tipo de servicio</h3>
+                <span
+                  class="inline-block px-4 py-2 bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 rounded-full font-semibold">
+                  {{ selectedEmprendedor.tipo_servicio }}
+                </span>
+              </div>
+
+              <!-- Rango de precios -->
+              <div>
+                <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Rango de precios</h3>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ selectedEmprendedor.precio_rango }}</p>
+              </div>
+
+              <!-- Métodos de pago -->
+              <div>
+                <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Métodos de pago</h3>
+                <div class="flex flex-wrap gap-2">
+                  <span *ngFor="let metodo of selectedEmprendedor.metodos_pago"
+                    class="px-3 py-1 bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 rounded-full text-sm font-medium">
+                    {{ metodo }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Idiomas -->
+              <div>
+                <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Idiomas hablados</h3>
+                <div class="flex flex-wrap gap-2">
+                  <span *ngFor="let idioma of selectedEmprendedor.idiomas_hablados"
+                    class="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium">
+                    {{ idioma }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class=" via-white to-orange-100 dark:from-gray-800 dark:to-gray-900 py-20 px-6 transition-colors duration-300">
+      <div class="max-w-7xl mx-auto">
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+          <!-- Contenido de texto -->
+          <div class="lg:pr-12">
+            <span class="inline-block px-6 py-2 bg-orange-500 text-white text-sm font-semibold rounded-full mb-6">
+              Ubicación
+            </span>
+
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+              ¿Cómo llegar a
+              <span class="text-orange-500">Capachica?</span>
+            </h2>
+
+            <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
+              Estamos ubicados en la hermosa península de Capachica, en las orillas del majestuoso lago Titicaca,
+              en el departamento de Puno, Perú. Un destino donde la naturaleza y la cultura se encuentran
+              para ofrecerte una experiencia única e inolvidable.
+            </p>
+
+            <!-- Puntos destacados -->
+            <div class="space-y-4 mb-8">
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-orange-100 dark:bg-orange-500 rounded-full flex items-center justify-center mr-4">
+
+                </div>
+                <span class="text-gray-700 dark:text-gray-300">A orillas del lago Titicaca</span>
+              </div>
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-orange-100 dark:bg-orange-500 rounded-full flex items-center justify-center mr-4">
+
+                </div>
+                <span class="text-gray-700 dark:text-gray-300">Paisajes andinos espectaculares</span>
+              </div>
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-orange-100 dark:bg-orange-500 rounded-full flex items-center justify-center mr-4">
+
+                </div>
+                <span class="text-gray-700 dark:text-gray-300">Rica cultura ancestral</span>
+              </div>
+            </div>
+
+
+          </div>
+
+          <!-- Mapa mejorado -->
+          <div class="relative">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-2xl">
+              <div class="h-[400px] rounded-2xl overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12590.106066335879!2d-69.8417794!3d-15.6446622!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915d7c95db9aeed9%3A0xa6d88f0376391024!2sCapachica%2C%20Per%C3%BA!5e0!3m2!1ses-419!2spe!4v1617738498032!5m2!1ses-419!2spe"
+                  class="w-full h-full border-0 rounded-2xl" allowfullscreen="" loading="lazy">
+                </iframe>
+              </div>
+            </div>
+
+            <!-- Elementos decorativos -->
+            <div class="absolute -top-4 -right-4 w-16 h-16 bg-orange-200 dark:bg-orange-800/50 rounded-full -z-10">
+            </div>
+            <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-orange-100 dark:bg-orange-900/30 rounded-full -z-10">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTE 10: Muni -->
+  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+    <div *ngIf="municipalidad" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <!-- Lado Izquierdo: Nombre de la municipalidad-->
+      <div class="relative">
+        <!-- Frase de bienvenida -->
         <div class="relative mb-8">
-          <h1
-            class="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-orange-600 via-orange-500 to-orange-700 bg-clip-text text-transparent leading-tight">
-            {{ municipalidad.nombre }}
-          </h1>
+          <blockquote
+            class="text-xl dark:text-orange-400 lg:text-5xl font-semibold text-orange-800 italic leading-relaxed text-center">
+            "{{ municipalidad.nombre }}"
+          </blockquote>
           <!-- Decoración bajo el título -->
-          <div class="flex items-center mt-4">
+          <div class="flex items-center justify-center mt-4">
             <div class="h-1 w-20 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
             <div class="w-3 h-3 bg-orange-500 rounded-full mx-3"></div>
             <div class="h-1 w-12 bg-orange-300 rounded-full"></div>
@@ -179,959 +831,209 @@
 
       <!-- Lado Derecho: Frase y Descripción -->
       <div class="relative">
-        <!-- Frase destacada -->
-        <div
-          class="relative mb-8 p-8 bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-2xl border border-orange-200/50 backdrop-blur-sm">
-          <!-- Comillas decorativas -->
-          <div class="absolute -top-4 -left-4 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd"
-                d="M6 5a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zM6 10a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zM6 15a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z"
-                clip-rule="evenodd" />
-            </svg>
-          </div>
-
-          <blockquote class="text-xl lg:text-2xl font-semibold text-orange-800 italic leading-relaxed text-center">
-            "{{ municipalidad.frase }}"
-          </blockquote>
-        </div>
-
-        <!-- Descripción -->
-        <div class="space-y-6">
-          <p
-            class="text-lg text-gray-700 leading-relaxed text-justify first-letter:text-4xl first-letter:font-bold first-letter:text-orange-600 first-letter:float-left first-letter:mr-2 first-letter:mt-1">
+        <!-- Descripcion -->
+        <div class="flex items-start gap-4 bg-orange-400 dark:bg-orange-400 p-6 mx-4 
+            rounded-xl shadow-md max-w-4xl mx-auto">
+          <p class="text-base text-gray-100 dark:text-gray-200 font-bold text-justify leading-relaxed">
             {{ municipalidad.descripcion }}
           </p>
-
-
         </div>
+
       </div>
 
     </div>
   </div>
-</section>
 
-<!-- PARTE 5: EVENTOS TURÍSTICOS CAPACHICA -->
-<div
-  class="py-4 px-4 bg-gradient-to-br from-orange-50 via-orange-100 to-amber-50 dark:from-gray-900 dark:via-orange-900/20 dark:to-gray-800 relative overflow-hidden">
+  <!-- PARTE 11: Reseña -->
+  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+    <!-- PARTE 9: RESEÑAS DE TURISTAS MEJORADA -->
+    <div class="py-20 px-6 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
 
-  <!-- Efectos de fondo temático -->
-  <div class="absolute inset-0 opacity-10">
-    <div class="absolute top-10 left-10 w-32 h-32 bg-orange-400 rounded-full blur-2xl"></div>
-    <div class="absolute bottom-20 right-20 w-40 h-40 bg-amber-400 rounded-full blur-3xl"></div>
-    <div class="absolute top-1/2 left-1/3 w-24 h-24 bg-orange-300 rounded-full blur-xl"></div>
-  </div>
 
-  <div class="max-w-7xl mx-auto relative z-10">
+      <div class="relative z-10 max-w-7xl mx-auto">
 
-    <!-- Encabezado turístico -->
-    <div class="text-center mb-16">
-      <div
-        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-bold rounded-full mb-6 shadow-lg">
-
-        EXPERIENCIAS EN CAPACHICA
-      </div>
-      <h2 class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">
-        PRÓXIMO
-        <span class="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
-          EVENTO
-        </span>
-      </h2>
-      <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-        Descubre las maravillas de la península de Capachica
-      </p>
-    </div>
-
-    <!-- Evento turístico destacado -->
-    <div *ngIf="eventoMasCercano"
-      class="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-2xl border border-orange-100 dark:border-orange-800/30 hover:shadow-orange-200/50 dark:hover:shadow-orange-800/20 transition-all duration-700 group">
-
-      <div class="grid grid-cols-1 lg:grid-cols-5 gap-0">
-
-        <!-- Imagen del evento turístico -->
-        <div class="lg:col-span-2 relative overflow-hidden">
-          <div class="aspect-[1/1]  relative">
-            <img [src]="getSliderImage(eventoMasCercano)" [alt]="eventoMasCercano.nombre"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-
-            <!-- Overlay sutil -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-
-            <!-- Badge de evento -->
-            <div class="absolute top-6 left-6">
-              <div
-                class="px-4 py-2 bg-orange-500 text-white font-bold rounded-full text-sm shadow-lg flex items-center">
-                <span class="mr-2"></span>
-                EVENTO ESPECIAL
-              </div>
-            </div>
-
-            <!-- Fecha destacada -->
-            <div class="absolute bottom-6 left-6 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-              <div class="text-center">
-                <div class="text-2xl font-black text-orange-600">
-                  {{ eventoMasCercano.fecha_inicio | date:'dd' }}
-                </div>
-                <div class="text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                  {{ eventoMasCercano.fecha_inicio | date:'MMM' }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contenido del evento -->
-        <div class="lg:col-span-3 p-8 lg:p-12 flex flex-col justify-center">
-
-          <!-- Título del evento -->
-          <h3 class="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-6 leading-tight">
-            {{ eventoMasCercano.nombre }}
-          </h3>
-
-          <!-- Información del evento -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-
-            <!-- Fecha y hora -->
-            <div class="flex items-center space-x-4">
-              <div
-                class="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-lg">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <div class="text-gray-800 dark:text-gray-200">
-                <p class="font-bold text-lg">{{ eventoMasCercano.fecha_inicio | date:'EEEE, dd MMMM' }}</p>
-                <p class="text-gray-600 dark:text-gray-400">{{ eventoMasCercano.fecha_inicio | date:'HH:mm' }} hrs</p>
-              </div>
-            </div>
-
-            <!-- Duración -->
-            <div class="flex items-center space-x-4" *ngIf="eventoMasCercano.fecha_fin">
-              <div
-                class="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-lg">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div class="text-gray-800 dark:text-gray-200">
-                <p class="font-bold text-lg">Hasta el</p>
-                <p class="text-gray-600 dark:text-gray-400">{{ eventoMasCercano.fecha_fin | date:'dd MMM' }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Descripción -->
-          <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-8 line-clamp-3">
-            {{ eventoMasCercano.descripcion }}
-          </p>
-
-          <!-- Botones de acción turística -->
-          <div class="flex flex-col sm:flex-row gap-4 px-5">
-            <a [routerLink]="['/eventos/eventosdetalle', eventoMasCercano.id]" class="flex-1">
-              <button
-                class="w-full py-4 px-8 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-2xl hover:shadow-2xl hover:shadow-orange-300/50 transition-all duration-300 transform hover:-translate-y-1 text-lg flex items-center justify-center space-x-2">
-                <span>VER MÁS DETALLES</span>
-              </button>
-            </a>
-
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- Estado sin eventos -->
-    <div *ngIf="!eventoMasCercano"
-      class="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-orange-100 dark:border-orange-800/30">
-
-      <div
-        class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-2xl">
-        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-        </svg>
-      </div>
-
-      <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-        ¡Próximamente eventos en Capachica!
-      </h3>
-      <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-md mx-auto">
-        Estamos organizando experiencias turísticas increíbles en la península. Mantente atento.
-      </p>
-
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <button
-          class="px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2">
-          <span>🔔</span>
-          <span>Notificarme</span>
-        </button>
-        <button
-          class="px-8 py-3 border border-orange-300 dark:border-orange-600 text-orange-600 dark:text-orange-400 font-semibold rounded-xl hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all duration-300 flex items-center justify-center space-x-2">
-          <span>🏝️</span>
-          <span>Explorar Capachica</span>
-        </button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- Galería de Imágenes Interactiva Mejorada -->
-<section #galeria
-  class="px-6 py-20 bg-gradient-to-b from-white via-orange-50/20 to-orange-100/40 relative overflow-hidden">
-  <!-- Elementos decorativos animados -->
-  <div class="absolute top-1/4 left-0 w-64 h-64 bg-orange-200/30 rounded-full -translate-x-1/2 blur-3xl animate-pulse">
-  </div>
-  <div
-    class="absolute bottom-1/4 right-0 w-80 h-80 bg-orange-300/20 rounded-full translate-x-1/2 blur-3xl animate-pulse delay-1000">
-  </div>
-  <div
-    class="absolute top-1/2 left-1/2 w-32 h-32 bg-amber-200/40 rounded-full -translate-x-1/2 -translate-y-1/2 blur-2xl animate-bounce">
-  </div>
-  <div class="max-w-7xl mx-auto relative z-10"> <!-- Encabezado mejorado -->
-    <div class="text-center mb-16">
-      <div
-        class="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-200/50 backdrop-blur-sm mb-6 shadow-lg">
-        <div
-          class="w-8 h-8 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full flex items-center justify-center mr-3 shadow-md">
-          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd"
-              d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-              clip-rule="evenodd" />
-          </svg> </div> <span class="text-orange-800 font-semibold">Galería Visual</span>
-        <div class="ml-3 w-2 h-2 bg-orange-500 rounded-full animate-ping"></div>
-      </div>
-      <h3
-        class="text-5xl lg:text-6xl font-black bg-gradient-to-r from-orange-600 via-orange-700 to-amber-600 bg-clip-text text-transparent mb-6 tracking-tight">
-        Momentos Mágicos </h3>
-      <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"> Sumérgete en la belleza natural y cultural de
-        Capachica. Cada imagen cuenta una historia única de nuestra península </p>
-    </div> <!-- Grid de Galería Masonry Mejorado -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-      <div *ngFor="let slider of visibleSliders; let i = index"
-        class="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-700 transform hover:-translate-y-4 hover:rotate-1 cursor-pointer border border-orange-100/50"
-        [class.lg:col-span-1]="i === 0" [class.lg:row-span-1]="i === 0" [class.xl:col-span-1]="i === 1"
-        (click)="abrirImagen(slider.url_completa)"> <!-- Imagen con efectos mejorados -->
-        <div class="relative overflow-hidden">
-          
-          <img [src]="slider.url_completa" [alt]="slider.nombre"
-            class="w-full h-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:rotate-2" />
-          <!-- Overlay interactivo con gradiente -->
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
-          </div> <!-- Efectos de partículas al hover -->
-          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-            <div class="absolute top-4 left-4 w-2 h-2 bg-orange-400 rounded-full animate-ping"></div>
-            <div class="absolute top-8 right-8 w-1 h-1 bg-amber-400 rounded-full animate-pulse delay-300"></div>
-            <div class="absolute bottom-12 left-8 w-1.5 h-1.5 bg-orange-300 rounded-full animate-bounce delay-500">
-            </div>
-          </div> <!-- Botones de acción mejorados -->
-          <div
-            class="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-            <!-- Botón de zoom --> <button
-              class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all duration-200 shadow-lg">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-              </svg> </button> <!-- Botón de compartir --> <button
-              class="w-12 h-12 bg-orange-500/80 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-orange-600/80 hover:scale-110 transition-all duration-200 shadow-lg">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-              </svg> </button> </div> <!-- Indicador de interactividad -->
-          <div
-            class="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-            <div class="flex items-center space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-2">
-              <div class="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div> <span
-                class="text-white text-sm font-medium">Click para ampliar</span>
-            </div>
-          </div>
-        </div> <!-- Contenido mejorado -->
-        <div class="p-6 lg:p-8">
-          <div class="flex items-start justify-between mb-4">
-            <h4
-              class="text-xl lg:text-2xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors duration-300 leading-tight">
-              {{ slider.nombre }} </h4>
-            <div class="flex items-center ml-2">
-              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            </div>
-          </div>
-          <p class="text-gray-600 leading-relaxed mb-4 line-clamp-3"> {{ slider.descripcion.descripcion }} </p>
-          <!-- Etiquetas y estadísticas -->
-          <div class="flex items-center justify-between"> <span
-              class="inline-flex items-center px-4 py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-orange-100 to-amber-100 text-orange-800 shadow-sm">
-              <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd"
-                  d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                  clip-rule="evenodd" />
-              </svg> Atractivo Turístico </span>
-            <div class="flex items-center space-x-1 text-gray-400"> <svg class="w-4 h-4" fill="currentColor"
-                viewBox="0 0 20 20">
-                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                <path fill-rule="evenodd"
-                  d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                  clip-rule="evenodd" />
-              </svg> <span class="text-sm">{{ 100 + i * 23 }}</span> </div>
-          </div>
-        </div> <!-- Borde de hover animado -->
-        <div
-          class="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-orange-400/50 transition-all duration-500 pointer-events-none">
-        </div>
-      </div>
-    </div> <!-- Botón Ver más/menos mejorado -->
-    <div class="mt-20 text-center" *ngIf="totalSliders > 4"> <button (click)="toggleMostrarTodo(galeria)"
-        class="group relative inline-flex items-center px-10 py-5 bg-gradient-to-r from-orange-500 via-orange-600 to-amber-500 hover:from-orange-600 hover:via-orange-700 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-        <!-- Efecto de brillo -->
-        <div
-          class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
-        </div> <span class="relative z-10 text-lg">{{ mostrarTodo ? '👁️ Ver menos lugares' : '🔍 Descubrir máaravillas' }}</span> <svg
-          class="relative z-10 w-6 h-6 ml-3 transition-transform duration-300 group-hover:scale-110"
-          [class.rotate-180]="mostrarTodo" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button> </div>
-  </div> <!-- Modal de Imagen Ampliada Super Mejorado -->
-  <div *ngIf="imagenSeleccionada"
-    class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4 animate-fade-in"
-    (click)="cerrarImagen()"> <!-- Contenedor de imagen con zoom -->
-    <div class="relative max-w-6xl max-h-full group" (click)="$event.stopPropagation()">
-      <!-- Imagen principal con zoom interactivo -->
-      <div class="relative overflow-hidden rounded-3xl shadow-2xl"> <img [src]="imagenSeleccionada"
-          alt="Imagen ampliada"
-          class="max-w-full max-h-[90vh] object-contain transition-transform duration-500 hover:scale-110 cursor-zoom-in rounded-3xl"
-          #imagenModal (click)="toggleZoom($event)" /> <!-- Overlay de información -->
-        <div
-          class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <h4 class="text-2xl font-bold text-white mb-2">Capachica - Península del Titicaca</h4>
-          <p class="text-gray-200">Haz click en la imagen para hacer zoom</p>
-        </div>
-      </div> <!-- Controles mejorados -->
-      <div class="absolute -top-6 -right-6 flex space-x-3"> <!-- Botón de descarga --> <button
-          class="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-110">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg> </button> <!-- Botón de cerrar --> <button (click)="cerrarImagen()"
-          class="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-110 hover:rotate-90">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg> </button> </div> <!-- Navegación entre imágenes --> <button
-        class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 flex items-center justify-center hover:scale-110">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg> </button> <button
-        class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 flex items-center justify-center hover:scale-110">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg> </button>
-    </div> <!-- Indicador de zoom -->
-    <div
-      class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
-      🔍 Click en la imagen para zoom · ESC para cerrar </div>
-  </div>
-</section> <!-- Estilos adicionales -->
-<style>
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.3s ease-out;
-  }
-
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Zoom personalizado para la imagen del modal */
-  .zoom-active {
-    transform: scale(2) !important;
-    cursor: zoom-out !important;
-  }
-</style>
-
-<!-- ESTILOS CSS ADICIONALES -->
-<style>
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.3s ease-out;
-  }
-
-  /* Efecto de primera letra */
-  .first-letter\:text-4xl::first-letter {
-    font-size: 2.25rem;
-    line-height: 2.5rem;
-  }
-
-  .first-letter\:font-bold::first-letter {
-    font-weight: 700;
-  }
-
-  .first-letter\:text-orange-600::first-letter {
-    color: #ea580c;
-  }
-
-  .first-letter\:float-left::first-letter {
-    float: left;
-  }
-
-  .first-letter\:mr-2::first-letter {
-    margin-right: 0.5rem;
-  }
-
-  .first-letter\:mt-1::first-letter {
-    margin-top: 0.25rem;
-  }
-</style>
-
-<!-- PARTE 3: SECCIÓN DE HISTORIAS MEJORADA -->
-<div *ngIf="municipalidad"
-  class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-800 dark:to-gray-900 py-16 px-6 transition-colors duration-300">
-  <div class="max-w-7xl mx-auto">
-
-
-    <div class="flex flex-col gap-12">
-      <!-- Card 1: Historia de Capachica -->
-      <div *ngIf="imagenHistoriacapachica"
-        class="group relative w-full h-[500px] rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-[1.02]">
-
-        <!-- Imagen de fondo con overlay -->
-        <img [src]="imagenHistoriacapachica.url_completa"
-          [alt]="imagenHistoriacapachica.descripcion?.titulo || 'Historia de Capachica'"
-          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-
-        <!-- Overlay con gradiente -->
-        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
-
-        <!-- Contenido -->
-        <div class="absolute inset-0 flex items-center px-8 md:px-12">
-          <div class="text-white max-w-2xl">
-            <div class="mb-4">
-
-            </div>
-            <h3 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Historia de
-              <span class="text-orange-400">CAPACHICA</span>
-            </h3>
-            <p class="text-lg md:text-xl leading-relaxed text-gray-200 line-clamp-4">
-              {{ municipalidad.historiacapachica }}
-            </p>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 2: Historia de las Familias -->
-      <div *ngIf="imagenHistoriafamilia"
-        class="group relative w-full h-[500px] rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-[1.02]">
-
-        <!-- Imagen de fondo -->
-        <img [src]="imagenHistoriafamilia.url_completa"
-          [alt]="imagenHistoriafamilia.descripcion?.titulo || 'Historia de las Familias'"
-          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-
-        <!-- Overlay invertido (contenido a la derecha) -->
-        <div class="absolute inset-0 bg-gradient-to-l from-black/80 via-black/40 to-transparent"></div>
-
-        <!-- Contenido alineado a la derecha -->
-        <div class="absolute inset-0 flex items-center justify-end px-8 md:px-12">
-          <div class="text-white max-w-2xl text-right">
-            <div class="mb-4">
-
-            </div>
-            <h3 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Historia de los
-              <span class="text-orange-400">EMPRENDEDORES</span>
-            </h3>
-            <p class="text-lg md:text-xl leading-relaxed text-gray-200 line-clamp-4">
-              {{ municipalidad.historiacapachica || municipalidad.historiacapachica }}
-            </p>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PARTE 4: COMUNIDADES DE CAPACHICA MEJORADA -->
-<div *ngIf="slidersComunidad.length > 0"
-  class="py-20 px-6 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
-
-  <!-- Elementos decorativos de fondo -->
-  <div
-    class="absolute top-0 left-0 w-72 h-72 bg-orange-100 dark:bg-orange-900/20 rounded-full -translate-x-36 -translate-y-36">
-  </div>
-  <div
-    class="absolute bottom-0 right-0 w-96 h-96 bg-orange-50 dark:bg-orange-900/10 rounded-full translate-x-48 translate-y-48">
-  </div>
-
-  <div class="relative z-10 max-w-7xl mx-auto">
-    <!-- Encabezado mejorado -->
-    <div class="text-center mb-16">
-      <span
-        class="inline-block px-6 py-2 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-sm font-semibold rounded-full mb-4">
-        Nuestras Comunidades
-      </span>
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-        Comunidades de
-        <span class="text-orange-500">Capachica</span>
-      </h2>
-      <p class="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
-        Descubre la riqueza cultural de nuestras comunidades ancestrales y los servicios únicos que ofrecen a los
-        visitantes
-      </p>
-    </div>
-
-    <!-- Grid de comunidades mejorado -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-      <div *ngFor="let slider of slidersComunidad"
-        class="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-all duration-500 transform hover:-translate-y-2">
-
-        <!-- Imagen con overlay -->
-        <div class="relative h-56 overflow-hidden">
-          <img [src]="slider.url_completa" [alt]="slider.descripcion.titulo || slider.nombre"
-            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-
-          <!-- Overlay sutil -->
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          </div>
-
-          <!-- Badge de comunidad -->
-          <div class="absolute top-4 right-4 px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full">
-            Comunidad
-          </div>
-        </div>
-
-        <!-- Contenido -->
-        <div class="p-6">
-          <h3
-            class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-orange-500 transition-colors duration-300">
-            {{ slider.nombre }}
-          </h3>
-          <p class="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-4">
-            {{ slider.descripcion.descripcion }}
-          </p>
-
-          <!-- Botón de acción -->
-          <button
-            class="w-full py-2 px-4 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 font-semibold rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-all duration-300 group-hover:bg-orange-500 group-hover:text-white">
-            Explorar comunidad
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- PARTE 6: EVENTO PRÓXIMO ADICIONAL (si tienes la variable 'evento') -->
-<div *ngIf="evento && eventoProximo" class="py-16 px-6 bg-white dark:bg-gray-900">
-  <div class="max-w-5xl mx-auto">
-    <div
-      class="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-gray-800 dark:to-gray-700 rounded-3xl shadow-xl overflow-hidden">
-
-      <div class="grid grid-cols-1 md:grid-cols-2">
-        <!-- Imagen del evento -->
-        <div class="h-80 md:h-auto">
-          <img [src]="eventoProximo.imagenUrl || 'https://source.unsplash.com/800x600/?culture,event'"
-            [alt]="'Evento ' + eventoProximo.nombre" class="w-full h-full object-cover" />
-        </div>
-
-        <!-- Detalles del evento -->
-        <div class="p-8 flex flex-col justify-center">
-          <span class="inline-block px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-full mb-4 w-fit">
-            Evento Destacado
+        <!-- Encabezado -->
+        <div class="text-center mb-12 sm:mb-16">
+          <span
+            class="inline-block px-4 py-2 bg-white/20 bg-amber-500/80 dark:bg-amber-500/80 text-gray-100 dark:text-gray-900 text-sm font-semibold rounded-full mb-4 transition-all duration-300">
+            Testimonios
           </span>
-
-          <h3 class="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-4">
-            {{ eventoProximo.nombre }}
-          </h3>
-
-          <div class="space-y-3 text-gray-700 dark:text-gray-300">
-            <p><strong class="text-gray-900 dark:text-white">Tipo:</strong> {{ eventoProximo.tipo_evento | titlecase }}
-            </p>
-            <p><strong class="text-gray-900 dark:text-white">Fecha:</strong> {{ eventoProximo.fecha_inicio |
-              date:'fullDate' }}</p>
-            <p><strong class="text-gray-900 dark:text-white">Hora:</strong> {{ eventoProximo.hora_inicio }}</p>
-            <p><strong class="text-gray-900 dark:text-white">Organizado por:</strong> {{
-              eventoProximo.emprendedor?.nombre }}</p>
-          </div>
+          <h2 class="text-3xl sm:text-4xl md:text-5xl text-gray-800 dark:text-gray-100 font-bold mb-4 sm:mb-6">
+            Reseñas de Turistas
+          </h2>
+          <p
+            class="text-gray-800 dark:text-gray-300 text-base sm:text-lg max-w-2xl mx-auto transition-colors duration-300">
+            Descubre lo que nuestros visitantes dicen sobre su experiencia en Capachica
+          </p>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- PARTE 7: MODAL DE EMPRENDEDOR MEJORADO -->
-<div *ngIf="selectedEmprendedor"
-  class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+        <!-- Grid de testimonios -->
+        <div class=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-  <div
-    class="bg-white dark:bg-gray-800 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl transition-colors duration-300 animate-slideUp">
-
-    <!-- Header del modal -->
-    <div class="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 p-6 rounded-t-3xl">
-      <div class="flex justify-between items-center">
-        <h2 class="text-2xl font-bold text-white">{{ selectedEmprendedor.nombre }}</h2>
-        <button (click)="closeEmprendedorDetails()"
-          class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-all duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Contenido del modal -->
-    <div class="p-8">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-        <!-- Columna izquierda: Imagen y contacto -->
-        <div class="space-y-6">
-          <div class="relative overflow-hidden rounded-2xl shadow-lg">
-            <img src="https://www.dzoom.org.es/wp-content/uploads/2017/07/seebensee-2384369-810x540.jpg"
-              [alt]="'Imagen de ' + selectedEmprendedor.nombre" class="w-full h-64 object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          </div>
-
-          <!-- Información de contacto -->
-          <div class="bg-orange-50 dark:bg-gray-700 p-6 rounded-2xl border border-orange-100 dark:border-gray-600">
-            <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-4 flex items-center">
-              <span class="mr-2">📞</span>
-              Información de contacto
-            </h3>
-            <div class="space-y-3 text-gray-700 dark:text-gray-200">
-              <p><strong>Teléfono:</strong> {{ selectedEmprendedor.telefono }}</p>
-              <p><strong>Email:</strong> {{ selectedEmprendedor.email }}</p>
-              <p><strong>Ubicación:</strong> {{ selectedEmprendedor.ubicacion }}</p>
-              <p><strong>Horario:</strong> {{ selectedEmprendedor.horario_atencion }}</p>
+          <!-- Testimonio 1 -->
+          <div
+            class="group bg-white dark:bg-gray-800 dark:text-white backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-2">
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 bg-orange-100 dark:bg-orange-400 rounded-full flex items-center justify-center mr-3">
+                <span class="text-orange-600 font-bold text-lg">B</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-gray-900 dark:text-white">Beatriz</h4>
+                <div class="flex text-orange-500 text-sm">⭐⭐⭐⭐⭐</div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Columna derecha: Información detallada -->
-        <div class="space-y-6">
-
-          <!-- Descripción -->
-          <div>
-            <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Descripción</h3>
-            <p class="text-gray-700 dark:text-gray-200 leading-relaxed">
-              {{ selectedEmprendedor.descripcion }}
+            <h5 class="font-semibold text-gray-800 dark:text-orange-200 mb-2">Visita a Puno</h5>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+              Reservamos con PunoTours varios paquetes. Wilson fue muy amable y profesional.
+              Estuvimos en contacto por mail antes de viajar para ajustar los detalles...
             </p>
           </div>
 
-          <!-- Tipo de servicio -->
-          <div>
-            <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Tipo de servicio</h3>
-            <span
-              class="inline-block px-4 py-2 bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 rounded-full font-semibold">
-              {{ selectedEmprendedor.tipo_servicio }}
-            </span>
-          </div>
-
-          <!-- Rango de precios -->
-          <div>
-            <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Rango de precios</h3>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ selectedEmprendedor.precio_rango }}</p>
-          </div>
-
-          <!-- Métodos de pago -->
-          <div>
-            <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Métodos de pago</h3>
-            <div class="flex flex-wrap gap-2">
-              <span *ngFor="let metodo of selectedEmprendedor.metodos_pago"
-                class="px-3 py-1 bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 rounded-full text-sm font-medium">
-                {{ metodo }}
-              </span>
+          <!-- Testimonio 1 -->
+          <div
+            class="group bg-white dark:bg-gray-800 dark:text-white backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-2">
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 bg-orange-100 dark:bg-orange-400 rounded-full flex items-center justify-center mr-3">
+                <span class="text-orange-600 font-bold text-lg">B</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-gray-900 dark:text-white">Beatriz</h4>
+                <div class="flex text-orange-500 text-sm">⭐⭐⭐⭐⭐</div>
+              </div>
             </div>
+            <h5 class="font-semibold text-gray-800 dark:text-orange-200 mb-2">Visita a Puno</h5>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+              Reservamos con PunoTours varios paquetes. Wilson fue muy amable y profesional.
+              Estuvimos en contacto por mail antes de viajar para ajustar los detalles...
+            </p>
           </div>
 
-          <!-- Idiomas -->
-          <div>
-            <h3 class="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">Idiomas hablados</h3>
-            <div class="flex flex-wrap gap-2">
-              <span *ngFor="let idioma of selectedEmprendedor.idiomas_hablados"
-                class="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium">
-                {{ idioma }}
-              </span>
+          <!-- Testimonio 1 -->
+          <div
+            class="group bg-white dark:bg-gray-800 dark:text-white backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-2">
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 bg-orange-100 dark:bg-orange-400 rounded-full flex items-center justify-center mr-3">
+                <span class="text-orange-600 font-bold text-lg">B</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-gray-900 dark:text-white">Beatriz</h4>
+                <div class="flex text-orange-500 text-sm">⭐⭐⭐⭐⭐</div>
+              </div>
             </div>
+            <h5 class="font-semibold text-gray-800 dark:text-orange-200 mb-2">Visita a Puno</h5>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+              Reservamos con PunoTours varios paquetes. Wilson fue muy amable y profesional.
+              Estuvimos en contacto por mail antes de viajar para ajustar los detalles...
+            </p>
           </div>
+
+          <!-- Testimonio 1 -->
+          <div
+            class="group bg-white dark:bg-gray-800 dark:text-white backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-2">
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 bg-orange-100 dark:bg-orange-400 rounded-full flex items-center justify-center mr-3">
+                <span class="text-orange-600 font-bold text-lg">B</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-gray-900 dark:text-white">Beatriz</h4>
+                <div class="flex text-orange-500 text-sm">⭐⭐⭐⭐⭐</div>
+              </div>
+            </div>
+            <h5 class="font-semibold text-gray-800 dark:text-orange-200 mb-2">Visita a Puno</h5>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+              Reservamos con PunoTours varios paquetes. Wilson fue muy amable y profesional.
+              Estuvimos en contacto por mail antes de viajar para ajustar los detalles...
+            </p>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Footer - Enhanced for dark mode -->
+  <footer *ngIf="municipalidad"
+    class="bg-amber-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 pt-16 pb-8 px-6 transition-colors duration-300">
+    <div
+      class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-sm border-b border-amber-200 dark:border-gray-700 pb-10">
+
+      <!-- Columna 1: Compañía -->
+      <div>
+        <h4 class="text-base font-bold mb-4 text-amber-700 dark:text-amber-500">Compañía</h4>
+        <ul class="space-y-2">
+          <li><a href="#"
+              class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Nosotros</a></li>
+          <li><a href="#" class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Nuestros
+              Servicios</a></li>
+          <li><a href="#" class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Política
+              de Privacidad</a></li>
+          <li><a href="#"
+              class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Afíliate</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 2: Ayuda -->
+      <div>
+        <h4 class="text-base font-bold mb-4 text-amber-700 dark:text-amber-500">Ayuda</h4>
+        <ul class="space-y-2">
+          <li><a href="#"
+              class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Preguntas</a></li>
+          <li><a href="#"
+              class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Compras</a></li>
+          <li><a href="#"
+              class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Envíos</a>
+          </li>
+          <li><a href="#"
+              class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Pagos</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Contacto real -->
+      <div>
+        <h4 class="text-base font-bold mb-4 text-amber-700 dark:text-amber-500">Contacto</h4>
+        <p class="mb-2"><strong class="text-gray-800 dark:text-gray-200">Email:</strong> {{ municipalidad.correo }}
+        </p>
+        <p><strong class="text-gray-800 dark:text-gray-200">Horario:</strong> {{ municipalidad.horariodeatencion }}
+        </p>
+      </div>
+
+      <!-- Columna 4: Redes sociales -->
+      <div>
+        <h4 class="text-base font-bold mb-4 text-amber-700 dark:text-amber-500">Síguenos</h4>
+        <div class="flex space-x-3">
+          <a [href]="municipalidad.red_facebook" target="_blank"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 hover:bg-amber-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-sm">
+            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.877v-6.987H7.898v-2.89h2.54V9.797c0-2.507 1.493-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.242 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33V22C18.343 21.128 22 16.991 22 12z" />
+            </svg>
+          </a>
+          <a [href]="municipalidad.red_instagram" target="_blank"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 hover:bg-amber-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-sm">
+            <svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm0 2h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3zm5 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm4.5-.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+            </svg>
+          </a>
+          <a [href]="municipalidad.red_youtube" target="_blank"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 hover:bg-amber-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-sm">
+            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M10 15l5.19-3L10 9v6zm12-3c0-1.74-.148-3.077-.428-4.17a3.38 3.38 0 0 0-2.4-2.4C17.077 5.148 15.74 5 14 5H10c-1.74 0-3.077.148-4.17.428a3.38 3.38 0 0 0-2.4 2.4C3.148 8.923 3 10.26 3 12s.148 3.077.428 4.17a3.38 3.38 0 0 0 2.4 2.4C6.923 18.852 8.26 19 10 19h4c1.74 0 3.077-.148 4.17-.428a3.38 3.38 0 0 0 2.4-2.4c.28-1.093.428-2.43.428-4.17z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center text-sm mt-8 text-gray-500 dark:text-gray-400">
+      &copy; {{ currentYear }} Municipalidad de Capachica. Todos los derechos reservados.
+    </div>
+  </footer>
+
 </div>
-
-<!-- PARTE 8: SECCIÓN DE UBICACIÓN MEJORADA -->
-<div
-  class="bg-gradient-to-br from-orange-50 via-white to-orange-100 dark:from-gray-800 dark:to-gray-900 py-20 px-6 transition-colors duration-300">
-  <div class="max-w-7xl mx-auto">
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-      <!-- Contenido de texto -->
-      <div class="lg:pr-12">
-        <span class="inline-block px-6 py-2 bg-orange-500 text-white text-sm font-semibold rounded-full mb-6">
-          Ubicación
-        </span>
-
-        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-          ¿Cómo llegar a
-          <span class="text-orange-500">Capachica?</span>
-        </h2>
-
-        <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
-          Estamos ubicados en la hermosa península de Capachica, en las orillas del majestuoso lago Titicaca,
-          en el departamento de Puno, Perú. Un destino donde la naturaleza y la cultura se encuentran
-          para ofrecerte una experiencia única e inolvidable.
-        </p>
-
-        <!-- Puntos destacados -->
-        <div class="space-y-4 mb-8">
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mr-4">
-              1
-            </div>
-            <span class="text-gray-700 dark:text-gray-300">A orillas del lago Titicaca</span>
-          </div>
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mr-4">
-              2
-            </div>
-            <span class="text-gray-700 dark:text-gray-300">Paisajes andinos espectaculares</span>
-          </div>
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mr-4">
-              3
-            </div>
-            <span class="text-gray-700 dark:text-gray-300">Rica cultura ancestral</span>
-          </div>
-        </div>
-
-
-      </div>
-
-      <!-- Mapa mejorado -->
-      <div class="relative">
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-2xl">
-          <div class="h-[400px] rounded-2xl overflow-hidden">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12590.106066335879!2d-69.8417794!3d-15.6446622!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915d7c95db9aeed9%3A0xa6d88f0376391024!2sCapachica%2C%20Per%C3%BA!5e0!3m2!1ses-419!2spe!4v1617738498032!5m2!1ses-419!2spe"
-              class="w-full h-full border-0 rounded-2xl" allowfullscreen="" loading="lazy">
-            </iframe>
-          </div>
-        </div>
-
-        <!-- Elementos decorativos -->
-        <div class="absolute -top-4 -right-4 w-16 h-16 bg-orange-200 dark:bg-orange-800/50 rounded-full -z-10"></div>
-        <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-orange-100 dark:bg-orange-900/30 rounded-full -z-10"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- PARTE 9: RESEÑAS DE TURISTAS MEJORADA -->
-<div class="py-20 px-6 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 relative overflow-hidden">
-
-  <!-- Elementos decorativos de fondo -->
-  <div class="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full -translate-x-48 -translate-y-48"></div>
-  <div class="absolute bottom-0 right-0 w-80 h-80 bg-white/5 rounded-full translate-x-40 translate-y-40"></div>
-
-  <div class="relative z-10 max-w-7xl mx-auto">
-
-    <!-- Encabezado -->
-    <div class="text-center mb-16">
-      <span class="inline-block px-6 py-2 bg-white/20 text-white text-sm font-semibold rounded-full mb-4">
-        Testimonios
-      </span>
-      <h3 class="text-4xl md:text-5xl text-white font-bold mb-6">
-        Reseñas de Turistas
-      </h3>
-      <p class="text-orange-100 text-lg max-w-2xl mx-auto">
-        Descubre lo que nuestros visitantes dicen sobre su experiencia en Capachica
-      </p>
-    </div>
-
-    <!-- Grid de testimonios -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-      <!-- Testimonio 1 -->
-      <div
-        class="group bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:bg-white transition-all duration-300 transform hover:-translate-y-2">
-        <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-            <span class="text-orange-600 font-bold text-lg">B</span>
-          </div>
-          <div>
-            <h4 class="font-bold text-gray-900">Beatriz</h4>
-            <div class="flex text-orange-500 text-sm">⭐⭐⭐⭐⭐</div>
-          </div>
-        </div>
-        <h5 class="font-semibold text-gray-800 mb-2">Visita a Puno</h5>
-        <p class="text-gray-600 text-sm leading-relaxed">
-          Reservamos con PunoTours varios paquetes. Wilson fue muy amable y profesional.
-          Estuvimos en contacto por mail antes de viajar para ajustar los detalles...
-        </p>
-      </div>
-      <!-- Testimonio 1 -->
-      <div
-        class="group bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:bg-white transition-all duration-300 transform hover:-translate-y-2">
-        <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-            <span class="text-orange-600 font-bold text-lg">B</span>
-          </div>
-          <div>
-            <h4 class="font-bold text-gray-900">Beatriz</h4>
-            <div class="flex text-orange-500 text-sm">⭐⭐⭐⭐⭐</div>
-          </div>
-        </div>
-        <h5 class="font-semibold text-gray-800 mb-2">Visita a Puno</h5>
-        <p class="text-gray-600 text-sm leading-relaxed">
-          Reservamos con PunoTours varios paquetes. Wilson fue muy amable y profesional.
-          Estuvimos en contacto por mail antes de viajar para ajustar los detalles...
-        </p>
-      </div>
-      <!-- Testimonio 1 -->
-      <div
-        class="group bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:bg-white transition-all duration-300 transform hover:-translate-y-2">
-        <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-            <span class="text-orange-600 font-bold text-lg">B</span>
-          </div>
-          <div>
-            <h4 class="font-bold text-gray-900">Beatriz</h4>
-            <div class="flex text-orange-500 text-sm">⭐⭐⭐⭐⭐</div>
-          </div>
-        </div>
-        <h5 class="font-semibold text-gray-800 mb-2">Visita a Puno</h5>
-        <p class="text-gray-600 text-sm leading-relaxed">
-          Reservamos con PunoTours varios paquetes. Wilson fue muy amable y profesional.
-          Estuvimos en contacto por mail antes de viajar para ajustar los detalles...
-        </p>
-      </div>
-      <!-- Testimonio 1 -->
-      <div
-        class="group bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:bg-white transition-all duration-300 transform hover:-translate-y-2">
-        <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-            <span class="text-orange-600 font-bold text-lg">B</span>
-          </div>
-          <div>
-            <h4 class="font-bold text-gray-900">Beatriz</h4>
-            <div class="flex text-orange-500 text-sm">⭐⭐⭐⭐⭐</div>
-          </div>
-        </div>
-        <h5 class="font-semibold text-gray-800 mb-2">Visita a Puno</h5>
-        <p class="text-gray-600 text-sm leading-relaxed">
-          Reservamos con PunoTours varios paquetes. Wilson fue muy amable y profesional.
-          Estuvimos en contacto por mail antes de viajar para ajustar los detalles...
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Footer - Enhanced for dark mode -->
-<footer *ngIf="municipalidad"
-  class="bg-amber-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 pt-16 pb-8 px-6 transition-colors duration-300">
-  <div
-    class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-sm border-b border-amber-200 dark:border-gray-700 pb-10">
-
-    <!-- Columna 1: Compañía -->
-    <div>
-      <h4 class="text-base font-bold mb-4 text-amber-700 dark:text-amber-500">Compañía</h4>
-      <ul class="space-y-2">
-        <li><a href="#"
-            class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Nosotros</a></li>
-        <li><a href="#" class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Nuestros
-            Servicios</a></li>
-        <li><a href="#" class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Política
-            de Privacidad</a></li>
-        <li><a href="#"
-            class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Afíliate</a></li>
-      </ul>
-    </div>
-
-    <!-- Columna 2: Ayuda -->
-    <div>
-      <h4 class="text-base font-bold mb-4 text-amber-700 dark:text-amber-500">Ayuda</h4>
-      <ul class="space-y-2">
-        <li><a href="#"
-            class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Preguntas</a></li>
-        <li><a href="#"
-            class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Compras</a></li>
-        <li><a href="#" class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Envíos</a>
-        </li>
-        <li><a href="#" class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200">Pagos</a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Columna 3: Contacto real -->
-    <div>
-      <h4 class="text-base font-bold mb-4 text-amber-700 dark:text-amber-500">Contacto</h4>
-      <p class="mb-2"><strong class="text-gray-800 dark:text-gray-200">Email:</strong> {{ municipalidad.correo }}</p>
-      <p><strong class="text-gray-800 dark:text-gray-200">Horario:</strong> {{ municipalidad.horariodeatencion }}</p>
-    </div>
-
-    <!-- Columna 4: Redes sociales -->
-    <div>
-      <h4 class="text-base font-bold mb-4 text-amber-700 dark:text-amber-500">Síguenos</h4>
-      <div class="flex space-x-3">
-        <a [href]="municipalidad.red_facebook" target="_blank"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 hover:bg-amber-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-sm">
-          <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.877v-6.987H7.898v-2.89h2.54V9.797c0-2.507 1.493-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.242 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33V22C18.343 21.128 22 16.991 22 12z" />
-          </svg>
-        </a>
-        <a [href]="municipalidad.red_instagram" target="_blank"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 hover:bg-amber-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-sm">
-          <svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm0 2h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3zm5 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm4.5-.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
-          </svg>
-        </a>
-        <a [href]="municipalidad.red_youtube" target="_blank"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 hover:bg-amber-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-sm">
-          <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M10 15l5.19-3L10 9v6zm12-3c0-1.74-.148-3.077-.428-4.17a3.38 3.38 0 0 0-2.4-2.4C17.077 5.148 15.74 5 14 5H10c-1.74 0-3.077.148-4.17.428a3.38 3.38 0 0 0-2.4 2.4C3.148 8.923 3 10.26 3 12s.148 3.077.428 4.17a3.38 3.38 0 0 0 2.4 2.4C6.923 18.852 8.26 19 10 19h4c1.74 0 3.077-.148 4.17-.428a3.38 3.38 0 0 0 2.4-2.4c.28-1.093.428-2.43.428-4.17z" />
-          </svg>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="text-center text-sm mt-8 text-gray-500 dark:text-gray-400">
-    &copy; {{ currentYear }} Municipalidad de Capachica. Todos los derechos reservados.
-  </div>
-</footer>
