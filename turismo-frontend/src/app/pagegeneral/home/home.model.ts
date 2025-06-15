@@ -62,6 +62,13 @@ export interface Slider {
   created_at: string;
   updated_at: string;
   url_completa: string;
+  // Agregado:
+    descripcion?: {
+    id: number;
+    slider_id: number;
+    titulo: string;
+    descripcion: string;
+  };
 }
 
 export interface SliderDescripcion {
@@ -126,3 +133,27 @@ export interface ReservaDTO {
   created_at: string;
   updated_at: string;
 }
+
+
+export interface Evento {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  tipo_evento: string;
+  idioma_principal: string;
+  fecha_inicio: string;
+  hora_inicio: string;
+  fecha_fin: string;
+  hora_fin: string;
+  duracion_horas: string;
+  coordenada_x: string;
+  coordenada_y: string;
+  imagenUrl: string;
+  emprendedor?: {
+    id: number;
+    nombre: string;
+  };
+  sliders: Slider[];  // Asegúrate de que esta propiedad sea un array de `Slider`
+}
+
+
