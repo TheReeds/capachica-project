@@ -1,3 +1,0 @@
-Asociacion Controller (Tests\Feature\Controllers\AsociacionController)
- [ ] Falla validacion ubicacion con coordenadas invalidas
-
