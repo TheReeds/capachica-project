@@ -50,16 +50,24 @@ export class HomeComponent implements OnInit, AfterViewInit {
   maxVisible = 4;
 
   intervalId: any;
+  
+  filteredSliders: any[] = []; 
 
 
 imagenSeleccionada: string | null = null;
 imagenActualIndex: number = 0;
 sliders: any[] = []; // tu lista original completa de imágenes
 
-  get visibleSliders() {
-    const sliders = this.municipalidad?.sliders_secundarios ?? [];
-    return this.mostrarTodo ? sliders : sliders.slice(0, this.maxVisible);
-  }
+ get visibleSliders() {
+  const sliders = this.municipalidad?.sliders_secundarios ?? [];
+  
+  // Filtra los sliders con orden igual a 2
+  const filteredSliders = sliders.filter(slider => slider.orden === 2);
+
+  // Si mostrarTodo es verdadero, retorna todos los sliders filtrados, sino, solo los primeros 'maxVisible'
+  return this.mostrarTodo ? filteredSliders : filteredSliders.slice(0, this.maxVisible);
+}
+
 
   get totalSliders(): number {
     return this.municipalidad?.sliders_secundarios?.length ?? 0;
@@ -70,6 +78,17 @@ sliders: any[] = []; // tu lista original completa de imágenes
       slider => slider.descripcion?.titulo?.toLowerCase() === 'historia de capachica'
     ) ?? null;
   }
+
+  get imagenComite(): any | null {
+  console.log('municipalidad:', this.municipalidad);
+  console.log('imagenComite:', this.municipalidad?.sliders_secundarios?.find(
+    slider => slider.descripcion?.titulo?.toLowerCase() === 'comite'
+  ));
+  return this.municipalidad?.sliders_secundarios?.find(
+    slider => slider.descripcion?.titulo?.toLowerCase() === 'comite'
+  ) ?? null;
+}
+
 
   get imagenHistoriafamilia(): any | null {
     return this.municipalidad?.sliders_secundarios?.find(
@@ -82,6 +101,15 @@ sliders: any[] = []; // tu lista original completa de imágenes
       slider.descripcion?.titulo?.toLowerCase().includes('comunidad')
     ) ?? [];
   }
+
+  get emptyCellsForLastRow(): number[] {
+  const cols = 4; // Número de columnas en xl
+  const remainder = this.visibleSliders.length % cols;
+  if (remainder === 0) return [];
+  const emptySlots = Math.floor((cols - remainder) / 2); // centrar
+  return Array(emptySlots).fill(0);
+}
+
 
   getImagenesmuni(): any[] {
     // Devuelve las imágenes secundarias si existen
@@ -281,6 +309,9 @@ irAImagenAnterior() {
     this.startAutoSlide();
     this.cargarEventos();
 
+    this.loadMunicipalidad();
+    
+
     this.homeService.getMunicipalidad().subscribe({
       next: (response) => {
         this.municipalidad = response; // 👈 aquí el fix
@@ -298,7 +329,17 @@ irAImagenAnterior() {
 
   }
 
-
+loadMunicipalidad() {
+    this.homeService.getMunicipalidad().subscribe({
+      next: (response) => {
+        this.municipalidad = response; // Asumimos que municipalidad tiene los sliders
+        this.filteredSliders = this.municipalidad?.sliders_secundarios?.filter(slider => slider.orden === 2) ?? [];
+      },
+      error: (err) => {
+        console.error('Error cargando municipalidad', err);
+      }
+    });
+  }
   ngAfterViewInit(): void {
     setTimeout(() => {
       if (!this.swiperInitialized) {

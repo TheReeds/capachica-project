@@ -193,3 +193,17 @@
     .animate-slide-in-right {
       animation: slide-in-right 0.8s ease-out;
     }
+
+    .grid-rows-custom {
+  grid-template-rows: auto;  /* Esto hace que las filas se adapten al contenido */
+}
+
+/* Estilo adicional para centrar contenido de filas posteriores */
+.grid > :nth-child(n+5) {
+  justify-self: center;  /* Esto asegura que los elementos desde el 5to elemento en adelante se centren */
+}
+
+.justify-self-center {
+  justify-self: center;
+}
+

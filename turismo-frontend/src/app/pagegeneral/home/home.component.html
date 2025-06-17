@@ -360,7 +360,7 @@
       class="px-6 py-20 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
 
       <div class="max-w-7xl mx-auto relative z-10">
-        <!-- Encabezado mejorado -->
+        <!-- Encabezado  -->
         <div class="text-center mb-16">
           <h3
             class="text-4xl dark:text-orange-400 lg:text-5xl font-black bg-gradient-to-r from-orange-600 via-orange-700 to-amber-600 bg-clip-text text-transparent mb-6 tracking-tight pb-4">
@@ -372,61 +372,48 @@
           </p>
         </div>
 
-        <!-- Grid de Galería Masonry Mejorado -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+        <!-- Grid de Galería Masonry -->
+        <div
+          class="grid justify-items gap-6  lg:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 justify-items"
+          style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+
           <div *ngFor="let slider of visibleSliders; let i = index"
-            class="aspect-[4/] group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-700 transform hover:-translate-y-4 hover:rotate-1 cursor-pointer border border-orange-100/50"
+            class="aspect-[4/3] group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-700 transform hover:-translate-y-4 hover:rotate-1 cursor-pointer border border-orange-100/50"
             [class.lg:col-span-1]="i === 0" [class.lg:row-span-1]="i === 0" [class.xl:col-span-1]="i === 1"
-            (click)="abrirImagen(slider.url_completa)">
+            [class.justify-self-center]="i >= 4" (click)="abrirImagen(slider.url_completa)">
 
-            <!-- Imagen con efectos mejorados -->
-            <div class="relative overflow-hidden">
+            <!-- Imagen con efectos -->
+            <div class="relative overflow-hidden rounded-3xl">
               <img [src]="slider.url_completa" [alt]="slider.nombre"
-                class="aspect-[4/3] w-full h-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:rotate-2" />
-              <!-- Overlay interactivo con gradiente -->
-              <div
-                class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-3xl">
-                <h4 class="text-2xl font-bold text-white mb-2">{{ slider.nombre }}</h4>
-              </div>
+                class="aspect-[4/3] w-full h-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:rotate-2 rounded-3xl" />
 
-
-
-              <!-- Botones de acción mejorados -->
+              <!-- Botones de acción -->
               <div
                 class="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                 <!-- Botón de zoom -->
                 <button
-                  class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all duration-200 shadow-lg">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="w-12 h-12 bg-red-20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all duration-200 shadow-lg">
+                  <svg class="w-5 h-5 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                   </svg>
                 </button>
-
               </div>
-
-
             </div>
-            <!-- Contenido mejorado -->
-            <div class="p-6 lg:p-8">
 
-              <p class="text-gray-600 leading-relaxed mb-4 line-clamp-3"> {{ slider.descripcion.descripcion }} </p>
-
-            </div> <!-- Borde de hover animado -->
+            <!-- Borde de hover animado -->
             <div
               class="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-orange-400/50 transition-all duration-500 pointer-events-none">
             </div>
           </div>
         </div>
 
+
         <!-- Botón Ver más/menos mejorado -->
         <div class="mt-20 text-center" *ngIf="totalSliders > 4">
           <button (click)="toggleMostrarTodo(galeria)"
             class="group relative inline-flex items-center px-10 py-5 bg-gradient-to-r from-orange-500 via-orange-500 to-amber-500 hover:from-orange-600 hover:via-orange-700 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-            <!-- Efecto de brillo -->
-            <div
-              class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
-            </div>
+
             <span class="relative z-10 text-lg">{{ mostrarTodo ? 'Ver menos lugares' : 'Descubrir más'
               }}</span>
             <svg class="relative z-10 w-6 h-6 ml-3 transition-transform duration-300 group-hover:scale-110"
@@ -438,41 +425,78 @@
 
       </div>
 
-      <!-- Modal de Imagen Ampliada Super Mejorado -->
+      <!-- Modal de Imagen Ampliada Mejorado -->
       <div *ngIf="imagenSeleccionada"
-        class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4 animate-fade-in"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex items-center justify-center pt-10 animate-fade-in"
         (click)="cerrarImagen()">
 
-        <!-- Contenedor de imagen con zoom -->
-        <div class="relative p-5 group" (click)="$event.stopPropagation()">
+        <!-- Contenedor de imagen con zoom y ajuste de margen para no tapar la barra de navegación -->
+        <!-- Contenedor de imagen con zoom y ajuste de margen para no tapar la barra de navegación -->
+        <div class="relative p-5 mt-24 group" (click)="$event.stopPropagation()">
           <!-- Imagen principal con zoom interactivo -->
-          <div class="relative overflow-hidden rounded-3xl shadow-2xl"> <img [src]="imagenSeleccionada"
-              alt="Imagen ampliada"
-              class="max-w-full max-h-[90vh] object-contain transition-transform duration-500 hover:scale-110 cursor-zoom-in rounded-3xl"
+          <div class="relative overflow-hidden rounded-3xl shadow-2xl">
+            <img [src]="imagenSeleccionada" alt="Imagen ampliada"
+              class="max-w-full max-h-[70vh] object-contain transition-transform duration-500 hover:scale-110 cursor-zoom-in rounded-3xl"
               #imagenModal (click)="toggleZoom($event)" />
 
-            <!-- Overlay de información -->
-            <div *ngFor="let slider of visibleSliders; let i = index"
-              class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <p class="text-gray-200">{{ slider.descripcion.descripcion }}</p>
-            </div>
+            <!-- Overlay de información mejorado -->
+            <ng-container *ngFor="let slider of visibleSliders">
+              <!-- Mostrar solo el slider seleccionado -->
+              <div *ngIf="slider.url_completa === imagenSeleccionada"
+                class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent via-30% to-black/70 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-between p-8 pointer-events-none">
+
+                <!-- Título en la parte superior -->
+                <div class="flex justify-center items-start">
+                  <div class="text-center max-w-4xl">
+                    <h2
+                      class="text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl leading-tight tracking-wide">
+                      {{ slider.descripcion.titulo }}
+                    </h2>
+
+                  </div>
+                </div>
+
+                <!-- Descripción en la parte inferior -->
+                <div class="flex justify-center items-end">
+                  <div class="text-center max-w-3xl">
+                    <p
+                      class="text-lg md:text-xl lg:text-2xl text-gray-100 drop-shadow-xl leading-relaxed font-medium tracking-wide">
+                      {{ slider.descripcion.descripcion }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Overlay permanente sutil (opcional - para mostrar texto siempre) -->
+            <ng-container *ngFor="let slider of visibleSliders">
+              <div *ngIf="slider.url_completa === imagenSeleccionada"
+                class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent via-40% to-black/40 rounded-3xl group-hover:opacity-0 transition-all duration-500 flex flex-col justify-between p-6 pointer-events-none">
+
+                <!-- Título siempre visible (versión sutil) -->
+                <div class="flex justify-center items-start">
+                  <h3
+                    class="text-xl md:text-2xl font-semibold text-white drop-shadow-lg text-center max-w-2xl leading-tight">
+                    {{ slider.descripcion.titulo }}
+                  </h3>
+                </div>
+
+                <!-- Descripción siempre visible (versión sutil) -->
+                <div class="flex justify-center items-end">
+                  <p class="text-sm md:text-base text-gray-200 drop-shadow-lg text-center max-w-xl leading-relaxed">
+                    {{ slider.descripcion.descripcion }}
+                  </p>
+                </div>
+              </div>
+            </ng-container>
           </div>
 
           <!-- Controles mejorados -->
-          <div class="absolute -top-6 -right-6 flex space-x-3">
-            <!-- Botón de descarga -->
-            <button
-              class="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-110">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </button>
-
+          <div class="absolute -top-6 -right-6 flex space-x-3 z-10">
             <!-- Botón de cerrar -->
             <button (click)="cerrarImagen()"
-              class="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-110 hover:rotate-90">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-110 hover:rotate-90 backdrop-blur-sm border-2 border-white/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -480,25 +504,25 @@
 
           <!-- Navegación entre imágenes -->
           <!-- Botón para ir a la imagen anterior -->
-<button (click)="navegarImagen('anterior')"
-  class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 flex items-center justify-center hover:scale-110">
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-  </svg>
-</button>
+          <button (click)="navegarImagen('anterior')"
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/60 hover:bg-black/80 text-white rounded-full transition-all duration-200 flex items-center justify-center hover:scale-110 backdrop-blur-sm border-2 border-white/20 z-10">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
 
-<!-- Botón para ir a la imagen siguiente -->
-<button (click)="navegarImagen('siguiente')"
-  class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 flex items-center justify-center hover:scale-110">
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-  </svg>
-</button>
-
-
-        </div> <!-- Indicador de zoom -->
+          <!-- Botón para ir a la imagen siguiente -->
+          <button (click)="navegarImagen('siguiente')"
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/60 hover:bg-black/80 text-white rounded-full transition-all duration-200 flex items-center justify-center hover:scale-110 backdrop-blur-sm border-2 border-white/20 z-10">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
 
       </div>
+
+
     </section>
   </div>
 
@@ -635,7 +659,147 @@
     </div>
   </div>
 
-  <!-- PARTE 9: Ubicacion -->
+  <!-- PARTE 9: Muni -->
+  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
+    <div *ngIf="municipalidad" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <!-- Lado Izquierdo: Nombre de la municipalidad-->
+      <div class="relative">
+        <!-- Frase de bienvenida -->
+        <div class="relative mb-8">
+          <blockquote
+            class="text-xl dark:text-orange-400 lg:text-5xl font-semibold text-orange-800 italic leading-relaxed text-center">
+            "{{ municipalidad.nombre }}"
+          </blockquote>
+          <!-- Decoración bajo el título -->
+          <div class="flex items-center justify-center mt-4">
+            <div class="h-1 w-20 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
+            <div class="w-3 h-3 bg-orange-500 rounded-full mx-3"></div>
+            <div class="h-1 w-12 bg-orange-300 rounded-full"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Lado Derecho: Frase y Descripción -->
+      <div class="relative">
+        <!-- Descripcion -->
+        <div class="flex items-start gap-4 bg-orange-400 dark:bg-orange-400 p-6 mx-4 
+            rounded-xl shadow-md max-w-4xl mx-auto">
+          <p class="text-base text-gray-100 dark:text-gray-200 font-bold text-justify leading-relaxed">
+            {{ municipalidad.descripcion }}
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PARTE 10: info extra -->
+  <section class="bg-white dark:bg-gray-900 py-20 px-10">
+    <div *ngIf="municipalidad" class="max-w-6xl mx-auto">
+
+      <!-- SECCIÓN MISIÓN -->
+      <section
+        class="bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 dark:from-orange-900 dark:via-orange-800 dark:to-orange-700 py-16 px-6">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <!-- Título -->
+          <div class="text-center md:text-left">
+            <h2 class="text-5xl font-extrabold text-orange-600 dark:text-white mb-4 drop-shadow-md">Nuestra Misión</h2>
+            <div class="w-24 h-1 bg-orange-400 rounded-full mx-auto md:mx-0 mb-4"></div>
+          </div>
+          <!-- Texto -->
+          <p class="text-gray-700 dark:text-orange-100 text-lg leading-relaxed text-center md:text-left">
+            {{ municipalidad.mision }}
+          </p>
+        </div>
+      </section>
+
+      <!-- SECCIÓN VISIÓN -->
+      <section class="bg-white dark:bg-gray-900 py-16 px-6 transition-colors">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <!-- Texto -->
+          <p class="text-gray-700 dark:text-orange-100 text-lg leading-relaxed text-center md:text-left">
+            {{ municipalidad.vision }}
+          </p>
+          <!-- Título -->
+          <div class="text-center md:text-left">
+            <h2 class="text-5xl font-extrabold text-orange-600 dark:text-white mb-4 drop-shadow-md">Nuestra Visión</h2>
+            <div class="w-24 h-1 bg-orange-400 rounded-full mx-auto md:mx-0 mb-4"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN VALORES -->
+      <section
+        class="bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-800 dark:to-orange-600 py-16 px-6">
+        <div class="text-center max-w-4xl mx-auto">
+          <h3 class="text-4xl font-bold text-orange-700 dark:text-white mb-8 tracking-tight">Nuestros Valores</h3>
+          <div class="flex flex-wrap justify-center gap-6">
+            <ng-container *ngFor="let valor of municipalidad.valores.split(',')">
+              <div
+                class="w-32 h-auto min-h-32 flex flex-col justify-between items-center rounded-lg p-4 bg-orange-500 text-white text-sm font-semibold shadow-lg hover:scale-110 hover:bg-orange-600 transition-transform duration-300">
+                <!-- Icono SVG (siempre a la misma altura) -->
+                <div class="flex items-center justify-center mb-2">
+                  <!-- Icono: Documento abierto (Transparencia) -->
+<svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+  <path
+    d="M6 2a2 2 0 00-2 2v16c0 1.1.9 2 2 2h9a2 2 0 002-2V8l-5-6H6zm7 1.5L17.5 8H13V3.5zM8 13h8v2H8v-2zm0 4h5v2H8v-2z" />
+</svg>
+
+                </div>
+                <!-- Texto centrado en el cuadro -->
+                <span class="block text-center flex-grow overflow-hidden text-ellipsis whitespace-normal break-words">{{
+                  valor.trim() }}</span>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SECCIÓN COMITÉ -->
+<section class="bg-white dark:bg-gray-900 py-20 px-6">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+    <!-- Imagen -->
+    <div *ngIf="imagenComite" class="relative overflow-hidden rounded-3xl shadow-2xl group">
+      <img [src]="imagenComite.url_completa" [alt]="imagenComite.descripcion?.titulo || 'comité'"
+        class="w-full h-[300px] object-cover transition-transform duration-700 group-hover:scale-105" />
+      <div class="absolute inset-0 bg-orange-600/30 group-hover:bg-orange-700/30 transition-colors"></div>
+    </div>
+    <!-- Texto -->
+    <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-3xl shadow-lg p-10 md:p-12 transition-all">
+  <h3 class="text-4xl font-bold text-orange-600 dark:text-white mb-6 text-center md:text-left tracking-tight drop-shadow-md">
+    Nuestro Comité
+  </h3>
+  
+  <div class="relative pl-4 border-l-4 border-orange-400 dark:border-orange-300">
+    <p class="text-lg text-gray-700 dark:text-orange-100 leading-relaxed max-w-3xl mx-auto md:mx-0">
+      {{ municipalidad.comite }}
+    </p>
+  </div>
+
+  <!-- Elemento decorativo opcional -->
+  <div class="mt-8 flex justify-center md:justify-start">
+    <div class="flex items-center gap-2 text-orange-500 dark:text-orange-200">
+      
+      <span class="font-medium">Comprometidos con el turismo sostenible</span>
+    </div>
+  </div>
+</div>
+
+  </div>
+</section>
+
+
+
+    </div>
+  </section>
+
+
+
+
+  <!-- PARTE 11: Ubicacion -->
   <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
     <div *ngIf="selectedEmprendedor"
       class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
@@ -808,43 +972,9 @@
     </div>
   </div>
 
-  <!-- PARTE 10: Muni -->
-  <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
-    <div *ngIf="municipalidad" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-      <!-- Lado Izquierdo: Nombre de la municipalidad-->
-      <div class="relative">
-        <!-- Frase de bienvenida -->
-        <div class="relative mb-8">
-          <blockquote
-            class="text-xl dark:text-orange-400 lg:text-5xl font-semibold text-orange-800 italic leading-relaxed text-center">
-            "{{ municipalidad.nombre }}"
-          </blockquote>
-          <!-- Decoración bajo el título -->
-          <div class="flex items-center justify-center mt-4">
-            <div class="h-1 w-20 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
-            <div class="w-3 h-3 bg-orange-500 rounded-full mx-3"></div>
-            <div class="h-1 w-12 bg-orange-300 rounded-full"></div>
-          </div>
-        </div>
 
-      </div>
 
-      <!-- Lado Derecho: Frase y Descripción -->
-      <div class="relative">
-        <!-- Descripcion -->
-        <div class="flex items-start gap-4 bg-orange-400 dark:bg-orange-400 p-6 mx-4 
-            rounded-xl shadow-md max-w-4xl mx-auto">
-          <p class="text-base text-gray-100 dark:text-gray-200 font-bold text-justify leading-relaxed">
-            {{ municipalidad.descripcion }}
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-  <!-- PARTE 11: Reseña -->
+  <!-- PARTE 12: Reseña -->
   <div class="py-4 px-4 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
     <!-- PARTE 9: RESEÑAS DE TURISTAS MEJORADA -->
     <div class="py-20 px-6 bg-white dark:bg-gray-900 transition-colors duration-300 relative overflow-hidden">
