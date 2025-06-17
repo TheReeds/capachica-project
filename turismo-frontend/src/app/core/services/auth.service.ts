@@ -524,4 +524,21 @@ export class AuthService {
         catchError(error => this.handleError(error))
       );
   }
+  /**
+   * Guarda la URL actual para redirección después del login
+   */
+  saveRedirectUrl(url: string): void {
+    localStorage.setItem('redirect_after_login', url);
+  }
+
+  /**
+   * Obtiene y limpia la URL de redirección guardada
+   */
+  getAndClearRedirectUrl(): string | null {
+    const url = localStorage.getItem('redirect_after_login');
+    if (url) {
+      localStorage.removeItem('redirect_after_login');
+    }
+    return url;
+  }
 }

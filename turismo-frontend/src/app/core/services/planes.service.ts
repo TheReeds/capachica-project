@@ -414,7 +414,94 @@ export class PlanesService {
     return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/emprendedores/${emprendedorId}/servicios`)
       .pipe(map(response => response.data || []));
   }
+  /**
+   * Obtener planes públicos (para usuarios no autenticados)
+   */
+  getPlanesPublicos(filtros: PlanFiltros = {}): Observable<PaginatedResponse<Plan>> {
+    let params = new HttpParams();
+    
+    // Forzar solo planes públicos
+    filtros.es_publico = true;
+    filtros.estado = 'activo';
+    
+    Object.keys(filtros).forEach(key => {
+      const value = (filtros as any)[key];
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
 
+    return this.http.get<ApiResponse<PaginatedResponse<Plan>>>(`${this.API_URL}/planes/publicos`, { params })
+      .pipe(map(response => response.data!));
+  }
+
+  /**
+   * Obtener plan público por ID (sin autenticación)
+   */
+  getPlanPublico(id: number): Observable<Plan> {
+    return this.http.get<ApiResponse<Plan>>(`${this.API_URL}/planes/publicos/${id}`)
+      .pipe(map(response => response.data!));
+  }
+
+  /**
+   * Buscar planes públicos
+   */
+  buscarPlanesPublicos(termino: string, filtros: Partial<PlanFiltros> = {}): Observable<Plan[]> {
+    let params = new HttpParams().set('q', termino);
+    
+    // Forzar solo planes públicos
+    filtros.es_publico = true;
+    filtros.estado = 'activo';
+    
+    Object.keys(filtros).forEach(key => {
+      const value = (filtros as any)[key];
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
+
+    return this.http.get<ApiResponse<Plan[]>>(`${this.API_URL}/planes/publicos/search`, { params })
+      .pipe(map(response => response.data || []));
+  }
+
+  /**
+   * Obtener planes destacados (para homepage)
+   */
+  getPlanesDestacados(limite: number = 6): Observable<Plan[]> {
+    const params = new HttpParams().set('limite', limite.toString());
+    
+    return this.http.get<ApiResponse<Plan[]>>(`${this.API_URL}/planes/destacados`, { params })
+      .pipe(map(response => response.data || []));
+  }
+
+  /**
+   * Obtener filtros disponibles para planes públicos
+   */
+  getFiltrosDisponibles(): Observable<{
+    dificultades: string[];
+    duraciones: { min: number; max: number };
+    precios: { min: number; max: number };
+    organizadores: { id: number; nombre: string }[];
+  }> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/planes/filtros-disponibles`)
+      .pipe(map(response => response.data!));
+  }
+
+  /**
+   * Verificar disponibilidad de cupos sin autenticación
+   */
+  verificarDisponibilidadCupos(planId: number, numeroParticipantes: number = 1): Observable<{
+    disponible: boolean;
+    cuposDisponibles: number;
+    mensaje?: string;
+  }> {
+    const params = new HttpParams()
+      .set('plan_id', planId.toString())
+      .set('numero_participantes', numeroParticipantes.toString());
+    
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/planes/verificar-cupos`, { params })
+      .pipe(map(response => response.data!));
+  }
   /**
    * Preparar FormData para envío de archivos (ACTUALIZADO)
    */

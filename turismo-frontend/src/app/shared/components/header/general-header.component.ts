@@ -78,7 +78,7 @@ import { Subscription, filter } from 'rxjs';
                 <span>Eventos</span>
                 <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-600 dark:bg-amber-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
-              <a routerLink="/contactos" 
+              <a routerLink="/planes" 
                 routerLinkActive="text-amber-800 dark:text-amber-400 font-medium border-b-2 border-amber-600 dark:border-amber-500" 
                 class="flex items-center text-gray-800 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-400 py-1 transition-colors duration-200 relative group"
               >
