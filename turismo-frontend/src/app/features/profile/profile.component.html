@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+
     <div class="max-w-5xl mx-auto">
       <!-- Cabecera del perfil -->
       <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8 transition-colors duration-300">
@@ -220,33 +220,63 @@
               </div>
             </div>
             
-            <!-- Foto de perfil -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto de perfil</label>
-              <div class="flex items-start space-x-6">
-                <div>
-                  <div *ngIf="user?.foto_perfil" class="h-24 w-24 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
-                    <img [src]="user?.foto_perfil" alt="Foto de perfil" class="h-full w-full object-cover" />
-                  </div>
-                  <div *ngIf="!user?.foto_perfil" class="h-24 w-24 rounded-md flex items-center justify-center bg-gray-100 dark:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                </div>
-                <div class="flex-1">
-                  <input 
-                    type="file" 
-                    id="foto_perfil" 
-                    (change)="onFileChange($event)" 
-                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:text-gray-400 dark:file:bg-blue-900 dark:file:text-blue-200"
-                    accept="image/*"
-                  />
-                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">PNG, JPG, GIF hasta 5MB</p>
-                  <p *ngIf="fileError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ fileError }}</p>
-                </div>
-              </div>
-            </div>
+<!-- Foto de perfil -->
+<div>
+  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto de perfil</label>
+  <div class="flex items-start space-x-6">
+    <!-- Imagen actual o vista previa -->
+    <div>
+      <!-- Mostrar vista previa si hay una imagen seleccionada -->
+      <div *ngIf="previewUrl" class="h-24 w-24 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700 relative">
+        <img [src]="previewUrl" alt="Vista previa" class="h-full w-full object-cover" />
+        <!-- Indicador de que es una vista previa -->
+        <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs px-1 rounded-bl">
+          Vista previa
+        </div>
+      </div>
+      
+      <!-- Mostrar imagen actual si no hay vista previa pero existe foto de perfil -->
+      <div *ngIf="!previewUrl && user?.foto_perfil" class="h-24 w-24 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
+        <img [src]="user?.foto_perfil" alt="Foto de perfil" class="h-full w-full object-cover" />
+      </div>
+      
+      <!-- Mostrar placeholder si no hay imagen ni vista previa -->
+      <div *ngIf="!previewUrl && !user?.foto_perfil" class="h-24 w-24 rounded-md flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </div>
+    </div>
+    
+    <div class="flex-1">
+      <input 
+        type="file" 
+        id="foto_perfil" 
+        (change)="onFileChange($event)" 
+        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:text-gray-400 dark:file:bg-blue-900 dark:file:text-blue-200"
+        accept="image/*"
+      />
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">PNG, JPG, GIF hasta 5MB</p>
+      <p *ngIf="fileError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ fileError }}</p>
+      
+      <!-- Botones de acción cuando hay una vista previa -->
+      <div *ngIf="previewUrl" class="mt-3 flex space-x-2">
+        <button 
+          type="button"
+          (click)="saveProfilePhoto()" 
+          class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+          Guardar
+        </button>
+        <button 
+          type="button"
+          (click)="cancelSelection()" 
+          class="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
             
             <!-- Botones de acción -->
             <div class="flex justify-end space-x-3">
@@ -361,4 +391,3 @@
         </div>
       </div>
     </div>
-  </div>
