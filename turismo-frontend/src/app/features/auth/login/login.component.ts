@@ -110,14 +110,14 @@ export class LoginComponent implements OnInit {
           this.loading = false;
           return;
         }
-        // Esperar a que el perfil esté cargado y el rol disponible
+        
+        // Esperar a que el perfil esté cargado antes de redirigir
         this.authService.loadUserProfile(true).subscribe({
           next: () => {
-            if (this.authService.administraEmprendimientos()) {
-              this.router.navigate(['/seleccion-panel']);
-            } else {
-              this.router.navigate(['/dashboard']);
-            }
+            this.loading = false;
+            
+            // USAR EL NUEVO MÉTODO para manejar redirección con queryParams
+            this.authService.handlePostLoginRedirectWithParams(this.router, this.route);
           },
           error: () => {
             this.error = 'Error al cargar el perfil de usuario';

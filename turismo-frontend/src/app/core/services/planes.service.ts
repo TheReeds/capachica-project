@@ -439,7 +439,7 @@ export class PlanesService {
    * Obtener plan público por ID (sin autenticación)
    */
   getPlanPublico(id: number): Observable<Plan> {
-    return this.http.get<ApiResponse<Plan>>(`${this.API_URL}/planes/publicos/${id}`)
+    return this.http.get<ApiResponse<Plan>>(`${this.API_URL}/planes/${id}`)
       .pipe(map(response => response.data!));
   }
 

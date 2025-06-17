@@ -161,6 +161,12 @@ class MenuController extends Controller
                         'path' => '/admin/reservas/mis-reservas',
                         'permissions' => ['user_read'],
                     ],
+                    [
+                        'id' => 'mis-inscripciones',
+                        'title' => 'Mis Inscripciones',
+                        'path' => '/admin/reservas/mis-inscripciones',
+                        'permissions' => ['user_read'],
+                    ], 
                 ]
             ],
             [

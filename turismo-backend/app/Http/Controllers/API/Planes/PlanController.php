@@ -290,4 +290,58 @@ class PlanController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    /**
+     * Obtener planes públicos con filtros específicos
+     */
+    /**
+     * Obtener planes públicos con filtros específicos
+     */
+    public function publicos(Request $request): JsonResponse
+    {
+        try {
+            $filtros = $request->only([
+                'con_cupos',
+                'dificultad',
+                'duracion_min',
+                'duracion_max',
+                'precio_min',
+                'precio_max',
+                'buscar',
+                'emprendedor_id',
+                'organizador_id'
+            ]);
+            
+            // Limpiar filtros vacíos
+            $filtros = array_filter($filtros, function($value) {
+                return $value !== null && $value !== '';
+            });
+            
+            $perPage = min($request->get('per_page', 15), 50); // Máximo 50 por página
+            
+            // Usar el método simple si hay problemas con relaciones complejas
+            $planes = $this->planService->getPlanesPublicos($filtros, $perPage);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $planes,
+                'meta' => [
+                    'filtros_aplicados' => $filtros,
+                    'per_page' => $perPage,
+                    'current_page' => $planes->currentPage(),
+                    'total' => $planes->total(),
+                    'last_page' => $planes->lastPage(),
+                    'has_more_pages' => $planes->hasMorePages()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener planes públicos: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud',
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno del servidor'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

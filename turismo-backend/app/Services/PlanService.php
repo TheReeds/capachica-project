@@ -631,4 +631,120 @@ class PlanService
             'organizador_principal' => $plan->organizador_principal?->nombre,
         ];
     }
+    /**
+     * Obtener planes públicos optimizado para catálogo público
+     */
+    public function getPlanesPublicos(array $filtros = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = Plan::with([
+            'emprendedor:id,nombre,ubicacion', // Legacy para compatibilidad
+            'emprendedores:id,nombre,ubicacion,telefono', // Múltiples emprendedores
+            'organizadorPrincipal:id,nombre,ubicacion,telefono', // Organizador principal
+            'dias:id,plan_id,numero_dia', // Removido 'nombre' que no existe
+            'inscripciones:id,plan_id,estado,numero_participantes'
+        ])
+        ->select([
+            'id', 'nombre', 'descripcion', 'que_incluye', 'capacidad', 
+            'duracion_dias', 'precio_total', 'dificultad', 'imagen_principal', 
+            'imagenes_galeria', 'emprendedor_id', 'created_at', 'updated_at'
+        ]);
+        
+        // Aplicar filtros básicos obligatorios
+        $query->publicos()->activos();
+        
+        // Filtro de cupos disponibles
+        if (!empty($filtros['con_cupos']) && $filtros['con_cupos'] === 'true') {
+            $query->conCuposDisponibles();
+        }
+        
+        // Filtro por emprendedor (cualquier emprendedor participante)
+        if (!empty($filtros['emprendedor_id'])) {
+            $query->deEmprendedor($filtros['emprendedor_id']);
+        }
+        
+        // Filtro por organizador principal específico
+        if (!empty($filtros['organizador_id'])) {
+            $query->organizadoPor($filtros['organizador_id']);
+        }
+        
+        // Filtro por dificultad
+        if (!empty($filtros['dificultad'])) {
+            $query->where('dificultad', $filtros['dificultad']);
+        }
+        
+        // Filtros de duración
+        if (!empty($filtros['duracion_min'])) {
+            $query->where('duracion_dias', '>=', (int)$filtros['duracion_min']);
+        }
+        
+        if (!empty($filtros['duracion_max'])) {
+            $query->where('duracion_dias', '<=', (int)$filtros['duracion_max']);
+        }
+        
+        // Filtros de precio
+        if (!empty($filtros['precio_min'])) {
+            $query->where('precio_total', '>=', (float)$filtros['precio_min']);
+        }
+        
+        if (!empty($filtros['precio_max'])) {
+            $query->where('precio_total', '<=', (float)$filtros['precio_max']);
+        }
+        
+        // Búsqueda por texto
+        if (!empty($filtros['buscar'])) {
+            $query->buscar($filtros['buscar']);
+        }
+        
+        // Ordenamiento corregido para PostgreSQL
+        $query->orderByRaw('
+            CASE 
+                WHEN capacidad > (
+                    SELECT COALESCE(SUM(numero_participantes), 0) 
+                    FROM plan_inscripciones 
+                    WHERE plan_id = plans.id AND estado = ?
+                ) THEN 0 
+                ELSE 1 
+            END
+        ', ['confirmada']) // Parámetro preparado para PostgreSQL
+        ->orderBy('created_at', 'desc');
+        
+        $result = $query->paginate($perPage);
+        
+        // Agregar información calculada para cada plan
+        $result->getCollection()->transform(function ($plan) {
+            // Calcular cupos disponibles
+            $inscripcionesConfirmadas = $plan->inscripciones
+                ->where('estado', 'confirmada')
+                ->sum('numero_participantes');
+            
+            $plan->cupos_ocupados = $inscripcionesConfirmadas;
+            $plan->cupos_disponibles = max(0, $plan->capacidad - $inscripcionesConfirmadas);
+            $plan->porcentaje_ocupacion = $plan->capacidad > 0 
+                ? round(($inscripcionesConfirmadas / $plan->capacidad) * 100, 1)
+                : 0;
+            
+            // Información del organizador principal
+            $organizador = $plan->organizador_principal;
+            $plan->organizador = $organizador ? [
+                'id' => $organizador->id,
+                'nombre' => $organizador->nombre,
+                'ubicacion' => $organizador->ubicacion,
+                'telefono' => $organizador->telefono
+            ] : null;
+            
+            // Total de emprendedores participantes
+            $plan->total_emprendedores_participantes = $plan->emprendedores->count();
+            
+            // URLs de imágenes
+            $plan->imagen_principal_url = $plan->imagen_principal_url;
+            $plan->imagenes_galeria_urls = $plan->imagenes_galeria_urls;
+            
+            // Limpiar relaciones innecesarias para reducir payload
+            unset($plan->inscripciones);
+            
+            return $plan;
+        });
+        
+        return $result;
+    }
 }

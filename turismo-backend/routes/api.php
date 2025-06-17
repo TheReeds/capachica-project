@@ -134,10 +134,11 @@ Route::prefix('eventos')->group(function () {
 // Planes (rutas públicas)
 Route::prefix('planes')->group(function () {
     Route::get('/', [PlanController::class, 'index']); // Listar planes con filtros
+    Route::get('/publicos', [PlanController::class, 'publicos']); // NUEVO: Endpoint específico para planes públicos
     Route::get('/search', [PlanController::class, 'search']); // Buscar planes
     Route::get('/{id}', [PlanController::class, 'show']); // Ver plan específico
     
-    // NUEVO: Ver emprendedores de un plan (público)
+    // Ver emprendedores de un plan (público)
     Route::get('/{id}/emprendedores', [PlanEmprendedoresController::class, 'index']);
 });
 

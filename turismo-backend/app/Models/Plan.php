@@ -337,17 +337,17 @@ class Plan extends Model
         ];
     }
     
-    // Scopes
+    // Scopes    
     public function scopeActivos($query)
     {
         return $query->where('estado', self::ESTADO_ACTIVO);
     }
-    
+
     public function scopePublicos($query)
     {
         return $query->where('es_publico', true);
     }
-    
+
     // SCOPE ACTUALIZADO - buscar por cualquier emprendedor del plan
     public function scopeDeEmprendedor($query, $emprendedorId)
     {
@@ -355,49 +355,50 @@ class Plan extends Model
             $q->where('emprendedores.id', $emprendedorId);
         });
     }
-    
+
     // NUEVO SCOPE - buscar por organizador principal
     public function scopeOrganizadoPor($query, $emprendedorId)
     {
         return $query->whereHas('emprendedores', function($q) use ($emprendedorId) {
             $q->where('emprendedores.id', $emprendedorId)
-              ->where('plan_emprendedores.es_organizador_principal', true);
+            ->where('plan_emprendedores.es_organizador_principal', true);
         });
     }
-    
+
     // NUEVO SCOPE - buscar donde el emprendedor es colaborador
     public function scopeColaborandoEn($query, $emprendedorId)
     {
         return $query->whereHas('emprendedores', function($q) use ($emprendedorId) {
             $q->where('emprendedores.id', $emprendedorId)
-              ->where('plan_emprendedores.rol', 'colaborador');
+            ->where('plan_emprendedores.rol', 'colaborador');
         });
     }
-    
+
+    // SCOPE CORREGIDO - Compatible con PostgreSQL
     public function scopeConCuposDisponibles($query)
     {
-        return $query->whereRaw('capacidad > (
-            SELECT COALESCE(SUM(numero_participantes), 0) 
-            FROM plan_inscripciones 
-            WHERE plan_id = plans.id 
-            AND estado = "confirmada"
-        )');
+        return $query->where('capacidad', '>', function($subquery) {
+            $subquery->selectRaw('COALESCE(SUM(numero_participantes), 0)')
+                    ->from('plan_inscripciones')
+                    ->whereColumn('plan_id', 'plans.id')
+                    ->where('estado', 'confirmada');
+        });
     }
-    
+
     public function scopePorDificultad($query, $dificultad)
     {
         return $query->where('dificultad', $dificultad);
     }
-    
+
     public function scopeBuscar($query, $termino)
     {
         return $query->where(function($q) use ($termino) {
-            $q->where('nombre', 'like', "%{$termino}%")
-              ->orWhere('descripcion', 'like', "%{$termino}%")
-              ->orWhere('que_incluye', 'like', "%{$termino}%");
+            $q->where('nombre', 'ILIKE', "%{$termino}%") // ILIKE para PostgreSQL (case insensitive)
+            ->orWhere('descripcion', 'ILIKE', "%{$termino}%")
+            ->orWhere('que_incluye', 'ILIKE', "%{$termino}%");
         });
     }
-    
+
     /**
      * Obtener el emprendedor que es organizador principal de este plan
      */
