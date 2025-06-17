@@ -62,6 +62,11 @@ export const ADMIN_ROUTES: Routes = [
         loadChildren: () => import('./turismo/evento/eventos.routes').then(m => m.EVENTOS_ROUTES),
         title: 'Gestión de Eventos'
       },
+        {
+        path: 'planes',
+        loadChildren: () => import('./turismo/planes/planes.routes').then(m => m.PLANES_ROUTES),
+        title: 'Gestion de Planes'
+      },
       {
         path: '',
         redirectTo: 'dashboard',

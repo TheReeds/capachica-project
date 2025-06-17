@@ -1289,15 +1289,7 @@ import {
           margin-bottom: 1rem;
         }
         
-        /* Vista lista en móvil */
-        .lg\:w-2\/5 {
-          width: 100% !important;
-          height: 250px !important;
-        }
         
-        .lg\:w-3\/5 {
-          width: 100% !important;
-        }
         
         /* Hero section mobile */
         .hero-section {

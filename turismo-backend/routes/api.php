@@ -9,6 +9,7 @@ use App\Http\Controllers\API\Auth\GoogleAuthController;
 use App\Http\Controllers\API\Dashboard\DashboardController;
 use App\Http\Controllers\API\Emprendedores\EmprendedorController;
 use App\Http\Controllers\API\Emprendedores\MisEmprendimientosController;
+use App\Http\Controllers\API\Emprendedores\EmprendedorPlanesController;
 use App\Http\Controllers\API\Evento\EventController;
 use App\Http\Controllers\API\PageGeneral\MunicipalidadController;
 use App\Http\Controllers\API\PageGeneral\SliderController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\API\Servicios\CategoriaController;
 use App\Http\Controllers\API\Servicios\ServicioController;
 use App\Http\Controllers\API\Planes\PlanController;
 use App\Http\Controllers\API\Planes\PlanInscripcionController;
+use App\Http\Controllers\API\Planes\PlanEmprendedoresController; // NUEVO
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\API\Reservas\CarritoReservaController;
 
@@ -37,7 +39,6 @@ use Illuminate\Support\Facades\Route;
 // ===== RUTAS PÚBLICAS =====
 
 // Autenticación
-// Rutas públicas de autenticación
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/', fn() => response()->json(['status' => 'ok']));
@@ -57,8 +58,6 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 // Rutas para recuperación de contraseña
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-// Rutas para Google Authentication
-
 
 // ===== RUTAS PÚBLICAS DEL SISTEMA DE TURISMO =====
 
@@ -106,9 +105,7 @@ Route::prefix('servicios')->group(function () {
     Route::get('/', [ServicioController::class, 'index']);
     Route::get('/emprendedor/{emprendedorId}', [ServicioController::class, 'byEmprendedor']);
     Route::get('/categoria/{categoriaId}', [ServicioController::class, 'byCategoria']);
-    // Nueva ruta para verificar disponibilidad (no requiere autenticación)
     Route::get('/verificar-disponibilidad', [ServicioController::class, 'verificarDisponibilidad']);
-    // Nueva ruta para obtener servicios por ubicación
     Route::get('/ubicacion', [ServicioController::class, 'byUbicacion']);
     Route::get('/{id}', [ServicioController::class, 'show']);
 });
@@ -118,37 +115,114 @@ Route::prefix('categorias')->group(function () {
     Route::get('/', [CategoriaController::class, 'index']);
     Route::get('/{id}', [CategoriaController::class, 'show']);
 });
-Route::get('/users/search', [UserController::class, 'search']);
-// Evento
 
+// Búsqueda de usuarios (pública)
+Route::get('/users/search', [UserController::class, 'search']);
+
+// Eventos
 Route::prefix('eventos')->group(function () {
     Route::get('/', [EventController::class, 'index']);
-    
-    // Rutas específicas primero
     Route::get('/proximos', [EventController::class, 'proximosEventos']);
     Route::get('/activos', [EventController::class, 'eventosActivos']);
     Route::get('/emprendedor/{emprendedorId}', [EventController::class, 'byEmprendedor']);
-    
-    // Rutas con ID después
     Route::get('/{id}', [EventController::class, 'show']);
     Route::put('/{id}', [EventController::class, 'update']);
     Route::delete('/{id}', [EventController::class, 'destroy']);
-
-    // Crear
     Route::post('/', [EventController::class, 'store']);
 });
 
+// Planes (rutas públicas)
 Route::prefix('planes')->group(function () {
-    Route::get('/publicos', [PlanController::class, 'getPublicPlanes']);
-    Route::get('/{id}', [PlanController::class, 'show']);
+    Route::get('/', [PlanController::class, 'index']); // Listar planes con filtros
+    Route::get('/search', [PlanController::class, 'search']); // Buscar planes
+    Route::get('/{id}', [PlanController::class, 'show']); // Ver plan específico
+    
+    // NUEVO: Ver emprendedores de un plan (público)
+    Route::get('/{id}/emprendedores', [PlanEmprendedoresController::class, 'index']);
 });
+
+// ===== RUTAS PÚBLICAS ESPECÍFICAS PARA CATÁLOGO =====
+Route::prefix('public')->group(function () {
+    // Planes públicos para mostrar en landing page o catálogo público
+    Route::get('/planes', function(Request $request) {
+        $planes = \App\Models\Plan::with([
+                'emprendedor:id,nombre,ubicacion', // Legacy
+                'emprendedores:id,nombre,ubicacion' // Nuevo - múltiples emprendedores
+            ])
+            ->publicos()
+            ->activos()
+            ->conCuposDisponibles()
+            ->select('id', 'nombre', 'descripcion', 'duracion_dias', 'precio_total', 'imagen_principal', 'emprendedor_id', 'dificultad')
+            ->paginate(12);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $planes
+        ]);
+    });
+    
+    Route::get('/planes/{id}', function($id) {
+        $plan = \App\Models\Plan::with([
+            'emprendedor:id,nombre,ubicacion,telefono,email', // Legacy
+            'emprendedores:id,nombre,ubicacion,telefono,email', // Nuevo
+            'organizadorPrincipal:id,nombre,ubicacion,telefono,email', // Organizador principal
+            'dias.servicios:id,nombre,descripcion,precio'
+        ])
+        ->publicos()
+        ->activos()
+        ->find($id);
+        
+        if (!$plan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Plan no encontrado'
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => $plan
+        ]);
+    });
+    
+    // ACTUALIZADO: Incluir planes donde el emprendedor participa (no solo organiza)
+    Route::get('/emprendedores/{emprendedorId}/planes', function($emprendedorId) {
+        $planes = \App\Models\Plan::with([
+                'emprendedores' => function($query) use ($emprendedorId) {
+                    $query->where('emprendedores.id', $emprendedorId);
+                }
+            ])
+            ->whereHas('emprendedores', function($query) use ($emprendedorId) {
+                $query->where('emprendedores.id', $emprendedorId);
+            })
+            ->publicos()
+            ->activos()
+            ->conCuposDisponibles()
+            ->select('id', 'nombre', 'descripcion', 'duracion_dias', 'precio_total', 'imagen_principal', 'dificultad')
+            ->get();
+        
+        // Agregar información del rol del emprendedor en cada plan
+        $planes->each(function($plan) use ($emprendedorId) {
+            $emprendedor = $plan->emprendedores->first();
+            if ($emprendedor) {
+                $plan->mi_rol = $emprendedor->pivot->rol;
+                $plan->soy_organizador_principal = $emprendedor->pivot->es_organizador_principal;
+            }
+        });
+        
+        return response()->json([
+            'success' => true,
+            'data' => $planes
+        ]);
+    });
+});
+
 // ===== RUTAS PROTEGIDAS =====
 Route::middleware('auth:sanctum')->group(function () {
     // Perfil de usuario
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
-    // Reenviar correo de verificación
     Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail']);
     
     // Menú dinámico
@@ -186,12 +260,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [AsociacionController::class, 'destroy'])->middleware('permission:asociacion_delete');
         Route::get('/{id}/emprendedores/detallado', [AsociacionController::class, 'getEmprendedores'])
             ->middleware('permission:asociacion_read');
-            
-        // Obtener asociaciones por municipalidad (versión protegida)
         Route::get('/municipalidad/{municipalidadId}/admin', [AsociacionController::class, 'getByMunicipalidad'])
             ->middleware('permission:asociacion_read');
-            
-        // Búsqueda por ubicación (versión protegida con más opciones)
         Route::post('/ubicacion/buscar-avanzada', [AsociacionController::class, 'getByUbicacion'])
             ->middleware('permission:asociacion_read');
     });
@@ -206,6 +276,23 @@ Route::middleware('auth:sanctum')->group(function () {
         // Gestión de administradores de emprendimientos
         Route::post('/{id}/administradores', [EmprendedorController::class, 'agregarAdministrador']);
         Route::delete('/{id}/administradores/{userId}', [EmprendedorController::class, 'eliminarAdministrador']);
+        
+        // ===== GESTIÓN DE PLANES POR EMPRENDEDORES (ACTUALIZADO) =====
+        Route::prefix('{emprendedorId}/planes')->group(function () {
+            Route::get('/', [EmprendedorPlanesController::class, 'index']);
+            // Parámetros disponibles: ?tipo_rol=organizando|colaborando|todos&solo_activos=true|false
+            
+            Route::get('/{planId}', [EmprendedorPlanesController::class, 'show']);
+            Route::get('/{planId}/inscripciones', [EmprendedorPlanesController::class, 'inscripciones']);
+            Route::get('/{planId}/estadisticas', [EmprendedorPlanesController::class, 'estadisticas']);
+            Route::patch('/{planId}/inscripciones/{inscripcionId}/confirmar', 
+                        [EmprendedorPlanesController::class, 'confirmarInscripcion']);
+            Route::patch('/{planId}/inscripciones/{inscripcionId}/cancelar', 
+                        [EmprendedorPlanesController::class, 'cancelarInscripcion']);
+        });
+        
+        // Resumen de todos los planes del emprendedor
+        Route::get('/{emprendedorId}/planes-resumen', [EmprendedorPlanesController::class, 'resumen']);
     });
     
     // Servicios (rutas protegidas)
@@ -222,8 +309,43 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [CategoriaController::class, 'destroy']);
     });
     
-    // Reservas (nuevas rutas)
-    // Reservas
+    // ===== PLANES (rutas protegidas) =====
+    Route::prefix('planes')->group(function () {
+        Route::post('/', [PlanController::class, 'store']); // Crear plan
+        Route::put('/{id}', [PlanController::class, 'update']); // Actualizar plan
+        Route::patch('/{id}', [PlanController::class, 'update']); // Actualización parcial
+        Route::delete('/{id}', [PlanController::class, 'destroy']); // Eliminar plan
+        Route::patch('/{id}/estado', [PlanController::class, 'cambiarEstado']); // Cambiar estado
+        Route::get('/{id}/estadisticas', [PlanController::class, 'estadisticas']); // Estadísticas del plan
+        
+        // ===== NUEVAS RUTAS: GESTIÓN DE EMPRENDEDORES EN PLANES =====
+        Route::prefix('{plan}/emprendedores')->group(function () {
+            Route::get('/', [PlanEmprendedoresController::class, 'index']); // Listar emprendedores del plan
+            Route::post('/', [PlanEmprendedoresController::class, 'store']); // Agregar emprendedor al plan
+            Route::put('/{emprendedor}', [PlanEmprendedoresController::class, 'update']); // Actualizar rol del emprendedor
+            Route::delete('/{emprendedor}', [PlanEmprendedoresController::class, 'destroy']); // Remover emprendedor del plan
+            Route::post('/cambiar-organizador', [PlanEmprendedoresController::class, 'cambiarOrganizadorPrincipal']); // Cambiar organizador principal
+            Route::get('/disponibles', [PlanEmprendedoresController::class, 'emprendedoresDisponibles']); // Emprendedores disponibles para agregar
+        });
+    });
+    
+    // ===== INSCRIPCIONES A PLANES =====
+    Route::prefix('inscripciones')->group(function () {
+        // Mis inscripciones
+        Route::get('/mis-inscripciones', [PlanInscripcionController::class, 'misInscripciones']);
+        Route::get('/proximas', [PlanInscripcionController::class, 'proximasInscripciones']);
+        Route::get('/en-progreso', [PlanInscripcionController::class, 'inscripcionesEnProgreso']);
+        
+        // Gestión de inscripciones
+        Route::post('/', [PlanInscripcionController::class, 'inscribirse']); // Inscribirse a un plan
+        Route::get('/{id}', [PlanInscripcionController::class, 'show']); // Ver inscripción
+        Route::put('/{id}', [PlanInscripcionController::class, 'update']); // Actualizar inscripción
+        Route::patch('/{id}/cancelar', [PlanInscripcionController::class, 'cancelar']); // Cancelar inscripción
+        Route::patch('/{id}/completar', [PlanInscripcionController::class, 'marcarCompletada']); // Marcar como completada
+        Route::delete('/{id}', [PlanInscripcionController::class, 'destroy']); // Eliminar inscripción
+    });
+    
+    // ===== RESERVAS =====
     Route::prefix('reservas')->group(function () {
         // Rutas específicas (deben ir primero)
         Route::get('carrito', [CarritoReservaController::class, 'obtenerCarrito']);
@@ -247,18 +369,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('{id}/estado', [ReservaController::class, 'cambiarEstado']);
     });
 
-    // Reserva Servicios (nuevas rutas)
+    // Reserva Servicios
     Route::prefix('reserva-servicios')->group(function () {
-        // Obtener servicios por reserva
         Route::get('/reserva/{reservaId}', [ReservaServicioController::class, 'byReserva']);
-        
-        // Cambiar estado de un servicio reservado
         Route::put('/{id}/estado', [ReservaServicioController::class, 'cambiarEstado']);
-        
-        // Obtener servicios para calendario
         Route::get('/calendario', [ReservaServicioController::class, 'calendario']);
-        
-        // Verificar disponibilidad de un servicio
         Route::get('/verificar-disponibilidad', [ReservaServicioController::class, 'verificarDisponibilidad']);
     });
     
@@ -272,57 +387,105 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [RoleController::class, 'update'])->middleware('permission:role_update');
         Route::delete('/{id}', [RoleController::class, 'destroy'])->middleware('permission:role_delete');
     });
-    Route::get('/users/{id}/permissions', [PermissionController::class, 'getUserPermissions']);
+    
     // Permisos
+    Route::get('/users/{id}/permissions', [PermissionController::class, 'getUserPermissions']);
     Route::prefix('permissions')->middleware('permission:permission_read')->group(function () {
         Route::get('/', [PermissionController::class, 'index']);
         Route::post('/assign-to-user', [PermissionController::class, 'assignPermissionsToUser'])->middleware('permission:permission_assign');
         Route::post('/assign-to-role', [PermissionController::class, 'assignPermissionsToRole'])->middleware('permission:permission_assign');
-        
     });
     
     // Gestión de Usuarios
     Route::prefix('users')->middleware('can:user_read')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::get('/{id}', [UserController::class, 'show']);
-        
-        // Creación de usuario (requiere permiso user_create)
         Route::post('/', [UserController::class, 'store'])->middleware('can:user_create');
         
-        // Actualización de usuario (requiere permiso user_update)
         Route::middleware('can:user_update')->group(function () {
             Route::put('/{id}', [UserController::class, 'update']);
             Route::patch('/{id}', [UserController::class, 'update']);
             Route::post('/{id}/activate', [UserController::class, 'activate']);
             Route::post('/{id}/deactivate', [UserController::class, 'deactivate']);
             Route::post('/{id}/roles', [UserController::class, 'assignRoles']);
-            
-            // Gestión de foto de perfil
             Route::post('/{id}/profile-photo', [UserController::class, 'updateProfilePhoto']);
             Route::delete('/{id}/profile-photo', [UserController::class, 'deleteProfilePhoto']);
         });
         
-        // Eliminación de usuario (requiere permiso user_delete)
         Route::delete('/{id}', [UserController::class, 'destroy'])->middleware('can:user_delete');
     });
-    Route::prefix('planes')->group(function () {
-        Route::get('/', [PlanController::class, 'index']);
-        Route::post('/', [PlanController::class, 'store']);
-        Route::put('/{id}', [PlanController::class, 'update']);
-        Route::delete('/{id}', [PlanController::class, 'destroy']);
+    
+    // ===== ADMINISTRACIÓN DE PLANES (ACTUALIZADO) =====
+    Route::prefix('admin/planes')->middleware('permission:user_read')->group(function () {
+        Route::get('/todos', [PlanController::class, 'index']);
+        Route::get('/estadisticas-generales', function() {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'total_planes' => \App\Models\Plan::count(),
+                    'planes_activos' => \App\Models\Plan::activos()->count(),
+                    'planes_publicos' => \App\Models\Plan::publicos()->count(),
+                    'total_inscripciones' => \App\Models\PlanInscripcion::count(),
+                    'inscripciones_confirmadas' => \App\Models\PlanInscripcion::confirmadas()->count(),
+                    'inscripciones_pendientes' => \App\Models\PlanInscripcion::pendientes()->count(),
+                    'ingresos_totales' => \App\Models\PlanInscripcion::confirmadas()->sum('precio_pagado') ?? 0,
+                    
+                    // ACTUALIZADO: Estadísticas de emprendedores participantes
+                    'emprendedores_con_planes' => \App\Models\PlanEmprendedor::distinct('emprendedor_id')->count('emprendedor_id'),
+                    'emprendedores_organizadores' => \App\Models\PlanEmprendedor::where('rol', 'organizador')->distinct('emprendedor_id')->count('emprendedor_id'),
+                    'emprendedores_colaboradores' => \App\Models\PlanEmprendedor::where('rol', 'colaborador')->distinct('emprendedor_id')->count('emprendedor_id'),
+                    'planes_colaborativos' => \App\Models\Plan::has('emprendedores', '>', 1)->count(),
+                    
+                    'planes_por_dificultad' => [
+                        'facil' => \App\Models\Plan::where('dificultad', 'facil')->count(),
+                        'moderado' => \App\Models\Plan::where('dificultad', 'moderado')->count(),
+                        'dificil' => \App\Models\Plan::where('dificultad', 'dificil')->count(),
+                    ],
+                    'planes_por_estado' => [
+                        'activos' => \App\Models\Plan::where('estado', 'activo')->count(),
+                        'inactivos' => \App\Models\Plan::where('estado', 'inactivo')->count(),
+                        'borradores' => \App\Models\Plan::where('estado', 'borrador')->count(),
+                    ]
+                ]
+            ]);
+        });
         
-        // Inscripciones a planes
-        Route::get('/mis-planes', [PlanInscripcionController::class, 'misPlanes']);
-        Route::post('/{planId}/inscribirse', [PlanInscripcionController::class, 'inscribirse']);
-        Route::put('/inscripciones/{inscripcionId}/cancelar', [PlanInscripcionController::class, 'cancelarInscripcion']);
-        Route::put('/inscripciones/{inscripcionId}/confirmar', [PlanInscripcionController::class, 'confirmarInscripcion']);
-        Route::post('/inscripciones/{inscripcionId}/generar-reservas', [PlanInscripcionController::class, 'generarReservas']);
+        // Gestión avanzada de inscripciones para administradores
+        Route::get('/inscripciones/todas', function(Request $request) {
+            $query = \App\Models\PlanInscripcion::with(['plan:id,nombre', 'usuario:id,name,email']);
+            
+            if ($request->has('estado')) {
+                $query->where('estado', $request->estado);
+            }
+            
+            if ($request->has('plan_id')) {
+                $query->where('plan_id', $request->plan_id);
+            }
+            
+            if ($request->has('fecha_desde')) {
+                $query->where('fecha_inscripcion', '>=', $request->fecha_desde);
+            }
+            
+            if ($request->has('fecha_hasta')) {
+                $query->where('fecha_inscripcion', '<=', $request->fecha_hasta);
+            }
+            
+            $inscripciones = $query->orderBy('created_at', 'desc')->paginate(20);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $inscripciones
+            ]);
+        });
     });
+    
     // Dashboard
     Route::prefix('dashboard')->middleware('permission:user_read')->group(function () {
         Route::get('/summary', [DashboardController::class, 'summary']);
     });
 });
+
+// Status endpoint
 Route::get('/status', function () {
     return response()->json([
         'status' => 'online',

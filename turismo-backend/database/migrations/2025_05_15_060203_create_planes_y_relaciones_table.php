@@ -35,7 +35,7 @@ return new class extends Migration {
         });
 
         // Tabla para las inscripciones de usuarios a planes
-        Schema::create('plan_inscriptions', function (Blueprint $table) {
+        Schema::create('plan_inscripciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('plan_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

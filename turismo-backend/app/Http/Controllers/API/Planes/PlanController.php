@@ -3,286 +3,290 @@
 namespace App\Http\Controllers\API\Planes;
 
 use App\Http\Controllers\Controller;
+use App\Services\PlanService;
+use App\Http\Requests\PlanRequest;
 use Illuminate\Http\Request;
-use App\Models\Plan;
-use App\Models\Servicio;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class PlanController extends Controller
 {
-    /**
-     * Obtener todos los planes (para administradores)
-     */
-    public function index(): JsonResponse
+    protected $planService;
+
+    public function __construct(PlanService $planService)
     {
-        // Si es admin, mostrar todos los planes, si no, solo los públicos o creados por el usuario
-        $planes = Auth::user()->hasRole('admin') 
-                ? Plan::with(['creadoPor', 'services'])->paginate(15)
-                : Plan::where('es_publico', true)
-                    ->orWhere('creado_por_usuario_id', Auth::id())
-                    ->with(['creadoPor', 'services'])
-                    ->paginate(15);
-        
-        return response()->json([
-            'success' => true,
-            'data' => $planes
-        ]);
+        $this->planService = $planService;
     }
-    
+
     /**
-     * Obtener planes públicos (para usuarios)
+     * Obtener todos los planes con filtros opcionales
      */
-    public function getPublicPlanes(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $planes = Plan::where('es_publico', true)
-                    ->where('estado', Plan::ESTADO_ACTIVO)
-                    ->with(['services'])
-                    ->paginate(15);
-        
-        return response()->json([
-            'success' => true,
-            'data' => $planes
-        ]);
-    }
-    
-    /**
-     * Mostrar detalles de un plan
-     */
-    public function show(int $id): JsonResponse
-    {
-        $plan = Plan::with(['creadoPor', 'services', 'inscripciones.usuario'])->find($id);
-        
-        if (!$plan) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Plan no encontrado'
-            ], Response::HTTP_NOT_FOUND);
-        }
-        
-        // Verificar permisos - solo el creador o administrador puede ver detalles completos
-        $showFullDetails = Auth::user()->hasRole('admin') || $plan->creado_por_usuario_id === Auth::id();
-        
-        if (!$showFullDetails && !$plan->es_publico) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para ver este plan'
-            ], Response::HTTP_FORBIDDEN);
-        }
-        
-        $data = $plan->toArray();
-        
-        // Filtrar datos sensibles si no es administrador o creador
-        if (!$showFullDetails) {
-            unset($data['inscripciones']);
-            $data['cupos_disponibles'] = $plan->cupos_disponibles;
-        }
-        
-        return response()->json([
-            'success' => true,
-            'data' => $data
-        ]);
-    }
-    
-    /**
-     * Crear un nuevo plan (solo administradores o roles con permiso)
-     */
-    public function store(Request $request): JsonResponse
-    {
-        // Validación
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'capacidad' => 'required|integer|min:1',
-            'es_publico' => 'boolean',
-            'services' => 'required|array|min:1',
-            'services.*.service_id' => 'required|exists:servicios,id',
-            'services.*.fecha_inicio' => 'required|date_format:Y-m-d',
-            'services.*.fecha_fin' => 'nullable|date_format:Y-m-d|after_or_equal:services.*.fecha_inicio',
-            'services.*.hora_inicio' => 'required|date_format:H:i:s',
-            'services.*.hora_fin' => 'required|date_format:H:i:s|after:services.*.hora_inicio',
-            'services.*.duracion_minutos' => 'required|integer|min:1',
-            'services.*.notas' => 'nullable|string',
-            'services.*.orden' => 'nullable|integer|min:0',
-        ]);
-        
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-        
         try {
-            // Crear el plan
-            $plan = Plan::create([
-                'nombre' => $request->nombre,
-                'descripcion' => $request->descripcion,
-                'capacidad' => $request->capacidad,
-                'es_publico' => $request->es_publico ?? true,
-                'estado' => Plan::ESTADO_ACTIVO,
-                'creado_por_usuario_id' => Auth::id(),
+            $filtros = $request->only([
+                'emprendedor_id',
+                'estado',
+                'es_publico',
+                'dificultad',
+                'buscar',
+                'con_cupos',
+                'duracion_min',
+                'duracion_max',
+                'precio_min',
+                'precio_max',
+                'todos'
             ]);
             
-            // Añadir servicios al plan
-            foreach ($request->services as $index => $servicioData) {
-                $servicio = Servicio::find($servicioData['service_id']);
-                
-                if ($servicio) {
-                    $plan->services()->attach($servicio->id, [
-                        'fecha_inicio' => $servicioData['fecha_inicio'],
-                        'fecha_fin' => $servicioData['fecha_fin'] ?? null,
-                        'hora_inicio' => $servicioData['hora_inicio'],
-                        'hora_fin' => $servicioData['hora_fin'],
-                        'duracion_minutos' => $servicioData['duracion_minutos'],
-                        'notas' => $servicioData['notas'] ?? null,
-                        'orden' => $servicioData['orden'] ?? $index,
-                    ]);
-                }
-            }
+            $perPage = $request->get('per_page', 15);
+            $planes = $this->planService->getAll($filtros, $perPage);
             
             return response()->json([
                 'success' => true,
-                'data' => $plan->load('services'),
-                'message' => 'Plan creado exitosamente'
+                'data' => $planes
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener planes: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Crear un nuevo plan
+     */
+    public function store(PlanRequest $request): JsonResponse
+    {
+        try {
+            $data = $request->validated();
+            $data['creado_por_usuario_id'] = Auth::id();
+            
+            $plan = $this->planService->create($data);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Plan creado correctamente',
+                'data' => $plan
             ], Response::HTTP_CREATED);
         } catch (\Exception $e) {
+            Log::error('Error al crear plan: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear el plan: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     /**
-     * Actualizar un plan existente
+     * Obtener un plan específico
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function show($id): JsonResponse
     {
-        $plan = Plan::find($id);
-        
-        if (!$plan) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Plan no encontrado'
-            ], Response::HTTP_NOT_FOUND);
-        }
-        
-        // Verificar permisos
-        if (!Auth::user()->hasRole('admin') && $plan->creado_por_usuario_id !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para editar este plan'
-            ], Response::HTTP_FORBIDDEN);
-        }
-        
-        // Validación
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'sometimes|string|max:255',
-            'descripcion' => 'nullable|string',
-            'capacidad' => 'sometimes|integer|min:1',
-            'es_publico' => 'boolean',
-            'estado' => 'sometimes|in:activo,inactivo',
-            'services' => 'sometimes|array',
-            'services.*.id' => 'nullable|integer',
-            'services.*.service_id' => 'required|exists:servicios,id',
-            'services.*.fecha_inicio' => 'required|date_format:Y-m-d',
-            'services.*.fecha_fin' => 'nullable|date_format:Y-m-d|after_or_equal:services.*.fecha_inicio',
-            'services.*.hora_inicio' => 'required|date_format:H:i:s',
-            'services.*.hora_fin' => 'required|date_format:H:i:s|after:services.*.hora_inicio',
-            'services.*.duracion_minutos' => 'required|integer|min:1',
-            'services.*.notas' => 'nullable|string',
-            'services.*.orden' => 'nullable|integer|min:0',
-        ]);
-        
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-        
         try {
-            // Actualizar los datos del plan
-            $plan->fill($request->only([
-                'nombre', 'descripcion', 'capacidad', 'es_publico', 'estado'
-            ]));
+            $id = (int) $id;
+            $plan = $this->planService->getById($id);
             
-            $plan->save();
-            
-            // Actualizar los servicios del plan si se proporcionan
-            if ($request->has('services')) {
-                // Desasociar todos los servicios actuales
-                $plan->services()->detach();
-                
-                // Asociar los nuevos servicios
-                foreach ($request->services as $index => $servicioData) {
-                    $servicio = Servicio::find($servicioData['service_id']);
-                    
-                    if ($servicio) {
-                        $plan->services()->attach($servicio->id, [
-                            'fecha_inicio' => $servicioData['fecha_inicio'],
-                            'fecha_fin' => $servicioData['fecha_fin'] ?? null,
-                            'hora_inicio' => $servicioData['hora_inicio'],
-                            'hora_fin' => $servicioData['hora_fin'],
-                            'duracion_minutos' => $servicioData['duracion_minutos'],
-                            'notas' => $servicioData['notas'] ?? null,
-                            'orden' => $servicioData['orden'] ?? $index,
-                        ]);
-                    }
-                }
+            if (!$plan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Plan no encontrado'
+                ], Response::HTTP_NOT_FOUND);
             }
             
             return response()->json([
                 'success' => true,
-                'data' => $plan->load('services'),
-                'message' => 'Plan actualizado exitosamente'
+                'data' => $plan
             ]);
         } catch (\Exception $e) {
+            Log::error('Error al obtener plan: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Actualizar un plan existente
+     */
+    public function update(PlanRequest $request, $id): JsonResponse
+    {
+        try {
+            $id = (int) $id;
+            $data = $request->validated();
+            
+            $plan = $this->planService->update($id, $data);
+            
+            if (!$plan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Plan no encontrado'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Plan actualizado correctamente',
+                'data' => $plan
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar plan: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar el plan: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     /**
      * Eliminar un plan
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy($id): JsonResponse
     {
-        $plan = Plan::find($id);
-        
-        if (!$plan) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Plan no encontrado'
-            ], Response::HTTP_NOT_FOUND);
-        }
-        
-        // Verificar permisos
-        if (!Auth::user()->hasRole('admin') && $plan->creado_por_usuario_id !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para eliminar este plan'
-            ], Response::HTTP_FORBIDDEN);
-        }
-        
         try {
-            // Eliminar plan y sus relaciones
-            $plan->services()->detach();
-            $plan->delete();
+            $id = (int) $id;
+            
+            $deleted = $this->planService->delete($id);
+            
+            if (!$deleted) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Plan no encontrado'
+                ], Response::HTTP_NOT_FOUND);
+            }
             
             return response()->json([
                 'success' => true,
-                'message' => 'Plan eliminado exitosamente'
+                'message' => 'Plan eliminado correctamente'
             ]);
         } catch (\Exception $e) {
+            Log::error('Error al eliminar plan: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar el plan: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Buscar planes
+     */
+    public function search(Request $request): JsonResponse
+    {
+        try {
+            $termino = $request->get('q', '');
+            $filtros = $request->only(['dificultad', 'emprendedor_id']);
+            
+            if (empty($termino)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Término de búsqueda requerido'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            
+            $planes = $this->planService->buscar($termino, $filtros);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $planes
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al buscar planes: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la búsqueda: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Obtener estadísticas de un plan
+     */
+    public function estadisticas($id): JsonResponse
+    {
+        try {
+            $id = (int) $id;
+            $estadisticas = $this->planService->getEstadisticas($id);
+            
+            if (empty($estadisticas)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Plan no encontrado'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => $estadisticas
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener estadísticas del plan: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Cambiar estado de un plan
+     */
+    public function cambiarEstado(Request $request, $id): JsonResponse
+    {
+        try {
+            $id = (int) $id;
+            $nuevoEstado = $request->get('estado');
+            
+            if (!in_array($nuevoEstado, ['activo', 'inactivo', 'borrador'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Estado no válido'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            
+            $plan = $this->planService->getById($id);
+            
+            if (!$plan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Plan no encontrado'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            // Verificar permisos
+            if (!Auth::user()->hasRole('admin') && 
+                $plan->creado_por_usuario_id !== Auth::id() &&
+                (!$plan->emprendedor || !$plan->emprendedor->administradores()->where('users.id', Auth::id())->exists())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes permisos para modificar este plan'
+                ], Response::HTTP_FORBIDDEN);
+            }
+            
+            $planActualizado = $this->planService->update($id, ['estado' => $nuevoEstado]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Estado del plan actualizado correctamente',
+                'data' => $planActualizado
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar estado del plan: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

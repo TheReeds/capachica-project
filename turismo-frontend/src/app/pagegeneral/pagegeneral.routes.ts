@@ -41,6 +41,11 @@ export const PAGEGENERAL_ROUTES: Routes = [
         loadChildren: () =>
           import('./servicio/servicios/servicios.routes').then(m => m.SERVICIOS_ROUTES)
       },
+      {
+        path: 'planes',
+        loadChildren: () =>
+          import('./planes/planes.routes').then(m => m.PLANES_GENERAL_ROUTES)
+      },
       { 
         path: 'contactos', 
         component: ContactosComponent, 

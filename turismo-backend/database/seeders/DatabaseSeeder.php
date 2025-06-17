@@ -56,40 +56,143 @@ class DatabaseSeeder extends Seeder
     {
         // Crear permisos
         $permissions = [
+            // Gestión de usuarios
             'user_create', 'user_read', 'user_update', 'user_delete',
+            
+            // Gestión de roles
             'role_create', 'role_read', 'role_update', 'role_delete',
+            
+            // Gestión de permisos
             'permission_read', 'permission_assign',
+            
+            // Gestión de emprendedores
             'emprendedor_create', 'emprendedor_read', 'emprendedor_update', 'emprendedor_delete',
+            
+            // Gestión de servicios
             'servicio_create', 'servicio_read', 'servicio_update', 'servicio_delete',
+            
+            // Gestión de categorías
             'categoria_create', 'categoria_read', 'categoria_update', 'categoria_delete',
+            
+            // Gestión de asociaciones
             'asociacion_create', 'asociacion_read', 'asociacion_update', 'asociacion_delete',
-            'municipalidad_update', 'municipalidad_read',
-            'reserva_create', 'reserva_read', 'reserva_update', 'reserva_delete'
+            
+            // Gestión de municipalidades
+            'municipalidad_create', 'municipalidad_read', 'municipalidad_update', 'municipalidad_delete',
+            
+            // Gestión de reservas
+            'reserva_create', 'reserva_read', 'reserva_update', 'reserva_delete',
+            
+            // Gestión de sliders
+            'slider_create', 'slider_read', 'slider_update', 'slider_delete',
+            
+            // Gestión de eventos
+            'evento_create', 'evento_read', 'evento_update', 'evento_delete',
+            
+            // Gestión de planes
+            'plan_create', 'plan_read', 'plan_update', 'plan_delete',
+            'plan_manage_emprendedores', 'plan_manage_inscripciones',
+            
+            // Gestión de inscripciones a planes
+            'inscripcion_create', 'inscripcion_read', 'inscripcion_update', 'inscripcion_delete',
+            'inscripcion_confirmar', 'inscripcion_cancelar',
+            
+            // Dashboard y reportes
+            'dashboard_read', 'estadisticas_read',
+            
+            // Administración avanzada
+            'admin_planes_read', 'admin_inscripciones_read'
         ];
         
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
         }
-        
+
         // Crear roles
         $adminRole = Role::create(['name' => 'admin']);
         $userRole = Role::create(['name' => 'user']);
         $emprendedorRole = Role::create(['name' => 'emprendedor']);
-        
+        $moderadorRole = Role::create(['name' => 'moderador']);
+
         // Asignar todos los permisos al rol admin
         $adminRole->givePermissionTo(Permission::all());
-        
-        // Asignar permisos limitados al rol user
+
+        // Asignar permisos limitados al rol user (turista/cliente)
         $userRole->givePermissionTo([
-            'user_read', 'emprendedor_read', 'servicio_read', 
-            'categoria_read', 'asociacion_read', 'municipalidad_read',
-            'reserva_create', 'reserva_read', 'reserva_update'
+            // Lectura de contenido público
+            'emprendedor_read', 'servicio_read', 'categoria_read', 
+            'asociacion_read', 'municipalidad_read', 'evento_read',
+            'plan_read', 'slider_read',
+            
+            // Gestión de sus propias reservas
+            'reserva_create', 'reserva_read', 'reserva_update',
+            
+            // Gestión de sus propias inscripciones a planes
+            'inscripcion_create', 'inscripcion_read', 'inscripcion_update',
+            'inscripcion_cancelar',
+            
+            // Su propio perfil
+            'user_read'
         ]);
-        
+
         // Asignar permisos de emprendedor
         $emprendedorRole->givePermissionTo([
-            'emprendedor_read', 'servicio_create', 'servicio_read', 
-            'servicio_update', 'servicio_delete', 'reserva_read'
+            // Lectura general
+            'emprendedor_read', 'servicio_read', 'categoria_read', 
+            'asociacion_read', 'municipalidad_read', 'evento_read',
+            'plan_read', 'slider_read', 'user_read',
+            
+            // Gestión de sus servicios
+            'servicio_create', 'servicio_update', 'servicio_delete',
+            
+            // Gestión de sus eventos
+            'evento_create', 'evento_update', 'evento_delete',
+            
+            // Gestión de sus planes
+            'plan_create', 'plan_read', 'plan_update', 'plan_delete',
+            'plan_manage_emprendedores', 'plan_manage_inscripciones',
+            
+            // Gestión de inscripciones a sus planes
+            'inscripcion_read', 'inscripcion_update', 'inscripcion_confirmar', 
+            'inscripcion_cancelar',
+            
+            // Gestión de reservas (ver las de sus servicios)
+            'reserva_read', 'reserva_update',
+            
+            // Sus propias inscripciones como cliente
+            'inscripcion_create',
+            
+            // Gestión básica de sliders para su contenido
+            'slider_create', 'slider_update', 'slider_delete',
+            
+            // Acceso a estadísticas básicas
+            'estadisticas_read'
+        ]);
+
+        // Nuevo rol: Moderador (para administrar contenido sin permisos de sistema)
+        $moderadorRole->givePermissionTo([
+            // Lectura completa
+            'user_read', 'emprendedor_read', 'servicio_read', 'categoria_read',
+            'asociacion_read', 'municipalidad_read', 'evento_read', 'plan_read',
+            'slider_read', 'reserva_read', 'inscripcion_read',
+            
+            // Gestión de contenido
+            'emprendedor_update', 'servicio_update', 'evento_update',
+            'plan_update', 'slider_update',
+            
+            // Gestión de asociaciones y municipalidades
+            'asociacion_create', 'asociacion_update', 'asociacion_delete',
+            'municipalidad_create', 'municipalidad_update', 'municipalidad_delete',
+            
+            // Gestión de categorías
+            'categoria_create', 'categoria_update', 'categoria_delete',
+            
+            // Moderación de reservas e inscripciones
+            'reserva_update', 'inscripcion_update', 'inscripcion_confirmar',
+            'inscripcion_cancelar',
+            
+            // Acceso a dashboard y estadísticas
+            'dashboard_read', 'estadisticas_read'
         ]);
     }
     
