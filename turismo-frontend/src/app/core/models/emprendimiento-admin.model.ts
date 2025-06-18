@@ -1,3 +1,14 @@
+import type {
+  Emprendimiento,
+  Servicio,
+  AdminRequest,
+  ServicioPopular,
+} from './emprendimiento.model';
+
+// Exportar interfaces de emprendimiento para uso externo
+export type { Emprendimiento, Servicio, AdminRequest, ServicioPopular } from './emprendimiento.model';
+
+// Modelos base reutilizables
 export interface Usuario {
   id: number;
   name: string;
@@ -271,13 +282,6 @@ export interface DashboardEmprendimiento {
   total_reservas_confirmadas: number;
   reservas_proximas: Reserva[];
   servicios_populares: ServicioPopular[];
-}
-
-export interface ServicioPopular {
-  servicio_id: number;
-  nombre: string;
-  total_reservas: number;
-  ingresos_totales: string;
 }
 
 export interface CalendarioEvento {
