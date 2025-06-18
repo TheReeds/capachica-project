@@ -43,7 +43,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
                 id="search" 
                 [(ngModel)]="searchTerm" 
                 placeholder="Nombre o descripción" 
-                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                class="input-estilo block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
             </div>
           </div>
@@ -54,7 +54,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
               <select 
                 id="emprendedor" 
                 [(ngModel)]="selectedEmprendedorId" 
-                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                class="select-estilo block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todos</option>
                 @for (emprendedor of emprendedores; track emprendedor.id) {
@@ -70,7 +70,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
               <select 
                 id="categoria" 
                 [(ngModel)]="selectedCategoriaId" 
-                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                class="select-estilo block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todas</option>
                 @for (categoria of categorias; track categoria.id) {
@@ -86,7 +86,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
               <select 
                 id="estado" 
                 [(ngModel)]="selectedEstado" 
-                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                class="select-estilo block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               >
                 <option [ngValue]="null">Todos</option>
                 <option [ngValue]="true">Activos</option>

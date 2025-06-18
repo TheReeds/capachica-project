@@ -143,7 +143,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
                 [(ngModel)]="filtros.codigo"
                 (ngModelChange)="aplicarFiltros()"
                 placeholder="Código de reserva"
-                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-colors duration-200"
+                class="input-estilo block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-colors duration-200"
               >
             </div>
           </div>
@@ -155,7 +155,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
                 id="estado"
                 [(ngModel)]="filtros.estado"
                 (ngModelChange)="aplicarFiltros()"
-                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:text-white transition-colors duration-200"
+                class="select-estilo block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:text-white transition-colors duration-200"
               >
                 <option value="">Todos</option>
                 <option value="pendiente">Pendiente</option>
@@ -174,7 +174,7 @@ import { AdminHeaderComponent } from '../../../../../shared/components/admin-hea
                 id="fecha"
                 [(ngModel)]="filtros.fecha_inicio"
                 (ngModelChange)="aplicarFiltros()"
-                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:text-white transition-colors duration-200"
+                class="input-estilo block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:text-white transition-colors duration-200"
               >
             </div>
           </div>
