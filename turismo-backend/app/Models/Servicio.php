@@ -122,4 +122,5 @@ class Servicio extends Model
             
         return !$reservaExistente;
     }
+    
 }

@@ -5,6 +5,7 @@ import { ReservaDetailComponent } from './reserva-detalles/reserva-detalles.comp
 import { ReservaCalendarioComponent } from './reserva-calendario/reserva-calendario.component';
 import { ReservaServicioComponent } from './reserva-servicio/reserva-servicio.component';
 import { MisReservasComponent } from './mis-reservas/mis-reservas.component';
+import { MisInscripcionesComponent } from './mis-inscripciones/mis-inscripciones.component';
 
 export const RESERVAS_ROUTES: Routes = [
   {
@@ -38,5 +39,9 @@ export const RESERVAS_ROUTES: Routes = [
   {
     path: 'mis-reservas',
     component: MisReservasComponent
+  },
+  {
+    path: 'mis-inscripciones',
+    component: MisInscripcionesComponent
   }
 ];

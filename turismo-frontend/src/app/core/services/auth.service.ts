@@ -293,6 +293,15 @@ export class AuthService {
   
   // Método para manejar la redirección después del login basado en si el usuario administra emprendimientos
   handlePostLoginRedirect() {
+    // Primero verificar si hay queryParams guardados en localStorage
+    const savedRedirect = this.getAndClearRedirectUrl();
+    
+    if (savedRedirect) {
+      // Si hay una URL guardada, usarla
+      this.router.navigateByUrl(savedRedirect);
+      return;
+    }
+
     // Verificar si el usuario administra emprendimientos
     if (this.currentUser() && this._profileLoaded() && this._isLoggedIn()) {
       // Obtener los datos del perfil actual
@@ -318,6 +327,22 @@ export class AuthService {
     } else {
       // Por defecto, ir al dashboard
       this.router.navigate(['/dashboard']);
+    }
+  }
+
+  // NUEVO MÉTODO: Manejar redirección con router y route (para usar desde componentes)
+  handlePostLoginRedirectWithParams(router: any, route: any): void {
+    const queryParams = route.snapshot.queryParams;
+    
+    if (queryParams['redirect']) {
+      // Si hay una URL de redirección específica en queryParams
+      router.navigateByUrl(queryParams['redirect']);
+    } else if (queryParams['action'] === 'inscripcion' && queryParams['planId']) {
+      // Si venía de intentar inscribirse a un plan
+      router.navigate(['/planes/detalle', queryParams['planId']]);
+    } else {
+      // Usar el método existente para la lógica normal
+      this.handlePostLoginRedirect();
     }
   }
   
@@ -523,5 +548,22 @@ export class AuthService {
         }),
         catchError(error => this.handleError(error))
       );
+  }
+  /**
+   * Guarda la URL actual para redirección después del login
+   */
+  saveRedirectUrl(url: string): void {
+    localStorage.setItem('redirect_after_login', url);
+  }
+
+  /**
+   * Obtiene y limpia la URL de redirección guardada
+   */
+  getAndClearRedirectUrl(): string | null {
+    const url = localStorage.getItem('redirect_after_login');
+    if (url) {
+      localStorage.removeItem('redirect_after_login');
+    }
+    return url;
   }
 }

@@ -161,7 +161,20 @@ class MenuController extends Controller
                         'path' => '/admin/reservas/mis-reservas',
                         'permissions' => ['user_read'],
                     ],
+                    [
+                        'id' => 'mis-inscripciones',
+                        'title' => 'Mis Inscripciones',
+                        'path' => '/admin/reservas/mis-inscripciones',
+                        'permissions' => ['user_read'],
+                    ], 
                 ]
+            ],
+            [
+                'id' => 'planes',
+                'title' => 'Gestionar planes',
+                'icon' => 'chart',
+                'path' => '/admin/planes',
+                'permissions' => ['user_read'], 
             ],
             [
                 'id' => 'profile',
@@ -170,13 +183,7 @@ class MenuController extends Controller
                 'path' => '/admin/profile',
                 'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
             ],
-            [
-                'id' => 'planes',
-                'title' => 'Gestionar planes',
-                'icon' => 'user',
-                'path' => '/admin/planes',
-                'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
-            ],
+            
         ];
         
     

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API\Emprendedores;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EmprendedorRequest;
 use App\Models\User;
+use App\Models\Emprendedor;
+use App\Models\Reserva;
 use App\Services\EmprendedoresService;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -286,24 +288,54 @@ class EmprendedorController extends Controller
     /**
      * Obtener reservas de un emprendedor
      */
-    public function getReservas($id): JsonResponse
+    public function getReservas(int $id): JsonResponse
     {
-        // Convertir ID a entero
-        $id = (int) $id;
-        
-        $emprendedor = $this->emprendedorService->getById($id);
-        
-        if (!$emprendedor) {
+        try {
+            $emprendedor = Emprendedor::find($id);
+            
+            if (!$emprendedor) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Emprendedor no encontrado'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            // Verificar permisos
+            if (!Auth::user()->hasRole('admin') && 
+                !Auth::user()->emprendedores()->where('emprendedor_id', $id)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes permiso para ver estas reservas'
+                ], Response::HTTP_FORBIDDEN);
+            }
+            
+            // Obtener reservas a través de los servicios del emprendedor
+            $reservas = Reserva::whereHas('servicios', function($query) use ($id) {
+                $query->where('emprendedor_id', $id);
+            })
+            ->where('estado', '!=', Reserva::ESTADO_EN_CARRITO) // Excluir carritos
+            ->with([
+                'usuario:id,name,email',
+                'servicios' => function($query) use ($id) {
+                    $query->where('emprendedor_id', $id)
+                        ->with(['servicio:id,nombre,precio_referencial', 'emprendedor:id,nombre']);
+                }
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $reservas
+            ], Response::HTTP_OK);
+            
+        } catch (\Exception $e) {
+            Log::error('Error al obtener reservas del emprendedor: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Emprendedor no encontrado'
-            ], 404);
+                'message' => 'Error al procesar la solicitud'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
-        return response()->json([
-            'success' => true,
-            'data' => $emprendedor->reservas()->with('user')->get()
-        ]);
     }
     
     /**

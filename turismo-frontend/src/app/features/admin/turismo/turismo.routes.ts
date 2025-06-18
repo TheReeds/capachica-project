@@ -35,5 +35,6 @@ export const TURISMO_ROUTES: Routes = [
     path: 'asociaciones',
     loadChildren: () => import('./asociaciones/asociaciones.routes').then(m => m.ASOCIACIONES_ROUTES),
     title: 'Gestión de Asociaciones'
-  }
+  },
+  
 ];

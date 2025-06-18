@@ -155,12 +155,14 @@ export interface ExtendedUser extends User {
   emprendimientos_count?: number;
   emprendimientos?: UserEnterprise[];
 }
+
 export interface UserEnterprise {
   id: number;
   nombre: string;
   es_principal: boolean;
   rol: string;
 }
+
 export interface UserResponse {
   success: boolean;
   data: {

@@ -28,6 +28,7 @@ export class ProfileComponent implements OnInit {
   updateSuccess = false;
   fileError = '';
   selectedFile: File | null = null;
+  previewUrl: string | null = null; 
   userInitials = '';
   
   // Para controlar las pestañas
@@ -112,26 +113,34 @@ export class ProfileComponent implements OnInit {
     return 'U';
   }
   
-  onFileChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.fileError = '';
-    this.selectedFile = null;
+onFileChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  this.fileError = '';
+  
+  if (input.files && input.files.length) {
+    const file = input.files[0];
     
-    if (input.files && input.files.length) {
-      const file = input.files[0];
-      if (!file.type.startsWith('image/')) {
-        this.fileError = 'El archivo debe ser una imagen.';
-        input.value = '';
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        this.fileError = 'La imagen no debe superar los 5MB.';
-        input.value = '';
-        return;
-      }
-      this.selectedFile = file;
+    // Validaciones existentes
+    if (!file.type.startsWith('image/')) {
+      this.fileError = 'El archivo debe ser una imagen.';
+      input.value = '';
+      this.clearPreview();
+      return;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      this.fileError = 'La imagen no debe superar los 5MB.';
+      input.value = '';
+      this.clearPreview();
+      return;
+    }
+    
+    // Guardar archivo y crear vista previa
+    this.selectedFile = file;
+    this.createPreview(file);
+  } else {
+    this.clearPreview();
   }
+}
   
   setActiveTab(tabName: string): void {
     this.activeTab = tabName;
@@ -204,6 +213,7 @@ export class ProfileComponent implements OnInit {
     this.updateError = '';
     this.fileError = '';
     this.selectedFile = null;
+    this.clearPreview();
     this.loadUserProfile();
   }
   
@@ -239,4 +249,33 @@ export class ProfileComponent implements OnInit {
   getRolesLength(): number {
     return this.user?.roles?.length || 0;
   }
+private createPreview(file: File): void {
+  const reader = new FileReader();
+  reader.onload = (e: any) => {
+    this.previewUrl = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+private clearPreview(): void {
+  this.selectedFile = null;
+  this.previewUrl = null;
+}
+
+cancelSelection(): void {
+  this.clearPreview();
+  this.fileError = '';
+  // Limpiar el input file
+  const fileInput = document.getElementById('foto_perfil') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
+  }
+}
+
+saveProfilePhoto(): void {
+  // Esta funcionalidad ya la tienes en tu método onSubmit()
+  // Solo necesitas llamar a onSubmit() desde el botón "Guardar"
+  this.onSubmit();
+}
+  
 }
