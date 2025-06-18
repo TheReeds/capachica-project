@@ -17,8 +17,9 @@ import {
   template: `
           <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
             <!-- Hero Section -->
-            <section class="relative bg-gradient-to-r from-emerald-600 to-blue-600 text-white py-20">
-              <div class="absolute inset-0 bg-black/20"></div>
+            <section class="relative text-white py-20"
+            style="background-image: url('https://labrujuladelazar.wordpress.com/wp-content/uploads/2020/04/ebd31-111.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.8;">
+            <div class="absolute inset-0 bg-black/40"></div>
               <div class="relative container mx-auto px-4 text-center">
                 <h1 class="text-4xl md:text-6xl font-bold mb-6">
                   Emprendimientos Locales
