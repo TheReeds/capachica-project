@@ -21,9 +21,12 @@ import {
   MetaPlanResponse,
   MetaEmprendedorResponse,
   EmprendedorPlan,
-  EmprendedorInfo
+  EmprendedorInfo,
+  Emprendimiento,
+  Servicio,
+  AdminRequest,
+  ServicioPopular
 } from '../models/emprendimiento-admin.model';
-import { Emprendimiento, Servicio, AdminRequest } from '../models/emprendimiento.model';
 
 @Injectable({
   providedIn: 'root'
@@ -115,7 +118,7 @@ export class EmprendimientoAdminService {
     );
   }
 
-   // ==================== GESTIÓN DE SERVICIOS ====================
+    // ==================== GESTIÓN DE SERVICIOS ====================
 
   /**
    * Obtener todos los servicios de un emprendimiento
@@ -673,3 +676,4 @@ export class EmprendimientoAdminService {
     throw error;
   }
 }
+   
