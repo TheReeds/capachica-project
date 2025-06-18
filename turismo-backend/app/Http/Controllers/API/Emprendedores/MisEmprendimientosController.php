@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API\Emprendedores;
 
 use App\Http\Controllers\Controller;
 use App\Services\EmprendedoresService;
+use App\Models\Reserva;
+use App\Models\ReservaServicio;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -73,8 +75,7 @@ class MisEmprendimientosController extends Controller
                     'servicios.horarios',
                     'slidersPrincipales',
                     'slidersSecundarios.descripcion',
-                    'administradores',
-                    //'reservas'
+                    'administradores'
                 ])
                 ->where('emprendedores.id', $id)
                 ->first();
@@ -142,6 +143,7 @@ class MisEmprendimientosController extends Controller
     
     /**
      * Obtener las reservas de un emprendimiento específico del usuario
+     * ACTUALIZADO: Usando nueva estructura de reservas
      */
     public function getReservas($id): JsonResponse
     {
@@ -163,8 +165,20 @@ class MisEmprendimientosController extends Controller
                 ], Response::HTTP_NOT_FOUND);
             }
             
-            // Cargar las reservas
-            $reservas = $emprendimiento->reservas()->with(['user'])->get();
+            // NUEVA LÓGICA: Obtener reservas a través de reserva_servicios
+            $reservas = Reserva::whereHas('servicios', function($query) use ($id) {
+                $query->where('emprendedor_id', $id);
+            })
+            ->where('estado', '!=', Reserva::ESTADO_EN_CARRITO) // Excluir carritos
+            ->with([
+                'usuario:id,name,email,phone',
+                'servicios' => function($query) use ($id) {
+                    $query->where('emprendedor_id', $id)
+                          ->with('servicio:id,nombre,descripcion,precio_referencial');
+                }
+            ])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
             
             return response()->json([
                 'success' => true,
@@ -172,6 +186,183 @@ class MisEmprendimientosController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error al obtener reservas del emprendimiento: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    /**
+     * NUEVO: Obtener dashboard con estadísticas del emprendimiento
+     */
+    public function dashboard($id): JsonResponse
+    {
+        try {
+            $id = (int) $id;
+            $user = Auth::user();
+            
+            // Verificar permisos
+            $emprendimiento = $user->emprendimientos()
+                ->where('emprendedores.id', $id)
+                ->first();
+            
+            if (!$emprendimiento) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Emprendimiento no encontrado o no tienes permisos para acceder'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            $hoy = now()->format('Y-m-d');
+            $mesActual = now()->month;
+            $añoActual = now()->year;
+            
+            // Estadísticas del emprendimiento
+            $estadisticas = [
+                // Reservas de hoy
+                'reservas_hoy' => ReservaServicio::where('emprendedor_id', $id)
+                    ->where('fecha_inicio', $hoy)
+                    ->where('estado', '!=', ReservaServicio::ESTADO_EN_CARRITO)
+                    ->count(),
+                
+                // Reservas pendientes de confirmación
+                'reservas_pendientes' => ReservaServicio::where('emprendedor_id', $id)
+                    ->where('estado', ReservaServicio::ESTADO_PENDIENTE)
+                    ->count(),
+                
+                // Ingresos del mes actual
+                'ingresos_mes' => ReservaServicio::where('emprendedor_id', $id)
+                    ->whereMonth('created_at', $mesActual)
+                    ->whereYear('created_at', $añoActual)
+                    ->whereIn('estado', [ReservaServicio::ESTADO_CONFIRMADO, ReservaServicio::ESTADO_COMPLETADO])
+                    ->sum('precio') ?? 0,
+                
+                // Servicios activos
+                'servicios_activos' => $emprendimiento->servicios()
+                    ->where('estado', true)
+                    ->count(),
+                
+                // Total de reservas confirmadas
+                'total_reservas_confirmadas' => ReservaServicio::where('emprendedor_id', $id)
+                    ->whereIn('estado', [ReservaServicio::ESTADO_CONFIRMADO, ReservaServicio::ESTADO_COMPLETADO])
+                    ->count(),
+                
+                // Reservas próximas (próximos 7 días)
+                'reservas_proximas' => ReservaServicio::where('emprendedor_id', $id)
+                    ->where('fecha_inicio', '>=', $hoy)
+                    ->where('fecha_inicio', '<=', now()->addDays(7)->format('Y-m-d'))
+                    ->where('estado', ReservaServicio::ESTADO_CONFIRMADO)
+                    ->with([
+                        'reserva.usuario:id,name,email',
+                        'servicio:id,nombre,precio_referencial'
+                    ])
+                    ->orderBy('fecha_inicio')
+                    ->orderBy('hora_inicio')
+                    ->limit(10)
+                    ->get(),
+                
+                // Servicios más reservados del mes
+                'servicios_populares' => ReservaServicio::where('emprendedor_id', $id)
+                    ->whereMonth('created_at', $mesActual)
+                    ->whereYear('created_at', $añoActual)
+                    ->whereIn('estado', [ReservaServicio::ESTADO_CONFIRMADO, ReservaServicio::ESTADO_COMPLETADO])
+                    ->with('servicio:id,nombre')
+                    ->selectRaw('servicio_id, COUNT(*) as total_reservas, SUM(precio) as ingresos_generados')
+                    ->groupBy('servicio_id')
+                    ->orderBy('total_reservas', 'desc')
+                    ->limit(5)
+                    ->get()
+            ];
+            
+            return response()->json([
+                'success' => true,
+                'data' => $estadisticas
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error al obtener dashboard del emprendimiento: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    /**
+     * NUEVO: Obtener calendario de reservas del emprendimiento
+     */
+    public function getCalendario($id, Request $request): JsonResponse
+    {
+        try {
+            $id = (int) $id;
+            $user = Auth::user();
+            
+            // Verificar permisos
+            $emprendimiento = $user->emprendimientos()
+                ->where('emprendedores.id', $id)
+                ->first();
+            
+            if (!$emprendimiento) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Emprendimiento no encontrado o no tienes permisos para acceder'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            // Validar parámetros de fecha
+            $fechaInicio = $request->get('fecha_inicio', now()->startOfMonth()->format('Y-m-d'));
+            $fechaFin = $request->get('fecha_fin', now()->endOfMonth()->format('Y-m-d'));
+            
+            // Obtener reservas del emprendimiento en el rango de fechas
+            $reservas = ReservaServicio::where('emprendedor_id', $id)
+                ->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])
+                ->where('estado', '!=', ReservaServicio::ESTADO_EN_CARRITO)
+                ->with([
+                    'reserva.usuario:id,name,email,phone',
+                    'servicio:id,nombre,precio_referencial'
+                ])
+                ->orderBy('fecha_inicio')
+                ->orderBy('hora_inicio')
+                ->get();
+            
+            // Formatear para calendario
+            $eventosPorDia = $reservas->groupBy('fecha_inicio')->map(function($reservasDia) {
+                return $reservasDia->map(function($reserva) {
+                    return [
+                        'id' => $reserva->id,
+                        'titulo' => $reserva->servicio->nombre,
+                        'cliente' => $reserva->reserva->usuario->name,
+                        'email_cliente' => $reserva->reserva->usuario->email,
+                        'telefono_cliente' => $reserva->reserva->usuario->phone ?? null,
+                        'hora_inicio' => $reserva->hora_inicio,
+                        'hora_fin' => $reserva->hora_fin,
+                        'estado' => $reserva->estado,
+                        'precio' => $reserva->precio,
+                        'notas_cliente' => $reserva->notas_cliente,
+                        'duracion_minutos' => $reserva->duracion_minutos
+                    ];
+                });
+            });
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'fecha_inicio' => $fechaInicio,
+                    'fecha_fin' => $fechaFin,
+                    'eventos_por_dia' => $eventosPorDia,
+                    'total_reservas' => $reservas->count(),
+                    'ingresos_periodo' => $reservas->whereIn('estado', [
+                        ReservaServicio::ESTADO_CONFIRMADO, 
+                        ReservaServicio::ESTADO_COMPLETADO
+                    ])->sum('precio')
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error al obtener calendario del emprendimiento: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,

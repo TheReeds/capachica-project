@@ -193,7 +193,7 @@ class ReservaRepository
     {
         return $this->model->where('usuario_id', $usuarioId)
             ->where('estado', '!=', Reserva::ESTADO_EN_CARRITO)
-            ->with(['servicios.servicio', 'servicios.emprendedor', 'servicios.servicio.sliders'])
+            ->with(['servicios.servicio:id,nombre,descripcion,precio_referencial', 'servicios.emprendedor', 'servicios.servicio.sliders'])
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -217,10 +217,15 @@ class ReservaRepository
             $query->where('emprendedor_id', $emprendedorId);
         })
         ->where('estado', '!=', Reserva::ESTADO_EN_CARRITO)
-        ->with(['usuario', 'servicios' => function ($query) use ($emprendedorId) {
-            $query->where('emprendedor_id', $emprendedorId)
-                  ->with(['servicio', 'emprendedor']);
-        }])->get();
+        ->with([
+            'usuario:id,name,email',
+            'servicios' => function ($query) use ($emprendedorId) {
+                $query->where('emprendedor_id', $emprendedorId)
+                    ->with(['servicio:id,nombre,precio_referencial', 'emprendedor:id,nombre']);
+            }
+        ])
+        ->orderBy('created_at', 'desc')
+        ->get();
     }
     
     /**

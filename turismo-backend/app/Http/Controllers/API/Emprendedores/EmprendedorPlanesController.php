@@ -72,7 +72,7 @@ class EmprendedorPlanesController extends Controller
                 'dias.servicios',
                 'inscripciones',
                 'emprendedores' => function($q) {
-                    $q->select('id', 'nombre', 'ubicacion');
+                    $q->select('emprendedores.id', 'emprendedores.nombre', 'emprendedores.ubicacion');
                 }
             ])->get();
             

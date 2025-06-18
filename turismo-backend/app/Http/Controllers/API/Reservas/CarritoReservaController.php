@@ -161,9 +161,9 @@ class CarritoReservaController extends Controller
                 $carrito->save();
             }
             
-            // Obtener precio del servicio
+            // CORRECCIÓN: Obtener precio_referencial del servicio
             $servicio = $this->servicioRepository->findById($request->servicio_id);
-            $precio = $servicio ? $servicio->precio : 0;
+            $precio = $servicio ? $servicio->precio_referencial : 0;
             
             // Crear nuevo servicio en el carrito
             $servicioCarrito = new ReservaServicio([
@@ -176,7 +176,7 @@ class CarritoReservaController extends Controller
                 'hora_fin' => $request->hora_fin,
                 'duracion_minutos' => $request->duracion_minutos,
                 'cantidad' => $request->cantidad ?? 1,
-                'precio' => $precio,
+                'precio' => $precio, // Este es el precio específico de la reserva
                 'estado' => ReservaServicio::ESTADO_EN_CARRITO,
                 'notas_cliente' => $request->notas_cliente,
                 'notas_emprendedor' => null
@@ -187,7 +187,7 @@ class CarritoReservaController extends Controller
             DB::commit();
             
             // Retornar carrito actualizado
-            $carrito = $carrito->fresh(['servicios.servicio', 'servicios.emprendedor']);
+            $carrito = $carrito->fresh(['servicios.servicio:id,nombre,precio_referencial', 'servicios.emprendedor']);
             
             return response()->json([
                 'success' => true,

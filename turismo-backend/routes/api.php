@@ -233,8 +233,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('mis-emprendimientos')->group(function () {
         Route::get('/', [MisEmprendimientosController::class, 'index']);
         Route::get('/{id}', [MisEmprendimientosController::class, 'show']);
+        
+        // NUEVOS ENDPOINTS
+        Route::get('/{id}/dashboard', [MisEmprendimientosController::class, 'dashboard']);
+        Route::get('/{id}/calendario', [MisEmprendimientosController::class, 'getCalendario']);
+        
+        // ENDPOINTS EXISTENTES
         Route::get('/{id}/servicios', [MisEmprendimientosController::class, 'getServicios']);
-        Route::get('/{id}/reservas', [MisEmprendimientosController::class, 'getReservas']);
+        Route::get('/{id}/reservas', [MisEmprendimientosController::class, 'getReservas']); // ACTUALIZADO
+        
+        // Gestión de administradores
         Route::post('/{id}/administradores', [MisEmprendimientosController::class, 'agregarAdministrador']);
         Route::delete('/{id}/administradores/{userId}', [MisEmprendimientosController::class, 'eliminarAdministrador']);
     });
