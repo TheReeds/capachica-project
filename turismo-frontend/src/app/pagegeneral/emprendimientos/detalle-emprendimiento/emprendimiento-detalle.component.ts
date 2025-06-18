@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EmprendimientosService } from '../emprendimientos.service';
 import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-emprendimiento-detalle',
@@ -101,7 +102,9 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
           <!-- Botón de regreso -->
           <button
             (click)="volver()"
-            class="absolute top-4 left-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200">
+            class="absolute top-4 left-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 z-10"
+            title="Volver"
+            aria-label="Volver a la página anterior">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -449,6 +452,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
   private emprendimientosService = inject(EmprendimientosService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
 
   // Signals
   emprendimiento = signal<Emprendimiento | null>(null);
