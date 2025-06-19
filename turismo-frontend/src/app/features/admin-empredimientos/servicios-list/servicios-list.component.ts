@@ -4,294 +4,274 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EmprendimientoAdminService } from '../../../core/services/emprendimiento-admin.service';
 import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-admin.model';
-import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 @Component({
   selector: 'app-servicios-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <!-- Loading state glassmorphism -->
+    <div *ngIf="loading && servicios.length === 0" class="flex items-center justify-center h-64">
+      <div class="relative">
+        <div class="w-16 h-16 border-4 border-orange-200/30 rounded-full"></div>
+        <div class="w-16 h-16 border-4 border-orange-400 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+      </div>
+    </div>
+
+    <!-- Main content glassmorphism -->
+    <div *ngIf="!loading || servicios.length > 0" class="space-y-8">
       <!-- Header -->
-      <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <nav class="flex mb-3" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                  <li class="inline-flex items-center">
-                    <a routerLink="/admin-emprendedores/mis-emprendimientos" 
-                       class="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400">
-                      Mis Emprendimientos
-                    </a>
-                  </li>
-                  <li>
-                    <div class="flex items-center">
-                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                      </svg>
-                      <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId]" 
-                         class="ml-1 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400">
-                        {{ emprendimiento?.nombre || 'Emprendimiento' }}
-                      </a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="flex items-center">
-                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                      </svg>
-                      <span class="ml-1 text-gray-500 dark:text-gray-400">Servicios</span>
-                    </div>
-                  </li>
-                </ol>
-              </nav>
-              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                Servicios - {{ emprendimiento?.nombre || 'Cargando...' }}
-              </h1>
-              <p class="text-gray-600 dark:text-gray-400 mt-1">
-                Administra los servicios que ofreces en tu emprendimiento
-              </p>
-            </div>
-            <div class="flex items-center space-x-4">
-              <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId, 'servicio', 'nuevo']"
-                 class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                Nuevo Servicio
-              </a>
-              <button (click)="refreshData()" 
-                      [disabled]="loading"
-                      class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50">
-                <svg *ngIf="!loading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-                <div *ngIf="loading" class="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
-                Actualizar
-              </button>
-            </div>
-          </div>
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-orange-400 via-orange-300 to-amber-300 bg-clip-text text-transparent">
+            Servicios
+          </h1>
+          <p class="text-slate-300 dark:text-slate-400 mt-1">
+            Administra los servicios que ofreces en {{ emprendimiento?.nombre || 'tu emprendimiento' }}
+          </p>
         </div>
-      </header>
-
-      <!-- Loading State -->
-      <div *ngIf="loading && servicios.length === 0" class="flex justify-center items-center py-20">
-        <div class="relative">
-          <div class="w-16 h-16 border-4 border-orange-200 rounded-full"></div>
-          <div class="w-16 h-16 border-4 border-orange-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+        <div class="flex items-center gap-3">
+          <a [routerLink]="['nuevo']"
+             class="group flex items-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold shadow-lg hover:from-orange-600 hover:to-orange-500 transition-all duration-300 hover:shadow-xl">
+            <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            <span>Nuevo Servicio</span>
+          </a>
+          <button (click)="refreshData()" 
+                  [disabled]="loading"
+                  class="group flex items-center px-4 py-2.5 rounded-xl bg-white/10 dark:bg-slate-800/60 text-white hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60 disabled:opacity-50">
+            <svg *ngIf="!loading" class="h-5 w-5 mr-2 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <div *ngIf="loading" class="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            <span class="font-medium">Actualizar</span>
+          </button>
         </div>
       </div>
 
-      <!-- Error State -->
-      <div *ngIf="error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                Error al cargar los servicios
-              </h3>
-              <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                {{ error }}
+      <!-- Search and Filters glassmorphism -->
+      <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label for="search" class="block text-sm font-medium text-slate-300">
+              Buscar servicios
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
               </div>
-              <div class="mt-4">
-                <button (click)="loadServicios()" 
-                        class="bg-red-100 dark:bg-red-800 px-3 py-2 rounded-md text-sm font-medium text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-700">
-                  Reintentar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Search and Filters -->
-      <div *ngIf="!loading || servicios.length > 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Buscar servicios
-              </label>
               <input
                 type="text"
                 id="search"
                 [(ngModel)]="searchTerm"
                 (input)="applyFilters()"
                 placeholder="Nombre del servicio..."
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white">
+                class="block w-full pl-10 pr-3 py-3 border border-slate-600/50 rounded-xl bg-white/10 dark:bg-slate-800/30 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300">
             </div>
-            <div>
-              <label for="estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Estado
-              </label>
-              <select
-                id="estado"
-                [(ngModel)]="filtroEstado"
-                (change)="applyFilters()"
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white">
-                <option value="">Todos</option>
-                <option value="true">Activos</option>
-                <option value="false">Inactivos</option>
-              </select>
+          </div>
+          
+          <div class="space-y-2">
+            <label for="estado" class="block text-sm font-medium text-slate-300">
+              Estado
+            </label>
+            <select
+              id="estado"
+              [(ngModel)]="filtroEstado"
+              (change)="applyFilters()"
+              class="block w-full px-3 py-3 border border-slate-600/50 rounded-xl bg-white/10 dark:bg-slate-800/30 text-white focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300">
+              <option value="" class="bg-slate-800 text-white">Todos</option>
+              <option value="true" class="bg-slate-800 text-white">Activos</option>
+              <option value="false" class="bg-slate-800 text-white">Inactivos</option>
+            </select>
+          </div>
+          
+          <div class="flex items-end">
+            <button
+              (click)="clearFilters()"
+              class="w-full px-4 py-3 border border-white/20 dark:border-slate-600/50 rounded-xl text-sm font-medium text-slate-300 bg-white/10 dark:bg-slate-800/30 hover:bg-white/20 dark:hover:bg-slate-700/50 transition-all duration-300">
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error state glassmorphism -->
+      <div *ngIf="error" class="backdrop-blur-sm bg-red-500/20 border border-red-500/30 rounded-2xl p-6">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 text-red-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div>
+            <h3 class="text-red-200 font-semibold">Error al cargar los servicios</h3>
+            <p class="text-red-300 text-sm">{{ error }}</p>
+            <button (click)="loadServicios()" 
+                    class="mt-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-all duration-300 text-sm font-medium">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State glassmorphism -->
+      <div *ngIf="!loading && !error && servicios.length === 0" class="text-center py-16">
+        <svg class="mx-auto h-20 w-20 text-slate-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-white mb-2">No hay servicios</h3>
+        <p class="text-slate-300 dark:text-slate-400 mb-6">
+          Comienza creando tu primer servicio para este emprendimiento.
+        </p>
+        <a [routerLink]="['nuevo']"
+           class="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          Crear primer servicio
+        </a>
+      </div>
+
+      <!-- Services Grid glassmorphism -->
+      <div *ngIf="!loading && !error && filteredServicios.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let servicio of filteredServicios" 
+             class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/15 dark:hover:bg-slate-700/50 transition-all duration-300 group">
+          
+          <!-- Service Image -->
+          <div class="relative h-48 overflow-hidden">
+            <ng-container *ngIf="getServiceImage(servicio) as imageUrl; else noImageTemplate">
+              <img [src]="imageUrl" 
+                   [alt]="servicio.nombre" 
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            </ng-container>
+            <ng-template #noImageTemplate>
+              <div class="w-full h-full bg-gradient-to-br from-slate-700/80 to-slate-800/80 flex items-center justify-center">
+                <svg class="w-16 h-16 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+              </div>
+            </ng-template>
+            
+            <!-- Status Badge -->
+            <div class="absolute top-4 right-4">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border"
+                    [ngClass]="{
+                      'bg-green-500/20 text-green-300 border-green-400/30': servicio.estado,
+                      'bg-red-500/20 text-red-300 border-red-400/30': !servicio.estado
+                    }">
+                <div class="w-1.5 h-1.5 rounded-full mr-1"
+                     [ngClass]="{
+                       'bg-green-400': servicio.estado,
+                       'bg-red-400': !servicio.estado
+                     }"></div>
+                {{ servicio.estado ? 'Activo' : 'Inactivo' }}
+              </span>
             </div>
-            <div class="flex items-end">
-              <button
-                (click)="clearFilters()"
-                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                Limpiar filtros
+
+            <!-- Overlay gradient -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+          </div>
+
+          <!-- Service Content -->
+          <div class="p-6">
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold text-white mb-2 line-clamp-2 group-hover:text-orange-300 transition-colors duration-300">
+                {{ servicio.nombre }}
+              </h3>
+              <p class="text-slate-300 dark:text-slate-400 text-sm line-clamp-3 leading-relaxed">
+                {{ servicio.descripcion }}
+              </p>
+            </div>
+            
+            <!-- Price -->
+            <div class="mb-4 p-3 bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-600/30 rounded-xl">
+              <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-bold text-green-300">
+                  S/ {{ servicio.precio_referencial | number:'1.2-2' }}
+                </span>
+                <span class="text-xs text-slate-400">
+                  precio referencial
+                </span>
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div *ngIf="servicio.ubicacion_referencia" class="flex items-center text-sm text-slate-300 mb-4 p-2 bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-600/30 rounded-lg">
+              <svg class="w-4 h-4 mr-2 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span class="truncate">{{ servicio.ubicacion_referencia }}</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+              <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId, 'servicio', servicio.id]"
+                 class="flex-1 flex items-center justify-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all duration-300 shadow-lg hover:shadow-xl group">
+                <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Editar
+              </a>
+              
+              <button (click)="toggleServicioEstado(servicio)"
+                      [disabled]="servicio.updating"
+                      class="flex items-center justify-center px-4 py-2.5 rounded-xl border border-white/20 dark:border-slate-600/50 text-slate-300 bg-white/10 dark:bg-slate-800/30 hover:bg-white/20 dark:hover:bg-slate-700/50 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg *ngIf="servicio.updating" class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <svg *ngIf="!servicio.updating && servicio.estado" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <svg *ngIf="!servicio.updating && !servicio.estado" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-sm">
+                  {{ servicio.updating ? 'Actualizando...' : (servicio.estado ? 'Desactivar' : 'Activar') }}
+                </span>
+              </button>
+              
+              <button (click)="deleteServicio(servicio)"
+                      [disabled]="servicio.deleting"
+                      class="flex items-center justify-center p-2.5 rounded-xl text-red-300 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 hover:border-red-400/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group">
+                <svg *ngIf="servicio.deleting" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <svg *ngIf="!servicio.deleting" class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Empty State -->
-      <div *ngIf="!loading && !error && servicios.length === 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center">
-          <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <h3 class="mt-6 text-xl font-medium text-gray-900 dark:text-white">No hay servicios</h3>
-          <p class="mt-2 text-gray-500 dark:text-gray-400">
-            Comienza creando tu primer servicio para este emprendimiento.
-          </p>
-          <div class="mt-6">
-            <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId, 'servicio', 'nuevo']"
-               class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              Crear primer servicio
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Services Grid -->
-      <div *ngIf="!loading && !error && filteredServicios.length > 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div *ngFor="let servicio of filteredServicios" 
-               class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-200">
-            
-            <!-- Service Image -->
-            <div class="relative h-48">
-              <ng-container *ngIf="getServiceImage(servicio) as imageUrl; else noImageTemplate">
-                <img [src]="imageUrl" 
-                     [alt]="servicio.nombre" 
-                     class="w-full h-full object-cover">
-              </ng-container>
-              <ng-template #noImageTemplate>
-                <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
-                  <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-              </ng-template>
-              
-              <!-- Status Badge -->
-              <div class="absolute top-4 right-4">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      [ngClass]="{
-                        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': servicio.estado,
-                        'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': !servicio.estado
-                      }">
-                  {{ servicio.estado ? 'Activo' : 'Inactivo' }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Service Content -->
-            <div class="p-6">
-              <div class="flex items-start justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
-                  {{ servicio.nombre }}
-                </h3>
-              </div>
-              
-              <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
-                {{ servicio.descripcion }}
-              </p>
-              
-              <!-- Price -->
-              <div class="mb-4">
-                <span class="text-2xl font-bold text-green-600 dark:text-green-400">
-                  S/. {{ servicio.precio_referencial | number:'1.2-2' }}
-                </span>
-                <span class="text-sm text-gray-500 dark:text-gray-400 ml-1">
-                  precio referencial
-                </span>
-              </div>
-
-              <!-- Location -->
-              <div *ngIf="servicio.ubicacion_referencia" class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                {{ servicio.ubicacion_referencia }}
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="flex space-x-2">
-                <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId, 'servicio', servicio.id]"
-                   class="flex-1 bg-orange-600 text-white text-center py-2 px-4 rounded-md hover:bg-orange-700 transition-colors text-sm font-medium">
-                  Editar
-                </a>
-                <button (click)="toggleServicioEstado(servicio)"
-                        [disabled]="servicio.updating"
-                        class="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-center py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium disabled:opacity-50">
-                  <span *ngIf="!servicio.updating">
-                    {{ servicio.estado ? 'Desactivar' : 'Activar' }}
-                  </span>
-                  <span *ngIf="servicio.updating" class="flex items-center justify-center">
-                    <div class="w-4 h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent mr-1"></div>
-                    Actualizando...
-                  </span>
-                </button>
-                <button (click)="deleteServicio(servicio)"
-                        [disabled]="servicio.deleting"
-                        class="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors disabled:opacity-50">
-                  <svg *ngIf="!servicio.deleting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  <div *ngIf="servicio.deleting" class="w-4 h-4 animate-spin rounded-full border-2 border-red-400 border-t-transparent"></div>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- No Results -->
+      <!-- No Results glassmorphism -->
       <div *ngIf="!loading && !error && servicios.length > 0 && filteredServicios.length === 0" 
-           class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center">
-          <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No se encontraron servicios</h3>
-          <p class="mt-2 text-gray-500 dark:text-gray-400">
-            Intenta ajustar los filtros de búsqueda.
-          </p>
-          <div class="mt-4">
-            <button (click)="clearFilters()"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-orange-600 bg-orange-100 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-              Limpiar filtros
-            </button>
-          </div>
-        </div>
+           class="text-center py-16">
+        <svg class="mx-auto h-16 w-16 text-slate-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <h3 class="text-lg font-semibold text-white mb-2">No se encontraron servicios</h3>
+        <p class="text-slate-300 dark:text-slate-400 mb-6">
+          Intenta ajustar los filtros de búsqueda.
+        </p>
+        <button (click)="clearFilters()"
+                class="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+          Limpiar filtros
+        </button>
       </div>
     </div>
   `,
   styles: [`
     :host {
       display: block;
+    }
+    
+    /* Mejoras para transiciones suaves */
+    * {
+      transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     }
     
     .line-clamp-2 {
@@ -335,10 +315,10 @@ export class ServiciosListComponent implements OnInit {
         this.loadData();
       } else {
         console.error('Servicios - ID inválido:', id);
+        this.error = 'ID de emprendimiento inválido';
       }
     });
   }
-
 
   private loadData(): void {
     this.loadEmprendimiento();
@@ -438,6 +418,10 @@ export class ServiciosListComponent implements OnInit {
           this.servicios[index] = { ...updatedServicio, updating: false, deleting: false };
           this.applyFilters();
         }
+
+        // Mostrar mensaje de éxito
+        const actionText = updatedServicio.estado ? 'activado' : 'desactivado';
+        alert(`Servicio ${actionText} correctamente`);
       }
     } catch (err: any) {
       console.error('Error al actualizar servicio:', err);
@@ -450,7 +434,7 @@ export class ServiciosListComponent implements OnInit {
   async deleteServicio(servicio: Servicio & { deleting?: boolean }): Promise<void> {
     if (servicio.deleting || !servicio.id) return;
 
-    const confirmMessage = `¿Estás seguro de que quieres eliminar el servicio "${servicio.nombre}"? Esta acción no se puede deshacer.`;
+    const confirmMessage = `¿Estás seguro de que quieres eliminar el servicio "${servicio.nombre}"?\n\nEsta acción no se puede deshacer.`;
     
     if (!confirm(confirmMessage)) return;
 

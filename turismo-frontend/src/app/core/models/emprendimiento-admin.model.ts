@@ -67,9 +67,9 @@ export interface ServicioInfo {
   nombre: string;
   descripcion: string;
   precio_referencial: string;
+  capacidad: number; // Campo agregado como requerido
   emprendedor_id?: number;
   estado?: boolean;
-  capacidad?: number;
   latitud?: string;
   longitud?: string;
   ubicacion_referencia?: string;

@@ -543,11 +543,16 @@ export class EmprendimientoAdminService {
     }
     
     // Procesar categorías
+    // Procesar categorías
     if (data.categorias && Array.isArray(data.categorias)) {
-      data.categorias.forEach((categoriaId: number) => {
-        formData.append('categorias[]', categoriaId.toString());
+      data.categorias.forEach((categoria: any) => {
+        const id = typeof categoria === 'object' ? categoria.id : categoria;
+        if (id !== undefined && id !== null) {
+          formData.append('categorias[]', String(id));
+        }
       });
     }
+
     
     // Procesar ids de sliders eliminados
     if (data.deleted_sliders && Array.isArray(data.deleted_sliders)) {

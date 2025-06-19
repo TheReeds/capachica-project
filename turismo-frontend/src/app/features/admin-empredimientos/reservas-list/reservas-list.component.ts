@@ -10,7 +10,6 @@ import {
   UpdateEstadoServicioRequest,
   ReservaServicio
 } from '../../../core/models/emprendimiento-admin.model';
-import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 // Extendemos ReservaServicio para incluir la propiedad updating
 interface ReservaServicioWithUpdating extends ReservaServicio {
@@ -22,416 +21,489 @@ interface ReservaWithUpdating extends Omit<Reserva, 'servicios'> {
   servicios: ReservaServicioWithUpdating[];
 }
 
+// Interface para mensajes de chat (estático por ahora)
+interface ChatMessage {
+  id: number;
+  sender: 'cliente' | 'emprendedor';
+  message: string;
+  timestamp: Date;
+  read: boolean;
+}
+
 @Component({
   selector: 'app-reservas-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <!-- Header -->
-        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex items-center justify-between">
-                <div>
-                <nav class="flex mb-3" aria-label="Breadcrumb">
-                    <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                    <li class="inline-flex items-center">
-                        <a routerLink="/admin-emprendedores/mis-emprendimientos" 
-                        class="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400">
-                        Mis Emprendimientos
-                        </a>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId, 'dashboard']" 
-                            class="ml-1 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400">
-                            {{ emprendimiento?.nombre || 'Emprendimiento' }}
-                        </a>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        <span class="ml-1 text-gray-500 dark:text-gray-400">Reservas</span>
-                        </div>
-                    </li>
-                    </ol>
-                </nav>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    Reservas - {{ emprendimiento?.nombre || 'Cargando...' }}
-                </h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-1">
-                    Administra todas las reservas de tus servicios
-                </p>
-                </div>
-                <div class="flex items-center space-x-4">
-                <button (click)="exportToCSV()" 
-                        [disabled]="loading || !reservasData?.data?.length"
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Exportar CSV
-                </button>
-                <button (click)="refreshData()" 
-                        [disabled]="loading"
-                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50">
-                    <svg *ngIf="!loading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    <div *ngIf="loading" class="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                    Actualizar
-                </button>
-                </div>
-            </div>
-            </div>
-        </header>
+    <!-- Loading state glassmorphism -->
+    <div *ngIf="loading && !reservasData" class="flex items-center justify-center h-64">
+      <div class="relative">
+        <div class="w-16 h-16 border-4 border-orange-200/30 rounded-full"></div>
+        <div class="w-16 h-16 border-4 border-orange-400 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+      </div>
+    </div>
 
-        <!-- Filters -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <!-- Estado Filter -->
-                <div>
-                <label for="estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Estado
-                </label>
-                <select
-                    id="estado"
-                    [(ngModel)]="filters.estado"
-                    (change)="applyFilters()"
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white">
-                    <option value="">Todos</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="confirmada">Confirmada</option>
-                    <option value="cancelada">Cancelada</option>
-                    <option value="completada">Completada</option>
-                </select>
-                </div>
-
-                <!-- Fecha Inicio -->
-                <div>
-                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Fecha Desde
-                </label>
-                <input
-                    type="date"
-                    id="fecha_inicio"
-                    [(ngModel)]="filters.fecha_inicio"
-                    (change)="applyFilters()"
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white">
-                </div>
-
-                <!-- Fecha Fin -->
-                <div>
-                <label for="fecha_fin" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Fecha Hasta
-                </label>
-                <input
-                    type="date"
-                    id="fecha_fin"
-                    [(ngModel)]="filters.fecha_fin"
-                    (change)="applyFilters()"
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white">
-                </div>
-
-                <!-- Clear Filters -->
-                <div class="flex items-end">
-                <button
-                    (click)="clearFilters()"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                    Limpiar filtros
-                </button>
-                </div>
-            </div>
-            </div>
+    <!-- Main content glassmorphism -->
+    <div *ngIf="!loading || reservasData" class="space-y-8">
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-orange-400 via-orange-300 to-amber-300 bg-clip-text text-transparent">
+            Reservas
+          </h1>
+          <p class="text-slate-300 dark:text-slate-400 mt-1">
+            Administra todas las reservas de {{ emprendimiento?.nombre || 'tu emprendimiento' }}
+          </p>
         </div>
-
-        <!-- Loading State -->
-        <div *ngIf="loading && !reservasData" class="flex justify-center items-center py-20">
-            <div class="relative">
-            <div class="w-16 h-16 border-4 border-orange-200 rounded-full"></div>
-            <div class="w-16 h-16 border-4 border-orange-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
-            </div>
-        </div>
-
-        <!-- Error State -->
-        <div *ngIf="error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-                </div>
-                <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Error al cargar las reservas</h3>
-                <div class="mt-2 text-sm text-red-700 dark:text-red-300">{{ error }}</div>
-                <div class="mt-4">
-                    <button (click)="loadReservas()" 
-                            class="bg-red-100 dark:bg-red-800 px-3 py-2 rounded-md text-sm font-medium text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-700">
-                    Reintentar
-                    </button>
-                </div>
-                </div>
-            </div>
-            </div>
-        </div>
-
-        <!-- Empty State -->
-        <div *ngIf="!loading && !error && (!reservasData?.data || reservasData?.data?.length === 0)" 
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="text-center">
-            <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <div class="flex items-center gap-3">
+          <button (click)="exportToCSV()" 
+                  [disabled]="loading || !reservasData?.data?.length"
+                  class="group flex items-center px-4 py-2.5 rounded-xl bg-white/10 dark:bg-slate-800/40 text-white hover:bg-white/20 dark:hover:bg-slate-700/60 transition-all duration-300 shadow-lg border border-white/10 dark:border-slate-700/50 disabled:opacity-50">
+            <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
-            <h3 class="mt-6 text-xl font-medium text-gray-900 dark:text-white">No hay reservas</h3>
-            <p class="mt-2 text-gray-500 dark:text-gray-400">
-                {{ hasActiveFilters() ? 'No se encontraron reservas con los filtros aplicados.' : 'Aún no tienes reservas para este emprendimiento.' }}
-            </p>
-            <div *ngIf="hasActiveFilters()" class="mt-6">
-                <button (click)="clearFilters()"
-                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-orange-600 bg-orange-100 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                Limpiar filtros
-                </button>
+            <span class="font-medium">Exportar CSV</span>
+          </button>
+          <button (click)="refreshData()" 
+                  [disabled]="loading"
+                  class="group flex items-center px-4 py-2.5 rounded-xl bg-white/10 dark:bg-slate-800/60 text-white hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60 disabled:opacity-50">
+            <svg *ngIf="!loading" class="h-5 w-5 mr-2 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <div *ngIf="loading" class="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            <span class="font-medium">Actualizar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters glassmorphism -->
+      <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <!-- Estado Filter -->
+          <div class="space-y-2">
+            <label for="estado" class="block text-sm font-medium text-slate-300">Estado</label>
+            <select
+              id="estado"
+              [(ngModel)]="filters.estado"
+              (change)="applyFilters()"
+              class="w-full px-3 py-2 border border-slate-600/50 rounded-xl bg-white/10 dark:bg-slate-800/30 text-white focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300">
+              <option value="" class="bg-slate-800 text-white">Todos</option>
+              <option value="pendiente" class="bg-slate-800 text-white">Pendiente</option>
+              <option value="confirmada" class="bg-slate-800 text-white">Confirmada</option>
+              <option value="cancelada" class="bg-slate-800 text-white">Cancelada</option>
+              <option value="completada" class="bg-slate-800 text-white">Completada</option>
+            </select>
+          </div>
+
+          <!-- Fecha Inicio -->
+          <div class="space-y-2">
+            <label for="fecha_inicio" class="block text-sm font-medium text-slate-300">Fecha Desde</label>
+            <input
+              type="date"
+              id="fecha_inicio"
+              [(ngModel)]="filters.fecha_inicio"
+              (change)="applyFilters()"
+              class="w-full px-3 py-2 border border-slate-600/50 rounded-xl bg-white/10 dark:bg-slate-800/30 text-white focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300">
+          </div>
+
+          <!-- Fecha Fin -->
+          <div class="space-y-2">
+            <label for="fecha_fin" class="block text-sm font-medium text-slate-300">Fecha Hasta</label>
+            <input
+              type="date"
+              id="fecha_fin"
+              [(ngModel)]="filters.fecha_fin"
+              (change)="applyFilters()"
+              class="w-full px-3 py-2 border border-slate-600/50 rounded-xl bg-white/10 dark:bg-slate-800/30 text-white focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300">
+          </div>
+
+          <!-- Clear Filters -->
+          <div class="flex items-end">
+            <button
+              (click)="clearFilters()"
+              class="w-full px-4 py-2 border border-white/20 dark:border-slate-600/50 rounded-xl text-sm font-medium text-slate-300 bg-white/10 dark:bg-slate-800/30 hover:bg-white/20 dark:hover:bg-slate-700/50 transition-all duration-300">
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error state glassmorphism -->
+      <div *ngIf="error" class="backdrop-blur-sm bg-red-500/20 border border-red-500/30 rounded-2xl p-6">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 text-red-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div>
+            <h3 class="text-red-200 font-semibold">Error al cargar las reservas</h3>
+            <p class="text-red-300 text-sm">{{ error }}</p>
+            <button (click)="loadReservas()" 
+                    class="mt-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-all duration-300 text-sm font-medium">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state glassmorphism -->
+      <div *ngIf="!loading && !error && (!reservasData?.data || reservasData?.data?.length === 0)" 
+           class="text-center py-16">
+        <svg class="mx-auto h-20 w-20 text-slate-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-white mb-2">No hay reservas</h3>
+        <p class="text-slate-300 dark:text-slate-400 mb-6">
+          {{ hasActiveFilters() ? 'No se encontraron reservas con los filtros aplicados.' : 'Aún no tienes reservas para este emprendimiento.' }}
+        </p>
+        <button *ngIf="hasActiveFilters()" 
+                (click)="clearFilters()"
+                class="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all duration-300">
+          Limpiar filtros
+        </button>
+      </div>
+
+      <!-- Summary Stats glassmorphism -->
+      <div *ngIf="!loading && !error && reservasData?.data?.length" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+          <div class="flex items-center gap-3">
+            <div class="p-3 rounded-xl bg-blue-500/20 text-blue-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
             </div>
+            <div>
+              <p class="text-slate-300 text-sm font-medium">Total</p>
+              <p class="text-2xl font-bold text-white">{{ reservasData?.total }}</p>
             </div>
+          </div>
         </div>
 
-        <!-- Reservas List -->
-        <div *ngIf="!loading && !error && reservasData?.data?.length"
-                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-
-
-            
-            <!-- Summary Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    </div>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total</p>
-                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ reservasData?.total }}</p>
-                </div>
-                </div>
+        <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+          <div class="flex items-center gap-3">
+            <div class="p-3 rounded-xl bg-yellow-500/20 text-yellow-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
             </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    </div>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pendientes</p>
-                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ getReservasByEstado('pendiente').length }}</p>
-                </div>
-                </div>
+            <div>
+              <p class="text-slate-300 text-sm font-medium">Pendientes</p>
+              <p class="text-2xl font-bold text-white">{{ getReservasByEstado('pendiente').length }}</p>
             </div>
+          </div>
+        </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    </div>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Confirmadas</p>
-                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ getReservasByEstado('confirmada').length }}</p>
-                </div>
-                </div>
+        <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+          <div class="flex items-center gap-3">
+            <div class="p-3 rounded-xl bg-green-500/20 text-green-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
             </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                    </svg>
-                    </div>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ingresos Total</p>
-                    <p class="text-lg font-semibold text-gray-900 dark:text-white">S/. {{ calculateTotalIngresos() | number:'1.2-2' }}</p>
-                </div>
-                </div>
+            <div>
+              <p class="text-slate-300 text-sm font-medium">Confirmadas</p>
+              <p class="text-2xl font-bold text-white">{{ getReservasByEstado('confirmada').length }}</p>
             </div>
+          </div>
+        </div>
+
+        <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+          <div class="flex items-center gap-3">
+            <div class="p-3 rounded-xl bg-purple-500/20 text-purple-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+              </svg>
             </div>
-
-            <!-- Reservas Cards -->
-            <div class="space-y-6">
-            <div *ngFor="let reserva of reservasData?.data; trackBy: trackByReserva" 
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                
-                <!-- Reserva Header -->
-                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ reserva.usuario.name || 'Usuario' }}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Código: {{ reserva.codigo_reserva }}</p>
-                    </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                            [ngClass]="getEstadoBadgeClass(reserva.estado)">
-                        {{ reserva.estado | titlecase }}
-                    </span>
-                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ reserva.created_at | date:'short' }}
-                    </span>
-                    </div>
-                </div>
-                </div>
-
-                <!-- Servicios de la Reserva -->
-                <div class="p-6">
-                <div *ngIf="reserva.servicios && reserva.servicios.length > 0" class="space-y-4">
-                    <h4 class="text-md font-medium text-gray-900 dark:text-white mb-3">
-                    Servicios Reservados ({{ reserva.servicios.length }})
-                    </h4>
-                    
-                    <div *ngFor="let servicioReserva of reserva.servicios; trackBy: trackByServicioReserva" 
-                        class="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                        <div class="flex items-center justify-between mb-2">
-                            <h5 class="font-medium text-gray-900 dark:text-white">
-                            {{ servicioReserva.servicio?.nombre || 'Servicio' }}
-                            </h5>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                                [ngClass]="getEstadoBadgeClass(servicioReserva.estado)">
-                            {{ servicioReserva.estado | titlecase }}
-                            </span>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                            <span class="text-gray-500 dark:text-gray-400">Fecha:</span>
-                            <p class="font-medium text-gray-900 dark:text-white">
-                                {{ servicioReserva.fecha_inicio | date:'mediumDate' }}
-                            </p>
-                            </div>
-                            <div>
-                            <span class="text-gray-500 dark:text-gray-400">Horario:</span>
-                            <p class="font-medium text-gray-900 dark:text-white">
-                                {{ servicioReserva.hora_inicio }} - {{ servicioReserva.hora_fin }}
-                            </p>
-                            </div>
-                            <div>
-                            <span class="text-gray-500 dark:text-gray-400">Precio:</span>
-                            <p class="font-medium text-green-600 dark:text-green-400">
-                                S/. {{ servicioReserva.precio | number:'1.2-2' }}
-                            </p>
-                            </div>
-                        </div>
-
-                        <div *ngIf="servicioReserva.notas_cliente" class="mt-3">
-                            <span class="text-gray-500 dark:text-gray-400 text-sm">Notas del cliente:</span>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">{{ servicioReserva.notas_cliente }}</p>
-                        </div>
-
-                        <div *ngIf="servicioReserva.notas_emprendedor" class="mt-3">
-                            <span class="text-gray-500 dark:text-gray-400 text-sm">Notas del emprendedor:</span>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">{{ servicioReserva.notas_emprendedor }}</p>
-                        </div>
-                        </div>
-
-                        <!-- Actions for Service -->
-                        <div class="ml-4 flex flex-col space-y-2">
-                        <button *ngIf="servicioReserva.estado === 'pendiente'"
-                                (click)="updateEstadoServicio(servicioReserva, 'confirmado')"
-                                [disabled]="servicioReserva.updating"
-                                class="px-3 py-1 text-xs font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50">
-                            <span *ngIf="!servicioReserva.updating">Confirmar</span>
-                            <span *ngIf="servicioReserva.updating">...</span>
-                        </button>
-                        
-                        <button *ngIf="servicioReserva.estado === 'confirmado'"
-                                (click)="updateEstadoServicio(servicioReserva, 'completado')"
-                                [disabled]="servicioReserva.updating"
-                                class="px-3 py-1 text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50">
-                            <span *ngIf="!servicioReserva.updating">Completar</span>
-                            <span *ngIf="servicioReserva.updating">...</span>
-                        </button>
-                        
-                        <button *ngIf="servicioReserva.estado === 'pendiente' || servicioReserva.estado === 'confirmado'"
-                                (click)="updateEstadoServicio(servicioReserva, 'cancelado')"
-                                [disabled]="servicioReserva.updating"
-                                class="px-3 py-1 text-xs font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50">
-                            <span *ngIf="!servicioReserva.updating">Cancelar</span>
-                            <span *ngIf="servicioReserva.updating">...</span>
-                        </button>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-
-                <!-- Reserva Notes -->
-                <div *ngIf="reserva.notas" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
-                    <span class="text-gray-500 dark:text-gray-400 text-sm">Notas de la reserva:</span>
-                    <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">{{ reserva.notas }}</p>
-                </div>
-                </div>
+            <div>
+              <p class="text-slate-300 text-sm font-medium">Ingresos Total</p>
+              <p class="text-2xl font-bold text-white">S/ {{ calculateTotalIngresos() | number:'1.2-2' }}</p>
             </div>
-            </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Pagination -->
-            <div *ngIf="reservasData && reservasData.last_page > 1" class="mt-8 flex items-center justify-between">
-            <div class="text-sm text-gray-700 dark:text-gray-300">
-                Mostrando {{ reservasData.from }} a {{ reservasData.to }} de {{ reservasData.total }} reservas
-            </div>
-            <div class="flex items-center space-x-2">
-                <button
-                (click)="loadPage(currentPage - 1)"
-                [disabled]="currentPage <= 1 || loading"
-                class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                Anterior
+      <!-- Reservas Cards glassmorphism -->
+      <div *ngIf="!loading && !error && reservasData?.data?.length" class="space-y-6">
+        <div *ngFor="let reserva of reservasData?.data; trackBy: trackByReserva" 
+             class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
+          
+          <!-- Reserva Header glassmorphism -->
+          <div class="px-6 py-4 bg-white/10 dark:bg-slate-700/40 border-b border-white/20 dark:border-slate-600/50">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-500/20 to-orange-600/20 rounded-xl flex items-center justify-center border border-orange-400/30">
+                  <svg class="w-6 h-6 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-white">{{ reserva.usuario.name || 'Usuario' }}</h3>
+                  <p class="text-sm text-slate-300">Código: {{ reserva.codigo_reserva }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <!-- Chat Button -->
+                <button (click)="toggleChat(reserva.id)"
+                        class="relative group flex items-center px-4 py-2 rounded-xl bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-all duration-300 border border-blue-400/30 hover:border-blue-400/50">
+                  <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                  </svg>
+                  <span class="font-medium">Chat</span>
+                  <!-- Notification badge -->
+                  <span *ngIf="getUnreadMessagesCount(reserva.id) > 0" 
+                        class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                    {{ getUnreadMessagesCount(reserva.id) }}
+                  </span>
                 </button>
                 
-                <span class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Página {{ currentPage }} de {{ reservasData.last_page }}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border"
+                      [ngClass]="getEstadoBadgeClass(reserva.estado)">
+                  {{ reserva.estado | titlecase }}
                 </span>
-                
-                <button
-                (click)="loadPage(currentPage + 1)"
-                [disabled]="currentPage >= (reservasData.last_page || 1) || loading"
-                class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                Siguiente
+                <span class="text-sm text-slate-400">
+                  {{ reserva.created_at | date:'short' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Section (collapsible) -->
+          <div *ngIf="activeChatReserva === reserva.id" 
+               class="border-b border-white/20 dark:border-slate-600/50 bg-white/5 dark:bg-slate-800/20">
+            <div class="p-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-lg bg-blue-500/20 text-blue-300">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                  </svg>
+                </div>
+                <h4 class="text-lg font-semibold text-white">Chat con {{ reserva.usuario.name }}</h4>
+                <button (click)="toggleChat(0)"
+                        class="ml-auto p-2 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-all duration-300">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
                 </button>
+              </div>
+
+              <!-- Chat Messages -->
+              <div class="bg-white/5 dark:bg-slate-800/30 rounded-xl p-4 mb-4 max-h-64 overflow-y-auto border border-white/10 dark:border-slate-600/30">
+                <div *ngFor="let message of getChatMessages(reserva.id)" 
+                     class="mb-3 flex"
+                     [ngClass]="message.sender === 'emprendedor' ? 'justify-end' : 'justify-start'">
+                  <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-xl"
+                       [ngClass]="{
+                         'bg-orange-500/20 text-orange-100 border border-orange-400/30': message.sender === 'emprendedor',
+                         'bg-blue-500/20 text-blue-100 border border-blue-400/30': message.sender === 'cliente'
+                       }">
+                    <p class="text-sm">{{ message.message }}</p>
+                    <p class="text-xs opacity-70 mt-1">{{ message.timestamp | date:'short' }}</p>
+                  </div>
+                </div>
+                
+                <!-- Empty state -->
+                <div *ngIf="getChatMessages(reserva.id).length === 0" 
+                     class="text-center py-8 text-slate-400">
+                  <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                  </svg>
+                  <p class="text-sm">No hay mensajes aún</p>
+                  <p class="text-xs">Inicia una conversación con el cliente</p>
+                </div>
+              </div>
+
+              <!-- Chat Input -->
+              <div class="flex gap-3">
+                <input 
+                  type="text" 
+                  [(ngModel)]="newMessage"
+                  (keyup.enter)="sendMessage(reserva.id)"
+                  placeholder="Escribe un mensaje..."
+                  class="flex-1 px-4 py-3 border border-slate-600/50 rounded-xl bg-white/10 dark:bg-slate-800/30 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300">
+                <button (click)="sendMessage(reserva.id)"
+                        [disabled]="!newMessage.trim()"
+                        class="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                  </svg>
+                </button>
+              </div>
             </div>
+          </div>
+
+          <!-- Servicios de la Reserva -->
+          <div class="p-6">
+            <div *ngIf="reserva.servicios && reserva.servicios.length > 0" class="space-y-4">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-lg bg-green-500/20 text-green-300">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                  </svg>
+                </div>
+                <h4 class="text-lg font-semibold text-white">
+                  Servicios Reservados ({{ reserva.servicios.length }})
+                </h4>
+              </div>
+              
+              <div *ngFor="let servicioReserva of reserva.servicios; trackBy: trackByServicioReserva" 
+                   class="backdrop-blur-sm bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-600/30 rounded-xl p-5">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-3">
+                      <h5 class="font-semibold text-white text-lg">
+                        {{ servicioReserva.servicio?.nombre || 'Servicio' }}
+                      </h5>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border"
+                            [ngClass]="getEstadoBadgeClass(servicioReserva.estado)">
+                        {{ servicioReserva.estado | titlecase }}
+                      </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+                      <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <div>
+                          <span class="text-slate-400">Fecha:</span>
+                          <p class="font-medium text-white">
+                            {{ servicioReserva.fecha_inicio | date:'mediumDate' }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                          <span class="text-slate-400">Horario:</span>
+                          <p class="font-medium text-white">
+                            {{ servicioReserva.hora_inicio }} - {{ servicioReserva.hora_fin }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                        </svg>
+                        <div>
+                          <span class="text-slate-400">Precio:</span>
+                          <p class="font-medium text-green-300">
+                            S/ {{ servicioReserva.precio | number:'1.2-2' }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div *ngIf="servicioReserva.notas_cliente" class="mb-3 p-3 bg-blue-500/10 border border-blue-400/30 rounded-lg">
+                      <span class="text-blue-300 text-sm font-medium flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Notas del cliente:
+                      </span>
+                      <p class="text-sm text-blue-100 mt-1">{{ servicioReserva.notas_cliente }}</p>
+                    </div>
+
+                    <div *ngIf="servicioReserva.notas_emprendedor" class="mb-3 p-3 bg-orange-500/10 border border-orange-400/30 rounded-lg">
+                      <span class="text-orange-300 text-sm font-medium flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        Notas del emprendedor:
+                      </span>
+                      <p class="text-sm text-orange-100 mt-1">{{ servicioReserva.notas_emprendedor }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Actions for Service -->
+                  <div class="ml-6 flex flex-col gap-3">
+                    <button *ngIf="servicioReserva.estado === 'pendiente'"
+                            (click)="updateEstadoServicio(servicioReserva, 'confirmado')"
+                            [disabled]="servicioReserva.updating"
+                            class="flex items-center px-4 py-2 text-sm font-medium rounded-xl text-green-300 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 hover:border-green-400/50 transition-all duration-300 disabled:opacity-50">
+                      <svg *ngIf="servicioReserva.updating" class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
+                      <svg *ngIf="!servicioReserva.updating" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      {{ servicioReserva.updating ? 'Confirmando...' : 'Confirmar' }}
+                    </button>
+                    
+                    <button *ngIf="servicioReserva.estado === 'confirmado'"
+                            (click)="updateEstadoServicio(servicioReserva, 'completado')"
+                            [disabled]="servicioReserva.updating"
+                            class="flex items-center px-4 py-2 text-sm font-medium rounded-xl text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 hover:border-blue-400/50 transition-all duration-300 disabled:opacity-50">
+                      <svg *ngIf="servicioReserva.updating" class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
+                      <svg *ngIf="!servicioReserva.updating" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {{ servicioReserva.updating ? 'Completando...' : 'Completar' }}
+                    </button>
+                    
+                    <button *ngIf="servicioReserva.estado === 'pendiente' || servicioReserva.estado === 'confirmado'"
+                            (click)="updateEstadoServicio(servicioReserva, 'cancelado')"
+                            [disabled]="servicioReserva.updating"
+                            class="flex items-center px-4 py-2 text-sm font-medium rounded-xl text-red-300 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 hover:border-red-400/50 transition-all duration-300 disabled:opacity-50">
+                      <svg *ngIf="servicioReserva.updating" class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
+                      <svg *ngIf="!servicioReserva.updating" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                      {{ servicioReserva.updating ? 'Cancelando...' : 'Cancelar' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <!-- Reserva Notes -->
+            <div *ngIf="reserva.notas" class="mt-6 pt-4 border-t border-white/20 dark:border-slate-600/50">
+              <div class="p-4 bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-600/30 rounded-xl">
+                <span class="text-slate-400 text-sm font-medium flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  Notas de la reserva:
+                </span>
+                <p class="text-sm text-slate-300 mt-2">{{ reserva.notas }}</p>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Pagination glassmorphism -->
+      <div *ngIf="reservasData && reservasData.last_page > 1" 
+           class="flex items-center justify-between backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+        <div class="text-sm text-slate-300">
+          Mostrando {{ reservasData.from }} a {{ reservasData.to }} de {{ reservasData.total }} reservas
         </div>
-  `,
-  styles: [`
-    :host {
-      display: block;
-    }
-  `]
+        <div class="flex items-center gap-3">
+          <button
+            (click)="loadPage(currentPage - 1)"
+            [disabled]="currentPage <= 1 || loading"
+            class="px-4 py-2 border border-white/20 dark:border-slate-600/50 rounded-xl text-sm font-medium text-slate-300 bg-white/10 dark:bg-slate-800/30 hover:bg-white/20 dark:hover:bg-slate-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300">
+            Anterior
+          </button>
+          
+          <span class="px-4 py-2 text-sm font-medium text-white">
+            Página {{ currentPage }} de {{ reservasData.last_page }}
+          </span>
+          
+          <button
+            (click)="loadPage(currentPage + 1)"
+            [disabled]="currentPage >= (reservasData.last_page || 1) || loading"
+            class="px-4 py-2 border border-white/20 dark:border-slate-600/50 rounded-xl text-sm font-medium text-slate-300 bg-white/10 dark:bg-slate-800/30 hover:bg-white/20 dark:hover:bg-slate-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300">
+            Siguiente
+          </button>
+        </div>
+      </div>
+    </div>
+    `
 })
 export class ReservasListComponent implements OnInit {
   private emprendimientoAdminService = inject(EmprendimientoAdminService);
@@ -444,6 +516,11 @@ export class ReservasListComponent implements OnInit {
   error = '';
   currentPage = 1;
 
+  // Chat functionality
+  activeChatReserva = 0;
+  newMessage = '';
+  chatMessages: { [reservaId: number]: ChatMessage[] } = {};
+
   filters = {
     estado: '',
     fecha_inicio: '',
@@ -453,7 +530,7 @@ export class ReservasListComponent implements OnInit {
   };
 
   ngOnInit(): void {
-  // Obtener el ID de la ruta padre
+    // Obtener el ID de la ruta padre
     this.route.parent?.paramMap.subscribe(params => {
       const id = params.get('id');
       console.log('Reservas - ID recibido:', id); // Debug
@@ -461,25 +538,16 @@ export class ReservasListComponent implements OnInit {
       if (id && !isNaN(+id)) {
         this.emprendimientoId = +id;
         this.loadData();
+        this.initializeMockChatData();
       } else {
         console.error('Reservas - ID inválido:', id);
+        this.error = 'ID de emprendimiento inválido';
       }
     });
   }
 
   private loadData(): void {
     this.loadReservas();
-  }
-
-  private loadEmprendimiento(): void {
-    this.emprendimientoAdminService.getEmprendimiento(this.emprendimientoId).subscribe({
-      next: (data) => {
-        this.emprendimiento = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar emprendimiento:', err);
-      }
-    });
   }
 
   loadReservas(page: number = 1): void {
@@ -558,15 +626,15 @@ export class ReservasListComponent implements OnInit {
 
   getEstadoBadgeClass(estado: string): string {
     const classes = {
-      'pendiente': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'confirmada': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      'confirmado': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      'cancelada': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      'cancelado': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      'completada': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      'completado': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+      'pendiente': 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
+      'confirmada': 'bg-green-500/20 text-green-300 border-green-400/30',
+      'confirmado': 'bg-green-500/20 text-green-300 border-green-400/30',
+      'cancelada': 'bg-red-500/20 text-red-300 border-red-400/30',
+      'cancelado': 'bg-red-500/20 text-red-300 border-red-400/30',
+      'completada': 'bg-blue-500/20 text-blue-300 border-blue-400/30',
+      'completado': 'bg-blue-500/20 text-blue-300 border-blue-400/30'
     };
-    return classes[estado as keyof typeof classes] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+    return classes[estado as keyof typeof classes] || 'bg-gray-500/20 text-gray-300 border-gray-400/30';
   }
 
   getReservasByEstado(estado: string): ReservaWithUpdating[] {
@@ -648,6 +716,94 @@ export class ReservasListComponent implements OnInit {
       console.error('Error al exportar CSV:', err);
       alert('Error al exportar los datos');
     }
+  }
+
+  // Chat functionality methods
+  toggleChat(reservaId: number): void {
+    this.activeChatReserva = this.activeChatReserva === reservaId ? 0 : reservaId;
+    if (this.activeChatReserva === reservaId) {
+      // Mark messages as read when opening chat
+      this.markMessagesAsRead(reservaId);
+    }
+  }
+
+  getChatMessages(reservaId: number): ChatMessage[] {
+    return this.chatMessages[reservaId] || [];
+  }
+
+  getUnreadMessagesCount(reservaId: number): number {
+    const messages = this.chatMessages[reservaId] || [];
+    return messages.filter(msg => !msg.read && msg.sender === 'cliente').length;
+  }
+
+  sendMessage(reservaId: number): void {
+    if (!this.newMessage.trim()) return;
+
+    if (!this.chatMessages[reservaId]) {
+      this.chatMessages[reservaId] = [];
+    }
+
+    const newMsg: ChatMessage = {
+      id: Date.now(),
+      sender: 'emprendedor',
+      message: this.newMessage.trim(),
+      timestamp: new Date(),
+      read: true
+    };
+
+    this.chatMessages[reservaId].push(newMsg);
+    this.newMessage = '';
+
+    // Simulate auto-response (remove this in real implementation)
+    setTimeout(() => {
+      const autoResponse: ChatMessage = {
+        id: Date.now() + 1,
+        sender: 'cliente',
+        message: 'Gracias por tu mensaje. Te responderé pronto.',
+        timestamp: new Date(),
+        read: false
+      };
+      this.chatMessages[reservaId].push(autoResponse);
+    }, 2000);
+  }
+
+  private markMessagesAsRead(reservaId: number): void {
+    if (this.chatMessages[reservaId]) {
+      this.chatMessages[reservaId].forEach(msg => {
+        if (msg.sender === 'cliente') {
+          msg.read = true;
+        }
+      });
+    }
+  }
+
+  private initializeMockChatData(): void {
+    // Mock data for demonstration - remove in real implementation
+    this.chatMessages = {
+      1: [
+        {
+          id: 1,
+          sender: 'cliente',
+          message: 'Hola, tengo una pregunta sobre mi reserva.',
+          timestamp: new Date(Date.now() - 3600000),
+          read: false
+        },
+        {
+          id: 2,
+          sender: 'emprendedor',
+          message: 'Hola! Claro, dime en qué te puedo ayudar.',
+          timestamp: new Date(Date.now() - 3300000),
+          read: true
+        },
+        {
+          id: 3,
+          sender: 'cliente',
+          message: '¿Puedo cambiar la hora de mi reserva?',
+          timestamp: new Date(Date.now() - 1800000),
+          read: false
+        }
+      ]
+    };
   }
 
   // Track by functions for performance

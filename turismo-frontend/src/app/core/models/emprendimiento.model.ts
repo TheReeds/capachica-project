@@ -47,6 +47,7 @@ export interface Servicio {
   nombre: string;
   descripcion: string;
   precio_referencial: number | string;
+  capacidad: number; // Campo agregado como requerido
   emprendedor_id: number;
   estado?: boolean;
   latitud?: string | number;
