@@ -3,17 +3,19 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EmprendimientosService } from '../emprendimientos.service';
 import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-emprendimiento-detalle',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
       <!-- Loading State -->
       <div *ngIf="cargando()" class="flex justify-center items-center min-h-screen">
         <div class="text-center">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 dark:border-blue-600"></div>
           <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando emprendimiento...</p>
         </div>
       </div>
@@ -24,24 +26,24 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
         <section class="relative">
           <!-- Imagen Principal -->
           <div class="relative h-96 md:h-[500px] overflow-hidden">
-            <img 
-              [src]="imagenPrincipalActual()" 
+            <img
+              [src]="imagenPrincipalActual()"
               [alt]="emprendimiento()!.nombre"
               class="w-full h-full object-cover"
               onerror="this.src='/assets/general/placeholder-business.jpg'"
             >
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-            
+
             <!-- Navegación de imágenes -->
             <div *ngIf="todasLasImagenes().length > 1" class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4">
-              <button 
+              <button
                 (click)="imagenAnterior()"
                 class="bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
               </button>
-              <button 
+              <button
                 (click)="imagenSiguiente()"
                 class="bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +55,7 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
             <!-- Indicadores de imagen -->
             <div *ngIf="todasLasImagenes().length > 1" class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
               <div class="flex space-x-2">
-                <button 
+                <button
                   *ngFor="let imagen of todasLasImagenes(); let i = index"
                   (click)="seleccionarImagen(i)"
                   [class]="i === indiceImagenActual() ? 'bg-white' : 'bg-white/50'"
@@ -63,13 +65,15 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
             </div>
 
             <!-- Información superpuesta -->
-            <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <div class="absolute bottom-8 left-0 right-0 p-4 text-white">
+
+            <div class="absolute bottom-0 left-0 right-0 p-4 text-white" style="top: 80px;">
               <div class="container mx-auto">
                 <div class="flex items-end justify-between">
                   <div>
                     <h1 class="text-3xl md:text-5xl font-bold mb-2">{{ emprendimiento()!.nombre }}</h1>
                     <div class="flex items-center space-x-4 text-lg">
-                      <span class="bg-emerald-500 px-3 py-1 rounded-full text-sm font-medium">
+                      <span class="bg-orange-500 dark:bg-blue-500 px-3 py-1 rounded-full text-sm font-medium">
                         {{ emprendimiento()!.categoria }}
                       </span>
                       <span>{{ emprendimiento()!.tipo_servicio }}</span>
@@ -91,13 +95,16 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
                   </div>
                 </div>
               </div>
+              </div>
             </div>
           </div>
 
           <!-- Botón de regreso -->
-          <button 
+          <button
             (click)="volver()"
-            class="absolute top-4 left-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200">
+            class="absolute top-4 left-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 z-10"
+            title="Volver"
+            aria-label="Volver a la página anterior">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -105,22 +112,22 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
         </section>
 
         <!-- Contenido -->
-        <div class="container mx-auto px-4 -mt-16 relative z-10">
+        <div class="container mx-auto px-4 mt-8 relative z-10" style="margin-top: 2rem;">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
+
             <!-- Información Principal -->
             <div class="lg:col-span-2 space-y-6">
-              
+
               <!-- Descripción -->
               <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Acerca de este emprendimiento</h2>
                 <p class="text-gray-600 dark:text-gray-400 leading-relaxed">{{ emprendimiento()!.descripcion }}</p>
-                
+
                 <!-- Certificaciones -->
                 <div *ngIf="emprendimiento()!.certificaciones" class="mt-4">
                   <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Certificaciones</h3>
-                  <div class="bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-lg">
-                    <span class="text-emerald-700 dark:text-emerald-300">{{ emprendimiento()!.certificaciones }}</span>
+                  <div class="bg-orange-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                    <span class="text-orange-700 dark:text-blue-300">{{ emprendimiento()!.certificaciones }}</span>
                   </div>
                 </div>
               </div>
@@ -133,28 +140,28 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
                     ({{ emprendimiento()!.servicios?.length || 0 }})
                   </span>
                 </h2>
-                
-                <div *ngIf="emprendimiento()!.servicios && emprendimiento()!.servicios!.length > 0; else noServicios" 
+
+                <div *ngIf="emprendimiento()!.servicios && emprendimiento()!.servicios!.length > 0; else noServicios"
                      class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div *ngFor="let servicio of emprendimiento()!.servicios" 
+                  <div *ngFor="let servicio of emprendimiento()!.servicios"
                        class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
                        (click)="verServicio(servicio.id)">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">{{ servicio.nombre }}</h3>
                     <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">{{ servicio.descripcion }}</p>
-                    
+
                     <div class="flex justify-between items-center">
-                      <span class="text-emerald-600 dark:text-emerald-400 font-bold">
+                      <span class="text-orange-600 dark:text-blue-400 font-bold">
                         S/. {{ servicio.precio_referencial }}
                       </span>
                       <span class="text-xs text-gray-500 dark:text-gray-500">
                         {{ servicio.categorias?.[0]?.nombre || 'Servicio' }}
                       </span>
                     </div>
-                    
+
                     <!-- Horarios del servicio -->
                     <div *ngIf="servicio.horarios && servicio.horarios.length > 0" class="mt-2">
                       <div class="flex flex-wrap gap-1">
-                        <span *ngFor="let horario of obtenerHorariosUnicos(servicio.horarios).slice(0, 3)" 
+                        <span *ngFor="let horario of obtenerHorariosUnicos(servicio.horarios).slice(0, 3)"
                               class="inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded">
                           {{ formatearDia(horario.dia_semana) }}
                         </span>
@@ -174,13 +181,13 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
               </div>
 
               <!-- Galería Secundaria -->
-              <div *ngIf="emprendimiento()!.sliders_secundarios && emprendimiento()!.sliders_secundarios.length > 0" 
+              <div *ngIf="emprendimiento()!.sliders_secundarios && emprendimiento()!.sliders_secundarios.length > 0"
                    class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Galería</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div *ngFor="let slider of emprendimiento()!.sliders_secundarios" class="relative group">
-                    <img 
-                      [src]="slider.url_completa" 
+                    <img
+                      [src]="slider.url_completa"
                       [alt]="slider.nombre"
                       class="w-full h-32 object-cover rounded-lg group-hover:opacity-75 transition-opacity duration-200"
                       onerror="this.src='/assets/general/placeholder-gallery.jpg'"
@@ -197,20 +204,20 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
             </div>
 
             <!-- Información de Contacto y Detalles -->
-            <div class="space-y-6">
-              
+            <div class="space-y-14">
+
               <!-- Información de Contacto -->
               <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Información de Contacto</h2>
-                
+
                 <div class="space-y-3">
                   <!-- Teléfono -->
                   <div class="flex items-center">
                     <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                     </svg>
-                    <a [href]="'tel:' + emprendimiento()!.telefono" 
-                       class="text-emerald-600 dark:text-emerald-400 hover:underline">
+                    <a [href]="'tel:' + emprendimiento()!.telefono"
+                       class="text-orange-600 dark:text-blue-400 hover:underline">
                       {{ emprendimiento()!.telefono }}
                     </a>
                   </div>
@@ -220,8 +227,8 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
                     <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
-                    <a [href]="'mailto:' + emprendimiento()!.email" 
-                       class="text-emerald-600 dark:text-emerald-400 hover:underline">
+                    <a [href]="'mailto:' + emprendimiento()!.email"
+                       class="text-orange-600 dark:text-blue-400 hover:underline">
                       {{ emprendimiento()!.email }}
                     </a>
                   </div>
@@ -231,8 +238,8 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
                     <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
                     </svg>
-                    <a [href]="emprendimiento()!.pagina_web" target="_blank" 
-                       class="text-emerald-600 dark:text-emerald-400 hover:underline">
+                    <a [href]="emprendimiento()!.pagina_web" target="_blank"
+                       class="text-orange-600 dark:text-blue-400 hover:underline">
                       Visitar sitio web
                     </a>
                   </div>
@@ -256,7 +263,7 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
               <!-- Detalles del Negocio -->
               <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Detalles del Negocio</h2>
-                
+
                 <div class="space-y-4">
                   <!-- Capacidad -->
                   <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
@@ -273,7 +280,7 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
                   <!-- Accesibilidad -->
                   <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                     <span class="text-gray-600 dark:text-gray-400">Accesible para discapacidad</span>
-                    <span [class]="emprendimiento()!.facilidades_discapacidad ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'" 
+                    <span [class]="emprendimiento()!.facilidades_discapacidad ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
                           class="font-semibold">
                       {{ emprendimiento()!.facilidades_discapacidad ? 'Sí' : 'No' }}
                     </span>
@@ -291,19 +298,19 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
               <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Métodos de Pago</h2>
                 <div class="flex flex-wrap gap-2">
-                  <span *ngFor="let metodo of procesarMetodosPago()" 
-                        class="inline-block bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 px-3 py-1 rounded-full text-sm font-medium">
+                  <span *ngFor="let metodo of procesarMetodosPago()"
+                        class="inline-block bg-orange-100 dark:bg-blue-900 text-orange-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
                     {{ metodo }}
                   </span>
                 </div>
               </div>
 
               <!-- Idiomas -->
-              <div *ngIf="emprendimiento()!.idiomas_hablados && emprendimiento()!.idiomas_hablados.length > 0" 
+              <div *ngIf="emprendimiento()!.idiomas_hablados && emprendimiento()!.idiomas_hablados.length > 0"
                    class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Idiomas</h2>
                 <div class="flex flex-wrap gap-2">
-                  <span *ngFor="let idioma of procesarIdiomasHablados()" 
+                  <span *ngFor="let idioma of procesarIdiomasHablados()"
                         class="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
                     {{ idioma }}
                   </span>
@@ -314,8 +321,8 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
               <div *ngIf="emprendimiento()!.asociacion" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Asociación</h2>
                 <div class="flex items-center space-x-4">
-                  <img *ngIf="emprendimiento()!.asociacion!.imagen_url" 
-                       [src]="emprendimiento()!.asociacion!.imagen_url" 
+                  <img *ngIf="emprendimiento()!.asociacion!.imagen_url"
+                       [src]="emprendimiento()!.asociacion!.imagen_url"
                        [alt]="emprendimiento()!.asociacion!.nombre"
                        class="w-16 h-16 rounded-full object-cover"
                        onerror="this.src='/assets/general/placeholder-association.jpg'">
@@ -338,7 +345,7 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
                 <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                   <div class="flex items-start space-x-3">
                     <div class="flex-shrink-0">
-                      <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center">
+                      <div class="w-10 h-10 bg-orange-500 dark:bg-blue-500 rounded-full flex items-center justify-center">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
@@ -361,9 +368,9 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
 
               <!-- Botones de Acción -->
               <div class="space-y-3">
-                <a 
+                <a
                   [href]="'mailto:' + emprendimiento()!.email"
-                  class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center">
+                  class="w-full bg-orange-500 hover:bg-orange-600 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center">
                   <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
@@ -374,14 +381,14 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
 
                 <a
                   [href]="'mailto:' + emprendimiento()!.email"
-                  class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center">
+                  class="w-full bg-orange-500 hover:bg-orange-600 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center">
                   <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                   </svg>
                   Enviar Email
                 </a>
 
-                <button 
+                <button
                   (click)="compartir()"
                   class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center">
                   <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -403,7 +410,7 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
           </svg>
           <h2 class="text-2xl font-semibold text-gray-600 dark:text-gray-400 mb-2">Emprendimiento no encontrado</h2>
           <p class="text-gray-500 dark:text-gray-500 mb-4">El emprendimiento que buscas no existe o ha sido eliminado.</p>
-          <button 
+          <button
             (click)="volver()"
             class="bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-6 rounded-lg transition-colors duration-200">
             Volver a Emprendimientos
@@ -411,6 +418,7 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
         </div>
       </div>
     </div>
+
   `,
   styles: [`
     :host {
@@ -444,6 +452,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
   private emprendimientosService = inject(EmprendimientosService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
 
   // Signals
   emprendimiento = signal<Emprendimiento | null>(null);
@@ -461,12 +470,12 @@ export class EmprendimientoDetalleComponent implements OnInit {
     if (!emp) return [];
 
     const imagenes: string[] = [];
-    
+
     // Agregar imágenes principales
     if (emp.sliders_principales) {
       imagenes.push(...emp.sliders_principales.map(slider => slider.url_completa));
     }
-    
+
     // Agregar imágenes secundarias
     if (emp.sliders_secundarios) {
       imagenes.push(...emp.sliders_secundarios.map(slider => slider.url_completa));
@@ -492,7 +501,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
 
   private async cargarEmprendimiento(id: number) {
     this.cargando.set(true);
-    
+
     try {
       const emprendimiento = await this.emprendimientosService.getEmprendimiento(id).toPromise();
       if (emprendimiento) {

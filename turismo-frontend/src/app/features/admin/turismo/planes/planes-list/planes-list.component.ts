@@ -62,7 +62,7 @@ import { environment } from '../../../../../../environments/environments';
               [(ngModel)]="filtros.buscar"
               (input)="onFiltroChange()"
               placeholder="Nombre del plan..."
-              class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+              class="input-estilo w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
             >
           </div>
           
@@ -71,7 +71,7 @@ import { environment } from '../../../../../../environments/environments';
             <select
               [(ngModel)]="filtros.estado"
               (change)="onFiltroChange()"
-              class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+              class="select-estilo w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
             >
               <option value="">Todos</option>
               <option value="activo">Activos</option>
@@ -85,7 +85,7 @@ import { environment } from '../../../../../../environments/environments';
             <select
               [(ngModel)]="filtros.dificultad"
               (change)="onFiltroChange()"
-              class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+              class="select-estilo w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
             >
               <option value="">Todas</option>
               <option value="facil">Fácil</option>
@@ -99,7 +99,7 @@ import { environment } from '../../../../../../environments/environments';
             <select
               [(ngModel)]="filtros.es_publico"
               (change)="onFiltroChange()"
-              class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+              class="select-estilo w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
             >
               <option value="">Todos</option>
               <option value="true">Públicos</option>
@@ -116,7 +116,7 @@ import { environment } from '../../../../../../environments/environments';
                 (input)="onFiltroChange()"
                 placeholder="Min"
                 min="1"
-                class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+                class="py-2 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
               >
               <input
                 type="number"

@@ -386,7 +386,6 @@ import { environment } from '../../../../environments/environments';
 
                 <!-- Formulario de Inscripción -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-
                   <!-- Estado sin cupos -->
                   <div *ngIf="plan()!.cupos_disponibles === 0" class="p-6">
                     <div class="text-center">
@@ -495,7 +494,6 @@ import { environment } from '../../../../environments/environments';
                                     {{ inscripcionForm.get('numero_participantes')?.value === 1 ? 'Persona' : 'Personas' }}
                                   </div>
                                 </div>
-
                                 <button type="button"
                                         (click)="incrementarParticipantes()"
                                         [disabled]="inscripcionForm.get('numero_participantes')?.value >= cuposDisponibles()"
@@ -510,6 +508,9 @@ import { environment } from '../../../../environments/environments';
                                         'text-gray-300 dark:text-gray-600': inscripcionForm.get('numero_participantes')?.value >= cuposDisponibles()
                                       }"
                                       fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button type="button" class="group p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300">
+                                  <svg class="w-7 h-7 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                   </svg>
                                 </button>

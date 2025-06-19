@@ -81,11 +81,57 @@ class Emprendedor extends Model
         return $this->hasMany(Servicio::class);
     }
     
-    public function reservas(): BelongsToMany
+    public function reservas()
     {
-        return $this->belongsToMany(Reserva::class, 'reserva_detalle')
-                    ->withPivot('descripcion', 'cantidad')
-                    ->withTimestamps();
+        return $this->hasManyThrough(
+            Reserva::class,
+            ReservaServicio::class,
+            'emprendedor_id', // Foreign key en reserva_servicios
+            'id', // Foreign key en reservas
+            'id', // Local key en emprendedores
+            'reserva_id' // Local key en reserva_servicios
+        )->distinct()->where('reservas.estado', '!=', 'en_carrito');
+    }
+
+    /**
+     * Relación directa con los servicios reservados del emprendedor
+     */
+    public function reservaServicios()
+    {
+        return $this->hasMany(ReservaServicio::class, 'emprendedor_id');
+    }
+    /**
+     * Reservas confirmadas del emprendedor
+     */
+    public function reservasConfirmadas()
+    {
+        return $this->reservas()->where('reservas.estado', 'confirmada');
+    }
+
+    /**
+     * Reservas pendientes del emprendedor
+     */
+    public function reservasPendientes()
+    {
+        return $this->reservas()->where('reservas.estado', 'pendiente');
+    }
+
+    /**
+     * Servicios reservados confirmados
+     */
+    public function serviciosReservadosConfirmados()
+    {
+        return $this->reservaServicios()
+            ->whereIn('estado', ['confirmado', 'completado']);
+    }
+
+    /**
+     * Servicios reservados pendientes
+     */
+    public function serviciosReservadosPendientes()
+    {
+        return $this->reservaServicios()
+            ->where('estado', 'pendiente');
     }
 
     // Nuevas relaciones para sliders
