@@ -469,8 +469,20 @@ import { environment } from '../../../../environments/environments';
                               </div>
 
                               <div class="flex items-center justify-center space-x-8">
-                                <button type="button" class="group p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300">
-                                  <svg class="w-7 h-7 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button type="button"
+                                        (click)="decrementarParticipantes()"
+                                        [disabled]="inscripcionForm.get('numero_participantes')?.value <= 1"
+                                        class="group p-4 rounded-2xl border-2 border-dashed transition-all duration-300"
+                                        [ngClass]="{
+                                          'border-gray-300 dark:border-gray-600 hover:border-red-500 dark:hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-900/20': inscripcionForm.get('numero_participantes')?.value > 1,
+                                          'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-not-allowed': inscripcionForm.get('numero_participantes')?.value <= 1
+                                        }">
+                                  <svg class="w-7 h-7 transition-colors duration-300"
+                                      [ngClass]="{
+                                        'text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400': inscripcionForm.get('numero_participantes')?.value > 1,
+                                        'text-gray-300 dark:text-gray-600': inscripcionForm.get('numero_participantes')?.value <= 1
+                                      }"
+                                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4" />
                                   </svg>
                                 </button>
@@ -484,8 +496,20 @@ import { environment } from '../../../../environments/environments';
                                   </div>
                                 </div>
 
-                                <button type="button" class="group p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300">
-                                  <svg class="w-7 h-7 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button type="button"
+                                        (click)="incrementarParticipantes()"
+                                        [disabled]="inscripcionForm.get('numero_participantes')?.value >= cuposDisponibles()"
+                                        class="group p-4 rounded-2xl border-2 border-dashed transition-all duration-300"
+                                        [ngClass]="{
+                                          'border-gray-300 dark:border-gray-600 hover:border-green-500 dark:hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20': inscripcionForm.get('numero_participantes')?.value < cuposDisponibles(),
+                                          'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-not-allowed': inscripcionForm.get('numero_participantes')?.value >= cuposDisponibles()
+                                        }">
+                                  <svg class="w-7 h-7 transition-colors duration-300"
+                                      [ngClass]="{
+                                        'text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400': inscripcionForm.get('numero_participantes')?.value < cuposDisponibles(),
+                                        'text-gray-300 dark:text-gray-600': inscripcionForm.get('numero_participantes')?.value >= cuposDisponibles()
+                                      }"
+                                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                   </svg>
                                 </button>
@@ -849,6 +873,27 @@ export class PlanesDetalleComponent implements OnInit {
         planId: this.plan()?.id
       }
     });
+  }
+
+  incrementarParticipantes(): void {
+    const currentValue = this.inscripcionForm.get('numero_participantes')?.value || 1;
+    const maxCupos = this.cuposDisponibles();
+
+    if (currentValue < maxCupos) {
+      this.inscripcionForm.patchValue({
+        numero_participantes: currentValue + 1
+      });
+    }
+  }
+
+  decrementarParticipantes(): void {
+    const currentValue = this.inscripcionForm.get('numero_participantes')?.value || 1;
+
+    if (currentValue > 1) {
+      this.inscripcionForm.patchValue({
+        numero_participantes: currentValue - 1
+      });
+    }
   }
 
   irARegistro() {
