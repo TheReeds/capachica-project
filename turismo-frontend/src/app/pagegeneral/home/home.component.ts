@@ -143,8 +143,8 @@ sliders: any[] = []; // tu lista original completa de imágenes
 
   // Método para obtener la primera imagen del slider
   getSliderImage(evento: Evento): string {
-    const slider = evento.sliders.find(s => s.es_principal);  // Busca el slider principal
-    return slider ? slider.url_completa : '';  // Devuelve la URL completa del primer slider, o vacío si no existe
+    const sliders_principales = evento.sliders.find(s => s.es_principal);  // Busca el slider principal
+    return sliders_principales ? sliders_principales.url_completa : '';  // Devuelve la URL completa del primer slider, o vacío si no existe
   }
 
   eventoProximo: any;
