@@ -10,6 +10,7 @@ import {
   ResumenPlanes,
   EstadisticasPlan
 } from '../../../core/models/emprendimiento-admin.model';
+import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 @Component({
   selector: 'app-planes-list',
@@ -514,14 +515,21 @@ export class PlanesListComponent implements OnInit {
   Math = Math;
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.emprendimientoId = +params['id'];
-      this.loadData();
+  // Obtener el ID de la ruta padre
+    this.route.parent?.paramMap.subscribe(params => {
+      const id = params.get('id');
+      console.log('Planes - ID recibido:', id); // Debug
+      
+      if (id && !isNaN(+id)) {
+        this.emprendimientoId = +id;
+        this.loadData();
+      } else {
+        console.error('Planes - ID inválido:', id);
+      }
     });
   }
 
   private loadData(): void {
-    this.loadEmprendimiento();
     this.loadPlanes();
     this.loadResumen();
   }

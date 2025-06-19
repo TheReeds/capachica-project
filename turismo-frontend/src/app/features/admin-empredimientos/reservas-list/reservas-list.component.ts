@@ -10,6 +10,7 @@ import {
   UpdateEstadoServicioRequest,
   ReservaServicio
 } from '../../../core/models/emprendimiento-admin.model';
+import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 // Extendemos ReservaServicio para incluir la propiedad updating
 interface ReservaServicioWithUpdating extends ReservaServicio {
@@ -24,8 +25,9 @@ interface ReservaWithUpdating extends Omit<Reserva, 'servicios'> {
 @Component({
   selector: 'app-reservas-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, EmprendimientoNavComponent],
   template: `
+    <app-emprendimiento-nav [emprendimiento]="emprendimiento">
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -425,6 +427,7 @@ interface ReservaWithUpdating extends Omit<Reserva, 'servicios'> {
             </div>
         </div>
         </div>
+    </app-emprendimiento-nav>
   `,
   styles: [`
     :host {
@@ -452,14 +455,21 @@ export class ReservasListComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.emprendimientoId = +params['id'];
-      this.loadData();
+  // Obtener el ID de la ruta padre
+    this.route.parent?.paramMap.subscribe(params => {
+      const id = params.get('id');
+      console.log('Reservas - ID recibido:', id); // Debug
+      
+      if (id && !isNaN(+id)) {
+        this.emprendimientoId = +id;
+        this.loadData();
+      } else {
+        console.error('Reservas - ID inválido:', id);
+      }
     });
   }
 
   private loadData(): void {
-    this.loadEmprendimiento();
     this.loadReservas();
   }
 

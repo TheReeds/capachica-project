@@ -20,64 +20,62 @@ export const ADMIN_EMPRENDEDORES_ROUTES: Routes = [
     canActivate: [authGuard],
     title: 'Detalle de mi Emprendimiento'
   },
+  // Layout padre para todas las rutas de gestión de emprendimiento
   {
     path: 'admin-emprendedores/emprendimiento/:id',
-    loadComponent: () => import('./emprendimiento-detalle/emprendimiento-detalle.component').then(c => c.EmprendimientoDetalleComponent),
+    loadComponent: () => import('./emprendimiento-layout/emprendimiento-layout.component').then(c => c.EmprendimientoLayoutComponent),
     canActivate: [authGuard],
-    title: 'Detalle de Emprendimiento'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/dashboard',
-    loadComponent: () => import('./emprendimiento-dashboard/emprendimiento-dashboard.component').then(c => c.EmprendimientoDashboardComponent),
-    canActivate: [authGuard],
-    title: 'Dashboard del Emprendimiento'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/servicios',
-    loadComponent: () => import('./servicios-list/servicios-list.component').then(c => c.ServiciosListComponent),
-    canActivate: [authGuard],
-    title: 'Servicios del Emprendimiento'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/servicio/nuevo',
-    loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
-    canActivate: [authGuard],
-    title: 'Nuevo Servicio'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/servicio/:servicioId',
-    loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
-    canActivate: [authGuard],
-    title: 'Editar Servicio'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/administradores',
-    loadComponent: () => import('./administradores-list/administradores-list.component').then(c => c.AdministradoresListComponent),
-    canActivate: [authGuard],
-    title: 'Administradores del Emprendimiento'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/reservas',
-    loadComponent: () => import('./reservas-list/reservas-list.component').then(c => c.ReservasListComponent),
-    canActivate: [authGuard],
-    title: 'Reservas del Emprendimiento'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/calendario',
-    loadComponent: () => import('./calendario-emprendimiento/calendario-emprendimiento.component').then(c => c.CalendarioEmprendimientoComponent),
-    canActivate: [authGuard],
-    title: 'Calendario del Emprendimiento'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/planes',
-    loadComponent: () => import('./planes-list/planes-list.component').then(c => c.PlanesListComponent),
-    canActivate: [authGuard],
-    title: 'Planes del Emprendimiento'
-  },
-  {
-    path: 'admin-emprendedores/emprendimiento/:id/estadisticas',
-    loadComponent: () => import('./estadisticas-emprendimiento/estadisticas-emprendimiento.component').then(c => c.EstadisticasEmprendimientoComponent),
-    canActivate: [authGuard],
-    title: 'Estadísticas del Emprendimiento'
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./emprendimiento-detalle/emprendimiento-detalle.component').then(c => c.EmprendimientoDetalleComponent),
+        title: 'Información del Emprendimiento'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./emprendimiento-dashboard/emprendimiento-dashboard.component').then(c => c.EmprendimientoDashboardComponent),
+        title: 'Dashboard del Emprendimiento'
+      },
+      {
+        path: 'servicios',
+        loadComponent: () => import('./servicios-list/servicios-list.component').then(c => c.ServiciosListComponent),
+        title: 'Servicios del Emprendimiento'
+      },
+      {
+        path: 'servicio/nuevo',
+        loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
+        title: 'Nuevo Servicio'
+      },
+      {
+        path: 'servicio/:servicioId',
+        loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
+        title: 'Editar Servicio'
+      },
+      {
+        path: 'administradores',
+        loadComponent: () => import('./administradores-list/administradores-list.component').then(c => c.AdministradoresListComponent),
+        title: 'Administradores del Emprendimiento'
+      },
+      {
+        path: 'reservas',
+        loadComponent: () => import('./reservas-list/reservas-list.component').then(c => c.ReservasListComponent),
+        title: 'Reservas del Emprendimiento'
+      },
+      {
+        path: 'calendario',
+        loadComponent: () => import('./calendario-emprendimiento/calendario-emprendimiento.component').then(c => c.CalendarioEmprendimientoComponent),
+        title: 'Calendario del Emprendimiento'
+      },
+      {
+        path: 'planes',
+        loadComponent: () => import('./planes-list/planes-list.component').then(c => c.PlanesListComponent),
+        title: 'Planes del Emprendimiento'
+      },
+      {
+        path: 'estadisticas',
+        loadComponent: () => import('./estadisticas-emprendimiento/estadisticas-emprendimiento.component').then(c => c.EstadisticasEmprendimientoComponent),
+        title: 'Estadísticas del Emprendimiento'
+      }
+    ]
   }
 ];

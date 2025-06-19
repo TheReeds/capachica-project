@@ -4,6 +4,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EmprendimientoAdminService } from '../../../core/services/emprendimiento-admin.service';
 import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-admin.model';
+import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 @Component({
   selector: 'app-servicios-list',
@@ -324,11 +325,20 @@ export class ServiciosListComponent implements OnInit {
   filtroEstado = '';
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.emprendimientoId = +params['id'];
-      this.loadData();
+    // Obtener el ID de la ruta padre
+    this.route.parent?.paramMap.subscribe(params => {
+      const id = params.get('id');
+      console.log('Servicios - ID recibido:', id); // Debug
+      
+      if (id && !isNaN(+id)) {
+        this.emprendimientoId = +id;
+        this.loadData();
+      } else {
+        console.error('Servicios - ID inválido:', id);
+      }
     });
   }
+
 
   private loadData(): void {
     this.loadEmprendimiento();
@@ -347,11 +357,13 @@ export class ServiciosListComponent implements OnInit {
   }
 
   loadServicios(): void {
+    console.log('Servicios - Cargando servicios para emprendimiento:', this.emprendimientoId); // Debug
     this.loading = true;
     this.error = '';
 
     this.emprendimientoAdminService.getServicios(this.emprendimientoId).subscribe({
       next: (data) => {
+        console.log('Servicios - Servicios cargados:', data); // Debug
         this.servicios = data.map(servicio => ({ ...servicio, updating: false, deleting: false }));
         this.applyFilters();
         this.loading = false;

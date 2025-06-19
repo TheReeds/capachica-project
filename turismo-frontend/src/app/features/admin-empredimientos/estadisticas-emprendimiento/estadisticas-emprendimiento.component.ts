@@ -7,6 +7,7 @@ import {
   Emprendimiento,
   ServicioPopular
 } from '../../../core/models/emprendimiento-admin.model';
+import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 interface EstadisticasConsolidadas {
   reservas: {
@@ -601,10 +602,18 @@ export class EstadisticasEmprendimientoComponent implements OnInit {
   Math = Math;
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.emprendimientoId = +params['id'];
-      this.initPeriodos();
-      this.loadData();
+  // Obtener el ID de la ruta padre
+    this.route.parent?.paramMap.subscribe(params => {
+      const id = params.get('id');
+      console.log('Estadisticas - ID recibido:', id); // Debug
+      
+      if (id && !isNaN(+id)) {
+        this.emprendimientoId = +id;
+        this.initPeriodos();
+        this.loadData();
+      } else {
+        console.error('Estadisticas - ID inválido:', id);
+      }
     });
   }
 
@@ -647,7 +656,6 @@ export class EstadisticasEmprendimientoComponent implements OnInit {
   }
 
   private loadData(): void {
-    this.loadEmprendimiento();
     this.loadEstadisticas();
   }
 

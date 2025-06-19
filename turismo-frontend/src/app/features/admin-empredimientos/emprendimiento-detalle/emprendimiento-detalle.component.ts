@@ -4,12 +4,14 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormArray } from '@angular/forms';
 import { EmprendimientosService, Emprendimiento } from '../../../core/services/emprendimientos.service';
 import { SliderUploadComponent, SliderImage } from '../../../shared/components/slider-upload/slider-upload.component';
+import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 @Component({
   selector: 'app-emprendimiento-detalle',
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, SliderUploadComponent],
   template: `
+    
     <div class="bg-gray-100 dark:bg-gray-900 min-h-screen">
       <!-- Barra Superior -->
       <header class="bg-white dark:bg-gray-800 shadow">
@@ -340,6 +342,7 @@ import { SliderUploadComponent, SliderImage } from '../../../shared/components/s
         </form>
       </main>
     </div>
+
   `,
   styles: [`
     :host {
@@ -371,9 +374,17 @@ export class EmprendimientoDetalleComponent implements OnInit {
   activeSection = 'general';
   
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.emprendimientoId = +params['id'];
-      this.loadEmprendimiento();
+  // Obtener el ID de la ruta padre
+    this.route.parent?.paramMap.subscribe(params => {
+      const id = params.get('id');
+      console.log('Detalle - ID recibido:', id); // Debug
+      
+      if (id && !isNaN(+id)) {
+        this.emprendimientoId = +id;
+        this.loadEmprendimiento();
+      } else {
+        console.error('Detalle - ID inválido:', id);
+      }
     });
   }
   

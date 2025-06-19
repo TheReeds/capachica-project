@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { EmprendimientoAdminService } from '../../../core/services/emprendimiento-admin.service';
 import { DashboardEmprendimiento, Emprendimiento } from '../../../core/models/emprendimiento-admin.model';
+import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 @Component({
   selector: 'app-emprendimiento-dashboard',
@@ -329,14 +330,21 @@ export class EmprendimientoDashboardComponent implements OnInit {
   error = '';
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.emprendimientoId = +params['id'];
-      this.loadData();
+    // Obtener el ID de la ruta padre
+    this.route.parent?.paramMap.subscribe(params => {
+      const id = params.get('id');
+      console.log('Dashboard - ID recibido:', id); // Debug
+      
+      if (id && !isNaN(+id)) {
+        this.emprendimientoId = +id;
+        this.loadData();
+      } else {
+        console.error('Dashboard - ID inválido:', id);
+      }
     });
   }
 
   private loadData(): void {
-    this.loadEmprendimiento();
     this.loadDashboard();
   }
 
