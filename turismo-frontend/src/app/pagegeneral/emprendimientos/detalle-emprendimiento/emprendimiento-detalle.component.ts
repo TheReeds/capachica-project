@@ -123,34 +123,69 @@ import { Location } from '@angular/common';
                 <div *ngIf="emprendimiento()!.servicios && emprendimiento()!.servicios!.length > 0; else noServicios"
                     class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div *ngFor="let servicio of emprendimiento()!.servicios"
-                    class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                    class="group relative overflow-hidden rounded-xl cursor-pointer transform transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-2 hover:scale-105"
                     (click)="verServicio(servicio.id)">
-                    <!-- Imagen del servicio -->
-                    <img *ngIf="servicio.sliders && servicio.sliders.length > 0"
-                        [src]="servicio.sliders[0].url_completa"
-                        [alt]="servicio.nombre"
-                        class="w-full h-32 object-cover rounded-md mb-3"
-                        onerror="this.src='/assets/general/placeholder-service.jpg'" />
 
-                          <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">{{ servicio.nombre }}</h3>
-                          <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">{{ servicio.descripcion }}</p>
+                    <!-- Contenedor de imagen -->
+                    <div class="relative h-64 overflow-hidden rounded-xl">
+                      <!-- Imagen del servicio con efecto click -->
+                      <img *ngIf="servicio.sliders && servicio.sliders.length > 0"
+                          [src]="servicio.sliders[0].url_completa"
+                          [alt]="servicio.nombre"
+                          class="w-full h-full object-cover transition-all duration-500 hover:scale-110 hover:brightness-125 hover:saturate-150 cursor-zoom-in transform-gpu"
+                          (click)="$event.stopPropagation(); ampliarImagenServicio(servicio)"
+                          onerror="this.src='/assets/general/placeholder-service.jpg'" />
 
-                          <div class="flex justify-between items-center">
-                            <span class="text-orange-600 dark:text-blue-400 font-bold">
-                              S/. {{ servicio.precio_referencial }}
-                            </span>
-                            <span class="text-xs text-gray-500 dark:text-gray-500">
-                              {{ servicio.categorias?.[0]?.nombre || 'Servicio' }}
-                            </span>
-                          </div>
-                    <!-- Horarios del servicio -->
-                    <div *ngIf="servicio.horarios && servicio.horarios.length > 0" class="mt-2">
-                      <div class="flex flex-wrap gap-1">
-                        <span *ngFor="let horario of obtenerHorariosUnicos(servicio.horarios).slice(0, 3)"
-                              class="inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded">
-                          {{ formatearDia(horario.dia_semana) }}
-                        </span>
+                      <!-- Imagen placeholder si no hay imagen -->
+                      <div *ngIf="!servicio.sliders || servicio.sliders.length === 0"
+                          class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
                       </div>
+
+                      <!-- Overlay permanente con gradiente sutil -->
+                      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+
+
+
+                      <!-- Contenido siempre visible en la parte inferior -->
+                      <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <!-- Nombre del servicio -->
+                        <h3 class="text-lg font-bold mb-1 drop-shadow-lg">{{ servicio.nombre }}</h3>
+
+                        <!-- Descripción -->
+                        <p class="text-sm text-white/90 mb-2 line-clamp-2 drop-shadow-md">{{ servicio.descripcion }}</p>
+
+                        <!-- Precio y categoría -->
+                        <div class="flex justify-between items-center mb-2">
+                          <span class="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-blue-500 dark:to-blue-600 px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm shadow-lg animate-pulse">
+                            S/. {{ servicio.precio_referencial }}
+                          </span>
+                          <span class="bg-white/20 px-2 py-1 rounded-full text-xs backdrop-blur-sm">
+                            {{ servicio.categorias?.[0]?.nombre || 'Servicio' }}
+                          </span>
+                        </div>
+
+                        <!-- Horarios del servicio -->
+                        <div *ngIf="servicio.horarios && servicio.horarios.length > 0" class="flex flex-wrap gap-1">
+                          <span *ngFor="let horario of obtenerHorariosUnicos(servicio.horarios).slice(0, 3)"
+                                class="inline-block bg-green-500/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                            {{ formatearDia(horario.dia_semana) }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Indicador de click en la imagen -->
+                      <button
+                      (click)="$event.stopPropagation(); ampliarImagenServicio(servicio)"
+                      class="absolute top-3 right-3 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-125 animate-pulse"
+                      title="Ampliar imagen"
+                      aria-label="Ampliar imagen del servicio">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                      </svg>
+                    </button>
                     </div>
                   </div>
                 </div>
@@ -164,6 +199,71 @@ import { Location } from '@angular/common';
                   </div>
                 </ng-template>
               </div>
+
+              <!-- Modal para imagen ampliada -->
+              <div *ngIf="servicioAmpliado()"
+                class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+                (click)="cerrarImagenAmpliada()">
+                <div class="relative max-w-4xl max-h-full w-full" (click)="$event.stopPropagation()">
+                  <!-- Imagen principal ampliada -->
+                  <div class="relative rounded-2xl overflow-hidden shadow-2xl">
+                    <img [src]="imagenServicioActual()"
+                      [alt]="servicioAmpliado()!.nombre"
+                      class="w-full max-h-[85vh] object-contain rounded-xl"
+                      onerror="this.src='/assets/general/placeholder-service.jpg'">
+
+                    <!-- Navegación de imágenes del servicio -->
+                    <div *ngIf="imagenesServicioActual().length > 1" class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-6 pointer-events-none">
+                      <button (click)="$event.stopPropagation(); imagenServicioAnterior()"
+                              class="pointer-events-auto bg-black/50 hover:bg-black/70 text-white rounded-xl p-3 transition-all duration-200 hover:scale-110">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                      </button>
+                      <button (click)="$event.stopPropagation(); imagenServicioSiguiente()"
+                              class="pointer-events-auto bg-black/50 hover:bg-black/70 text-white rounded-xl p-3 transition-all duration-200 hover:scale-110">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                      </button>
+                    </div>
+
+                  <!-- Información del servicio en overlay -->
+                  <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
+                    <h3 class="text-2xl font-bold text-white mb-2">{{ servicioAmpliado()!.nombre }}</h3>
+                    <p class="text-white/90 mb-3">{{ servicioAmpliado()!.descripcion }}</p>
+                    <div class="flex items-center justify-between">
+                      <span class="bg-orange-500 text-white px-4 py-2 rounded-full font-bold">
+                        S/. {{ servicioAmpliado()!.precio_referencial }}
+                      </span>
+                      <button (click)="$event.stopPropagation(); verServicio(servicioAmpliado()!.id)"
+                              class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-full transition-colors">
+                        Ver Detalles
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón cerrar -->
+                <button (click)="cerrarImagenAmpliada()"
+                  class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-full p-2 transition-all duration-200 hover:scale-110 z-10">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+
+                <!-- Indicadores de imagen -->
+                <div *ngIf="imagenesServicioActual().length > 1" class="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+                  <div class="flex space-x-2">
+                    <button *ngFor="let imagen of imagenesServicioActual(); let i = index"
+                            (click)="$event.stopPropagation(); seleccionarImagenServicio(i)"
+                            [class]="i === indiceImagenServicio() ? 'bg-white' : 'bg-white/50'"
+                            class="w-3 h-3 rounded-full transition-all duration-200 hover:scale-125">
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
               <!-- Galería Secundaria - Diseño Limpio -->
               <div *ngIf="emprendimiento()!.sliders_secundarios && emprendimiento()!.sliders_secundarios.length > 0"
@@ -424,6 +524,23 @@ import { Location } from '@angular/common';
       -webkit-box-orient: vertical;
     }
 
+    .line-clamp-2 {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    /* Efecto de hover más suave */
+    .group:hover .transition-transform {
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Backdrop blur para mejor legibilidad */
+    .backdrop-blur-sm {
+      backdrop-filter: blur(4px);
+    }
+
     /* Transiciones suaves para la galería */
     .transition-opacity {
       transition: opacity 0.3s ease-in-out;
@@ -437,6 +554,25 @@ import { Location } from '@angular/common';
     /* Animación para las cards de servicios */
     .transition-shadow {
       transition: box-shadow 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .cursor-zoom-in {
+      cursor: zoom-in;
+    }
+
+    /* Efectos de hover mejorados */
+    .group:hover .transition-transform {
+      transform-origin: center;
+    }
+
+    /* Backdrop blur más intenso */
+    .backdrop-blur-sm {
+      backdrop-filter: blur(8px);
     }
   `]
 })
@@ -455,6 +591,8 @@ export class EmprendimientoDetalleComponent implements OnInit {
     if (!emp) return 0;
     return this.emprendimientosService.calcularCalificacionPromedio(emp);
   });
+  servicioAmpliado = signal<ServicioEmprendimiento | null>(null);
+  indiceImagenServicio = signal<number>(0);
 
   // Computed
   todasLasImagenes = computed(() => {
@@ -474,6 +612,22 @@ export class EmprendimientoDetalleComponent implements OnInit {
     }
 
     return imagenes.length > 0 ? imagenes : ['/assets/general/placeholder-business.jpg'];
+  });
+
+  imagenesServicioActual = computed(() => {
+    const servicio = this.servicioAmpliado();
+    if (!servicio?.sliders || servicio.sliders.length === 0) return [];
+    return servicio.sliders.map(slider => slider.url_completa);
+  });
+
+  imagenServicioActual = computed(() => {
+    const servicio = this.servicioAmpliado();
+    if (!servicio?.sliders || servicio.sliders.length === 0) {
+      return '/assets/general/placeholder-service.jpg';
+    }
+    const imagenes = servicio.sliders.map(slider => slider.url_completa);
+    const indice = this.indiceImagenServicio();
+    return imagenes[indice] || '/assets/general/placeholder-service.jpg';
   });
 
   imagenPrincipalActual = computed(() => {
@@ -527,6 +681,39 @@ export class EmprendimientoDetalleComponent implements OnInit {
   // Navegación
   volver() {
     this.router.navigate(['/emprendimientos']);
+  }
+
+  imagenAmpliada = signal<string | null>(null);
+
+  // Agrega estos métodos
+  ampliarImagen(urlImagen: string) {
+    this.imagenAmpliada.set(urlImagen);
+  }
+
+  ampliarImagenServicio(servicio: ServicioEmprendimiento) {
+    this.servicioAmpliado.set(servicio);
+    this.indiceImagenServicio.set(0);
+  }
+
+  imagenServicioSiguiente() {
+    const totalImagenes = this.imagenesServicioActual().length;
+    const indiceActual = this.indiceImagenServicio();
+    this.indiceImagenServicio.set((indiceActual + 1) % totalImagenes);
+  }
+
+  imagenServicioAnterior() {
+    const totalImagenes = this.imagenesServicioActual().length;
+    const indiceActual = this.indiceImagenServicio();
+    this.indiceImagenServicio.set((indiceActual - 1 + totalImagenes) % totalImagenes);
+  }
+
+  seleccionarImagenServicio(indice: number) {
+    this.indiceImagenServicio.set(indice);
+  }
+
+  cerrarImagenAmpliada() {
+    this.servicioAmpliado.set(null);
+    this.indiceImagenServicio.set(0);
   }
 
   verServicio(servicioId: number) {
