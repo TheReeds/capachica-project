@@ -32,10 +32,12 @@ import { Location } from '@angular/common';
               class="w-full h-full object-cover"
               onerror="this.src='/assets/general/placeholder-business.jpg'"
             >
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+            <!-- Gradiente para mejorar legibilidad del texto -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
 
             <!-- Navegación de imágenes -->
-            <div *ngIf="todasLasImagenes().length > 1" class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4">
+            <div *ngIf="todasLasImagenes().length > 1" class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 z-10">
               <button
                 (click)="imagenAnterior()"
                 class="bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200">
@@ -53,7 +55,7 @@ import { Location } from '@angular/common';
             </div>
 
             <!-- Indicadores de imagen -->
-            <div *ngIf="todasLasImagenes().length > 1" class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+            <div *ngIf="todasLasImagenes().length > 1" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20">
               <div class="flex space-x-2">
                 <button
                   *ngFor="let imagen of todasLasImagenes(); let i = index"
@@ -64,51 +66,28 @@ import { Location } from '@angular/common';
               </div>
             </div>
 
-            <!-- Información superpuesta -->
-          <div class="absolute bottom-8 left-0 right-0 p-4 text-white">
-
-            <div class="absolute bottom-0 left-0 right-0 p-4 text-white" style="top: 80px;">
-              <div class="container mx-auto">
-                <div class="flex items-end justify-between">
-                  <div>
-                    <h1 class="text-3xl md:text-5xl font-bold mb-2">{{ emprendimiento()!.nombre }}</h1>
-                    <div class="flex items-center space-x-4 text-lg">
-                      <span class="bg-orange-500 dark:bg-blue-500 px-3 py-1 rounded-full text-sm font-medium">
-                        {{ emprendimiento()!.categoria }}
-                      </span>
-                      <span>{{ emprendimiento()!.tipo_servicio }}</span>
-                      <div class="flex items-center">
-                        <svg class="w-5 h-5 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                        </svg>
-                        <span class="font-semibold">{{ calificacionPromedio() }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <div *ngIf="emprendimiento()!.precio_rango" class="text-2xl font-bold">
-                      {{ emprendimiento()!.precio_rango }}
-                    </div>
-                    <div [class]="estaAbierto() ? 'text-green-400' : 'text-red-400'" class="font-semibold">
-                      {{ estaAbierto() ? 'Abierto ahora' : 'Cerrado' }}
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <!-- Nombre del emprendimiento centrado en la imagen -->
+            <div class="absolute inset-0 flex items-center justify-center z-15">
+              <div class="text-center">
+                <h1 class="text-2xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl mb-4 px-4">
+                  {{ emprendimiento()!.nombre }}
+                </h1>
+                <p class="text-lg md:text-xl text-white/90 drop-shadow-lg font-medium">
+                  Un viaje auténtico hacia nuestras raíces
+                </p>
               </div>
             </div>
+            <!-- Botón de regreso -->
+            <button
+              (click)="volver()"
+              class="absolute top-4 left-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 z-30"
+              title="Volver"
+              aria-label="Volver a la página anterior">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
           </div>
-
-          <!-- Botón de regreso -->
-          <button
-            (click)="volver()"
-            class="absolute top-4 left-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 z-10"
-            title="Volver"
-            aria-label="Volver a la página anterior">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-          </button>
         </section>
 
         <!-- Contenido -->
