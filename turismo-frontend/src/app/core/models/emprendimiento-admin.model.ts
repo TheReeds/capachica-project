@@ -3,10 +3,12 @@ import type {
   Servicio,
   AdminRequest,
   ServicioPopular,
+  Horario,
+  EventoBackend
 } from './emprendimiento.model';
 
 // Exportar interfaces de emprendimiento para uso externo
-export type { Emprendimiento, Servicio, AdminRequest, ServicioPopular } from './emprendimiento.model';
+export type { Emprendimiento, Servicio, AdminRequest, ServicioPopular, Horario, EventoBackend } from './emprendimiento.model';
 
 // Modelos base reutilizables
 export interface Usuario {
@@ -65,9 +67,9 @@ export interface ServicioInfo {
   nombre: string;
   descripcion: string;
   precio_referencial: string;
+  capacidad: number; // Campo agregado como requerido
   emprendedor_id?: number;
   estado?: boolean;
-  capacidad?: number;
   latitud?: string;
   longitud?: string;
   ubicacion_referencia?: string;
@@ -306,7 +308,7 @@ export interface EventoCalendario {
 export interface CalendarioEmprendimiento {
   fecha_inicio: string;
   fecha_fin: string;
-  eventos_por_dia: CalendarioEvento[];
+  eventos_por_dia: Record<string, EventoBackend[]>;
   total_reservas: number;
   ingresos_periodo: number;
 }

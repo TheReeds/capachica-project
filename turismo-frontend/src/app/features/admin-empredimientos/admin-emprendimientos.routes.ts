@@ -15,33 +15,72 @@ export const ADMIN_EMPRENDEDORES_ROUTES: Routes = [
     title: 'Mis Emprendimientos'
   },
   {
-    path: 'emprendimiento/:id',
-    loadComponent: () => import('./emprendimiento-detalle/emprendimiento-detalle.component').then(c => c.EmprendimientoDetalleComponent),
+    path: 'mis-emprendimientos/:id',
+    loadComponent: () => import('./mis-emprendimientos-detalle/mis-emprendimientos-detalle.component').then(c => c.MisEmprendimientoDetalleComponent),
     canActivate: [authGuard],
-    title: 'Detalle de Emprendimiento'
+    title: 'Detalle de mi Emprendimiento'
   },
+  // Layout padre para todas las rutas de gestión de emprendimiento
   {
-    path: 'emprendimiento/:id/servicios',
-    loadComponent: () => import('./servicios-list/servicios-list.component').then(c => c.ServiciosListComponent),
+    path: 'admin-emprendedores/emprendimiento/:id',
+    loadComponent: () => import('./emprendimiento-layout/emprendimiento-layout.component').then(c => c.EmprendimientoLayoutComponent),
     canActivate: [authGuard],
-    title: 'Servicios del Emprendimiento'
-  },
-  {
-    path: 'emprendimiento/:id/servicio/nuevo',
-    loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
-    canActivate: [authGuard],
-    title: 'Nuevo Servicio'
-  },
-  {
-    path: 'emprendimiento/:id/servicio/:servicioId',
-    loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
-    canActivate: [authGuard],
-    title: 'Editar Servicio'
-  },
-  {
-    path: 'emprendimiento/:id/administradores',
-    loadComponent: () => import('./administradores-list/administradores-list.component').then(c => c.AdministradoresListComponent),
-    canActivate: [authGuard],
-    title: 'Administradores del Emprendimiento'
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./mis-emprendimientos-detalle/mis-emprendimientos-detalle.component').then(c => c.MisEmprendimientoDetalleComponent),
+        title: 'Detalle de mi Emprendimiento'
+      },
+      {
+        path: 'mis-emprendimientos/:id',
+        loadComponent: () => import('./emprendimiento-detalle/emprendimiento-detalle.component').then(c => c.EmprendimientoDetalleComponent),
+        title: 'Información del Emprendimiento'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./emprendimiento-dashboard/emprendimiento-dashboard.component').then(c => c.EmprendimientoDashboardComponent),
+        title: 'Dashboard del Emprendimiento'
+      },
+      {
+        path: 'servicios',
+        loadComponent: () => import('./servicios-list/servicios-list.component').then(c => c.ServiciosListComponent),
+        title: 'Servicios del Emprendimiento'
+      },
+      {
+        path: 'servicio/nuevo',
+        loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
+        title: 'Nuevo Servicio'
+      },
+      {
+        path: 'servicio/:servicioId',
+        loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
+        title: 'Editar Servicio'
+      },
+      {
+        path: 'administradores',
+        loadComponent: () => import('./administradores-list/administradores-list.component').then(c => c.AdministradoresListComponent),
+        title: 'Administradores del Emprendimiento'
+      },
+      {
+        path: 'reservas',
+        loadComponent: () => import('./reservas-list/reservas-list.component').then(c => c.ReservasListComponent),
+        title: 'Reservas del Emprendimiento'
+      },
+      {
+        path: 'calendario',
+        loadComponent: () => import('./calendario-emprendimiento/calendario-emprendimiento.component').then(c => c.CalendarioEmprendimientoComponent),
+        title: 'Calendario del Emprendimiento'
+      },
+      {
+        path: 'planes',
+        loadComponent: () => import('./planes-list/planes-list.component').then(c => c.PlanesListComponent),
+        title: 'Planes del Emprendimiento'
+      },
+      {
+        path: 'estadisticas',
+        loadComponent: () => import('./estadisticas-emprendimiento/estadisticas-emprendimiento.component').then(c => c.EstadisticasEmprendimientoComponent),
+        title: 'Estadísticas del Emprendimiento'
+      }
+    ]
   }
 ];

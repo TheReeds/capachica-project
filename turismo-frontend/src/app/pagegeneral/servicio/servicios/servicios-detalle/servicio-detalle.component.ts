@@ -14,7 +14,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
   imports: [CommonModule, RouterModule, FormsModule, UbicacionMapComponent],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
-      
+
       <!-- Loading State -->
       <div *ngIf="cargando()" class="container mx-auto px-4 py-20">
         <div class="text-center">
@@ -31,7 +31,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
           </svg>
           <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Servicio no encontrado</h2>
           <p class="text-gray-600 dark:text-gray-400 mb-6">El servicio que buscas no existe o ha sido eliminado.</p>
-          <button 
+          <button
             (click)="volverAServicios()"
             class="bg-amber-500 hover:bg-amber-600 text-white py-2 px-6 rounded-lg transition-colors duration-200"
           >
@@ -42,7 +42,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
 
       <!-- Contenido del Servicio -->
       <div *ngIf="!cargando() && !error() && servicio()" class="container mx-auto px-4 py-8">
-        
+
         <!-- Breadcrumb -->
         <nav class="flex mb-8" aria-label="Breadcrumb">
           <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -74,24 +74,24 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           <!-- Contenido Principal -->
           <div class="lg:col-span-2">
-            
+
             <!-- Galería de Imágenes -->
             <div class="mb-8">
               <div class="relative h-96 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700">
-                <img 
-                  [src]="imagenActual" 
+                <img
+                  [src]="imagenActual"
                   [alt]="servicio()?.nombre"
                   class="w-full h-full object-cover"
                   onerror="this.src='/assets/general/placeholder-service.jpg'"
                 >
-                
+
                 <!-- Navegación de galería -->
                 <div *ngIf="servicio()?.sliders && servicio()!.sliders!.length > 1" class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
                   <div class="flex space-x-2 bg-black/50 rounded-full px-3 py-2">
-                    <button 
+                    <button
                       *ngFor="let slider of servicio()?.sliders; let i = index"
                       (click)="cambiarImagen(i)"
                       [class]="imagenIndex() === i ? 'bg-white' : 'bg-white/50'"
@@ -99,9 +99,9 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                     ></button>
                   </div>
                 </div>
-                
+
                 <!-- Botones de navegación -->
-                <button 
+                <button
                   *ngIf="servicio()?.sliders && servicio()!.sliders!.length > 1"
                   (click)="imagenAnterior()"
                   class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors duration-200"
@@ -110,8 +110,8 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                
-                <button 
+
+                <button
                   *ngIf="servicio()?.sliders && servicio()!.sliders!.length > 1"
                   (click)="imagenSiguiente()"
                   class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors duration-200"
@@ -128,11 +128,11 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
               <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
                 <div class="mb-4 md:mb-0">
                   <div class="flex items-center mb-2">
-                    <span *ngIf="servicio()?.categorias?.[0]" 
+                    <span *ngIf="servicio()?.categorias?.[0]"
                           class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-3 py-1 rounded-full text-sm font-medium mr-3">
                       {{ servicio()?.categorias?.[0]?.nombre }}
                     </span>
-                    <span *ngIf="servicio()?.estado" 
+                    <span *ngIf="servicio()?.estado"
                           class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">
                       Disponible
                     </span>
@@ -141,7 +141,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                     {{ servicio()?.nombre }}
                   </h1>
                 </div>
-                
+
                 <div *ngIf="servicio()?.precio_referencial" class="text-right">
                   <p class="text-sm text-gray-500 dark:text-gray-400">Precio referencial</p>
                   <p class="text-3xl md:text-4xl font-bold text-amber-600">
@@ -179,7 +179,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
             </div>
 
             <!-- Horarios de Disponibilidad -->
-            <div *ngIf="servicio()?.horarios && servicio()!.horarios!.length > 0" 
+            <div *ngIf="servicio()?.horarios && servicio()!.horarios!.length > 0"
                  class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
               <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                 <svg class="w-6 h-6 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,9 +187,9 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </svg>
                 Horarios de Disponibilidad
               </h2>
-              
+
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div *ngFor="let horario of obtenerHorariosAgrupados()" 
+                <div *ngFor="let horario of obtenerHorariosAgrupados()"
                      [class]="horario.activo ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600'"
                      class="border rounded-lg p-4">
                   <div class="flex justify-between items-center">
@@ -216,7 +216,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </svg>
                 Verificar Disponibilidad
               </h2>
-              
+
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -229,7 +229,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                   >
                 </div>
-                
+
                 <div>
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Hora de inicio
@@ -240,7 +240,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                   >
                 </div>
-                
+
                 <div>
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Hora de fin
@@ -252,7 +252,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                   >
                 </div>
               </div>
-              
+
               <button
                 (click)="verificarDisponibilidad()"
                 [disabled]="!fechaConsulta || !horaInicio || !horaFin || verificandoDisponibilidad()"
@@ -267,9 +267,9 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                   Verificando...
                 </span>
               </button>
-              
+
               <!-- Resultado de disponibilidad -->
-              <div *ngIf="resultadoDisponibilidad !== null" class="mt-4 p-4 rounded-lg" 
+              <div *ngIf="resultadoDisponibilidad !== null" class="mt-4 p-4 rounded-lg"
                    [class]="resultadoDisponibilidad ? 'bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800'">
                 <div class="flex items-center">
                   <svg *ngIf="resultadoDisponibilidad" class="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,12 +278,12 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                   <svg *ngIf="!resultadoDisponibilidad" class="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
-                  <span [class]="resultadoDisponibilidad ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'" 
+                  <span [class]="resultadoDisponibilidad ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'"
                         class="font-medium">
                     {{ resultadoDisponibilidad ? '¡Servicio disponible!' : 'Servicio no disponible' }}
                   </span>
                 </div>
-                <p [class]="resultadoDisponibilidad ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'" 
+                <p [class]="resultadoDisponibilidad ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'"
                    class="mt-1 text-sm">
                   {{ resultadoDisponibilidad ? 'Puedes agregar este servicio a tu carrito para la fecha y horario seleccionados.' : 'El servicio no está disponible en la fecha y horario seleccionados. Intenta con otro horario.' }}
                 </p>
@@ -291,7 +291,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
             </div>
 
             <!-- Mapa de Ubicación -->
-            <div *ngIf="servicio()?.latitud && servicio()?.longitud" 
+            <div *ngIf="servicio()?.latitud && servicio()?.longitud"
                  class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
               <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                 <svg class="w-6 h-6 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,7 +300,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </svg>
                 Ubicación del Servicio
               </h2>
-              
+
               <div class="h-64">
                 <app-ubicacion-map
                   [latitud]="servicio()?.latitud"
@@ -313,7 +313,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
 
           <!-- Sidebar -->
           <div class="lg:col-span-1">
-            
+
             <!-- Información del Emprendedor -->
             <div *ngIf="servicio()?.emprendedor" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 sticky top-4">
               <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
@@ -322,43 +322,43 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </svg>
                 Emprendedor
               </h3>
-              
+
               <div class="space-y-4">
                 <div>
                   <h4 class="font-semibold text-gray-800 dark:text-gray-200">{{ servicio()?.emprendedor?.nombre }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.tipo_servicio }}</p>
                 </div>
-                
+
                 <div *ngIf="servicio()?.emprendedor?.telefono" class="flex items-center">
                   <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                   </svg>
                   <span class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.telefono }}</span>
                 </div>
-                
+
                 <div *ngIf="servicio()?.emprendedor?.email" class="flex items-center">
                   <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                   </svg>
                   <span class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.email }}</span>
                 </div>
-                
+
                 <div *ngIf="servicio()?.emprendedor?.ubicacion" class="flex items-start">
                   <svg class="w-4 h-4 text-gray-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                   </svg>
                   <span class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.ubicacion }}</span>
                 </div>
-                
+
                 <div *ngIf="servicio()?.emprendedor?.precio_rango" class="flex items-center">
                   <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                   </svg>
                   <span class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.precio_rango }}</span>
                 </div>
-                
+
                 <!-- Mensajes del carrito -->
-                <div *ngIf="mensajeCarrito()" class="mb-4 p-3 rounded-lg" 
+                <div *ngIf="mensajeCarrito()" class="mb-4 p-3 rounded-lg"
                     [class]="tipoMensajeCarrito() === 'success' ? 'bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800'">
                 <div class="flex items-center">
                     <svg *ngIf="tipoMensajeCarrito() === 'success'" class="w-5 h-5 text-green-600 dark:text-green-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -367,7 +367,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                     <svg *ngIf="tipoMensajeCarrito() === 'error'" class="w-5 h-5 text-red-600 dark:text-red-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
                     </svg>
-                    <span [class]="tipoMensajeCarrito() === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'" 
+                    <span [class]="tipoMensajeCarrito() === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'"
                         class="text-sm font-medium">
                     {{ mensajeCarrito() }}
                     </span>
@@ -377,7 +377,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 <!-- Botones de acción -->
                 <div class="pt-4 space-y-3">
                 <!-- Botón principal: Agregar al carrito -->
-                <button 
+                <button
                     *ngIf="estaAutenticado() && resultadoDisponibilidad === true"
                     (click)="agregarAlCarrito()"
                     [disabled]="agregandoAlCarrito()"
@@ -399,7 +399,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </button>
 
                 <!-- Botón: Verificar disponibilidad primero -->
-                <button 
+                <button
                     *ngIf="estaAutenticado() && resultadoDisponibilidad !== true && (fechaConsulta || horaInicio || horaFin)"
                     disabled
                     class="w-full bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400 py-3 px-4 rounded-lg font-medium cursor-not-allowed"
@@ -408,7 +408,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </button>
 
                 <!-- Botón: Seleccionar fecha y hora -->
-                <button 
+                <button
                     *ngIf="estaAutenticado() && !fechaConsulta && !horaInicio && !horaFin"
                     disabled
                     class="w-full bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400 py-3 px-4 rounded-lg font-medium cursor-not-allowed"
@@ -417,7 +417,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </button>
 
                 <!-- Botón: Iniciar sesión -->
-                <button 
+                <button
                     *ngIf="!estaAutenticado()"
                     (click)="irAlLogin()"
                     class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center"
@@ -429,7 +429,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </button>
 
                 <!-- Botón: Ver carrito (solo si está autenticado y tiene items) -->
-                <button 
+                <button
                     *ngIf="estaAutenticado() && getTotalItemsCarrito() > 0"
                     (click)="irAlCarrito()"
                     class="w-full bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 py-2 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center"
@@ -441,7 +441,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </button>
 
                 <!-- Botón: WhatsApp -->
-                <button 
+                <button
                     *ngIf="servicio()?.emprendedor?.telefono"
                     (click)="contactarWhatsApp()"
                     class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center"
@@ -451,9 +451,9 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                     </svg>
                     Contactar por WhatsApp
                 </button>
-                
+
                 <!-- Botón: Volver a servicios -->
-                <button 
+                <button
                     (click)="volverAServicios()"
                     class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg transition-colors duration-200 font-medium"
                 >
@@ -469,9 +469,9 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
                 </svg>
                 Servicios Relacionados
               </h3>
-              
+
               <div class="space-y-4">
-                <div *ngFor="let servicioRel of serviciosRelacionados().slice(0, 3)" 
+                <div *ngFor="let servicioRel of serviciosRelacionados().slice(0, 3)"
                      (click)="verOtroServicio(servicioRel.id)"
                      class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200">
                   <h4 class="font-medium text-gray-800 dark:text-gray-200 text-sm">{{ servicioRel.nombre }}</h4>
@@ -491,14 +491,14 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
     :host {
       display: block;
     }
-    
+
     .line-clamp-1 {
       overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
     }
-    
+
     .line-clamp-2 {
       overflow: hidden;
       display: -webkit-box;
@@ -543,7 +543,7 @@ export class ServicioDetalleComponent implements OnInit {
 
   ngOnInit() {
     this.fechaMinima = new Date().toISOString().split('T')[0];
-    
+
     this.route.params.subscribe(params => {
       const id = +params['id'];
       if (id) {
@@ -559,7 +559,7 @@ export class ServicioDetalleComponent implements OnInit {
 
     try {
       const servicio = await this.turismoService.getServicio(id).toPromise();
-      
+
       if (servicio) {
         const servicioTransformado = this.transformarServicio(servicio);
         this.servicio.set(servicioTransformado);
@@ -627,7 +627,7 @@ export class ServicioDetalleComponent implements OnInit {
         const serviciosCategoria = await this.turismoService.getServiciosByCategoria(
           servicio.categorias[0].id
         ).toPromise();
-        
+
         if (serviciosCategoria) {
           // Filtrar el servicio actual y tomar máximo 5
           const relacionados = serviciosCategoria
@@ -648,7 +648,7 @@ export class ServicioDetalleComponent implements OnInit {
     }
 
     this.verificandoDisponibilidad.set(true);
-    
+
     try {
       const resultado = await this.turismoService.verificarDisponibilidadServicio(
         this.servicio()!.id,
@@ -656,7 +656,7 @@ export class ServicioDetalleComponent implements OnInit {
         this.horaInicio + ':00',
         this.horaFin + ':00'
       ).toPromise();
-      
+
       this.resultadoDisponibilidad = resultado?.disponible || false;
     } catch (error) {
       console.error('Error al verificar disponibilidad:', error);
@@ -749,13 +749,13 @@ export class ServicioDetalleComponent implements OnInit {
 
   formatearHora(hora: string): string {
     if (!hora) return '';
-    
+
     // Convertir de formato 24h a 12h
     const [horas, minutos] = hora.split(':');
     const hora24 = parseInt(horas);
     const hora12 = hora24 === 0 ? 12 : hora24 > 12 ? hora24 - 12 : hora24;
     const periodo = hora24 >= 12 ? 'PM' : 'AM';
-    
+
     return `${hora12}:${minutos} ${periodo}`;
   }
   estaAutenticado(): boolean {
@@ -767,8 +767,8 @@ export class ServicioDetalleComponent implements OnInit {
    */
   irAlLogin() {
     const currentUrl = this.router.url;
-    this.router.navigate(['/login'], { 
-      queryParams: { redirect: currentUrl } 
+    this.router.navigate(['/login'], {
+      queryParams: { redirect: currentUrl }
     });
   }
 
@@ -805,12 +805,12 @@ export class ServicioDetalleComponent implements OnInit {
       };
 
       await this.carritoService.agregarAlCarrito(item).toPromise();
-      
+
       this.mostrarMensajeExito('¡Servicio agregado al carrito exitosamente!');
-      
+
       // Limpiar formulario después de agregar
       this.limpiarFormularioDisponibilidad();
-      
+
     } catch (error: any) {
       console.error('Error al agregar al carrito:', error);
       this.mostrarMensajeError(error?.message || 'Error al agregar el servicio al carrito');
@@ -881,7 +881,7 @@ export class ServicioDetalleComponent implements OnInit {
    */
   calcularDuracionMinutos(): number {
     if (!this.horaInicio || !this.horaFin) return 0;
-    
+
     const inicio = new Date(`1970-01-01T${this.horaInicio}:00`);
     const fin = new Date(`1970-01-01T${this.horaFin}:00`);
     return Math.round((fin.getTime() - inicio.getTime()) / (1000 * 60));

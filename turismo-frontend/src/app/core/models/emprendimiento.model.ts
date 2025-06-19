@@ -47,6 +47,7 @@ export interface Servicio {
   nombre: string;
   descripcion: string;
   precio_referencial: number | string;
+  capacidad: number; // Campo agregado como requerido
   emprendedor_id: number;
   estado?: boolean;
   latitud?: string | number;
@@ -79,7 +80,57 @@ export interface AdminRequest {
 // Modelo para servicios populares en el dashboard
 export interface ServicioPopular {
   servicio_id: number;
-  nombre: string;
   total_reservas: number;
+  ingresos_generados: string;
   ingresos_totales: string;
+  nombre: string;
+  servicio: {
+    id: number;
+    nombre: string;
+    precio_referencial?: string;
+  };
+}
+
+export interface CalendarioEmprendimiento {
+  fecha_inicio: string;
+  fecha_fin: string;
+  eventos_por_dia: Record<string, EventoBackend[]>; // Más específico y type-safe
+  total_reservas: number;
+  ingresos_periodo: number;
+}
+
+// Modelo que coincide exactamente con la respuesta del backend
+export interface EventoBackend {
+  id: number;
+  titulo: string;
+  cliente: string;
+  email_cliente: string;
+  telefono_cliente: string;
+  hora_inicio: string;
+  hora_fin: string;
+  estado: string;
+  precio: string;
+  notas_cliente?: string;
+  duracion_minutos: number;
+}
+
+// Modelo transformado para uso en el frontend
+export interface EventoCalendario {
+  id: number;
+  titulo: string;
+  hora_inicio: string;
+  hora_fin: string;
+  estado: string;
+  cliente?: string;
+  servicio?: string;
+  precio?: string;
+  tipo: 'reserva' | 'plan';
+}
+
+// Mantener estos modelos para compatibilidad (aunque no se usen actualmente)
+export interface CalendarioEvento {
+  fecha: string;
+  eventos: EventoCalendario[];
+  total_eventos: number;
+  ingresos_dia: number;
 }

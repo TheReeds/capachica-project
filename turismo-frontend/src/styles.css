@@ -213,3 +213,13 @@
   width: 300px;
   height: 300px;
 }
+.input-estilo {
+  @apply pl-3 py-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm
+          focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400
+          sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200;
+}
+.select-estilo {
+  @apply pl-3 pr-10 py-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm 
+          focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 
+          sm:text-base
+}

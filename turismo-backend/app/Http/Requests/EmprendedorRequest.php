@@ -26,13 +26,38 @@ class EmprendedorRequest extends FormRequest
             }
         }
         
-        // Convertir idiomas_hablados que viene como string a array
-        if ($this->has('idiomas_hablados') && is_string($this->idiomas_hablados)) {
-            $idiomas = array_map('trim', explode(',', $this->idiomas_hablados));
-            $this->merge([
-                'idiomas_hablados' => $idiomas
-            ]);
+        // Convertir certificaciones que viene como string JSON a array
+        if ($this->has('certificaciones') && is_string($this->certificaciones)) {
+            if (is_array(json_decode($this->certificaciones, true))) {
+                $this->merge([
+                    'certificaciones' => json_decode($this->certificaciones, true)
+                ]);
+            }
         }
+        
+        // Convertir idiomas_hablados que viene como string JSON a array
+        if ($this->has('idiomas_hablados') && is_string($this->idiomas_hablados)) {
+                $idiomas = $this->idiomas_hablados;
+                
+                // Intentar decodificar múltiples veces hasta obtener un array limpio
+                while (is_string($idiomas)) {
+                    $decoded = json_decode($idiomas, true);
+                    if (is_array($decoded)) {
+                        $idiomas = $decoded;
+                    } else {
+                        // Si no es JSON válido, tratar como string separado por comas
+                        $idiomas = array_map('trim', explode(',', $idiomas));
+                        break;
+                    }
+                }
+                
+                // Asegurar que tenemos un array plano de strings
+                $idiomas = array_filter(array_map('trim', (array) $idiomas));
+                
+                $this->merge([
+                    'idiomas_hablados' => $idiomas
+                ]);
+            }
         
         // Asegurar que facilidades_discapacidad sea booleano
         if ($this->has('facilidades_discapacidad')) {
@@ -112,7 +137,7 @@ class EmprendedorRequest extends FormRequest
             'sliders_principales.*.id' => 'nullable|integer|exists:sliders,id',
             'sliders_principales.*.nombre' => 'required|string|max:255',
             'sliders_principales.*.orden' => 'required|integer|min:1',
-            'sliders_principales.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:5120',
+            'sliders_principales.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:12288',
             
             'sliders_secundarios' => 'nullable|array',
             'sliders_secundarios.*.id' => 'nullable|integer|exists:sliders,id',
@@ -120,7 +145,7 @@ class EmprendedorRequest extends FormRequest
             'sliders_secundarios.*.orden' => 'required|integer|min:1',
             'sliders_secundarios.*.titulo' => 'required|string|max:255',
             'sliders_secundarios.*.descripcion' => 'nullable|string',
-            'sliders_secundarios.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:5120',
+            'sliders_secundarios.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:12288',
             
             'deleted_sliders' => 'nullable|array',
             'deleted_sliders.*' => 'integer|exists:sliders,id',
