@@ -1,13 +1,14 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormArray } from '@angular/forms';
 import { EmprendimientosService, Emprendimiento } from '../../../core/services/emprendimientos.service';
+import { SliderUploadComponent, SliderImage } from '../../../shared/components/slider-upload/slider-upload.component';
 
 @Component({
   selector: 'app-emprendimiento-detalle',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, SliderUploadComponent],
   template: `
     <div class="bg-gray-100 dark:bg-gray-900 min-h-screen">
       <!-- Barra Superior -->
@@ -273,62 +274,49 @@ import { EmprendimientosService, Emprendimiento } from '../../../core/services/e
               
               <!-- Imágenes -->
               <div *ngIf="activeSection === 'imagenes'" class="space-y-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-white">Imágenes</h2>
+                <h2 class="text-lg font-medium text-gray-900 dark:text-white">Gestión de Imágenes</h2>
                 
+                <!-- Sliders Principales -->
                 <div class="space-y-4">
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imagen Principal</h3>
-                    
-                    <div *ngIf="emprendimiento?.sliders_principales?.length" class="mb-4">
-                      <div *ngFor="let slider of emprendimiento?.sliders_principales" class="border border-gray-300 dark:border-gray-600 rounded-lg p-2 mb-2 flex items-center">
-                        <img [src]="slider.url_completa" [alt]="slider.nombre" class="h-16 w-24 object-cover rounded mr-4">
-                        <div class="flex-grow">
-                          <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ slider.nombre }}</p>
-                        </div>
-                      </div>
+                  <app-slider-upload
+                    title="Imágenes Principales"
+                    [slidersFormArray]="slidersPrincipalesArray"
+                    [existingSliders]="slidersPrincipales"
+                    [isSliderPrincipal]="true"
+                    (changeSlidersEvent)="onSlidersPrincipalesChange($event)"
+                    (deletedSlidersEvent)="onDeletedSlidersPrincipalesChange($event)"
+                  ></app-slider-upload>
+                </div>
+                
+                <!-- Sliders Secundarios -->
+                <div class="space-y-4">
+                  <app-slider-upload
+                    title="Imágenes Secundarias"
+                    [slidersFormArray]="slidersSecundariosArray"
+                    [existingSliders]="slidersSecundarios"
+                    [isSliderPrincipal]="false"
+                    (changeSlidersEvent)="onSlidersSecundariosChange($event)"
+                    (deletedSlidersEvent)="onDeletedSlidersSecundariosChange($event)"
+                  ></app-slider-upload>
+                </div>
+                
+                <!-- Información adicional -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-blue-400 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
                     </div>
-                    
-                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-dashed border-gray-300 dark:border-gray-600">
-                      <div class="text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6.5 20H16a4 4 0 004-4V7a4 4 0 00-4-4H6a4 4 0 00-4 4v9a4 4 0 004 4h.5z" />
-                        </svg>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                          Próximamente: Subir y editar imágenes
-                        </p>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                          Esta función estará disponible en una próxima actualización.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imágenes Secundarias</h3>
-                    
-                    <div *ngIf="emprendimiento?.sliders_secundarios?.length" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                      <div *ngFor="let slider of emprendimiento?.sliders_secundarios" class="border border-gray-300 dark:border-gray-600 rounded-lg p-2 flex items-center">
-                        <img [src]="slider.url_completa" [alt]="slider.nombre" class="h-16 w-24 object-cover rounded mr-4">
-                        <div class="flex-grow">
-                          <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ slider.nombre }}</p>
-                          <p *ngIf="slider.descripcion" class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ getSliderDescripcion(slider) }}
-                            </p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-dashed border-gray-300 dark:border-gray-600">
-                      <div class="text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6.5 20H16a4 4 0 004-4V7a4 4 0 00-4-4H6a4 4 0 00-4 4v9a4 4 0 004 4h.5z" />
-                        </svg>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                          Próximamente: Subir y editar imágenes
-                        </p>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                          Esta función estará disponible en una próxima actualización.
-                        </p>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">Información sobre imágenes</h3>
+                      <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+                        <ul class="list-disc pl-5 space-y-1">
+                          <li><strong>Imágenes principales:</strong> Se mostrarán como slider principal en la página del emprendimiento</li>
+                          <li><strong>Imágenes secundarias:</strong> Se mostrarán como galería adicional con título y descripción</li>
+                          <li><strong>Tamaño máximo:</strong> 5MB por imagen</li>
+                          <li><strong>Formatos soportados:</strong> JPG, PNG, WebP</li>
+                        </ul>
                       </div>
                     </div>
                   </div>
@@ -368,6 +356,11 @@ export class EmprendimientoDetalleComponent implements OnInit {
   emprendimientoId: number = 0;
   emprendimiento: Emprendimiento | null = null;
   emprendimientoForm: FormGroup | null = null;
+
+  slidersPrincipales: SliderImage[] = [];
+  slidersSecundarios: SliderImage[] = [];
+  deletedSlidersPrincipales: number[] = [];
+  deletedSlidersSecundarios: number[] = [];
   
   loading = true;
   submitting = false;
@@ -450,8 +443,11 @@ export class EmprendimientoDetalleComponent implements OnInit {
       opciones_acceso: [this.emprendimiento.opciones_acceso],
       facilidades_discapacidad: [this.emprendimiento.facilidades_discapacidad],
       estado: [this.emprendimiento.estado ?? true],
-      asociacion_id: [this.emprendimiento.asociacion_id]
+      asociacion_id: [this.emprendimiento.asociacion_id],
+      sliders_principales: this.fb.array([]),
+      sliders_secundarios: this.fb.array([])
     });
+    this.processExistingSliders();
   }
   
   onSubmit(): void {
@@ -503,6 +499,22 @@ export class EmprendimientoDetalleComponent implements OnInit {
       formData.idiomas_hablados = formData.idiomas_hablados.split(',').map((item: string) => item.trim());
     }
     
+    formData.sliders_principales = this.slidersPrincipales.map(slider => ({
+      ...slider,
+      es_principal: true
+    }));
+    
+    formData.sliders_secundarios = this.slidersSecundarios.map(slider => ({
+      ...slider,
+      es_principal: false
+    }));
+    
+    // Agregar IDs de sliders eliminados
+    formData.deleted_sliders = [
+      ...this.deletedSlidersPrincipales,
+      ...this.deletedSlidersSecundarios
+    ];
+    
     return formData;
   }
   getSliderDescripcion(slider: any): string {
@@ -517,5 +529,184 @@ export class EmprendimientoDetalleComponent implements OnInit {
   
   cancel(): void {
     this.router.navigate(['/mis-emprendimientos']);
+  }
+
+  processExistingSliders(): void {
+    if (this.emprendimiento?.sliders_principales) {
+      this.slidersPrincipales = this.emprendimiento.sliders_principales.map(slider => ({
+        id: slider.id,
+        nombre: slider.nombre,
+        es_principal: true,
+        orden: slider.orden || 1,
+        url_completa: slider.url_completa,
+        imagen: slider.url_completa
+      }));
+    }
+    
+    if (this.emprendimiento?.sliders_secundarios) {
+      this.slidersSecundarios = this.emprendimiento.sliders_secundarios.map(slider => {
+        let titulo = '';
+        let descripcion = '';
+        
+        if (slider.descripcion && typeof slider.descripcion === 'object') {
+          titulo = (slider.descripcion as any).titulo || '';
+          descripcion = (slider.descripcion as any).descripcion || '';
+        }
+        
+        return {
+          id: slider.id,
+          nombre: slider.nombre,
+          es_principal: false,
+          orden: slider.orden || 1,
+          url_completa: slider.url_completa,
+          imagen: slider.url_completa,
+          titulo,
+          descripcion
+        };
+      });
+    }
+  }
+  get slidersPrincipalesArray(): FormArray {
+    return this.emprendimientoForm?.get('sliders_principales') as FormArray;
+  }
+
+  get slidersSecundariosArray(): FormArray {
+    return this.emprendimientoForm?.get('sliders_secundarios') as FormArray;
+  }
+
+
+  // 6. Métodos para manejar cambios en sliders
+  onSlidersPrincipalesChange(sliders: SliderImage[]): void {
+    this.slidersPrincipales = sliders;
+  }
+
+  onSlidersSecundariosChange(sliders: SliderImage[]): void {
+    this.slidersSecundarios = sliders;
+  }
+
+  onDeletedSlidersPrincipalesChange(deletedIds: number[]): void {
+    this.deletedSlidersPrincipales = deletedIds;
+  }
+
+  onDeletedSlidersSecundariosChange(deletedIds: number[]): void {
+    this.deletedSlidersSecundarios = deletedIds;
+  }
+  validateForm(): boolean {
+    // Validar campos requeridos
+    if (this.emprendimientoForm?.invalid) {
+      this.markFormGroupTouched(this.emprendimientoForm);
+      return false;
+    }
+    
+    // Validar que tenga al menos una imagen principal
+    if (this.slidersPrincipales.length === 0) {
+      this.error = 'Debe agregar al menos una imagen principal';
+      this.activeSection = 'imagenes';
+      return false;
+    }
+    
+    return true;
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+      
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  // 2. NOTIFICACIONES MEJORADAS
+  showSuccessMessage(message: string): void {
+    // Implementar sistema de notificaciones toast
+    // O usar el alert actual pero con mejor UX
+    this.success = message;
+    setTimeout(() => {
+      this.success = '';
+    }, 5000);
+  }
+
+  showErrorMessage(message: string): void {
+    this.error = message;
+    setTimeout(() => {
+      this.error = '';
+    }, 8000);
+  }
+
+  // 3. NAVEGACIÓN INTELIGENTE ENTRE SECCIONES
+  goToSection(section: string): void {
+    this.activeSection = section;
+    
+    // Scroll suave a la sección
+    setTimeout(() => {
+      const element = document.querySelector(`[data-section="${section}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }
+
+  // 4. VERIFICACIÓN DE CAMBIOS NO GUARDADOS
+  hasUnsavedChanges(): boolean {
+    if (!this.emprendimientoForm) return false;
+    
+    return this.emprendimientoForm.dirty || 
+          this.slidersPrincipales.some(s => s.imagen instanceof File) ||
+          this.slidersSecundarios.some(s => s.imagen instanceof File) ||
+          this.deletedSlidersPrincipales.length > 0 ||
+          this.deletedSlidersSecundarios.length > 0;
+  }
+
+  // 5. CONFIRMAR ANTES DE SALIR
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    if (this.hasUnsavedChanges()) {
+      $event.returnValue = 'Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?';
+    }
+  }
+
+  // 6. PREVISUALIZACIÓN DE DATOS
+  previewEmprendimiento(): void {
+    const data = this.prepareFormData();
+    // Abrir modal o nueva pestaña con vista previa
+    console.log('Vista previa:', data);
+  }
+
+  // 7. RESET DE FORMULARIO
+  resetForm(): void {
+    if (confirm('¿Estás seguro de que quieres descartar todos los cambios?')) {
+      this.loadEmprendimiento();
+      this.success = '';
+      this.error = '';
+    }
+  }
+
+  // 8. VALIDACIÓN EN TIEMPO REAL
+  onFieldChange(fieldName: string): void {
+    const control = this.emprendimientoForm?.get(fieldName);
+    if (control && control.invalid && control.touched) {
+      // Mostrar error específico del campo
+      this.validateField(fieldName);
+    }
+  }
+
+  private validateField(fieldName: string): void {
+    const control = this.emprendimientoForm?.get(fieldName);
+    if (!control) return;
+    
+    if (control.hasError('required')) {
+      this.showFieldError(fieldName, 'Este campo es obligatorio');
+    } else if (control.hasError('email')) {
+      this.showFieldError(fieldName, 'Ingresa un email válido');
+    }
+    // Agregar más validaciones según necesites
+  }
+
+  private showFieldError(fieldName: string, message: string): void {
+    // Implementar sistema de errores por campo
+    console.log(`Error en ${fieldName}: ${message}`);
   }
 }
