@@ -25,9 +25,8 @@ interface ReservaWithUpdating extends Omit<Reserva, 'servicios'> {
 @Component({
   selector: 'app-reservas-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, EmprendimientoNavComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   template: `
-    <app-emprendimiento-nav [emprendimiento]="emprendimiento">
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -427,7 +426,6 @@ interface ReservaWithUpdating extends Omit<Reserva, 'servicios'> {
             </div>
         </div>
         </div>
-    </app-emprendimiento-nav>
   `,
   styles: [`
     :host {

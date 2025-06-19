@@ -201,8 +201,16 @@ export class EmprendimientosService {
           key !== 'horarios' && key !== 'categorias') {
         
         if (data[key] !== null && data[key] !== undefined) {
-          // Si es un array, convertirlo a JSON
-          if (Array.isArray(data[key])) {
+          // Campos que deben enviarse como arrays JSON
+          if (key === 'metodos_pago' || key === 'idiomas_hablados' || key === 'certificaciones') {
+            if (Array.isArray(data[key])) {
+              formData.append(key, JSON.stringify(data[key]));
+            } else if (typeof data[key] === 'string') {
+              // Si viene como string, convertir a array
+              const arrayValue = data[key].split(',').map((item: string) => item.trim()).filter((item: string) => item.length > 0);
+              formData.append(key, JSON.stringify(arrayValue));
+            }
+          } else if (Array.isArray(data[key])) {
             formData.append(key, JSON.stringify(data[key]));
           } else if (typeof data[key] === 'object' && !(data[key] instanceof File)) {
             formData.append(key, JSON.stringify(data[key]));

@@ -28,6 +28,11 @@ export const ADMIN_EMPRENDEDORES_ROUTES: Routes = [
     children: [
       {
         path: '',
+        loadComponent: () => import('./mis-emprendimientos-detalle/mis-emprendimientos-detalle.component').then(c => c.MisEmprendimientoDetalleComponent),
+        title: 'Detalle de mi Emprendimiento'
+      },
+      {
+        path: 'mis-emprendimientos/:id',
         loadComponent: () => import('./emprendimiento-detalle/emprendimiento-detalle.component').then(c => c.EmprendimientoDetalleComponent),
         title: 'Información del Emprendimiento'
       },

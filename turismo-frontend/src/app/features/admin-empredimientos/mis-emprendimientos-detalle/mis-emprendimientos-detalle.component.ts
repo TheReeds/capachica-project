@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 import { EmprendimientoAdminService } from '../../../core/services/emprendimiento-admin.service';
 import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model';
@@ -8,9 +8,8 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
 @Component({
   selector: 'app-mis-emprendimientos-detalle',
   standalone: true,
-  imports: [CommonModule, RouterModule, EmprendimientoNavComponent],
+  imports: [CommonModule, RouterModule],
   template: `
-    <app-emprendimiento-nav [emprendimiento]="emprendimiento">
       <!-- Contenido del detalle -->
       <div *ngIf="loading" class="flex justify-center py-12">
         <div class="relative">
@@ -201,7 +200,8 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                 Acciones Rápidas
               </h3>
               <div class="space-y-3">
-                <button class="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 dark:from-blue-500 dark:to-blue-400 text-white font-bold shadow-lg hover:from-orange-600 hover:to-orange-500 dark:hover:from-blue-600 dark:hover:to-blue-500 transition-all duration-300 active:scale-95">
+                <button (click)="editarEmprendimiento()" 
+                        class="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 dark:from-blue-500 dark:to-blue-400 text-white font-bold shadow-lg hover:from-orange-600 hover:to-orange-500 dark:hover:from-blue-600 dark:hover:to-blue-500 transition-all duration-300 active:scale-95">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
@@ -270,11 +270,11 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
           </div>
         </div>
       </div>
-    </app-emprendimiento-nav>
   `
 })
 export class MisEmprendimientoDetalleComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private emprendimientoService = inject(EmprendimientoAdminService);
   
   emprendimiento?: Emprendimiento;
@@ -302,6 +302,13 @@ export class MisEmprendimientoDetalleComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  editarEmprendimiento(): void {
+    if (this.emprendimiento) {
+      // Navega a la ruta de edición del emprendimiento dentro del layout admin
+      this.router.navigate(['/admin-emprendedores/emprendimiento', this.emprendimiento.id, 'mis-emprendimientos', this.emprendimiento.id]);
+    }
   }
 
   getMainImage(emprendimiento: Emprendimiento): string | null {

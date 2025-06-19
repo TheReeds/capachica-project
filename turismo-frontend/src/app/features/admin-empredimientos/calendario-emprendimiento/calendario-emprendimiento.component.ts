@@ -7,9 +7,9 @@ import {
   Emprendimiento, 
   CalendarioEmprendimiento,
   CalendarioEvento,
-  EventoCalendario
+  EventoCalendario,
+  EventoBackend
 } from '../../../core/models/emprendimiento-admin.model';
-import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 interface CalendarDay {
   date: Date;
@@ -26,307 +26,277 @@ interface CalendarDay {
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <!-- Header -->
-      <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <nav class="flex mb-3" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                  <li class="inline-flex items-center">
-                    <a routerLink="/admin-emprendedores/mis-emprendimientos" 
-                       class="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400">
-                      Mis Emprendimientos
-                    </a>
-                  </li>
-                  <li>
-                    <div class="flex items-center">
-                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                      </svg>
-                      <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId, 'dashboard']" 
-                         class="ml-1 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400">
-                        {{ emprendimiento?.nombre || 'Emprendimiento' }}
-                      </a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="flex items-center">
-                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                      </svg>
-                      <span class="ml-1 text-gray-500 dark:text-gray-400">Calendario</span>
-                    </div>
-                  </li>
-                </ol>
-              </nav>
-              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                Calendario - {{ emprendimiento?.nombre || 'Cargando...' }}
-              </h1>
-              <p class="text-gray-600 dark:text-gray-400 mt-1">
-                Vista de calendario con reservas y eventos
-              </p>
-            </div>
-            <div class="flex items-center space-x-4">
-              <button (click)="goToToday()" 
-                      class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                Hoy
-              </button>
-              <button (click)="refreshData()" 
-                      [disabled]="loading"
-                      class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50">
-                <svg *ngIf="!loading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-                <div *ngIf="loading" class="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                Actualizar
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <!-- Calendar Navigation -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-4">
-              <button (click)="previousMonth()" 
-                      class="p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-              </button>
-              <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ currentDate | date:'MMMM yyyy':'':'es' | titlecase }}
-              </h2>
-              <button (click)="nextMonth()" 
-                      class="p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
-            
-            <!-- Summary Stats -->
-            <div *ngIf="calendarioData" class="flex items-center space-x-6 text-sm">
-              <div class="text-center">
-                <p class="font-medium text-gray-900 dark:text-white">{{ calendarioData.total_reservas }}</p>
-                <p class="text-gray-500 dark:text-gray-400">Reservas</p>
-              </div>
-              <div class="text-center">
-                <p class="font-medium text-green-600 dark:text-green-400">S/. {{ calendarioData.ingresos_periodo | number:'1.2-2' }}</p>
-                <p class="text-gray-500 dark:text-gray-400">Ingresos</p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Loading state glassmorphism -->
+    <div *ngIf="loading && !calendarDays.length" class="flex items-center justify-center h-64">
+      <div class="relative">
+        <div class="w-16 h-16 border-4 border-orange-200/30 rounded-full"></div>
+        <div class="w-16 h-16 border-4 border-orange-400 border-t-transparent rounded-full animate-spin absolute top-0"></div>
       </div>
+    </div>
 
-      <!-- Loading State -->
-      <div *ngIf="loading && !calendarDays.length" class="flex justify-center items-center py-20">
-        <div class="relative">
-          <div class="w-16 h-16 border-4 border-orange-200 rounded-full"></div>
-          <div class="w-16 h-16 border-4 border-orange-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
-        </div>
+    <!-- Error state glassmorphism -->
+    <div *ngIf="error && !loading" class="text-center py-12">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-500/20 flex items-center justify-center">
+        <svg class="w-8 h-8 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
       </div>
+      <h3 class="text-xl font-semibold text-white mb-2">Error al cargar el calendario</h3>
+      <p class="text-slate-300 dark:text-slate-400 mb-4">{{ error }}</p>
+      <button (click)="loadCalendar()" 
+              class="px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors duration-300">
+        Reintentar
+      </button>
+    </div>
 
-      <!-- Error State -->
-      <div *ngIf="error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+    <!-- Calendar content glassmorphism -->
+    <div *ngIf="!loading || calendarDays.length" class="space-y-8">
+      <!-- Header con navegación -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-orange-400 via-orange-300 to-amber-300 bg-clip-text text-transparent">
+            Calendario
+          </h1>
+          <div class="flex items-center gap-2">
+            <button (click)="previousMonth()" 
+                    class="p-2 rounded-xl bg-white/10 dark:bg-slate-800/40 border border-white/20 dark:border-slate-700/50 text-slate-200 hover:bg-white/20 dark:hover:bg-slate-700/60 transition-all duration-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
+            </button>
+            <h2 class="text-xl font-semibold text-white min-w-[200px] text-center">
+              {{ currentDate | date:'MMMM yyyy':'':'es' | titlecase }}
+            </h2>
+            <button (click)="nextMonth()" 
+                    class="p-2 rounded-xl bg-white/10 dark:bg-slate-800/40 border border-white/20 dark:border-slate-700/50 text-slate-200 hover:bg-white/20 dark:hover:bg-slate-700/60 transition-all duration-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <!-- Summary Stats -->
+          <div *ngIf="calendarioData" class="flex items-center gap-6 text-sm">
+            <div class="text-center">
+              <p class="font-semibold text-white">{{ calendarioData.total_reservas }}</p>
+              <p class="text-slate-300 dark:text-slate-400">Reservas</p>
             </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Error al cargar el calendario</h3>
-              <div class="mt-2 text-sm text-red-700 dark:text-red-300">{{ error }}</div>
-              <div class="mt-4">
-                <button (click)="loadCalendar()" 
-                        class="bg-red-100 dark:bg-red-800 px-3 py-2 rounded-md text-sm font-medium text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-700">
-                  Reintentar
-                </button>
-              </div>
+            <div class="text-center">
+              <p class="font-semibold text-green-300">S/ {{ calendarioData.ingresos_periodo }}</p>
+              <p class="text-slate-300 dark:text-slate-400">Ingresos</p>
             </div>
           </div>
+          
+          <button (click)="goToToday()" 
+                  class="px-4 py-2 rounded-xl bg-white/10 dark:bg-slate-800/40 border border-white/20 dark:border-slate-700/50 text-white hover:bg-white/20 dark:hover:bg-slate-700/60 transition-all duration-300 font-medium">
+            Hoy
+          </button>
+          <button (click)="refreshData()" 
+                  [disabled]="loading"
+                  class="group flex items-center px-4 py-2 rounded-xl bg-white/10 dark:bg-slate-800/60 text-white hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60 disabled:opacity-50">
+            <svg *ngIf="!loading" class="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <div *ngIf="loading" class="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            Actualizar
+          </button>
         </div>
       </div>
 
-      <!-- Calendar Grid -->
-      <div *ngIf="!error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-          
-          <!-- Days of Week Header -->
-          <div class="grid grid-cols-7 bg-gray-50 dark:bg-gray-700">
-            <div *ngFor="let day of daysOfWeek" 
-                 class="p-4 text-center text-sm font-medium text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600 last:border-r-0">
-              {{ day }}
-            </div>
+      <!-- Calendar Grid glassmorphism -->
+      <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
+        
+        <!-- Days of Week Header -->
+        <div class="grid grid-cols-7 bg-white/10 dark:bg-slate-700/50 border-b border-white/20 dark:border-slate-600/50">
+          <div *ngFor="let day of daysOfWeek" 
+               class="p-4 text-center text-sm font-semibold text-slate-200 dark:text-slate-300 border-r border-white/10 dark:border-slate-600/30 last:border-r-0">
+            {{ day }}
           </div>
+        </div>
 
-          <!-- Calendar Days -->
-          <div class="grid grid-cols-7">
-            <div *ngFor="let day of calendarDays; trackBy: trackByDay" 
-                 class="relative border-r border-b border-gray-200 dark:border-gray-600 last:border-r-0 h-32 overflow-hidden"
-                 [ngClass]="{
-                   'bg-gray-50 dark:bg-gray-700': !day.isCurrentMonth,
-                   'bg-white dark:bg-gray-800': day.isCurrentMonth,
-                   'bg-orange-50 dark:bg-orange-900/20': day.isToday,
-                   'bg-blue-50 dark:bg-blue-900/20': day.isSelected
-                 }"
-                 (click)="selectDay(day)">
-              
-              <!-- Day Number -->
-              <div class="p-2">
-                <span class="text-sm font-medium"
+        <!-- Calendar Days -->
+        <div class="grid grid-cols-7">
+          <div *ngFor="let day of calendarDays; trackBy: trackByDay" 
+               class="relative border-r border-b border-white/10 dark:border-slate-600/30 last:border-r-0 h-32 overflow-hidden cursor-pointer group"
+               [ngClass]="{
+                 'bg-white/5 dark:bg-slate-700/30': !day.isCurrentMonth,
+                 'bg-white/8 dark:bg-slate-800/30': day.isCurrentMonth,
+                 'bg-orange-500/20 border-orange-400/50': day.isToday,
+                 'bg-blue-500/20 border-blue-400/50': day.isSelected
+               }"
+               (click)="selectDay(day)">
+            
+            <!-- Day Number -->
+            <div class="p-3">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-semibold"
                       [ngClass]="{
-                        'text-gray-400 dark:text-gray-500': !day.isCurrentMonth,
-                        'text-gray-900 dark:text-white': day.isCurrentMonth && !day.isToday,
-                        'text-orange-600 dark:text-orange-400 font-bold': day.isToday
+                        'text-slate-400 dark:text-slate-500': !day.isCurrentMonth,
+                        'text-white': day.isCurrentMonth && !day.isToday,
+                        'text-orange-200 font-bold': day.isToday
                       }">
                   {{ day.date.getDate() }}
                 </span>
                 
-                <!-- Events indicator -->
-                <div *ngIf="day.totalEventos > 0" class="flex items-center justify-between mt-1">
-                  <span class="text-xs text-gray-600 dark:text-gray-400">
-                    {{ day.totalEventos }} evento{{ day.totalEventos > 1 ? 's' : '' }}
-                  </span>
-                  <span *ngIf="day.ingresosDia > 0" class="text-xs text-green-600 dark:text-green-400 font-medium">
-                    S/. {{ day.ingresosDia | number:'1.0-0' }}
-                  </span>
+                <!-- Events indicator badge -->
+                <div *ngIf="day.totalEventos > 0" 
+                     class="px-2 py-1 rounded-full text-xs font-bold bg-orange-500/30 text-orange-200 border border-orange-400/30">
+                  {{ day.totalEventos }}
                 </div>
               </div>
-
-              <!-- Events Preview -->
-              <div class="px-2 pb-2 space-y-1">
-                <div *ngFor="let evento of day.eventos.slice(0, 2); trackBy: trackByEvento" 
-                     class="text-xs p-1 rounded truncate cursor-pointer"
-                     [ngClass]="getEventoClass(evento)"
-                     [title]="evento.titulo + ' - ' + evento.hora_inicio + ' a ' + evento.hora_fin">
-                  {{ evento.titulo }}
-                </div>
-                <div *ngIf="day.eventos.length > 2" 
-                     class="text-xs text-gray-500 dark:text-gray-400 pl-1">
-                  +{{ day.eventos.length - 2 }} más
-                </div>
+              
+              <!-- Income indicator -->
+              <div *ngIf="day.ingresosDia > 0" class="text-xs text-green-300 font-medium">
+                S/ {{ day.ingresosDia | number:'1.0-0' }}
               </div>
             </div>
+
+            <!-- Events Preview -->
+            <div class="px-3 pb-2 space-y-1">
+              <div *ngFor="let evento of day.eventos.slice(0, 2); trackBy: trackByEvento" 
+                   class="text-xs p-1.5 rounded-lg truncate"
+                   [ngClass]="getEventoClass(evento)"
+                   [title]="evento.titulo + ' - ' + evento.hora_inicio + ' a ' + evento.hora_fin">
+                {{ evento.titulo }}
+              </div>
+              <div *ngIf="day.eventos.length > 2" 
+                   class="text-xs text-slate-400 dark:text-slate-500 pl-1.5 font-medium">
+                +{{ day.eventos.length - 2 }} más
+              </div>
+            </div>
+
+            <!-- Hover effect -->
+            <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
         </div>
+      </div>
 
-        <!-- Selected Day Details -->
-        <div *ngIf="selectedDay" class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-              Eventos del {{ selectedDay.date | date:'fullDate':'':'es' | titlecase }}
-            </h3>
-            <div *ngIf="selectedDay.totalEventos > 0" class="mt-2 flex items-center space-x-4 text-sm">
-              <span class="text-gray-600 dark:text-gray-400">
-                {{ selectedDay.totalEventos }} evento{{ selectedDay.totalEventos > 1 ? 's' : '' }}
-              </span>
-              <span *ngIf="selectedDay.ingresosDia > 0" class="text-green-600 dark:text-green-400 font-medium">
-                Ingresos: S/. {{ selectedDay.ingresosDia | number:'1.2-2' }}
-              </span>
-            </div>
+      <!-- Selected Day Details glassmorphism -->
+      <div *ngIf="selectedDay" class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
+        <div class="px-6 py-4 bg-white/10 dark:bg-slate-700/40 border-b border-white/20 dark:border-slate-600/50">
+          <h3 class="text-xl font-semibold text-white">
+            Eventos del {{ selectedDay.date | date:'fullDate':'':'es' | titlecase }}
+          </h3>
+          <div *ngIf="selectedDay.totalEventos > 0" class="mt-2 flex items-center space-x-6 text-sm">
+            <span class="text-slate-300 dark:text-slate-400">
+              {{ selectedDay.totalEventos }} evento{{ selectedDay.totalEventos > 1 ? 's' : '' }}
+            </span>
+            <span *ngIf="selectedDay.ingresosDia > 0" class="text-green-300 font-semibold">
+              Ingresos: S/ {{ selectedDay.ingresosDia | number:'1.2-2' }}
+            </span>
           </div>
-          
-          <div class="p-6">
-            <!-- No events -->
-            <div *ngIf="selectedDay.eventos.length === 0" class="text-center py-8">
-              <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No hay eventos</h3>
-              <p class="mt-2 text-gray-500 dark:text-gray-400">
-                No tienes reservas ni eventos programados para este día.
-              </p>
-            </div>
+        </div>
+        
+        <div class="p-6">
+          <!-- No events -->
+          <div *ngIf="selectedDay.eventos.length === 0" class="text-center py-12">
+            <svg class="mx-auto h-16 w-16 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h3 class="text-lg font-semibold text-white mb-2">No hay eventos</h3>
+            <p class="text-slate-300 dark:text-slate-400">
+              No tienes reservas ni eventos programados para este día.
+            </p>
+          </div>
 
-            <!-- Events list -->
-            <div *ngIf="selectedDay.eventos.length > 0" class="space-y-4">
-              <div *ngFor="let evento of selectedDay.eventos; trackBy: trackByEvento" 
-                   class="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <div class="flex items-start justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center space-x-3 mb-2">
-                      <div class="w-3 h-3 rounded-full"
-                           [ngClass]="evento.tipo === 'reserva' ? 'bg-blue-500' : 'bg-green-500'"></div>
-                      <h4 class="text-lg font-medium text-gray-900 dark:text-white">
-                        {{ evento.titulo }}
-                      </h4>
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                            [ngClass]="getEventoEstadoBadge(evento.estado)">
-                        {{ evento.estado | titlecase }}
-                      </span>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <!-- Events list -->
+          <div *ngIf="selectedDay.eventos.length > 0" class="space-y-4">
+            <div *ngFor="let evento of selectedDay.eventos; trackBy: trackByEvento" 
+                 class="backdrop-blur-sm bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-700/30 rounded-xl p-5 hover:bg-white/10 dark:hover:bg-slate-700/40 transition-all duration-300 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-orange-400 shadow-lg shadow-orange-400/50"></div>
+                    <h4 class="text-lg font-semibold text-white">
+                      {{ evento.titulo }}
+                    </h4>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                          [ngClass]="getEventoEstadoBadge(evento.estado)">
+                      {{ evento.estado | titlecase }}
+                    </span>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
                       <div>
-                        <span class="text-gray-500 dark:text-gray-400">Horario:</span>
-                        <p class="font-medium text-gray-900 dark:text-white">
+                        <span class="text-slate-400">Horario:</span>
+                        <p class="font-semibold text-white">
                           {{ evento.hora_inicio }} - {{ evento.hora_fin }}
                         </p>
                       </div>
-                      <div *ngIf="evento.cliente">
-                        <span class="text-gray-500 dark:text-gray-400">Cliente:</span>
-                        <p class="font-medium text-gray-900 dark:text-white">
+                    </div>
+                    <div *ngIf="evento.cliente" class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                      </svg>
+                      <div>
+                        <span class="text-slate-400">Cliente:</span>
+                        <p class="font-semibold text-white">
                           {{ evento.cliente }}
                         </p>
                       </div>
-                      <div *ngIf="evento.servicio">
-                        <span class="text-gray-500 dark:text-gray-400">Servicio:</span>
-                        <p class="font-medium text-gray-900 dark:text-white">
+                    </div>
+                    <div *ngIf="evento.servicio" class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                      </svg>
+                      <div>
+                        <span class="text-slate-400">Servicio:</span>
+                        <p class="font-semibold text-white">
                           {{ evento.servicio }}
                         </p>
                       </div>
                     </div>
-
-                    <div *ngIf="evento.precio" class="mt-3">
-                      <span class="text-gray-500 dark:text-gray-400 text-sm">Precio:</span>
-                      <span class="ml-2 font-medium text-green-600 dark:text-green-400">
-                        S/. {{ evento.precio | number:'1.2-2' }}
-                      </span>
-                    </div>
                   </div>
 
-                  <!-- Event Actions -->
-                  <div class="ml-4">
-                    <button *ngIf="evento.tipo === 'reserva'"
-                            [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId, 'reservas']"
-                            class="text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 text-sm font-medium">
-                      Ver Reserva
-                    </button>
+                  <div *ngIf="evento.precio" class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                    </svg>
+                    <span class="text-slate-400 text-sm">Precio:</span>
+                    <span class="font-semibold text-green-300">
+                      S/ {{ evento.precio | number:'1.2-2' }}
+                    </span>
                   </div>
+                </div>
+
+                <!-- Event Actions -->
+                <div class="ml-4">
+                  <button [routerLink]="['../reservas']"
+                          class="px-4 py-2 rounded-xl bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 transition-all duration-300 text-sm font-semibold border border-orange-400/30 hover:border-orange-400/50">
+                    Ver Detalles
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Legend -->
-        <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Leyenda</h3>
-          <div class="flex flex-wrap items-center space-x-6 text-sm">
-            <div class="flex items-center space-x-2">
-              <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span class="text-gray-700 dark:text-gray-300">Reservas</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span class="text-gray-700 dark:text-gray-300">Planes</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div class="w-4 h-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded"></div>
-              <span class="text-gray-700 dark:text-gray-300">Día actual</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div class="w-4 h-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded"></div>
-              <span class="text-gray-700 dark:text-gray-300">Día seleccionado</span>
-            </div>
+      <!-- Legend glassmorphism -->
+      <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Leyenda</h3>
+        <div class="flex flex-wrap items-center gap-6 text-sm">
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 bg-orange-400 rounded-full shadow-lg shadow-orange-400/50"></div>
+            <span class="text-slate-300 dark:text-slate-300">Reservas</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 bg-green-400 rounded-full shadow-lg shadow-green-400/50"></div>
+            <span class="text-slate-300 dark:text-slate-300">Planes</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 bg-orange-500/20 border border-orange-400/50 rounded"></div>
+            <span class="text-slate-300 dark:text-slate-300">Día actual</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 bg-blue-500/20 border border-blue-400/50 rounded"></div>
+            <span class="text-slate-300 dark:text-slate-300">Día seleccionado</span>
           </div>
         </div>
       </div>
@@ -335,6 +305,11 @@ interface CalendarDay {
   styles: [`
     :host {
       display: block;
+    }
+    
+    /* Mejoras para transiciones suaves */
+    * {
+      transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     }
   `]
 })
@@ -365,23 +340,13 @@ export class CalendarioEmprendimientoComponent implements OnInit {
         this.loadData();
       } else {
         console.error('Calendario - ID inválido:', id);
+        this.error = 'ID de emprendimiento inválido';
       }
     });
   }
 
   private loadData(): void {
     this.loadCalendar();
-  }
-
-  private loadEmprendimiento(): void {
-    this.emprendimientoAdminService.getEmprendimiento(this.emprendimientoId).subscribe({
-      next: (data) => {
-        this.emprendimiento = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar emprendimiento:', err);
-      }
-    });
   }
 
   loadCalendar(): void {
@@ -394,8 +359,11 @@ export class CalendarioEmprendimientoComponent implements OnInit {
     const fechaInicio = this.formatDate(startOfMonth);
     const fechaFin = this.formatDate(endOfMonth);
 
+    console.log('Cargando calendario para:', { emprendimientoId: this.emprendimientoId, fechaInicio, fechaFin }); // Debug
+
     this.emprendimientoAdminService.getCalendario(this.emprendimientoId, fechaInicio, fechaFin).subscribe({
       next: (data) => {
+        console.log('Datos del calendario recibidos:', data); // Debug
         this.calendarioData = data;
         this.buildCalendar();
         this.loading = false;
@@ -450,17 +418,35 @@ export class CalendarioEmprendimientoComponent implements OnInit {
     }
     
     this.calendarDays = days;
+    console.log('Calendario construido con', days.length, 'días'); // Debug
   }
 
   private getEventosForDate(dateStr: string): EventoCalendario[] {
     if (!this.calendarioData?.eventos_por_dia) return [];
-    
-    const eventoDelDia = this.calendarioData.eventos_por_dia.find(
-      evento => evento.fecha === dateStr
-    );
-    
-    return eventoDelDia?.eventos || [];
+
+    const eventosPorDia = this.calendarioData.eventos_por_dia;
+    const eventosKeys = Object.keys(eventosPorDia);
+    const matchingKey = eventosKeys.find(key => key.startsWith(dateStr));
+
+    if (typeof matchingKey === 'string' && eventosPorDia[matchingKey]) {
+      const eventosArray = eventosPorDia[matchingKey];
+      return eventosArray.map((evento: EventoBackend) => ({
+        id: evento.id,
+        titulo: evento.titulo,
+        hora_inicio: evento.hora_inicio,
+        hora_fin: evento.hora_fin,
+        estado: evento.estado,
+        cliente: evento.cliente,
+        servicio: evento.titulo,
+        precio: evento.precio,
+        tipo: 'reserva' as const
+      }));
+    }
+
+    return [];
   }
+
+
 
   private calculateDayIngresos(eventos: EventoCalendario[]): number {
     return eventos.reduce((total, evento) => {
@@ -520,25 +506,21 @@ export class CalendarioEmprendimientoComponent implements OnInit {
   }
 
   getEventoClass(evento: EventoCalendario): string {
-    if (evento.tipo === 'reserva') {
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-    } else {
-      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-    }
+    return 'bg-orange-500/20 text-orange-200 border border-orange-400/30';
   }
 
   getEventoEstadoBadge(estado: string): string {
     const classes = {
-      'pendiente': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'confirmado': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      'confirmada': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      'cancelado': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      'cancelada': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      'completado': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      'completada': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      'activo': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+      'pendiente': 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30',
+      'confirmado': 'bg-green-500/20 text-green-300 border border-green-400/30',
+      'confirmada': 'bg-green-500/20 text-green-300 border border-green-400/30',
+      'cancelado': 'bg-red-500/20 text-red-300 border border-red-400/30',
+      'cancelada': 'bg-red-500/20 text-red-300 border border-red-400/30',
+      'completado': 'bg-blue-500/20 text-blue-300 border border-blue-400/30',
+      'completada': 'bg-blue-500/20 text-blue-300 border border-blue-400/30',
+      'activo': 'bg-green-500/20 text-green-300 border border-green-400/30'
     };
-    return classes[estado as keyof typeof classes] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+    return classes[estado as keyof typeof classes] || 'bg-gray-500/20 text-gray-300 border border-gray-400/30';
   }
 
   // Track by functions for performance

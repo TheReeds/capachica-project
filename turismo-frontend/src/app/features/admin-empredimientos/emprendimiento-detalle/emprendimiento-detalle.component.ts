@@ -2,347 +2,339 @@ import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormArray } from '@angular/forms';
-import { EmprendimientosService, Emprendimiento } from '../../../core/services/emprendimientos.service';
+import { EmprendimientoAdminService } from '../../../core/services/emprendimiento-admin.service';
+import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model';
 import { SliderUploadComponent, SliderImage } from '../../../shared/components/slider-upload/slider-upload.component';
-import { EmprendimientoNavComponent } from '../../../shared/components/emprendimiento-nav/emprendimiento-nav.component';
 
 @Component({
   selector: 'app-emprendimiento-detalle',
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, SliderUploadComponent],
   template: `
-    
-    <div class="bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <!-- Barra Superior -->
-      <header class="bg-white dark:bg-gray-800 shadow">
-        <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              {{ emprendimiento ? 'Editar: ' + emprendimiento.nombre : 'Cargando emprendimiento...' }}
-            </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Actualiza la información de tu emprendimiento</p>
-          </div>
-          <div class="flex items-center space-x-4">
-            <a routerLink="/mis-emprendimientos" class="text-sm text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-              </svg>
-              Volver
-            </a>
-          </div>
-        </div>
-      </header>
-      
-      <!-- Contenido Principal -->
-      <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <!-- Estado de Carga -->
-        <div *ngIf="loading" class="flex justify-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-        </div>
-        
-        <!-- Error -->
-        <div *ngIf="error" class="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800 dark:text-red-300">{{ error }}</h3>
-              <div class="mt-4">
-                <button (click)="loadEmprendimiento()" class="rounded-md bg-red-50 dark:bg-red-900 px-3 py-2 text-sm font-medium text-red-800 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-800">
-                  Reintentar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Formulario de Edición -->
-        <form *ngIf="emprendimientoForm && !loading" [formGroup]="emprendimientoForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <!-- Secciones del Formulario -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-0">
-            <!-- Panel de Navegación -->
-            <div class="bg-gray-50 dark:bg-gray-900 p-4 border-r dark:border-gray-700">
-              <nav class="space-y-1">
-                <a (click)="activeSection = 'general'" 
-                   [class.bg-white]="activeSection === 'general'" 
-                   [class.dark:bg-gray-800]="activeSection === 'general'"
-                   [class.text-orange-600]="activeSection === 'general'"
-                   class="cursor-pointer group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Información General
-                </a>
-                <a (click)="activeSection = 'contacto'" 
-                   [class.bg-white]="activeSection === 'contacto'" 
-                   [class.dark:bg-gray-800]="activeSection === 'contacto'"
-                   [class.text-orange-600]="activeSection === 'contacto'"
-                   class="cursor-pointer group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  Contacto y Ubicación
-                </a>
-                <a (click)="activeSection = 'detalles'" 
-                   [class.bg-white]="activeSection === 'detalles'" 
-                   [class.dark:bg-gray-800]="activeSection === 'detalles'"
-                   [class.text-orange-600]="activeSection === 'detalles'"
-                   class="cursor-pointer group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  Detalles de Servicio
-                </a>
-                <a (click)="activeSection = 'imagenes'" 
-                   [class.bg-white]="activeSection === 'imagenes'" 
-                   [class.dark:bg-gray-800]="activeSection === 'imagenes'"
-                   [class.text-orange-600]="activeSection === 'imagenes'"
-                   class="cursor-pointer group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Imágenes
-                </a>
-              </nav>
-              
-              <div class="mt-8">
-                <div class="space-y-1">
-                  <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Otras opciones
-                  </h3>
-                  <a [routerLink]="['/emprendimiento', emprendimientoId, 'servicios']" class="group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                    Gestionar Servicios
-                  </a>
-                  <a [routerLink]="['/emprendimiento', emprendimientoId, 'administradores']" class="group rounded-md px-3 py-2 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:text-orange-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    Gestionar Administradores
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Contenido del Formulario -->
-            <div class="col-span-2 p-6">
-              <!-- Información General -->
-              <div *ngIf="activeSection === 'general'" class="space-y-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-white">Información General</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div class="col-span-2">
-                    <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre del Emprendimiento *</label>
-                    <input type="text" id="nombre" formControlName="nombre" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <div *ngIf="submitted && f['nombre'].errors" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                      <span *ngIf="f['nombre'].errors['required']">El nombre es requerido</span>
-                    </div>
-                  </div>
-                
-                  <div>
-                    <label for="tipo_servicio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Servicio *</label>
-                    <input type="text" id="tipo_servicio" formControlName="tipo_servicio" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <div *ngIf="submitted && f['tipo_servicio'].errors" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                      <span *ngIf="f['tipo_servicio'].errors['required']">El tipo de servicio es requerido</span>
-                    </div>
-                  </div>
-                
-                  <div>
-                    <label for="categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría *</label>
-                    <input type="text" id="categoria" formControlName="categoria" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <div *ngIf="submitted && f['categoria'].errors" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                      <span *ngIf="f['categoria'].errors['required']">La categoría es requerida</span>
-                    </div>
-                  </div>
-                
-                  <div class="col-span-2">
-                    <label for="descripcion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción *</label>
-                    <textarea id="descripcion" formControlName="descripcion" rows="4" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500"></textarea>
-                    <div *ngIf="submitted && f['descripcion'].errors" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                      <span *ngIf="f['descripcion'].errors['required']">La descripción es requerida</span>
-                    </div>
-                  </div>
-                
-                  <div class="flex items-center">
-                    <input type="checkbox" id="estado" formControlName="estado" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
-                    <label for="estado" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Emprendimiento activo</label>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Contacto y Ubicación -->
-              <div *ngIf="activeSection === 'contacto'" class="space-y-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-white">Contacto y Ubicación</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono *</label>
-                    <input type="text" id="telefono" formControlName="telefono" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <div *ngIf="submitted && f['telefono'].errors" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                      <span *ngIf="f['telefono'].errors['required']">El teléfono es requerido</span>
-                    </div>
-                  </div>
-                
-                  <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email *</label>
-                    <input type="email" id="email" formControlName="email" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <div *ngIf="submitted && f['email'].errors" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                      <span *ngIf="f['email'].errors['required']">El email es requerido</span>
-                      <span *ngIf="f['email'].errors['email']">El email debe ser válido</span>
-                    </div>
-                  </div>
-                
-                  <div>
-                    <label for="pagina_web" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Página Web</label>
-                    <input type="text" id="pagina_web" formControlName="pagina_web" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                  </div>
-                
-                  <div>
-                    <label for="ubicacion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ubicación *</label>
-                    <input type="text" id="ubicacion" formControlName="ubicacion" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <div *ngIf="submitted && f['ubicacion'].errors" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                      <span *ngIf="f['ubicacion'].errors['required']">La ubicación es requerida</span>
-                    </div>
-                  </div>
-                
-                  <div>
-                    <label for="opciones_acceso" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Opciones de Acceso</label>
-                    <input type="text" id="opciones_acceso" formControlName="opciones_acceso" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: A pie, transporte público, taxi</p>
-                  </div>
-                
-                  <div class="flex items-center">
-                    <input type="checkbox" id="facilidades_discapacidad" formControlName="facilidades_discapacidad" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
-                    <label for="facilidades_discapacidad" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Cuenta con facilidades para personas con discapacidad</label>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Detalles de Servicio -->
-              <div *ngIf="activeSection === 'detalles'" class="space-y-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-white">Detalles de Servicio</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label for="horario_atencion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Horario de Atención</label>
-                    <input type="text" id="horario_atencion" formControlName="horario_atencion" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: Lunes a Domingo: 8:00 am - 8:00 pm</p>
-                  </div>
-                
-                  <div>
-                    <label for="precio_rango" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rango de Precios</label>
-                    <input type="text" id="precio_rango" formControlName="precio_rango" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: S/. 15 - S/. 35</p>
-                  </div>
-                
-                  <div>
-                    <label for="capacidad_aforo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Capacidad/Aforo</label>
-                    <input type="number" id="capacidad_aforo" formControlName="capacidad_aforo" min="0" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                  </div>
-                
-                  <div>
-                    <label for="numero_personas_atiende" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Personas que Atienden</label>
-                    <input type="number" id="numero_personas_atiende" formControlName="numero_personas_atiende" min="0" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                  </div>
-                
-                  <div>
-                    <label for="metodos_pago" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Métodos de Pago</label>
-                    <input type="text" id="metodos_pago" formControlName="metodos_pago" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: Efectivo, Yape, Tarjetas (separados por coma)</p>
-                  </div>
-                
-                  <div>
-                    <label for="idiomas_hablados" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Idiomas Hablados</label>
-                    <input type="text" id="idiomas_hablados" formControlName="idiomas_hablados" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ej: Español, Quechua, Inglés (separados por coma)</p>
-                  </div>
-                
-                  <div>
-                    <label for="certificaciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Certificaciones</label>
-                    <input type="text" id="certificaciones" formControlName="certificaciones" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                  </div>
-                
-                  <div class="col-span-2">
-                    <label for="comentarios_resenas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Comentarios y Reseñas</label>
-                    <textarea id="comentarios_resenas" formControlName="comentarios_resenas" rows="3" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500"></textarea>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Imágenes -->
-              <div *ngIf="activeSection === 'imagenes'" class="space-y-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-white">Gestión de Imágenes</h2>
-                
-                <!-- Sliders Principales -->
-                <div class="space-y-4">
-                  <app-slider-upload
-                    title="Imágenes Principales"
-                    [slidersFormArray]="slidersPrincipalesArray"
-                    [existingSliders]="slidersPrincipales"
-                    [isSliderPrincipal]="true"
-                    (changeSlidersEvent)="onSlidersPrincipalesChange($event)"
-                    (deletedSlidersEvent)="onDeletedSlidersPrincipalesChange($event)"
-                  ></app-slider-upload>
-                </div>
-                
-                <!-- Sliders Secundarios -->
-                <div class="space-y-4">
-                  <app-slider-upload
-                    title="Imágenes Secundarias"
-                    [slidersFormArray]="slidersSecundariosArray"
-                    [existingSliders]="slidersSecundarios"
-                    [isSliderPrincipal]="false"
-                    (changeSlidersEvent)="onSlidersSecundariosChange($event)"
-                    (deletedSlidersEvent)="onDeletedSlidersSecundariosChange($event)"
-                  ></app-slider-upload>
-                </div>
-                
-                <!-- Información adicional -->
-                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
-                  <div class="flex">
-                    <div class="flex-shrink-0">
-                      <svg class="h-5 w-5 text-blue-400 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    </div>
-                    <div class="ml-3">
-                      <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">Información sobre imágenes</h3>
-                      <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
-                        <ul class="list-disc pl-5 space-y-1">
-                          <li><strong>Imágenes principales:</strong> Se mostrarán como slider principal en la página del emprendimiento</li>
-                          <li><strong>Imágenes secundarias:</strong> Se mostrarán como galería adicional con título y descripción</li>
-                          <li><strong>Tamaño máximo:</strong> 5MB por imagen</li>
-                          <li><strong>Formatos soportados:</strong> JPG, PNG, WebP</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Botones de Acción -->
-              <div class="mt-8 pt-5 border-t border-gray-200 dark:border-gray-700">
-                <div class="flex justify-between">
-                  <button type="button" (click)="cancel()" class="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-                    Cancelar
-                  </button>
-                  <button type="submit" [disabled]="submitting" class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-orange-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-                    <span *ngIf="submitting" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></span>
-                    Guardar Cambios
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      </main>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center py-12">
+      <div class="relative">
+        <div class="w-16 h-16 border-4 border-orange-200/30 dark:border-blue-800/30 rounded-full"></div>
+        <div class="w-16 h-16 border-4 border-orange-400 dark:border-blue-400 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+      </div>
     </div>
 
+    <!-- Error State -->
+    <div *ngIf="error" class="backdrop-blur-lg bg-red-500/10 dark:bg-red-900/20 border border-red-500/20 dark:border-red-800/30 rounded-2xl p-6 mb-6 shadow-2xl">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-medium text-red-200">Error al procesar</h3>
+          <div class="mt-2 text-sm text-red-300">
+            <div *ngIf="validationErrors && validationErrors.length > 0; else singleError">
+              <ul class="list-disc pl-5">
+                <li *ngFor="let error of validationErrors">{{ error }}</li>
+              </ul>
+            </div>
+            <ng-template #singleError>
+              <p>{{ error }}</p>
+            </ng-template>
+          </div>
+          <div class="mt-4">
+            <button (click)="clearErrors()" 
+                    class="inline-flex items-center px-4 py-2 rounded-full bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-all duration-300">
+              Entendido
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="success" class="backdrop-blur-lg bg-green-500/10 dark:bg-green-900/20 border border-green-500/20 dark:border-green-800/30 rounded-2xl p-6 mb-6 shadow-2xl">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-medium text-green-200">¡Éxito!</h3>
+          <div class="mt-2 text-sm text-green-300">
+            <p>{{ success }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de Edición -->
+    <div *ngIf="emprendimientoForm && !loading" class="space-y-8">
+      <!-- Header -->
+      <div class="backdrop-blur-lg bg-white/10 dark:bg-blue-800/20 rounded-2xl p-6 shadow-2xl border border-white/10 dark:border-blue-700/30">
+        <h2 class="text-2xl font-bold text-white mb-2">Editar Información</h2>
+        <p class="text-gray-300 dark:text-blue-300">Actualiza la información de tu emprendimiento</p>
+      </div>
+
+      <form [formGroup]="emprendimientoForm" (ngSubmit)="onSubmit()" class="space-y-8">
+        <!-- Navegación por pestañas -->
+        <div class="backdrop-blur-lg bg-white/10 dark:bg-blue-800/20 rounded-2xl p-6 shadow-2xl border border-white/10 dark:border-blue-700/30">
+          <nav class="flex flex-wrap gap-2">
+            <button type="button"
+                    *ngFor="let section of sections"
+                    (click)="activeSection = section.key"
+                    [class]="getSectionClasses(section.key)"
+                    class="flex items-center px-4 py-3 rounded-xl font-medium transition-all duration-300 active:scale-95">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="section.icon" />
+              </svg>
+              {{ section.label }}
+            </button>
+          </nav>
+        </div>
+
+        <!-- Contenido del formulario -->
+        <div class="backdrop-blur-lg bg-white/10 dark:bg-blue-800/20 rounded-2xl p-8 shadow-2xl border border-white/10 dark:border-blue-700/30">
+          <!-- Información General -->
+          <div *ngIf="activeSection === 'general'" class="space-y-6">
+            <h3 class="text-xl font-bold text-white mb-6">Información General</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="col-span-2">
+                <label for="nombre" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Nombre del Emprendimiento *</label>
+                <input type="text" id="nombre" formControlName="nombre" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <div *ngIf="submitted && f['nombre'].errors" class="mt-2 text-sm text-red-300">
+                  <span *ngIf="f['nombre'].errors['required']">El nombre es requerido</span>
+                </div>
+              </div>
+            
+              <div>
+                <label for="tipo_servicio" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Tipo de Servicio *</label>
+                <input type="text" id="tipo_servicio" formControlName="tipo_servicio" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <div *ngIf="submitted && f['tipo_servicio'].errors" class="mt-2 text-sm text-red-300">
+                  <span *ngIf="f['tipo_servicio'].errors['required']">El tipo de servicio es requerido</span>
+                </div>
+              </div>
+            
+              <div>
+                <label for="categoria" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Categoría *</label>
+                <input type="text" id="categoria" formControlName="categoria" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <div *ngIf="submitted && f['categoria'].errors" class="mt-2 text-sm text-red-300">
+                  <span *ngIf="f['categoria'].errors['required']">La categoría es requerida</span>
+                </div>
+              </div>
+            
+              <div class="col-span-2">
+                <label for="descripcion" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Descripción *</label>
+                <textarea id="descripcion" formControlName="descripcion" rows="4" 
+                          class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300 resize-none"></textarea>
+                <div *ngIf="submitted && f['descripcion'].errors" class="mt-2 text-sm text-red-300">
+                  <span *ngIf="f['descripcion'].errors['required']">La descripción es requerida</span>
+                </div>
+              </div>
+            
+              <div class="col-span-2">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                  <input type="checkbox" id="estado" formControlName="estado" 
+                         class="w-5 h-5 text-orange-600 dark:text-blue-600 bg-white/10 dark:bg-blue-900/30 border-white/20 dark:border-blue-700/50 rounded focus:ring-orange-500 dark:focus:ring-blue-500 focus:ring-2">
+                  <span class="text-gray-300 dark:text-blue-300 font-medium">Emprendimiento activo</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contacto y Ubicación -->
+          <div *ngIf="activeSection === 'contacto'" class="space-y-6">
+            <h3 class="text-xl font-bold text-white mb-6">Contacto y Ubicación</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="telefono" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Teléfono *</label>
+                <input type="text" id="telefono" formControlName="telefono" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <div *ngIf="submitted && f['telefono'].errors" class="mt-2 text-sm text-red-300">
+                  <span *ngIf="f['telefono'].errors['required']">El teléfono es requerido</span>
+                </div>
+              </div>
+            
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Email *</label>
+                <input type="email" id="email" formControlName="email" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <div *ngIf="submitted && f['email'].errors" class="mt-2 text-sm text-red-300">
+                  <span *ngIf="f['email'].errors['required']">El email es requerido</span>
+                  <span *ngIf="f['email'].errors['email']">El email debe ser válido</span>
+                </div>
+              </div>
+            
+              <div>
+                <label for="pagina_web" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Página Web</label>
+                <input type="text" id="pagina_web" formControlName="pagina_web" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+              </div>
+            
+              <div>
+                <label for="ubicacion" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Ubicación *</label>
+                <input type="text" id="ubicacion" formControlName="ubicacion" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <div *ngIf="submitted && f['ubicacion'].errors" class="mt-2 text-sm text-red-300">
+                  <span *ngIf="f['ubicacion'].errors['required']">La ubicación es requerida</span>
+                </div>
+              </div>
+            
+              <div>
+                <label for="opciones_acceso" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Opciones de Acceso</label>
+                <input type="text" id="opciones_acceso" formControlName="opciones_acceso" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <p class="mt-1 text-xs text-gray-400 dark:text-blue-400">Ej: A pie, transporte público, taxi</p>
+              </div>
+            
+              <div class="col-span-2">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                  <input type="checkbox" id="facilidades_discapacidad" formControlName="facilidades_discapacidad" 
+                         class="w-5 h-5 text-orange-600 dark:text-blue-600 bg-white/10 dark:bg-blue-900/30 border-white/20 dark:border-blue-700/50 rounded focus:ring-orange-500 dark:focus:ring-blue-500 focus:ring-2">
+                  <span class="text-gray-300 dark:text-blue-300 font-medium">Cuenta con facilidades para personas con discapacidad</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Detalles de Servicio -->
+          <div *ngIf="activeSection === 'detalles'" class="space-y-6">
+            <h3 class="text-xl font-bold text-white mb-6">Detalles de Servicio</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="horario_atencion" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Horario de Atención</label>
+                <input type="text" id="horario_atencion" formControlName="horario_atencion" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <p class="mt-1 text-xs text-gray-400 dark:text-blue-400">Ej: Lunes a Domingo: 8:00 am - 8:00 pm</p>
+              </div>
+            
+              <div>
+                <label for="precio_rango" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Rango de Precios</label>
+                <input type="text" id="precio_rango" formControlName="precio_rango" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <p class="mt-1 text-xs text-gray-400 dark:text-blue-400">Ej: S/. 15 - S/. 35</p>
+              </div>
+            
+              <div>
+                <label for="capacidad_aforo" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Capacidad/Aforo</label>
+                <input type="number" id="capacidad_aforo" formControlName="capacidad_aforo" min="0" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+              </div>
+            
+              <div>
+                <label for="numero_personas_atiende" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Número de Personas que Atienden</label>
+                <input type="number" id="numero_personas_atiende" formControlName="numero_personas_atiende" min="0" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+              </div>
+            
+              <div>
+                <label for="metodos_pago" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Métodos de Pago</label>
+                <input type="text" id="metodos_pago" formControlName="metodos_pago" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <p class="mt-1 text-xs text-gray-400 dark:text-blue-400">Ej: Efectivo, Yape, Tarjetas (separados por coma)</p>
+              </div>
+            
+              <div>
+                <label for="idiomas_hablados" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Idiomas Hablados</label>
+                <input type="text" id="idiomas_hablados" formControlName="idiomas_hablados" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <p class="mt-1 text-xs text-gray-400 dark:text-blue-400">Ej: Español, Quechua, Inglés (separados por coma)</p>
+              </div>
+            
+              <div>
+                <label for="certificaciones" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Certificaciones</label>
+                <input type="text" id="certificaciones" formControlName="certificaciones" 
+                       class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300">
+                <p class="mt-1 text-xs text-gray-400 dark:text-blue-400">Ej: Certificación A, Certificación B (separados por coma)</p>
+              </div>
+            
+              <div class="col-span-2">
+                <label for="comentarios_resenas" class="block text-sm font-medium text-gray-300 dark:text-blue-300 mb-2">Comentarios y Reseñas</label>
+                <textarea id="comentarios_resenas" formControlName="comentarios_resenas" rows="3" 
+                          class="w-full px-4 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 border border-white/20 dark:border-blue-700/50 text-white placeholder-gray-400 focus:border-orange-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-orange-400/20 dark:focus:ring-blue-400/20 transition-all duration-300 resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Imágenes -->
+          <div *ngIf="activeSection === 'imagenes'" class="space-y-6">
+            <h3 class="text-xl font-bold text-white mb-6">Gestión de Imágenes</h3>
+            
+            <!-- Sliders Principales -->
+            <div class="space-y-4">
+              <app-slider-upload
+                title="Imágenes Principales"
+                [slidersFormArray]="slidersPrincipalesArray"
+                [existingSliders]="slidersPrincipales"
+                [isSliderPrincipal]="true"
+                (changeSlidersEvent)="onSlidersPrincipalesChange($event)"
+                (deletedSlidersEvent)="onDeletedSlidersPrincipalesChange($event)"
+              ></app-slider-upload>
+            </div>
+            
+            <!-- Sliders Secundarios -->
+            <div class="space-y-4">
+              <app-slider-upload
+                title="Imágenes Secundarias"
+                [slidersFormArray]="slidersSecundariosArray"
+                [existingSliders]="slidersSecundarios"
+                [isSliderPrincipal]="false"
+                (changeSlidersEvent)="onSlidersSecundariosChange($event)"
+                (deletedSlidersEvent)="onDeletedSlidersSecundariosChange($event)"
+              ></app-slider-upload>
+            </div>
+            
+            <!-- Información adicional -->
+            <div class="backdrop-blur-lg bg-blue-500/10 dark:bg-blue-900/20 border border-blue-500/20 dark:border-blue-800/30 rounded-2xl p-6">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-6 w-6 text-blue-400 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h4 class="text-sm font-medium text-blue-200 dark:text-blue-300">Información sobre imágenes</h4>
+                  <div class="mt-2 text-sm text-blue-300 dark:text-blue-400">
+                    <ul class="list-disc pl-5 space-y-1">
+                      <li><strong>Imágenes principales:</strong> Se mostrarán como slider principal</li>
+                      <li><strong>Imágenes secundarias:</strong> Galería adicional con título y descripción</li>
+                      <li><strong>Tamaño máximo:</strong> 5MB por imagen</li>
+                      <li><strong>Formatos:</strong> JPG, PNG, WebP</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="backdrop-blur-lg bg-white/10 dark:bg-blue-800/20 rounded-2xl p-6 shadow-2xl border border-white/10 dark:border-blue-700/30">
+          <div class="flex flex-col sm:flex-row gap-4 justify-between">
+            <button type="button" (click)="cancel()" 
+                    class="flex items-center justify-center px-6 py-3 rounded-xl bg-white/10 dark:bg-blue-900/30 text-white font-medium hover:bg-white/20 dark:hover:bg-blue-800/50 transition-all duration-300 active:scale-95 border border-white/20 dark:border-blue-700/50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cancelar
+            </button>
+            
+            <button type="submit" [disabled]="submitting" 
+                    class="flex items-center justify-center px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 dark:from-blue-500 dark:to-blue-400 text-white font-bold shadow-lg hover:from-orange-600 hover:to-orange-500 dark:hover:from-blue-600 dark:hover:to-blue-500 transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+              <span *ngIf="submitting" class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></span>
+              <svg *ngIf="!submitting" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              {{ submitting ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   `,
   styles: [`
     :host {
@@ -351,7 +343,7 @@ import { EmprendimientoNavComponent } from '../../../shared/components/emprendim
   `]
 })
 export class EmprendimientoDetalleComponent implements OnInit {
-  private emprendimientosService = inject(EmprendimientosService);
+  private emprendimientoAdminService = inject(EmprendimientoAdminService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -370,11 +362,36 @@ export class EmprendimientoDetalleComponent implements OnInit {
   submitted = false;
   error = '';
   success = '';
+  validationErrors: string[] = [];
   
   activeSection = 'general';
+
+  // Configuración de secciones
+  sections = [
+    {
+      key: 'general',
+      label: 'General',
+      icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+    },
+    {
+      key: 'contacto',
+      label: 'Contacto',
+      icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+    },
+    {
+      key: 'detalles',
+      label: 'Detalles',
+      icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+    },
+    {
+      key: 'imagenes',
+      label: 'Imágenes',
+      icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+    }
+  ];
   
   ngOnInit(): void {
-  // Obtener el ID de la ruta padre
+    // Obtener el ID de la ruta padre
     this.route.parent?.paramMap.subscribe(params => {
       const id = params.get('id');
       console.log('Detalle - ID recibido:', id); // Debug
@@ -384,6 +401,8 @@ export class EmprendimientoDetalleComponent implements OnInit {
         this.loadEmprendimiento();
       } else {
         console.error('Detalle - ID inválido:', id);
+        this.error = 'ID de emprendimiento inválido';
+        this.loading = false;
       }
     });
   }
@@ -391,12 +410,21 @@ export class EmprendimientoDetalleComponent implements OnInit {
   get f() {
     return this.emprendimientoForm?.controls || {};
   }
+
+  getSectionClasses(sectionKey: string): string {
+    const baseClasses = 'text-white dark:text-blue-200';
+    const activeClasses = 'bg-gradient-to-r from-orange-500 to-orange-400 dark:from-blue-500 dark:to-blue-400 shadow-lg';
+    const inactiveClasses = 'bg-white/10 dark:bg-blue-900/30 hover:bg-white/20 dark:hover:bg-blue-800/50';
+    
+    return `${baseClasses} ${this.activeSection === sectionKey ? activeClasses : inactiveClasses}`;
+  }
   
   loadEmprendimiento(): void {
     this.loading = true;
     this.error = '';
+    this.validationErrors = [];
     
-    this.emprendimientosService.getEmprendimiento(this.emprendimientoId).subscribe({
+    this.emprendimientoAdminService.getEmprendimiento(this.emprendimientoId).subscribe({
       next: (data) => {
         this.emprendimiento = data;
         this.initForm();
@@ -413,24 +441,47 @@ export class EmprendimientoDetalleComponent implements OnInit {
   initForm(): void {
     if (!this.emprendimiento) return;
     
-    // Preparar los valores de los arrays
-    let metodosPago = this.emprendimiento.metodos_pago;
-    if (typeof metodosPago === 'string' && metodosPago.startsWith('[')) {
-      try {
-        metodosPago = JSON.parse(metodosPago).join(', ');
-      } catch (e) {
-        console.error('Error parsing metodos_pago:', e);
+    // Procesar arrays para mostrar como strings separados por comas
+    let metodosPago = '';
+    if (this.emprendimiento.metodos_pago) {
+      if (Array.isArray(this.emprendimiento.metodos_pago)) {
+        metodosPago = this.emprendimiento.metodos_pago.join(', ');
+      } else if (typeof this.emprendimiento.metodos_pago === 'string') {
+        try {
+          const parsed = JSON.parse(this.emprendimiento.metodos_pago);
+          metodosPago = Array.isArray(parsed) ? parsed.join(', ') : this.emprendimiento.metodos_pago;
+        } catch {
+          metodosPago = this.emprendimiento.metodos_pago;
+        }
       }
     }
     
-    let idiomasHablados = this.emprendimiento.idiomas_hablados;
-    if (typeof idiomasHablados === 'string' && idiomasHablados.includes(',')) {
-      idiomasHablados = idiomasHablados; // Ya está en formato string separado por comas
-    } else if (typeof idiomasHablados === 'string' && idiomasHablados.startsWith('[')) {
-      try {
-        idiomasHablados = JSON.parse(idiomasHablados).join(', ');
-      } catch (e) {
-        console.error('Error parsing idiomas_hablados:', e);
+    let idiomasHablados = '';
+    if (this.emprendimiento.idiomas_hablados) {
+      if (Array.isArray(this.emprendimiento.idiomas_hablados)) {
+        idiomasHablados = this.emprendimiento.idiomas_hablados.join(', ');
+      } else if (typeof this.emprendimiento.idiomas_hablados === 'string') {
+        try {
+          const parsed = JSON.parse(this.emprendimiento.idiomas_hablados);
+          idiomasHablados = Array.isArray(parsed) ? parsed.join(', ') : this.emprendimiento.idiomas_hablados;
+        } catch {
+          idiomasHablados = this.emprendimiento.idiomas_hablados;
+        }
+      }
+    }
+
+    // Procesar certificaciones de la misma manera
+    let certificaciones = '';
+    if (this.emprendimiento.certificaciones) {
+      if (Array.isArray(this.emprendimiento.certificaciones)) {
+        certificaciones = this.emprendimiento.certificaciones.join(', ');
+      } else if (typeof this.emprendimiento.certificaciones === 'string') {
+        try {
+          const parsed = JSON.parse(this.emprendimiento.certificaciones);
+          certificaciones = Array.isArray(parsed) ? parsed.join(', ') : this.emprendimiento.certificaciones;
+        } catch {
+          certificaciones = this.emprendimiento.certificaciones;
+        }
       }
     }
     
@@ -449,7 +500,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
       numero_personas_atiende: [this.emprendimiento.numero_personas_atiende],
       comentarios_resenas: [this.emprendimiento.comentarios_resenas],
       categoria: [this.emprendimiento.categoria, [Validators.required]],
-      certificaciones: [this.emprendimiento.certificaciones],
+      certificaciones: [certificaciones],
       idiomas_hablados: [idiomasHablados],
       opciones_acceso: [this.emprendimiento.opciones_acceso],
       facilidades_discapacidad: [this.emprendimiento.facilidades_discapacidad],
@@ -463,6 +514,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
   
   onSubmit(): void {
     this.submitted = true;
+    this.clearErrors();
     
     if (this.emprendimientoForm?.invalid) {
       // Ir a la primera sección con errores
@@ -478,22 +530,93 @@ export class EmprendimientoDetalleComponent implements OnInit {
     this.submitting = true;
     const formData = this.prepareFormData();
     
-    this.emprendimientosService.updateEmprendimiento(this.emprendimientoId, formData).subscribe({
+    this.emprendimientoAdminService.updateEmprendimiento(this.emprendimientoId, formData).subscribe({
       next: (data) => {
         this.emprendimiento = data;
         this.success = 'Emprendimiento actualizado correctamente';
         this.submitting = false;
+        this.submitted = false;
         
-        // Mostrar mensaje de éxito y redirigir a la lista
-        alert('Emprendimiento actualizado correctamente');
-        this.router.navigate(['/mis-emprendimientos']);
+        // Redirigir a la vista de información del emprendimiento
+        setTimeout(() => {
+          this.success = '';
+          this.router.navigate(['/admin-emprendedores/emprendimiento', this.emprendimientoId]);
+        }, 2000);
       },
       error: (err) => {
         console.error('Error al actualizar emprendimiento:', err);
-        this.error = err.error?.message || 'Error al actualizar el emprendimiento. Inténtalo de nuevo.';
+        this.handleValidationErrors(err);
         this.submitting = false;
       }
     });
+  }
+
+  private handleValidationErrors(err: any): void {
+    this.validationErrors = [];
+    
+    console.log('Error completo:', err); // Debug para ver la estructura del error
+    
+    if (err.error?.errors) {
+      // Procesar errores de validación del backend
+      Object.keys(err.error.errors).forEach(field => {
+        const fieldErrors = err.error.errors[field];
+        if (Array.isArray(fieldErrors)) {
+          fieldErrors.forEach((errorMsg: string) => {
+            this.validationErrors.push(`${this.getFieldDisplayName(field)}: ${errorMsg}`);
+          });
+        } else if (typeof fieldErrors === 'string') {
+          this.validationErrors.push(`${this.getFieldDisplayName(field)}: ${fieldErrors}`);
+        }
+      });
+    }
+    
+    if (this.validationErrors.length === 0) {
+      this.error = err.error?.message || 'Error al actualizar el emprendimiento. Inténtalo de nuevo.';
+    } else {
+      // Si hay errores de validación, también navegar a la sección correspondiente
+      this.navigateToErrorSection();
+    }
+  }
+
+  private navigateToErrorSection(): void {
+    // Buscar en qué sección están los errores y navegar allí
+    const errorFields = this.validationErrors.map(error => error.split(':')[0].toLowerCase());
+    
+    if (errorFields.some(field => ['nombre', 'tipo de servicio', 'descripción', 'categoría'].includes(field))) {
+      this.activeSection = 'general';
+    } else if (errorFields.some(field => ['teléfono', 'email', 'ubicación'].includes(field))) {
+      this.activeSection = 'contacto';
+    } else if (errorFields.some(field => ['métodos de pago', 'idiomas hablados', 'certificaciones'].includes(field))) {
+      this.activeSection = 'detalles';
+    }
+  }
+
+  private getFieldDisplayName(field: string): string {
+    const fieldNames: { [key: string]: string } = {
+      'nombre': 'Nombre',
+      'tipo_servicio': 'Tipo de servicio',
+      'descripcion': 'Descripción',
+      'ubicacion': 'Ubicación',
+      'telefono': 'Teléfono',
+      'email': 'Email',
+      'categoria': 'Categoría',
+      'metodos_pago': 'Métodos de pago',
+      'idiomas_hablados': 'Idiomas hablados',
+      'certificaciones': 'Certificaciones',
+      'pagina_web': 'Página web',
+      'horario_atencion': 'Horario de atención',
+      'precio_rango': 'Rango de precios',
+      'capacidad_aforo': 'Capacidad de aforo',
+      'numero_personas_atiende': 'Número de personas que atienden',
+      'comentarios_resenas': 'Comentarios y reseñas',
+      'opciones_acceso': 'Opciones de acceso'
+    };
+    return fieldNames[field] || field;
+  }
+
+  clearErrors(): void {
+    this.error = '';
+    this.validationErrors = [];
   }
   
   prepareFormData(): any {
@@ -503,11 +626,25 @@ export class EmprendimientoDetalleComponent implements OnInit {
     
     // Convertir strings separados por comas a arrays
     if (formData.metodos_pago && typeof formData.metodos_pago === 'string') {
-      formData.metodos_pago = formData.metodos_pago.split(',').map((item: string) => item.trim());
+      formData.metodos_pago = formData.metodos_pago
+        .split(',')
+        .map((item: string) => item.trim())
+        .filter((item: string) => item.length > 0);
     }
     
     if (formData.idiomas_hablados && typeof formData.idiomas_hablados === 'string') {
-      formData.idiomas_hablados = formData.idiomas_hablados.split(',').map((item: string) => item.trim());
+      formData.idiomas_hablados = formData.idiomas_hablados
+        .split(',')
+        .map((item: string) => item.trim())
+        .filter((item: string) => item.length > 0);
+    }
+
+    // Procesar certificaciones como array
+    if (formData.certificaciones && typeof formData.certificaciones === 'string') {
+      formData.certificaciones = formData.certificaciones
+        .split(',')
+        .map((item: string) => item.trim())
+        .filter((item: string) => item.length > 0);
     }
     
     formData.sliders_principales = this.slidersPrincipales.map(slider => ({
@@ -526,20 +663,18 @@ export class EmprendimientoDetalleComponent implements OnInit {
       ...this.deletedSlidersSecundarios
     ];
     
-    return formData;
-  }
-  getSliderDescripcion(slider: any): string {
-    if (!slider.descripcion) return '';
+    console.log('FormData preparado:', formData); // Debug
     
-    if (typeof slider.descripcion === 'string') {
-      return slider.descripcion;
-    } else {
-      return slider.descripcion.descripcion || '';
-    }
+    return formData;
   }
   
   cancel(): void {
-    this.router.navigate(['/mis-emprendimientos']);
+    if (this.hasUnsavedChanges()) {
+      if (!confirm('¿Estás seguro de que quieres descartar los cambios?')) {
+        return;
+      }
+    }
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   processExistingSliders(): void {
@@ -577,6 +712,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
       });
     }
   }
+
   get slidersPrincipalesArray(): FormArray {
     return this.emprendimientoForm?.get('sliders_principales') as FormArray;
   }
@@ -585,8 +721,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
     return this.emprendimientoForm?.get('sliders_secundarios') as FormArray;
   }
 
-
-  // 6. Métodos para manejar cambios en sliders
+  // Métodos para manejar cambios en sliders
   onSlidersPrincipalesChange(sliders: SliderImage[]): void {
     this.slidersPrincipales = sliders;
   }
@@ -602,65 +737,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
   onDeletedSlidersSecundariosChange(deletedIds: number[]): void {
     this.deletedSlidersSecundarios = deletedIds;
   }
-  validateForm(): boolean {
-    // Validar campos requeridos
-    if (this.emprendimientoForm?.invalid) {
-      this.markFormGroupTouched(this.emprendimientoForm);
-      return false;
-    }
-    
-    // Validar que tenga al menos una imagen principal
-    if (this.slidersPrincipales.length === 0) {
-      this.error = 'Debe agregar al menos una imagen principal';
-      this.activeSection = 'imagenes';
-      return false;
-    }
-    
-    return true;
-  }
 
-  private markFormGroupTouched(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(key => {
-      const control = formGroup.get(key);
-      control?.markAsTouched();
-      
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
-    });
-  }
-
-  // 2. NOTIFICACIONES MEJORADAS
-  showSuccessMessage(message: string): void {
-    // Implementar sistema de notificaciones toast
-    // O usar el alert actual pero con mejor UX
-    this.success = message;
-    setTimeout(() => {
-      this.success = '';
-    }, 5000);
-  }
-
-  showErrorMessage(message: string): void {
-    this.error = message;
-    setTimeout(() => {
-      this.error = '';
-    }, 8000);
-  }
-
-  // 3. NAVEGACIÓN INTELIGENTE ENTRE SECCIONES
-  goToSection(section: string): void {
-    this.activeSection = section;
-    
-    // Scroll suave a la sección
-    setTimeout(() => {
-      const element = document.querySelector(`[data-section="${section}"]`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
-  }
-
-  // 4. VERIFICACIÓN DE CAMBIOS NO GUARDADOS
   hasUnsavedChanges(): boolean {
     if (!this.emprendimientoForm) return false;
     
@@ -671,53 +748,10 @@ export class EmprendimientoDetalleComponent implements OnInit {
           this.deletedSlidersSecundarios.length > 0;
   }
 
-  // 5. CONFIRMAR ANTES DE SALIR
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any): void {
     if (this.hasUnsavedChanges()) {
       $event.returnValue = 'Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?';
     }
-  }
-
-  // 6. PREVISUALIZACIÓN DE DATOS
-  previewEmprendimiento(): void {
-    const data = this.prepareFormData();
-    // Abrir modal o nueva pestaña con vista previa
-    console.log('Vista previa:', data);
-  }
-
-  // 7. RESET DE FORMULARIO
-  resetForm(): void {
-    if (confirm('¿Estás seguro de que quieres descartar todos los cambios?')) {
-      this.loadEmprendimiento();
-      this.success = '';
-      this.error = '';
-    }
-  }
-
-  // 8. VALIDACIÓN EN TIEMPO REAL
-  onFieldChange(fieldName: string): void {
-    const control = this.emprendimientoForm?.get(fieldName);
-    if (control && control.invalid && control.touched) {
-      // Mostrar error específico del campo
-      this.validateField(fieldName);
-    }
-  }
-
-  private validateField(fieldName: string): void {
-    const control = this.emprendimientoForm?.get(fieldName);
-    if (!control) return;
-    
-    if (control.hasError('required')) {
-      this.showFieldError(fieldName, 'Este campo es obligatorio');
-    } else if (control.hasError('email')) {
-      this.showFieldError(fieldName, 'Ingresa un email válido');
-    }
-    // Agregar más validaciones según necesites
-  }
-
-  private showFieldError(fieldName: string, message: string): void {
-    // Implementar sistema de errores por campo
-    console.log(`Error en ${fieldName}: ${message}`);
   }
 }

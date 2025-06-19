@@ -571,14 +571,32 @@ export class ServicioFormComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     
-    this.route.params.subscribe(params => {
-      this.emprendimientoId = +params['id'];
-      this.servicioId = params['servicioId'] ? +params['servicioId'] : undefined;
-      this.isEditMode = !!this.servicioId;
+    // Obtener el ID del emprendimiento de la ruta padre
+    this.route.parent?.paramMap.subscribe(params => {
+      const emprendimientoId = params.get('id');
+      console.log('ServicioForm - Emprendimiento ID recibido:', emprendimientoId); // Debug
       
-      this.loadData();
+      if (emprendimientoId && !isNaN(+emprendimientoId)) {
+        this.emprendimientoId = +emprendimientoId;
+        
+        // Obtener el servicioId de la ruta actual
+        this.route.paramMap.subscribe(currentParams => {
+          const servicioId = currentParams.get('servicioId');
+          console.log('ServicioForm - Servicio ID recibido:', servicioId); // Debug
+          
+          this.servicioId = servicioId ? +servicioId : undefined;
+          this.isEditMode = !!this.servicioId;
+          
+          this.loadData();
+        });
+      } else {
+        console.error('ServicioForm - ID de emprendimiento inválido:', emprendimientoId);
+        this.error = 'ID de emprendimiento inválido';
+        this.loading = false;
+      }
     });
   }
+  
 
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any): void {
@@ -641,7 +659,6 @@ export class ServicioFormComponent implements OnInit {
 
   // Carga de datos
   private loadData(): void {
-    this.loadEmprendimiento();
     
     if (this.isEditMode && this.servicioId) {
       this.loadServicio();

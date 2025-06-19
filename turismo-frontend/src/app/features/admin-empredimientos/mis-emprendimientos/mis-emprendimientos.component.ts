@@ -13,7 +13,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
     <div class="min-h-screen relative">
       <!-- Background Pattern -->
       <div class="absolute inset-0 bg-[url('https://media-cdn.tripadvisor.com/media/photo-s/08/e7/29/52/capachica-peninsula.jpg')] bg-cover bg-center bg-no-repeat">
-        <div class="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-900/95 backdrop-blur-sm dark:from-blue-900/95 dark:via-blue-900/90 dark:to-blue-900/95"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-900/60 via-gray-900/50 to-gray-900/60 dark:from-blue-900/50 dark:via-blue-900/40 dark:to-blue-900/50"></div>
       </div>
 
       <!-- Content -->
@@ -210,7 +210,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                       
                       <!-- Botón de gestión principal -->
                       <div class="flex justify-center pt-4">
-                        <a [routerLink]="['/mis-emprendimientos', emprendimiento.id]" 
+                        <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimiento.id]" 
                            class="group flex items-center justify-center px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-400 dark:from-blue-500 dark:to-blue-400 text-white font-bold text-lg shadow-2xl hover:from-orange-600 hover:to-orange-500 dark:hover:from-blue-600 dark:hover:to-blue-500 transition-all duration-300 active:scale-95 transform hover:scale-105">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
