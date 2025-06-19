@@ -279,9 +279,26 @@ class EmprendedorController extends Controller
             ], 404);
         }
         
+        // Incluir sliders y otros datos relacionados en la consulta de servicios
+        $servicios = $emprendedor->servicios()->with([
+            'categorias',
+            'sliders' => function($query) {
+                $query->orderBy('orden');
+            },
+            'horarios' => function($query) {
+                $query->where('activo', true)
+                    ->orderBy('dia_semana')
+                    ->orderBy('hora_inicio');
+            }
+            // Si necesitas separar sliders principales y secundarios:
+            // 'sliders' => function($query) {
+            //     $query->where('es_principal', true)->orderBy('orden');
+            // }
+        ])->get();
+        
         return response()->json([
             'success' => true,
-            'data' => $emprendedor->servicios()->with('categorias')->get()
+            'data' => $servicios
         ]);
     }
 

@@ -1,218 +1,328 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
-import { EmprendimientosService, Emprendimiento, AdminRequest } from '../../../core/services/emprendimientos.service';
-import { UsersService } from '../../../core/services/users.service';
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { EmprendimientoAdminService } from '../../../core/services/emprendimiento-admin.service';
+import { Emprendimiento, AdminRequest } from '../../../core/models/emprendimiento-admin.model';
 import { User } from '../../../core/models/user.model';
+
+interface ValidationErrors {
+  [key: string]: string[];
+}
+
+interface ApiErrorResponse {
+  success: boolean;
+  message: string;
+  errors?: ValidationErrors;
+}
 
 @Component({
   selector: 'app-administradores-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule],
   template: `
-    <div class="min-h-screen relative">
-      <!-- Background Pattern -->
-      <div class="absolute inset-0 bg-[url('https://media-cdn.tripadvisor.com/media/photo-s/08/e7/29/52/capachica-peninsula.jpg')] bg-cover bg-center bg-no-repeat">
-        <div class="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-900/95 backdrop-blur-sm"></div>
+    <!-- Loading state glassmorphism -->
+    <div *ngIf="loading && !emprendimiento" class="flex items-center justify-center h-64">
+      <div class="relative">
+        <div class="w-16 h-16 border-4 border-orange-200/30 rounded-full"></div>
+        <div class="w-16 h-16 border-4 border-orange-400 border-t-transparent rounded-full animate-spin absolute top-0"></div>
       </div>
-      <!-- Content -->
-      <div class="relative min-h-screen">
-        <!-- Barra Superior -->
-        <header class="backdrop-blur-lg bg-white/10 dark:bg-gray-800/20 border-b border-white/10 dark:border-gray-700/30 sticky top-0 z-50">
-          <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <div>
-              <h1 class="text-3xl font-bold bg-gradient-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">
-                {{ emprendimiento ? 'Administradores: ' + emprendimiento.nombre : 'Cargando administradores...' }}
-              </h1>
-              <p class="text-sm text-gray-300 dark:text-gray-400 mt-1">Gestiona los administradores de tu emprendimiento</p>
+    </div>
+
+    <!-- Main content glassmorphism -->
+    <div *ngIf="!loading || emprendimiento" class="space-y-8">
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-orange-400 via-orange-300 to-amber-300 bg-clip-text text-transparent">
+            Administradores
+          </h1>
+          <p class="text-slate-300 dark:text-slate-400 mt-1">
+            Gestiona los administradores de {{ emprendimiento?.nombre || 'tu emprendimiento' }}
+          </p>
+        </div>
+        <button (click)="refreshData()" 
+                [disabled]="loading"
+                class="group flex items-center px-5 py-2.5 rounded-xl bg-white/10 dark:bg-slate-800/60 text-white hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60 disabled:opacity-50">
+          <svg *ngIf="!loading" class="h-5 w-5 mr-2 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <div *ngIf="loading" class="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+          <span class="font-medium">Actualizar</span>
+        </button>
+      </div>
+
+      <!-- Error global -->
+      <div *ngIf="globalError" class="backdrop-blur-sm bg-red-500/20 border border-red-500/30 rounded-2xl p-6">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 text-red-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div>
+            <h3 class="text-red-200 font-semibold">{{ globalError }}</h3>
+            <button (click)="loadEmprendimiento()" 
+                    class="mt-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-all duration-300 text-sm font-medium">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario para Agregar Administrador glassmorphism -->
+      <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 rounded-lg bg-orange-500/20 text-orange-300">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-white">Agregar Nuevo Administrador</h2>
+        </div>
+
+        <form [formGroup]="adminForm" (ngSubmit)="addAdministrador()" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Email -->
+            <div class="space-y-2">
+              <label for="email" class="block text-sm font-medium text-slate-300 dark:text-slate-300">
+                Email del Usuario *
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                  </svg>
+                </div>
+                <input 
+                  type="email" 
+                  id="email" 
+                  formControlName="email" 
+                  class="block w-full pl-10 pr-3 py-3 border rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300"
+                  [ngClass]="{
+                    'border-slate-600/50 bg-white/10 dark:bg-slate-800/30 text-white': !hasFieldError('email'),
+                    'border-red-400/50 bg-red-500/10 text-white': hasFieldError('email')
+                  }"
+                  placeholder="usuario@ejemplo.com">
+              </div>
+              <!-- Errores del campo email -->
+              <div *ngIf="hasFieldError('email')" class="space-y-1">
+                <p *ngFor="let error of getFieldErrors('email')" class="text-sm text-red-300 flex items-center gap-2">
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  {{ error }}
+                </p>
+              </div>
+              <!-- Errores de validación del frontend -->
+              <div *ngIf="adminForm.get('email')?.invalid && adminForm.get('email')?.touched && !hasFieldError('email')" class="space-y-1">
+                <p *ngIf="adminForm.get('email')?.errors?.['required']" class="text-sm text-red-300 flex items-center gap-2">
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  El email es requerido
+                </p>
+                <p *ngIf="adminForm.get('email')?.errors?.['email']" class="text-sm text-red-300 flex items-center gap-2">
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  El formato del email no es válido
+                </p>
+              </div>
             </div>
-            <div class="flex items-center space-x-4">
-              <a [routerLink]="['/mis-emprendimientos']" class="group flex items-center px-4 py-2 rounded-full bg-white/10 dark:bg-gray-800/30 text-white hover:bg-white/20 dark:hover:bg-gray-800/50 transition-all duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-                </svg>
-                Volver a Emprendimientos
-              </a>
+            
+            <!-- Rol -->
+            <div class="space-y-2">
+              <label for="rol" class="block text-sm font-medium text-slate-300 dark:text-slate-300">
+                Rol *
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </div>
+                <select 
+                  id="rol" 
+                  formControlName="rol" 
+                  class="block w-full pl-10 pr-3 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300"
+                  [ngClass]="{
+                    'border-slate-600/50 bg-white/10 dark:bg-slate-800/30 text-white': !hasFieldError('rol'),
+                    'border-red-400/50 bg-red-500/10 text-white': hasFieldError('rol')
+                  }">
+                  <option value="" class="bg-slate-800 text-white">Seleccionar rol</option>
+                  <option value="administrador" class="bg-slate-800 text-white">Administrador</option>
+                  <option value="colaborador" class="bg-slate-800 text-white">Colaborador</option>
+                  <option value="moderador" class="bg-slate-800 text-white">Moderador</option>
+                </select>
+              </div>
+              <!-- Errores del campo rol -->
+              <div *ngIf="hasFieldError('rol')" class="space-y-1">
+                <p *ngFor="let error of getFieldErrors('rol')" class="text-sm text-red-300 flex items-center gap-2">
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  {{ error }}
+                </p>
+              </div>
+              <!-- Errores de validación del frontend -->
+              <div *ngIf="adminForm.get('rol')?.invalid && adminForm.get('rol')?.touched && !hasFieldError('rol')" class="space-y-1">
+                <p *ngIf="adminForm.get('rol')?.errors?.['required']" class="text-sm text-red-300 flex items-center gap-2">
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  El rol es requerido
+                </p>
+              </div>
             </div>
           </div>
-        </header>
+          
+          <!-- Es Principal -->
+          <div class="flex items-center gap-3">
+            <label class="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                formControlName="es_principal"
+                class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-slate-600/50 rounded bg-white/10 transition-all duration-300">
+              <span class="ml-3 text-sm text-slate-300 font-medium">
+                Administrador Principal
+              </span>
+            </label>
+            <div class="group relative">
+              <svg class="h-4 w-4 text-slate-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div class="absolute bottom-6 left-0 hidden group-hover:block bg-slate-800/90 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap z-50 border border-slate-600/50">
+                Los administradores principales no pueden ser eliminados
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              [disabled]="adminForm.invalid || addingAdmin"
+              class="flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold shadow-lg hover:from-orange-600 hover:to-orange-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg *ngIf="addingAdmin" class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              <svg *ngIf="!addingAdmin" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              {{ addingAdmin ? 'Agregando...' : 'Agregar Administrador' }}
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Lista de Administradores glassmorphism -->
+      <div class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
+        <div class="p-6 border-b border-white/20 dark:border-slate-600/50">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-blue-500/20 text-blue-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-white">
+              Administradores Actuales ({{ emprendimiento?.administradores?.length || 0 }})
+            </h2>
+          </div>
+        </div>
         
-        <!-- Contenido Principal -->
-        <main class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-          <!-- Estado de Carga -->
-          <div *ngIf="loading" class="flex justify-center py-12 animate-fade-in">
-            <div class="relative">
-              <div class="w-16 h-16 border-4 border-orange-200/30 dark:border-orange-800/30 rounded-full"></div>
-              <div class="w-16 h-16 border-4 border-orange-400 border-t-transparent rounded-full animate-spin absolute top-0"></div>
-            </div>
+        <div class="p-6">
+          <!-- Sin Administradores -->
+          <div *ngIf="!loading && !globalError && (!emprendimiento?.administradores?.length)" class="text-center py-12">
+            <svg class="mx-auto h-16 w-16 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <h3 class="text-lg font-semibold text-white mb-2">No hay administradores</h3>
+            <p class="text-slate-300 dark:text-slate-400">
+              Este emprendimiento aún no tiene administradores registrados.
+            </p>
           </div>
           
-          <!-- Error -->
-          <div *ngIf="error" class="backdrop-blur-lg bg-red-500/10 dark:bg-red-900/20 border border-red-500/20 dark:border-red-800/30 rounded-2xl p-6 mb-6 shadow-2xl animate-fade-in">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="ml-4">
-                <h3 class="text-lg font-medium text-red-200">{{ error }}</h3>
-                <div class="mt-4">
-                  <button (click)="loadEmprendimiento()" class="inline-flex items-center px-4 py-2 rounded-full bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-all duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Reintentar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Formulario para Agregar Administrador -->
-          <div class="backdrop-blur-lg bg-white/10 dark:bg-gray-800/20 shadow-2xl rounded-2xl mb-8 border border-gradient-to-r from-orange-400/40 to-orange-600/40 animate-fade-in">
-            <div class="p-7">
-              <h2 class="text-xl font-extrabold bg-gradient-to-r from-orange-400 to-orange-200 bg-clip-text text-transparent mb-4 tracking-tight animate-slide-in">Agregar Nuevo Administrador</h2>
-              <form [formGroup]="adminForm" (ngSubmit)="onSubmit()" class="space-y-5">
-                <div class="relative">
-                  <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email del Usuario *</label>
-                  <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-orange-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                    </span>
-                    <input 
-                      type="email" 
-                      id="email" 
-                      formControlName="email" 
-                      class="mt-1 block w-full rounded-lg border border-gray-500/30 bg-white/20 dark:bg-gray-700/30 dark:text-white shadow-inner focus:border-orange-400 focus:ring-orange-400 focus:ring-2 px-10 py-2 placeholder-gray-400 transition-all duration-300 focus:shadow-orange-400/20"
-                      placeholder="Ingresa el email del usuario">
-                  </div>
-                  <div *ngIf="submitted && f['email'].errors" class="mt-1 text-sm text-red-400 animate-shake">
-                    <span *ngIf="f['email'].errors['required']">El email es requerido</span>
-                    <span *ngIf="f['email'].errors['email']">El formato del email no es válido</span>
-                  </div>
-                </div>
-                <div class="relative">
-                  <label for="rol" class="block text-sm font-medium text-gray-300 mb-1">Rol *</label>
-                  <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-orange-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
-                    </span>
-                    <select 
-                      id="rol" 
-                      formControlName="rol" 
-                      class="mt-1 block w-full rounded-lg border border-gray-500/30 bg-white/20 dark:bg-gray-700/30 dark:text-white shadow-inner focus:border-orange-400 focus:ring-orange-400 focus:ring-2 px-10 py-2 transition-all duration-300 focus:shadow-orange-400/20">
-                      <option value="administrador">Administrador</option>
-                      <option value="colaborador">Colaborador</option>
-                    </select>
-                  </div>
-                  <div *ngIf="submitted && f['rol'].errors" class="mt-1 text-sm text-red-400 animate-shake">
-                    <span *ngIf="f['rol'].errors['required']">El rol es requerido</span>
-                  </div>
-                </div>
-                <div class="flex justify-end">
-                  <button
-                    type="submit"
-                    [disabled]="submitting"
-                    class="inline-flex justify-center rounded-xl border border-transparent bg-gradient-to-r from-orange-500 to-orange-400 py-2 px-6 text-sm font-bold text-white shadow-lg hover:from-orange-600 hover:to-orange-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 active:scale-95 animate-pulse-once">
-                    <span *ngIf="submitting" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></span>
-                    Agregar Administrador
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-          
-          <!-- Lista de Administradores -->
-          <div class="backdrop-blur-lg bg-white/10 dark:bg-gray-800/20 shadow-2xl rounded-2xl border border-white/10 dark:border-gray-700/30 animate-fade-in">
-            <div class="p-7">
-              <h2 class="text-xl font-extrabold bg-gradient-to-r from-orange-400 to-orange-200 bg-clip-text text-transparent mb-4 tracking-tight animate-slide-in">Administradores Actuales</h2>
-              <!-- Sin Administradores -->
-              <div *ngIf="!loading && !error && (!administradores || administradores.length === 0)" class="text-center py-8 animate-fade-in">
-                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <h3 class="mt-2 text-lg font-bold text-white animate-fade-in">No hay administradores</h3>
-                <p class="mt-1 text-sm text-gray-300">Este emprendimiento aún no tiene administradores registrados.</p>
-              </div>
-              <!-- Tabla de Administradores -->
-              <div *ngIf="!loading && !error && administradores && administradores.length > 0" class="overflow-x-auto animate-fade-in">
-                <table class="min-w-full divide-y divide-gray-500/20 dark:divide-gray-700/40">
-                  <thead class="bg-white/20 dark:bg-gray-800/30 sticky top-0 z-10 shadow-lg">
-                    <tr>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Usuario</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Email</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Rol</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Estado</th>
-                      <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white/5 dark:bg-gray-800/10 divide-y divide-gray-500/20 dark:divide-gray-700/40">
-                    <tr *ngFor="let admin of administradores" class="transition-all duration-300 hover:bg-orange-400/10 hover:shadow-xl animate-fade-in">
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="flex-shrink-0 h-12 w-12 relative">
-                            <div class="absolute -inset-1 rounded-full bg-gradient-to-br from-orange-400/40 to-orange-600/40 blur-md opacity-70 z-0"></div>
-                            <img 
-                              *ngIf="admin.foto_perfil_url || admin.avatar" 
-                              [src]="admin.foto_perfil_url || admin.avatar" 
-                              [alt]="admin.name"
-                              class="h-12 w-12 rounded-full object-cover border-4 border-white/60 shadow-xl relative z-10">
-                            <div 
-                              *ngIf="!admin.foto_perfil_url && !admin.avatar" 
-                              class="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400/40 to-orange-600/40 flex items-center justify-center border-4 border-white/60 shadow-xl relative z-10">
-                              <span class="text-lg font-bold text-white">{{ getInitials(admin.name) }}</span>
-                            </div>
-                          </div>
-                          <div class="ml-4">
-                            <div class="text-base font-bold text-white">{{ admin.name }}</div>
-                          </div>
+          <!-- Tabla de Administradores -->
+          <div *ngIf="!loading && !globalError && (emprendimiento?.administradores ?? []).length > 0" class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead class="border-b border-white/20 dark:border-slate-600/50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-300 uppercase tracking-wider">Usuario</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-300 uppercase tracking-wider">Email</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-300 uppercase tracking-wider">Rol</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-300 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-4 text-right text-sm font-semibold text-slate-300 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/10 dark:divide-slate-600/30">
+                <tr *ngFor="let admin of emprendimiento?.administradores; trackBy: trackByAdminId" 
+                    class="hover:bg-white/5 dark:hover:bg-slate-700/30 transition-all duration-300">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <img 
+                          *ngIf="admin.foto_perfil_url" 
+                          [src]="admin.foto_perfil_url" 
+                          [alt]="admin.name"
+                          class="h-10 w-10 rounded-full object-cover border-2 border-white/20">
+                        <div 
+                          *ngIf="!admin.foto_perfil_url" 
+                          class="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center border-2 border-white/20">
+                          <span class="text-sm font-semibold text-orange-300">{{ getInitials(admin.name) }}</span>
                         </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-base text-gray-300">{{ admin.email }}</div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-base text-gray-300 flex items-center gap-2">
-                          <svg *ngIf="admin.pivot?.rol === 'administrador'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-300 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                          <svg *ngIf="admin.pivot?.rol === 'colaborador'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-300 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                          {{ admin.pivot?.rol || 'Administrador' }}
-                          <span *ngIf="admin.pivot?.es_principal" class="ml-1 bg-gradient-to-r from-yellow-400/80 to-yellow-300/80 text-yellow-900 text-xs px-2 py-0.5 rounded-full shadow flex items-center gap-1 animate-pulse">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                            Principal
-                          </span>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-bold rounded-full shadow-md flex items-center gap-1 animate-gradient-x" 
-                              [ngClass]="admin.active ? 'bg-gradient-to-r from-green-500/80 to-green-400/80 text-white' : 'bg-gradient-to-r from-red-500/80 to-red-400/80 text-white'">
-                          <svg *ngIf="admin.active" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2" /></svg>
-                          <svg *ngIf="!admin.active" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                          {{ admin.active ? 'Activo' : 'Inactivo' }}
-                        </span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-right text-base font-bold">
-                        <button 
-                          *ngIf="!admin.pivot?.es_principal"
-                          (click)="confirmRemoveAdmin(admin)"
-                          class="inline-flex items-center px-4 py-2 rounded-xl bg-gradient-to-r from-red-500 to-red-400 text-white shadow-lg hover:from-red-600 hover:to-red-500 transition-all duration-300 active:scale-95 animate-shake-on-hover">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                          Eliminar
-                        </button>
-                        <span *ngIf="admin.pivot?.es_principal" class="text-gray-400 dark:text-gray-500 cursor-not-allowed">
-                          No removible
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                      </div>
+                      <div>
+                        <div class="text-sm font-semibold text-white">{{ admin.name }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-slate-300">{{ admin.email }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <div class="w-2 h-2 rounded-full"
+                           [ngClass]="{
+                             'bg-blue-400': admin.pivot?.rol === 'administrador',
+                             'bg-green-400': admin.pivot?.rol === 'colaborador',
+                             'bg-purple-400': admin.pivot?.rol === 'moderador'
+                           }"></div>
+                      <span class="text-sm text-slate-300">{{ admin.pivot?.rol | titlecase }}</span>
+                      <span *ngIf="admin.pivot?.es_principal" 
+                            class="ml-2 px-2 py-1 text-xs bg-yellow-500/20 text-yellow-300 rounded-full border border-yellow-400/30">
+                        Principal
+                      </span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full"
+                          [ngClass]="admin.active ? 'bg-green-500/20 text-green-300 border border-green-400/30' : 'bg-red-500/20 text-red-300 border border-red-400/30'">
+                      <div class="w-1.5 h-1.5 rounded-full"
+                           [ngClass]="admin.active ? 'bg-green-400' : 'bg-red-400'"></div>
+                      {{ admin.active ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <button 
+                      *ngIf="!admin.pivot?.es_principal"
+                      (click)="removeAdministrador(admin)"
+                      [disabled]="adminStates[admin.id!].removing"
+                      class="inline-flex items-center px-3 py-2 rounded-xl bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all duration-300 text-sm font-medium border border-red-400/30 hover:border-red-400/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                      <svg *ngIf="adminStates[admin.id!]?.removing" class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
+                      <svg *ngIf="!adminStates[admin.id!]?.removing" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                      {{ adminStates[admin.id!].removing ? 'Eliminando...' : 'Eliminar' }}
+                    </button>
+                    <span *ngIf="admin.pivot?.es_principal" class="text-slate-400 text-sm italic">
+                      No removible
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   `,
@@ -220,125 +330,256 @@ import { User } from '../../../core/models/user.model';
     :host {
       display: block;
     }
+    
+    /* Mejoras para transiciones suaves */
+    * {
+      transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    }
   `]
 })
 export class AdministradoresListComponent implements OnInit {
-  private emprendimientosService = inject(EmprendimientosService);
-  private usersService = inject(UsersService);
+  private emprendimientoAdminService = inject(EmprendimientoAdminService);
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
   private fb = inject(FormBuilder);
   
-  emprendimientoId: number = 0;
-  emprendimiento: Emprendimiento | null = null;
-  administradores: User[] = [];
+  // Estados para el control de cada administrador
+  adminStates: { [key: number]: { removing?: boolean } } = {};
   
+  // Propiedades principales
+  emprendimientoId!: number;
+  emprendimiento?: Emprendimiento;
   loading = true;
-  submitting = false;
-  submitted = false;
-  error = '';
+  globalError = '';
+  addingAdmin = false;
+
+  // Formulario reactivo
+  adminForm!: FormGroup;
   
-  adminForm: FormGroup;
-  
-  constructor() {
+  // Errores de validación del backend
+  validationErrors: ValidationErrors = {};
+
+  ngOnInit(): void {
+    this.initForm();
+    
+    // Obtener el ID de la ruta padre
+    this.route.parent?.paramMap.subscribe(params => {
+      const id = params.get('id');
+      console.log('Administradores - ID recibido:', id); // Debug
+      
+      if (id && !isNaN(+id)) {
+        this.emprendimientoId = +id;
+        this.loadEmprendimiento();
+      } else {
+        console.error('Administradores - ID inválido:', id);
+        this.globalError = 'ID de emprendimiento inválido';
+      }
+    });
+  }
+
+  /**
+   * Inicializa el formulario reactivo con validaciones
+   */
+  private initForm(): void {
     this.adminForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      rol: ['administrador', [Validators.required]]
+      rol: ['', Validators.required],
+      es_principal: [false]
     });
   }
-  
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.emprendimientoId = +params['id'];
-      this.loadEmprendimiento();
-    });
-  }
-  
-  get f() {
-    return this.adminForm.controls;
-  }
-  
+
+  /**
+   * Carga los datos del emprendimiento y sus administradores
+   */
   loadEmprendimiento(): void {
     this.loading = true;
-    this.error = '';
-    
-    this.emprendimientosService.getEmprendimiento(this.emprendimientoId).subscribe({
+    this.globalError = '';
+
+    this.emprendimientoAdminService.getEmprendimiento(this.emprendimientoId).subscribe({
       next: (data) => {
         this.emprendimiento = data;
-        this.administradores = data.administradores || [];
         this.loading = false;
+        
+        // Inicializar estados de administradores
+        if (data.administradores) {
+          data.administradores.forEach(admin => {
+            if (admin.id) {
+              this.adminStates[admin.id] = {};
+            }
+          });
+        }
       },
       error: (err) => {
         console.error('Error al cargar emprendimiento:', err);
-        this.error = err.error?.message || 'Error al cargar el emprendimiento. Inténtalo de nuevo.';
+        this.globalError = err.error?.message || 'Error al cargar el emprendimiento';
         this.loading = false;
       }
     });
   }
-  
-  onSubmit(): void {
-    this.submitted = true;
-    
-    if (this.adminForm.invalid) {
-      return;
-    }
-    
-    this.submitting = true;
-    
-    const adminData: AdminRequest = {
-      email: this.adminForm.value.email,
-      rol: this.adminForm.value.rol,
-      es_principal: false // Siempre false desde esta interfaz
-    };
-    
-    this.emprendimientosService.addAdministrador(this.emprendimientoId, adminData).subscribe({
-      next: () => {
-        // Recargar lista de administradores
-        this.loadEmprendimiento();
-        this.adminForm.reset({
-          email: '',
-          rol: 'administrador'
-        });
-        this.submitted = false;
-        this.submitting = false;
-        alert('Administrador agregado correctamente');
-      },
-      error: (err) => {
-        console.error('Error al agregar administrador:', err);
-        this.error = err.error?.message || 'Error al agregar el administrador. Inténtalo de nuevo.';
-        this.submitting = false;
+
+  /**
+   * Refresca los datos del componente
+   */
+  refreshData(): void {
+    this.loadEmprendimiento();
+  }
+
+  /**
+   * Agrega un nuevo administrador al emprendimiento
+   */
+  async addAdministrador(): Promise<void> {
+    if (this.adminForm.invalid || this.addingAdmin) return;
+
+    this.addingAdmin = true;
+    this.validationErrors = {};
+    this.globalError = '';
+
+    try {
+      const adminData: AdminRequest = this.adminForm.value;
+      
+      await this.emprendimientoAdminService.addAdministrador(this.emprendimientoId, adminData).toPromise();
+      
+      // Reset form
+      this.adminForm.reset({
+        email: '',
+        rol: '',
+        es_principal: false
+      });
+      
+      // Marcar como pristine para limpiar validaciones
+      this.adminForm.markAsUntouched();
+      this.adminForm.markAsPristine();
+      
+      // Limpiar errores de validación
+      this.validationErrors = {};
+      
+      // Recargar datos
+      this.loadEmprendimiento();
+      
+      // Mostrar mensaje de éxito
+      this.showSuccessMessage('Administrador agregado correctamente');
+      
+    } catch (err: any) {
+      console.error('Error al agregar administrador:', err);
+      
+      // Manejar errores de validación del backend
+      if (err.error && err.error.errors) {
+        this.validationErrors = err.error.errors;
+      } else {
+        this.globalError = err.error?.message || 'Error al agregar el administrador';
       }
-    });
-  }
-  
-  confirmRemoveAdmin(admin: User): void {
-    if (confirm(`¿Estás seguro de que deseas eliminar a "${admin.name}" como administrador? Esta acción no se puede deshacer.`)) {
-      this.removeAdmin(admin.id!);
+    } finally {
+      this.addingAdmin = false;
     }
   }
-  
-  removeAdmin(userId: number): void {
-    this.emprendimientosService.removeAdministrador(this.emprendimientoId, userId).subscribe({
-      next: () => {
-        // Actualizar la lista de administradores
-        this.administradores = this.administradores.filter(a => a.id !== userId);
-        alert('Administrador eliminado correctamente');
-      },
-      error: (err) => {
-        console.error('Error al eliminar administrador:', err);
-        this.error = err.error?.message || 'Error al eliminar el administrador. Inténtalo de nuevo.';
+
+  /**
+   * Elimina un administrador del emprendimiento
+   */
+  async removeAdministrador(admin: User): Promise<void> {
+    if (!admin.id || this.adminStates[admin.id]?.removing || admin.pivot?.es_principal) return;
+
+    const confirmMessage = `¿Estás seguro de que quieres eliminar a ${admin.name} como administrador?\n\nEsta acción no se puede deshacer.`;
+    
+    if (!confirm(confirmMessage)) return;
+
+    // Marcar como eliminando
+    this.adminStates[admin.id] = { removing: true };
+
+    try {
+      await this.emprendimientoAdminService.removeAdministrador(this.emprendimientoId, admin.id).toPromise();
+      
+      // Actualizar lista local
+      if (this.emprendimiento?.administradores) {
+        this.emprendimiento.administradores = this.emprendimiento.administradores.filter(a => a.id !== admin.id);
       }
-    });
+      
+      // Limpiar estado
+      delete this.adminStates[admin.id];
+      
+      // Mostrar mensaje de éxito
+      this.showSuccessMessage('Administrador eliminado correctamente');
+      
+    } catch (err: any) {
+      console.error('Error al eliminar administrador:', err);
+      this.globalError = err.error?.message || 'Error al eliminar el administrador';
+      
+      // Restaurar estado
+      this.adminStates[admin.id] = { removing: false };
+    }
   }
-  
+
+  /**
+   * Verifica si un campo tiene errores de validación del backend
+   */
+  hasFieldError(fieldName: string): boolean {
+    return this.validationErrors[fieldName] && this.validationErrors[fieldName].length > 0;
+  }
+
+  /**
+   * Obtiene los errores de validación del backend para un campo específico
+   */
+  getFieldErrors(fieldName: string): string[] {
+    return this.validationErrors[fieldName] || [];
+  }
+
+  /**
+   * Obtiene las iniciales de un nombre para mostrar en el avatar
+   */
   getInitials(name: string): string {
-    if (!name) return '';
+    if (!name) return '?';
     
-    const parts = name.split(' ');
-    if (parts.length === 1) {
-      return parts[0].charAt(0).toUpperCase();
-    }
+    const parts = name.trim().split(' ').filter(part => part.length > 0);
+    
+    if (parts.length === 0) return '?';
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
     
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  }
+
+  /**
+   * TrackBy function para mejorar performance en ngFor
+   */
+  trackByAdminId(index: number, admin: User): number {
+    return admin.id || index;
+  }
+
+  /**
+   * Muestra un mensaje de éxito temporal
+   */
+  private showSuccessMessage(message: string): void {
+    // Implementar notificación toast o alert temporal
+    // Por ahora usamos alert, pero se puede mejorar con un servicio de notificaciones
+    alert(message);
+  }
+
+  /**
+   * Getter para obtener el rol traducido
+   */
+  getRolDisplayName(rol: string): string {
+    const roles: { [key: string]: string } = {
+      'administrador': 'Administrador',
+      'colaborador': 'Colaborador',
+      'moderador': 'Moderador'
+    };
+    return roles[rol] || rol;
+  }
+
+  /**
+   * Verifica si un usuario puede ser eliminado
+   */
+  canRemoveAdmin(admin: User): boolean {
+    return !admin.pivot?.es_principal && !this.adminStates[admin.id!]?.removing;
+  }
+
+  /**
+   * Obtiene el color del rol para la UI
+   */
+  getRolColor(rol: string): string {
+    const colors: { [key: string]: string } = {
+      'administrador': 'text-blue-300',
+      'colaborador': 'text-green-300',
+      'moderador': 'text-purple-300'
+    };
+    return colors[rol] || 'text-gray-300';
   }
 }
