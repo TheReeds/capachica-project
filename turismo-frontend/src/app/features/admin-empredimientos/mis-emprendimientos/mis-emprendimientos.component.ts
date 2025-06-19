@@ -72,53 +72,51 @@ import { AuthService } from '../../../core/services/auth.service';
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No hay emprendimientos asociados a tu cuenta.</p>
         </div>
         
-        <!-- Lista de Emprendimientos -->
+        <!-- Lista de Emprendimientos - Tarjetas más altas -->
         <div *ngIf="!loading && !error && emprendimientos.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div *ngFor="let emprendimiento of emprendimientos" class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-            <div class="relative h-48 overflow-hidden">
-            <ng-container *ngIf="emprendimiento.sliders_principales as sliders">
-                <!-- Si hay al menos un slider y su URL existe -->
+          <div *ngFor="let emprendimiento of emprendimientos" class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg h-full flex flex-col">
+            <!-- Imagen más alta (cambiada de h-48 a h-56) -->
+            <div class="relative h-56 overflow-hidden">
+              <ng-container *ngIf="emprendimiento.sliders_principales as sliders">
                 <img 
-                    *ngIf="sliders.length > 0 && sliders[0]?.url_completa" 
-                    [src]="sliders[0].url_completa" 
-                    [alt]="emprendimiento.nombre"
-                    class="w-full h-full object-cover"
+                  *ngIf="sliders.length > 0 && sliders[0]?.url_completa" 
+                  [src]="sliders[0].url_completa" 
+                  [alt]="emprendimiento.nombre"
+                  class="w-full h-full object-cover"
                 />
-
-                <!-- Si no hay sliders o el primero no tiene URL -->
                 <div 
-                    *ngIf="sliders.length === 0 || !sliders[0]?.url_completa" 
-                    class="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center"
+                  *ngIf="sliders.length === 0 || !sliders[0]?.url_completa" 
+                  class="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 
-                            0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                </ng-container>
+              </ng-container>
 
               <div class="absolute bottom-0 left-0 right-0 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent">
                 <h3 class="text-lg font-semibold text-white truncate">{{ emprendimiento.nombre }}</h3>
                 <p class="text-sm text-gray-200">{{ emprendimiento.tipo_servicio }}</p>
               </div>
             </div>
-            <div class="p-5">
-              <div class="mb-4">
-                <div class="flex items-center mb-1">
+            
+            <!-- Contenido con más espacio (cambiada de p-5 a p-6) -->
+            <div class="p-6 flex-grow flex flex-col">
+              <div class="mb-5 flex-grow">  <!-- Cambiada de mb-4 a mb-5 -->
+                <div class="flex items-center mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <span class="text-sm text-gray-600 dark:text-gray-300 truncate">{{ emprendimiento.ubicacion }}</span>
                 </div>
-                <div class="flex items-center mb-1">
+                <div class="flex items-center mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span class="text-sm text-gray-600 dark:text-gray-300 truncate">{{ emprendimiento.email }}</span>
                 </div>
-                <div class="flex items-center mb-1">
+                <div class="flex items-center mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
@@ -126,7 +124,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 </div>
               </div>
               
-              <div class="flex flex-wrap gap-2 mb-4">
+              <div class="flex flex-wrap gap-2 mb-5">  <!-- Cambiada de mb-4 a mb-5 -->
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
                   {{ emprendimiento.categoria }}
                 </span>
@@ -140,13 +138,13 @@ import { AuthService } from '../../../core/services/auth.service';
               </div>
               
               <div class="grid grid-cols-2 gap-3">
-                <a [routerLink]="['/emprendimiento', emprendimiento.id]" class="inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900 hover:bg-orange-200 dark:hover:bg-orange-800">
+                <a [routerLink]="['/emprendimiento', emprendimiento.id]" class="inline-flex justify-center items-center px-3 py-3 border border-transparent text-sm font-medium rounded-md text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900 hover:bg-orange-200 dark:hover:bg-orange-800">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                   Editar
                 </a>
-                <a [routerLink]="['/emprendimiento', emprendimiento.id, 'servicios']" class="inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800">
+                <a [routerLink]="['/emprendimiento', emprendimiento.id, 'servicios']" class="inline-flex justify-center items-center px-3 py-3 border border-transparent text-sm font-medium rounded-md text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
@@ -154,8 +152,8 @@ import { AuthService } from '../../../core/services/auth.service';
                 </a>
               </div>
               
-              <div class="mt-3">
-                <a [routerLink]="['/emprendimiento', emprendimiento.id, 'administradores']" class="inline-flex w-full justify-center items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+              <div class="mt-4">
+                <a [routerLink]="['/emprendimiento', emprendimiento.id, 'administradores']" class="inline-flex w-full justify-center items-center px-3 py-3 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>

@@ -10,12 +10,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, RouterModule]
 })
-<<<<<<< HEAD
-export class PlanesComponent {
-=======
 export class ContactosComponent {
   constructor(private router: Router) {}
->>>>>>> 7a8e4ea488c5a5e7b154995835e3e7b713725430
 
   seleccionarTour(familia: string) {
     console.log('Tour seleccionado:', familia);
@@ -23,9 +19,8 @@ export class ContactosComponent {
       .then(() => {
         console.log('Navegación exitosa a reservas de familia:', familia);
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error en la navegación:', error);
-        // Fallback a navegación directa si falla el router
         window.location.href = `/reservas/${familia}`;
       });
   }
