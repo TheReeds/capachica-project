@@ -193,7 +193,7 @@ export class SliderUploadComponent implements OnInit {
   fileErrors: {[index: number]: string} = {}; // Para almacenar errores de archivo
   
   // Constante para el tamaño máximo de archivo (5MB)
-  private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
+  private readonly MAX_FILE_SIZE = 12 * 1024 * 1024; // 5MB en bytes
   
   constructor(private fb: FormBuilder) {}
   

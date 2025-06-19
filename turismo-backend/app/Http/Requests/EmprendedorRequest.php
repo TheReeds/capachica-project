@@ -137,7 +137,7 @@ class EmprendedorRequest extends FormRequest
             'sliders_principales.*.id' => 'nullable|integer|exists:sliders,id',
             'sliders_principales.*.nombre' => 'required|string|max:255',
             'sliders_principales.*.orden' => 'required|integer|min:1',
-            'sliders_principales.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:5120',
+            'sliders_principales.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:12288',
             
             'sliders_secundarios' => 'nullable|array',
             'sliders_secundarios.*.id' => 'nullable|integer|exists:sliders,id',
@@ -145,7 +145,7 @@ class EmprendedorRequest extends FormRequest
             'sliders_secundarios.*.orden' => 'required|integer|min:1',
             'sliders_secundarios.*.titulo' => 'required|string|max:255',
             'sliders_secundarios.*.descripcion' => 'nullable|string',
-            'sliders_secundarios.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:5120',
+            'sliders_secundarios.*.imagen' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:12288',
             
             'deleted_sliders' => 'nullable|array',
             'deleted_sliders.*' => 'integer|exists:sliders,id',

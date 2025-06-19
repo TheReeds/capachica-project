@@ -94,9 +94,9 @@ class PlanRequest extends FormRequest
             'emprendedores.*.porcentaje_ganancia' => 'nullable|numeric|min:0|max:100',
             
             // Validaciones para imágenes
-            'imagen_principal' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'imagen_principal' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:12288',
             'imagenes_galeria' => 'nullable|array|max:10',
-            'imagenes_galeria.*' => 'file|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'imagenes_galeria.*' => 'file|mimes:jpg,jpeg,png,gif,webp|max:12288',
             
             // Validaciones para días
             'dias' => 'nullable|array|min:1',
