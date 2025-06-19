@@ -141,3 +141,79 @@
     top: 808px;
     left: 78px;
   }
+
+.cal-day{
+  background-color: #000;
+}
+/* Fondo general del calendario */
+::ng-deep .mwl-calendar-month-view {
+  background-color: #000 !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Fondo negro para cada celda del grid */
+::ng-deep .mwl-calendar-month-view .cal-cell {
+  background-color: #000 !important;
+  border: 1px solid #111 !important;
+}
+
+/* Estilo base de cada día */
+::ng-deep .mwl-calendar-month-view .cal-day {
+  background-color: #000 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 48px !important;
+}
+
+/* Día del mes (número) */
+::ng-deep .mwl-calendar-month-view .cal-day .cal-date {
+  background-color: #000 !important;
+  color: #fff !important;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  margin: 0 auto;
+  transition: background-color 0.3s ease;
+}
+
+/* Día actual */
+::ng-deep .mwl-calendar-month-view .cal-day.cal-today .cal-date {
+  background-color: #f97316 !important; /* naranja */
+  color: #fff !important;
+}
+
+/* Hover sobre días */
+::ng-deep .mwl-calendar-month-view .cal-day:hover .cal-date {
+  background-color: #222 !important;
+}
+
+/* Días fuera del mes (opacidad reducida) */
+::ng-deep .mwl-calendar-month-view .cal-day:not(.cal-in-month) {
+  opacity: 0.4;
+}
+
+/* Cabecera (L, M, M...) */
+::ng-deep .mwl-calendar-month-view .cal-header {
+  background-color: #000 !important;
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #111 !important;
+}
+
+/* Bordes de tabla más oscuros */
+::ng-deep .mwl-calendar-month-view table,
+::ng-deep .mwl-calendar-month-view td,
+::ng-deep .mwl-calendar-month-view th {
+  border-color: #111 !important;
+}
