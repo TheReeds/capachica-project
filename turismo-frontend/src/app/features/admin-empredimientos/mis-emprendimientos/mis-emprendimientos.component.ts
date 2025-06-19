@@ -328,16 +328,17 @@ export class MisEmprendimientosComponent implements OnInit {
   }
   
   // Método para determinar las clases del grid según la cantidad de emprendimientos
-  getGridClasses(): string {
-    const count = this.emprendimientos.length;
-    if (count === 1) {
-      return 'grid grid-cols-1 max-w-4xl mx-auto';
-    } else if (count === 2) {
-      return 'grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto';
-    } else {
-      return 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8';
-    }
+  // Método mejorado para determinar las clases del grid según la cantidad de emprendimientos
+// Método mejorado para determinar las clases del grid según la cantidad de emprendimientos
+getGridClasses(): string {
+  const count = this.emprendimientos.length;
+  if (count === 1) {
+    return 'grid grid-cols-1 max-w-4xl mx-auto';
+  } else {
+    // Para 2 o más elementos: siempre 2 columnas máximo con filas automáticas
+    return 'grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto';
   }
+}
   
   // Métodos helper para el template
   getMainImage(emprendimiento: Emprendimiento): string | null {

@@ -65,7 +65,7 @@ interface CalendarDay {
               </svg>
             </button>
             <h2 class="text-xl font-semibold text-white min-w-[200px] text-center">
-              {{ currentDate | date:'MMMM yyyy':'':'es' | titlecase }}
+              {{ getMonthName() }} {{ currentDate.getFullYear() }}
             </h2>
             <button (click)="nextMonth()" 
                     class="p-2 rounded-xl bg-white/10 dark:bg-slate-800/40 border border-white/20 dark:border-slate-700/50 text-slate-200 hover:bg-white/20 dark:hover:bg-slate-700/60 transition-all duration-300">
@@ -177,7 +177,7 @@ interface CalendarDay {
       <div *ngIf="selectedDay" class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
         <div class="px-6 py-4 bg-white/10 dark:bg-slate-700/40 border-b border-white/20 dark:border-slate-600/50">
           <h3 class="text-xl font-semibold text-white">
-            Eventos del {{ selectedDay.date | date:'fullDate':'':'es' | titlecase }}
+            Eventos del {{ formatSelectedDayDate() }}
           </h3>
           <div *ngIf="selectedDay.totalEventos > 0" class="mt-2 flex items-center space-x-6 text-sm">
             <span class="text-slate-300 dark:text-slate-400">
@@ -328,6 +328,10 @@ export class CalendarioEmprendimientoComponent implements OnInit {
   calendarDays: CalendarDay[] = [];
 
   daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  monthNames = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
 
   ngOnInit(): void {
     // Obtener el ID de la ruta padre
@@ -337,16 +341,14 @@ export class CalendarioEmprendimientoComponent implements OnInit {
       
       if (id && !isNaN(+id)) {
         this.emprendimientoId = +id;
-        this.loadData();
+        // Cargar automáticamente el calendario al inicializar
+        this.loadCalendar();
       } else {
         console.error('Calendario - ID inválido:', id);
         this.error = 'ID de emprendimiento inválido';
+        this.loading = false;
       }
     });
-  }
-
-  private loadData(): void {
-    this.loadCalendar();
   }
 
   loadCalendar(): void {
@@ -446,8 +448,6 @@ export class CalendarioEmprendimientoComponent implements OnInit {
     return [];
   }
 
-
-
   private calculateDayIngresos(eventos: EventoCalendario[]): number {
     return eventos.reduce((total, evento) => {
       if (evento.precio) {
@@ -465,6 +465,23 @@ export class CalendarioEmprendimientoComponent implements OnInit {
 
   private formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
+  }
+
+  // Función para obtener el nombre del mes
+  getMonthName(): string {
+    return this.monthNames[this.currentDate.getMonth()];
+  }
+
+  // Función para formatear la fecha del día seleccionado
+  formatSelectedDayDate(): string {
+    if (!this.selectedDay) return '';
+    
+    const date = this.selectedDay.date;
+    const day = date.getDate();
+    const month = this.monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    
+    return `${day} de ${month} de ${year}`;
   }
 
   selectDay(day: CalendarDay): void {
@@ -509,7 +526,7 @@ export class CalendarioEmprendimientoComponent implements OnInit {
     return 'bg-orange-500/20 text-orange-200 border border-orange-400/30';
   }
 
-  getEventoEstadoBadge(estado: string): string {
+getEventoEstadoBadge(estado: string): string {
     const classes = {
       'pendiente': 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30',
       'confirmado': 'bg-green-500/20 text-green-300 border border-green-400/30',
@@ -517,13 +534,13 @@ export class CalendarioEmprendimientoComponent implements OnInit {
       'cancelado': 'bg-red-500/20 text-red-300 border border-red-400/30',
       'cancelada': 'bg-red-500/20 text-red-300 border border-red-400/30',
       'completado': 'bg-blue-500/20 text-blue-300 border border-blue-400/30',
-      'completada': 'bg-blue-500/20 text-blue-300 border border-blue-400/30',
-      'activo': 'bg-green-500/20 text-green-300 border border-green-400/30'
+      'completada': 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
     };
-    return classes[estado as keyof typeof classes] || 'bg-gray-500/20 text-gray-300 border border-gray-400/30';
+    
+    return classes[estado.toLowerCase() as keyof typeof classes] || 'bg-gray-500/20 text-gray-300 border border-gray-400/30';
   }
 
-  // Track by functions for performance
+  // TrackBy functions para optimizar el rendimiento
   trackByDay(index: number, day: CalendarDay): string {
     return day.date.toISOString();
   }
