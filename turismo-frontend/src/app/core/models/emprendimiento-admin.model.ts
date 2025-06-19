@@ -3,10 +3,11 @@ import type {
   Servicio,
   AdminRequest,
   ServicioPopular,
+  Horario
 } from './emprendimiento.model';
 
 // Exportar interfaces de emprendimiento para uso externo
-export type { Emprendimiento, Servicio, AdminRequest, ServicioPopular } from './emprendimiento.model';
+export type { Emprendimiento, Servicio, AdminRequest, ServicioPopular, Horario } from './emprendimiento.model';
 
 // Modelos base reutilizables
 export interface Usuario {
