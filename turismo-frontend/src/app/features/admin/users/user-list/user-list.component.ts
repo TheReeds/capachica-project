@@ -46,7 +46,7 @@ import { AdminHeaderComponent } from '../../../../shared/components/admin-header
                     id="search" 
                     [(ngModel)]="filters.search" 
                     placeholder="Nombre o email" 
-                    class="block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                    class="input-estilo block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
                   >
                 </div>
               </div>
@@ -57,7 +57,7 @@ import { AdminHeaderComponent } from '../../../../shared/components/admin-header
                   <select 
                     id="active" 
                     [(ngModel)]="filters.active" 
-                    class="block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                    class="select-estilo block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
                   >
                     <option [ngValue]="undefined">Todos</option>
                     <option [ngValue]="true">Activos</option>
@@ -72,7 +72,7 @@ import { AdminHeaderComponent } from '../../../../shared/components/admin-header
                   <select 
                     id="role" 
                     [(ngModel)]="filters.role" 
-                    class="block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+                    class="select-estilo block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
                   >
                     <option value="">Todos</option>
                     @for (role of roles; track role.id) {

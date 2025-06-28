@@ -36,7 +36,7 @@ import { ThemeService } from '../../../../core/services/theme.service';
                   type="text"
                   [(ngModel)]="searchTerm"
                   placeholder="Buscar permisos..."
-                  class="block w-full rounded-md border-gray-300 dark:border-gray-600 pl-10 focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-300"
+                  class="py-2 block w-full rounded-md border-gray-300 dark:border-gray-600 pl-10 focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-300"
                 />
               </div>
             </div>

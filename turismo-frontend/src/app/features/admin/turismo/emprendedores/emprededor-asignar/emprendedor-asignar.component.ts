@@ -70,7 +70,7 @@ interface EmprendedorWithAdmins extends Emprendedor {
                 [(ngModel)]="searchEmail"
                 (keyup.enter)="searchUsers()"
                 placeholder="Buscar usuario por email"
-                class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors duration-300"
+                class="input-estilo block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors duration-300"
               >
               <button 
                 type="button" 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EmprendimientosService } from '../emprendimientos.service';
 import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-emprendimiento-detalle',
@@ -101,7 +102,9 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
           <!-- Botón de regreso -->
           <button
             (click)="volver()"
-            class="absolute top-4 left-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200">
+            class="absolute top-4 left-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 z-10"
+            title="Volver"
+            aria-label="Volver a la página anterior">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -139,22 +142,28 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
                 </h2>
 
                 <div *ngIf="emprendimiento()!.servicios && emprendimiento()!.servicios!.length > 0; else noServicios"
-                     class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div *ngFor="let servicio of emprendimiento()!.servicios"
-                       class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                       (click)="verServicio(servicio.id)">
-                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">{{ servicio.nombre }}</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">{{ servicio.descripcion }}</p>
+                    class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                    (click)="verServicio(servicio.id)">
+                    <!-- Imagen del servicio -->
+                    <img *ngIf="servicio.sliders && servicio.sliders.length > 0"
+                        [src]="servicio.sliders[0].url_completa"
+                        [alt]="servicio.nombre"
+                        class="w-full h-32 object-cover rounded-md mb-3"
+                        onerror="this.src='/assets/general/placeholder-service.jpg'" />
 
-                    <div class="flex justify-between items-center">
-                      <span class="text-orange-600 dark:text-blue-400 font-bold">
-                        S/. {{ servicio.precio_referencial }}
-                      </span>
-                      <span class="text-xs text-gray-500 dark:text-gray-500">
-                        {{ servicio.categorias?.[0]?.nombre || 'Servicio' }}
-                      </span>
-                    </div>
+                          <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">{{ servicio.nombre }}</h3>
+                          <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">{{ servicio.descripcion }}</p>
 
+                          <div class="flex justify-between items-center">
+                            <span class="text-orange-600 dark:text-blue-400 font-bold">
+                              S/. {{ servicio.precio_referencial }}
+                            </span>
+                            <span class="text-xs text-gray-500 dark:text-gray-500">
+                              {{ servicio.categorias?.[0]?.nombre || 'Servicio' }}
+                            </span>
+                          </div>
                     <!-- Horarios del servicio -->
                     <div *ngIf="servicio.horarios && servicio.horarios.length > 0" class="mt-2">
                       <div class="flex flex-wrap gap-1">
@@ -177,23 +186,30 @@ import { Emprendimiento, ServicioEmprendimiento } from '../emprendimiento.model'
                 </ng-template>
               </div>
 
-              <!-- Galería Secundaria -->
+              <!-- Galería Secundaria - Diseño Limpio -->
               <div *ngIf="emprendimiento()!.sliders_secundarios && emprendimiento()!.sliders_secundarios.length > 0"
-                   class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                  class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Galería</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+                <!-- Grid limpio y espacioso -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div *ngFor="let slider of emprendimiento()!.sliders_secundarios" class="relative group">
+                    <!-- Imagen grande y limpia -->
                     <img
                       [src]="slider.url_completa"
                       [alt]="slider.nombre"
-                      class="w-full h-32 object-cover rounded-lg group-hover:opacity-75 transition-opacity duration-200"
+                      class="w-full h-64 object-cover rounded-lg shadow-md"
                       onerror="this.src='/assets/general/placeholder-gallery.jpg'"
                     >
-                    <div *ngIf="slider.descripcion" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center p-2">
-                      <div class="text-white text-center">
-                        <h4 class="font-semibold text-sm">{{ slider.descripcion.titulo }}</h4>
-                        <p class="text-xs mt-1">{{ slider.descripcion.descripcion }}</p>
+
+                    <!-- Texto limpio en la parte inferior con línea -->
+                    <div *ngIf="slider.descripcion" class="absolute bottom-0 left-0 right-0 text-white p-2">
+                      <div class="inline-block">
+                        <h5 class="text-xl font-semibold mb-1" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">{{ slider.descripcion.titulo }}</h5>
+                        <div class="w-full h-0.5 bg-white mb-1"></div>
                       </div>
+                      <p class="opacity-90" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11px;">{{ slider.descripcion.descripcion }}</p>
                     </div>
                   </div>
                 </div>
@@ -449,6 +465,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
   private emprendimientosService = inject(EmprendimientosService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
 
   // Signals
   emprendimiento = signal<Emprendimiento | null>(null);
