@@ -37,12 +37,15 @@ export class EventosComponent implements OnInit {
   filtroFechaInicio: string = '';
   filtroFechaFin: string = '';
 
+  backgroundImageUrl: string = '';
+
   
 
   ngOnInit(): void {
     this.cargarEventos();
     this.cargarEventoCercano();
     this.obtenerEventoMasProximo();
+    
   }
 
   cargarEventos(): void {
