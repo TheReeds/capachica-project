@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EmprendimientosService } from '../emprendimientos.service';
@@ -165,35 +165,87 @@ import { Location } from '@angular/common';
                 </ng-template>
               </div>
 
-              <!-- Galería Secundaria - Diseño Limpio -->
-              <div *ngIf="emprendimiento()!.sliders_secundarios && emprendimiento()!.sliders_secundarios.length > 0"
-                  class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+<!-- Galería Secundaria - Con tamaños fijos -->
+<div *ngIf="emprendimiento()!.sliders_secundarios && emprendimiento()!.sliders_secundarios.length > 0"
+    class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+  <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Galería</h2>
 
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Galería</h2>
+  <!-- Grid con tamaños consistentes -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div *ngFor="let slider of emprendimiento()!.sliders_secundarios"
+         class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300"
+         (click)="abrirImagenModal(slider)">
 
-                <!-- Grid limpio y espacioso -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div *ngFor="let slider of emprendimiento()!.sliders_secundarios" class="relative group">
-                    <!-- Imagen grande y limpia -->
-                    <img
-                      [src]="slider.url_completa"
-                      [alt]="slider.nombre"
-                      class="w-full h-64 object-cover rounded-lg shadow-md"
-                      onerror="this.src='/assets/general/placeholder-gallery.jpg'"
-                    >
+      <!-- Contenedor de imagen con tamaño fijo -->
+      <div class="relative overflow-hidden group">
+        <!-- Imagen con dimensiones fijas y consistentes -->
+        <img
+          [src]="slider.url_completa"
+          [alt]="slider.nombre"
+          class="w-full h-64 object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+          onerror="this.src='/assets/general/placeholder-gallery.jpg'"
+        >
 
-                    <!-- Texto limpio en la parte inferior con línea -->
-                    <div *ngIf="slider.descripcion" class="absolute bottom-0 left-0 right-0 text-white p-2">
-                      <div class="inline-block">
-                        <h5 class="text-xl font-semibold mb-1" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">{{ slider.descripcion.titulo }}</h5>
-                        <div class="w-full h-0.5 bg-white mb-1"></div>
-                      </div>
-                      <p class="opacity-90" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11px;">{{ slider.descripcion.descripcion }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <!-- Overlay con ícono de ampliación -->
+        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+          <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Texto debajo de la imagen con altura mínima -->
+      <div *ngIf="slider.descripcion" class="p-4 min-h-[120px] flex flex-col justify-between">
+        <div>
+          <h5 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 line-clamp-2"
+             style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            {{ slider.descripcion.titulo }}
+          </h5>
+          <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-3"
+             style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            {{ slider.descripcion.descripcion }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Imagen con tamaño controlado -->
+<div *ngIf="imagenModal()"
+     class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+     (click)="cerrarImagenModal()">
+
+  <!-- Contenedor del modal con tamaño máximo controlado -->
+  <div class="relative w-full max-w-5xl max-h-full flex items-center justify-center"
+       (click)="$event.stopPropagation()">
+
+    <!-- Contenedor de imagen SIN fondo blanco -->
+    <div class="relative w-[600px] h-[400px]">
+      <!-- Botón cerrar DENTRO del contenedor de la imagen -->
+      <button (click)="cerrarImagenModal()"
+              class="absolute top-2 right-2 z-20 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all duration-200">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <!-- Imagen principal con tamaño FIJO mediano -->
+      <img [src]="imagenModal()!.url_completa"
+           [alt]="imagenModal()!.nombre"
+           class="w-full h-full object-cover rounded-lg shadow-2xl">
+
+      <!-- Información de la imagen - DENTRO del contenedor de la imagen -->
+      <div *ngIf="imagenModal()!.descripcion"
+           class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent text-white p-4 rounded-b-lg">
+        <h3 class="text-xl font-bold mb-2 line-clamp-2">{{ imagenModal()!.descripcion.titulo }}</h3>
+        <p class="text-gray-200 text-sm line-clamp-3">{{ imagenModal()!.descripcion.descripcion }}</p>
+      </div>
+    </div>
+  </div>
+</div>            </div>
 
             <!-- Información de Contacto y Detalles -->
             <div class="space-y-14">
@@ -446,17 +498,22 @@ export class EmprendimientoDetalleComponent implements OnInit {
   private router = inject(Router);
   private location = inject(Location);
 
-  // Signals
+  // Signals existentes
   emprendimiento = signal<Emprendimiento | null>(null);
   cargando = signal<boolean>(false);
   indiceImagenActual = signal<number>(0);
+
+  // Nuevos signals para el modal de galería
+  imagenModal = signal<any>(null);
+  indiceModalActual = signal<number>(0);
+
   calificacionPromedio = computed(() => {
     const emp = this.emprendimiento();
     if (!emp) return 0;
     return this.emprendimientosService.calcularCalificacionPromedio(emp);
   });
 
-  // Computed
+  // Computed existentes
   todasLasImagenes = computed(() => {
     const emp = this.emprendimiento();
     if (!emp) return [];
@@ -474,6 +531,13 @@ export class EmprendimientoDetalleComponent implements OnInit {
     }
 
     return imagenes.length > 0 ? imagenes : ['/assets/general/placeholder-business.jpg'];
+  });
+
+  // Nuevo computed para las imágenes de la galería secundaria
+  imagenesGaleriaSecundaria = computed(() => {
+    const emp = this.emprendimiento();
+    if (!emp || !emp.sliders_secundarios) return [];
+    return emp.sliders_secundarios;
   });
 
   imagenPrincipalActual = computed(() => {
@@ -507,7 +571,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
     }
   }
 
-  // Navegación de imágenes
+  // Navegación de imágenes principales (existente)
   imagenSiguiente() {
     const totalImagenes = this.todasLasImagenes().length;
     const indiceActual = this.indiceImagenActual();
@@ -524,7 +588,67 @@ export class EmprendimientoDetalleComponent implements OnInit {
     this.indiceImagenActual.set(indice);
   }
 
-  // Navegación
+  // NUEVOS MÉTODOS PARA EL MODAL DE GALERÍA
+  abrirImagenModal(slider: any) {
+    this.imagenModal.set(slider);
+    const imagenesGaleria = this.imagenesGaleriaSecundaria();
+    this.indiceModalActual.set(imagenesGaleria.findIndex(s => s === slider));
+    // Prevenir scroll del body
+    document.body.style.overflow = 'hidden';
+  }
+
+  cerrarImagenModal() {
+    this.imagenModal.set(null);
+    // Restaurar scroll del body
+    document.body.style.overflow = 'auto';
+  }
+
+  imagenModalAnterior() {
+    const imagenesGaleria = this.imagenesGaleriaSecundaria();
+    if (imagenesGaleria && imagenesGaleria.length > 0) {
+      const indiceActual = this.indiceModalActual();
+      const nuevoIndice = indiceActual > 0 ? indiceActual - 1 : imagenesGaleria.length - 1;
+      this.indiceModalActual.set(nuevoIndice);
+      this.imagenModal.set(imagenesGaleria[nuevoIndice]);
+    }
+  }
+
+  imagenModalSiguiente() {
+    const imagenesGaleria = this.imagenesGaleriaSecundaria();
+    if (imagenesGaleria && imagenesGaleria.length > 0) {
+      const indiceActual = this.indiceModalActual();
+      const nuevoIndice = indiceActual < imagenesGaleria.length - 1 ? indiceActual + 1 : 0;
+      this.indiceModalActual.set(nuevoIndice);
+      this.imagenModal.set(imagenesGaleria[nuevoIndice]);
+    }
+  }
+
+  // Listener para cerrar modal con tecla Escape
+  @HostListener('document:keydown.escape', ['$event'])
+  onKeydownHandler(event: KeyboardEvent) {
+    if (this.imagenModal()) {
+      this.cerrarImagenModal();
+    }
+  }
+
+  // Listener para navegación con teclado en el modal
+  @HostListener('document:keydown.arrowLeft', ['$event'])
+  onArrowLeft(event: KeyboardEvent) {
+    if (this.imagenModal()) {
+      event.preventDefault();
+      this.imagenModalAnterior();
+    }
+  }
+
+  @HostListener('document:keydown.arrowRight', ['$event'])
+  onArrowRight(event: KeyboardEvent) {
+    if (this.imagenModal()) {
+      event.preventDefault();
+      this.imagenModalSiguiente();
+    }
+  }
+
+  // Navegación existente
   volver() {
     this.router.navigate(['/emprendimientos']);
   }
@@ -533,7 +657,7 @@ export class EmprendimientoDetalleComponent implements OnInit {
     this.router.navigate(['/servicios', servicioId]);
   }
 
-  // Métodos utilitarios
+  // Métodos utilitarios existentes
   procesarMetodosPago(): string[] {
     const emp = this.emprendimiento();
     if (!emp) return [];
