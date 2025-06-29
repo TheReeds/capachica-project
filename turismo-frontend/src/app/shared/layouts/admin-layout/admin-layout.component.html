@@ -137,6 +137,8 @@
       (mouseenter)="onSidebarMouseEnter()" (mouseleave)="onSidebarMouseLeave()"
       [ngClass]="{'show-scrollbar': showScrollbar(), 'hide-scrollbar': !showScrollbar()}">
       <ul class="space-y-1 text-white">
+    
+        
         <!-- Recorremos los elementos de menú dinámico -->
         <ng-container *ngFor="let item of menuItems(); let i = index">
           <!-- Si es un separador de sección -->
@@ -152,7 +154,10 @@
           <li *ngIf="!item.id || !item.id.includes('_divider')" class="mt-1">
             <!-- Elemento simple sin hijos -->
             <ng-container *ngIf="!item.children || item.children.length === 0">
-              <a [routerLink]="item.path" routerLinkActive="bg-orange-600 dark:bg-blue-600 text-white shadow-md"
+              <a 
+                [routerLink]="item.path || ''" 
+                routerLinkActive="bg-orange-600 dark:bg-blue-600 text-white shadow-md" 
+              
                 [routerLinkActiveOptions]="{exact: item.id === 'dashboard'}"
                 class="flex items-center rounded-lg px-4 py-2.5 text-base font-medium text-white hover:bg-orange-600 dark:hover:bg-blue-600 transition-all duration-200 group menu-item">
                 <div class="flex-shrink-0 w-6 flex justify-center items-center">
@@ -269,10 +274,24 @@
               {{ getCurrentPageTitle() }}
             </h1>
           </div>
-
-
+          
           <div class="flex items-center space-x-4">
-
+        <!-- Botón Home -->
+        <a routerLink="/home" 
+        class="flex items-center px-4 py-2 text-black dark:text-white transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span>Inicio</span>
+        </a>
+        <!-- Botón Selección Panel -->
+        <a routerLink="/seleccion-panel" 
+        class="flex items-center px-4 py-2 text-black dark:text-white transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span>Panel</span>
+        </a>
             <!-- Theme toggle on top bar for larger screens -->
             <button (click)="toggleDarkMode()"
               class="p-1 rounded-full text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition-colors"
@@ -313,7 +332,7 @@
                   <span class="text-orange-700 dark:text-blue-700 font-medium">{{ userInitials() }}</span>
                 </div>
               </div>
-
+              
               <!-- Dropdown Menu Mejorado -->
               <div *ngIf="userMenuOpen"
                 class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none transition-all duration-200 max-h-96 overflow-y-auto z-50">
