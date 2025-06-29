@@ -12,7 +12,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
   template: `
     <div class="min-h-screen relative">
       <!-- Background Pattern Mejorado con Overlay Adaptativo -->
-      <div class="absolute inset-0 bg-[url('https://fotografias.antena3.com/clipping/cmsimages02/2022/07/05/D7383660-EF95-40BD-B0FF-CE76C4212FE0/lluvia-estrellas_98.jpg?crop=5000,2813,x0,y596&width=1900&height=1069&optimize=low&format=webply')] bg-cover bg-center bg-no-repeat">
+      <div class="absolute inset-0 bg-[url('https://consultasenlinea.mincetur.gob.pe/fichaInventario/foto.aspx?cod=471157')] bg-cover bg-center bg-no-repeat">
         <!-- Overlay adaptativo según el modo -->
         <div class="absolute inset-0 bg-gradient-to-br 
                     from-orange-950/96 via-orange-900/94 to-amber-950/96 backdrop-blur-sm
@@ -40,8 +40,8 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                            shadow-lg shadow-orange-900/20 dark:shadow-blue-900/30
                            transition-all duration-300">
                   <ng-container *ngIf="getMainImage(emprendimiento) as mainImage; else noImageTemplate">
-                    <img [src]="mainImage" 
-                         [alt]="emprendimiento?.nombre" 
+                    <img [src]="mainImage"
+                         [alt]="emprendimiento?.nombre"
                          class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                   </ng-container>
                   <ng-template #noImageTemplate>
@@ -55,7 +55,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                     </div>
                   </ng-template>
                 </div>
-                
+
                 <div class="space-y-1">
                   <h1 class="text-xl lg:text-2xl font-bold 
                             bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 
@@ -97,7 +97,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                   </svg>
                   <span class="font-medium">Volver</span>
                 </a>
-                
+
                 <button (click)="toggleDarkMode()"
                         class="group p-3 rounded-xl 
                                bg-orange-100/20 text-black hover:bg-orange-100/30
@@ -140,7 +140,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
 
             <!-- Navegación mejorada con colores adaptativos -->
             <nav class="flex flex-wrap gap-2">
-              <a *ngFor="let item of navigationItems" 
+              <a *ngFor="let item of navigationItems"
                  [routerLink]="item.route"
                  routerLinkActive="nav-link-active"
                  [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
@@ -214,12 +214,12 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
     * {
       transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     }
-    
+
     /* Mejora para el scroll suave */
     html {
       scroll-behavior: smooth;
     }
-    
+
     /* Animación personalizada para badges */
     @keyframes pulse {
       0%, 100% { opacity: 1; }
@@ -241,12 +241,12 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
 })
 export class EmprendimientoNavComponent implements OnInit {
   @Input() emprendimiento?: Emprendimiento;
-  
+
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private emprendimientoService = inject(EmprendimientoAdminService);
-  
+
   isDarkMode = false;
   navigationItems: Array<{
     label: string;

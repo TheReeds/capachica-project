@@ -12,7 +12,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
   template: `
     <div class="min-h-screen relative">
       <!-- Background Pattern -->
-      <div class="absolute inset-0 bg-[url('https://media-cdn.tripadvisor.com/media/photo-s/08/e7/29/52/capachica-peninsula.jpg')] bg-cover bg-center bg-no-repeat">
+            <div class="absolute inset-0 bg-[url('https://consultasenlinea.mincetur.gob.pe/fichaInventario/foto.aspx?cod=471157')] bg-cover bg-center bg-no-repeat">
         <div class="absolute inset-0 bg-gradient-to-br from-gray-900/60 via-gray-900/50 to-gray-900/60 dark:from-blue-900/50 dark:via-blue-900/40 dark:to-blue-900/50"></div>
       </div>
 
@@ -72,7 +72,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
             </div>
           </div>
         </header>
-        
+
         <!-- Contenido Principal -->
         <main class="mx-auto w-full max-w-7xl px-2 sm:px-4 lg:px-8 py-8 overflow-x-auto">
           <!-- Estado de Carga -->
@@ -82,7 +82,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
               <div class="w-12 h-12 sm:w-16 sm:h-16 border-4 border-orange-400 dark:border-blue-400 border-t-transparent rounded-full animate-spin absolute top-0"></div>
             </div>
           </div>
-          
+
           <!-- Error -->
           <div *ngIf="error" class="backdrop-blur-lg bg-red-500/10 dark:bg-red-900/20 border border-red-500/20 dark:border-red-800/30 rounded-2xl p-4 sm:p-6 mb-6 shadow-2xl">
             <div class="flex flex-col sm:flex-row">
@@ -108,7 +108,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
               </div>
             </div>
           </div>
-          
+
           <!-- Sin Emprendimientos -->
           <div *ngIf="!loading && !error && emprendimientos.length === 0" 
                class="backdrop-blur-lg bg-white/10 dark:bg-blue-800/20 rounded-2xl p-8 sm:p-12 text-center shadow-2xl border border-white/10 dark:border-blue-700/30">
@@ -120,9 +120,9 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
             <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">No tienes emprendimientos</h3>
             <p class="text-gray-300 dark:text-blue-300 text-sm sm:text-base">No hay emprendimientos asociados a tu cuenta.</p>
           </div>
-          
+
           <!-- Lista de Emprendimientos -->
-          <div *ngIf="!loading && !error && emprendimientos.length > 0" 
+          <div *ngIf="!loading && !error && emprendimientos.length > 0"
                [ngClass]="getGridClasses()">
             <ng-container *ngFor="let emprendimiento of emprendimientos; let i = index">
               <div class="group relative rounded-3xl shadow-2xl overflow-hidden bg-transparent animate-fade-in min-h-[400px] flex flex-col"
@@ -130,8 +130,8 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                 <!-- Imagen de fondo del emprendimiento -->
                 <div class="relative h-56 sm:h-96 md:h-[500px]">
                   <ng-container *ngIf="getMainImage(emprendimiento) as mainImage; else noImageTemplate">
-                    <img [src]="mainImage" 
-                         [alt]="emprendimiento.nombre" 
+                    <img [src]="mainImage"
+                         [alt]="emprendimiento.nombre"
                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   </ng-container>
                   <ng-template #noImageTemplate>
@@ -237,7 +237,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
     :host {
       display: block;
     }
-    
+
     @keyframes fade-in {
       from {
         opacity: 0;
@@ -248,12 +248,12 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
         transform: translateY(0);
       }
     }
-    
+
     .animate-fade-in {
       animation: fade-in 0.6s ease-out forwards;
       opacity: 0;
     }
-    
+
     .line-clamp-2 {
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -265,17 +265,17 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
 export class MisEmprendimientosComponent implements OnInit {
   private emprendimientoAdminService = inject(EmprendimientoAdminService);
   private authService = inject(AuthService);
-  
+
   emprendimientos: Emprendimiento[] = [];
   loading = true;
   error = '';
   isDarkMode = false;
-  
+
   ngOnInit(): void {
     this.loadEmprendimientos();
     this.initDarkMode();
   }
-  
+
   private initDarkMode(): void {
     const savedMode = localStorage.getItem('darkMode');
     if (savedMode) {
@@ -285,7 +285,7 @@ export class MisEmprendimientosComponent implements OnInit {
     }
     this.applyDarkMode();
   }
-  
+
   private applyDarkMode(): void {
     if (this.isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -293,11 +293,11 @@ export class MisEmprendimientosComponent implements OnInit {
       document.documentElement.classList.remove('dark');
     }
   }
-  
+
   loadEmprendimientos(): void {
     this.loading = true;
     this.error = '';
-    
+
     this.emprendimientoAdminService.getMisEmprendimientos().subscribe({
       next: (data) => {
         this.emprendimientos = data;
@@ -310,7 +310,7 @@ export class MisEmprendimientosComponent implements OnInit {
       }
     });
   }
-  
+
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
@@ -321,13 +321,13 @@ export class MisEmprendimientosComponent implements OnInit {
       }
     });
   }
-  
+
   toggleDarkMode(): void {
     this.isDarkMode = !this.isDarkMode;
     localStorage.setItem('darkMode', this.isDarkMode.toString());
     this.applyDarkMode();
   }
-  
+
   // Método para determinar las clases del grid según la cantidad de emprendimientos
   // Método mejorado para determinar las clases del grid según la cantidad de emprendimientos
 // Método mejorado para determinar las clases del grid según la cantidad de emprendimientos
@@ -340,7 +340,7 @@ getGridClasses(): string {
     return 'grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto';
   }
 }
-  
+
   // Métodos helper para el template
   getMainImage(emprendimiento: Emprendimiento): string | null {
     if (emprendimiento.sliders_principales?.length) {
@@ -348,11 +348,11 @@ getGridClasses(): string {
     }
     return null;
   }
-  
+
   getServiciosCount(emprendimiento: Emprendimiento): number {
     return emprendimiento.servicios?.length || 0;
   }
-  
+
   getAdministradoresCount(emprendimiento: Emprendimiento): number {
     return emprendimiento.administradores?.length || 0;
   }

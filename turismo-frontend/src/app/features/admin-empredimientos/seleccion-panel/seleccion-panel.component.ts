@@ -86,7 +86,6 @@ import { AuthService } from '../../../core/services/auth.service';
                   </svg>
                 </div>
               </div>
-
               <h3 class="relative z-10 text-lg sm:text-xl font-bold text-orange-800 dark:text-blue-300 text-center mb-2 transition-all duration-500 group-hover:scale-105">
                 Panel de Administración
               </h3>
@@ -129,7 +128,6 @@ import { AuthService } from '../../../core/services/auth.service';
                   </svg>
                 </div>
               </div>
-
               <h3 class="relative z-10 text-lg sm:text-xl font-bold text-amber-800 dark:text-cyan-300 text-center mb-2 transition-all duration-500 group-hover:scale-105">
                 Gestión de Emprendimientos
               </h3>
@@ -143,7 +141,6 @@ import { AuthService } from '../../../core/services/auth.service';
               </button>
             </div>
           </div>
-
           <!-- Botón para regresar al Home mejorado -->
           <div class="mt-6 sm:mt-8 text-center animate-fade-in-up" [style.animation-delay]="'0.9s'">
             <button
