@@ -12,7 +12,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
   template: `
     <div class="min-h-screen relative">
       <!-- Background Pattern -->
-      <div class="absolute inset-0 bg-[url('https://media-cdn.tripadvisor.com/media/photo-s/08/e7/29/52/capachica-peninsula.jpg')] bg-cover bg-center bg-no-repeat">
+            <div class="absolute inset-0 bg-[url('https://consultasenlinea.mincetur.gob.pe/fichaInventario/foto.aspx?cod=471157')] bg-cover bg-center bg-no-repeat">
         <div class="absolute inset-0 bg-gradient-to-br from-gray-900/60 via-gray-900/50 to-gray-900/60 dark:from-blue-900/50 dark:via-blue-900/40 dark:to-blue-900/50"></div>
       </div>
 
@@ -30,14 +30,14 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
               </p>
             </div>
             <div class="flex items-center space-x-4">
-              <a routerLink="/dashboard" 
+              <a routerLink="/dashboard"
                  class="group flex items-center px-4 py-2 rounded-full bg-white/10 dark:bg-blue-800/30 text-white hover:bg-white/20 dark:hover:bg-blue-800/50 transition-all duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
                 Dashboard Principal
               </a>
-              <button (click)="logout()" 
+              <button (click)="logout()"
                       class="group flex items-center px-4 py-2 rounded-full bg-white/10 dark:bg-blue-800/30 text-white hover:bg-white/20 dark:hover:bg-blue-800/50 transition-all duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -64,7 +64,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
             </div>
           </div>
         </header>
-        
+
         <!-- Contenido Principal -->
         <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <!-- Estado de Carga -->
@@ -74,7 +74,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
               <div class="w-16 h-16 border-4 border-orange-400 dark:border-blue-400 border-t-transparent rounded-full animate-spin absolute top-0"></div>
             </div>
           </div>
-          
+
           <!-- Error -->
           <div *ngIf="error" class="backdrop-blur-lg bg-red-500/10 dark:bg-red-900/20 border border-red-500/20 dark:border-red-800/30 rounded-2xl p-6 mb-6 shadow-2xl">
             <div class="flex">
@@ -89,7 +89,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                   <p>{{ error }}</p>
                 </div>
                 <div class="mt-4">
-                  <button (click)="loadEmprendimientos()" 
+                  <button (click)="loadEmprendimientos()"
                           class="inline-flex items-center px-4 py-2 rounded-full bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-all duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -100,9 +100,9 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
               </div>
             </div>
           </div>
-          
+
           <!-- Sin Emprendimientos -->
-          <div *ngIf="!loading && !error && emprendimientos.length === 0" 
+          <div *ngIf="!loading && !error && emprendimientos.length === 0"
                class="backdrop-blur-lg bg-white/10 dark:bg-blue-800/20 rounded-2xl p-12 text-center shadow-2xl border border-white/10 dark:border-blue-700/30">
             <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-400/20 dark:from-blue-500/20 dark:to-blue-400/20 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-orange-400 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,19 +112,19 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
             <h3 class="text-2xl font-bold text-white mb-2">No tienes emprendimientos</h3>
             <p class="text-gray-300 dark:text-blue-300">No hay emprendimientos asociados a tu cuenta.</p>
           </div>
-          
+
           <!-- Lista de Emprendimientos -->
-          <div *ngIf="!loading && !error && emprendimientos.length > 0" 
+          <div *ngIf="!loading && !error && emprendimientos.length > 0"
                [ngClass]="getGridClasses()">
             <ng-container *ngFor="let emprendimiento of emprendimientos; let i = index">
               <div class="group relative rounded-3xl shadow-2xl overflow-hidden bg-transparent animate-fade-in"
                    style="animation-delay: {{i * 150}}ms">
-                
+
                 <!-- Imagen de fondo del emprendimiento -->
                 <div class="relative h-96 md:h-[500px]">
                   <ng-container *ngIf="getMainImage(emprendimiento) as mainImage; else noImageTemplate">
-                    <img [src]="mainImage" 
-                         [alt]="emprendimiento.nombre" 
+                    <img [src]="mainImage"
+                         [alt]="emprendimiento.nombre"
                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   </ng-container>
                   <ng-template #noImageTemplate>
@@ -134,10 +134,10 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                       </svg>
                     </div>
                   </ng-template>
-                  
+
                   <!-- Overlay degradado -->
                   <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/20"></div>
-                  
+
                   <!-- Contenido superpuesto -->
                   <div class="absolute inset-0 flex flex-col justify-between p-8">
                     <!-- Header con estado -->
@@ -146,12 +146,12 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                         <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500/80 to-blue-400/80 text-white shadow-md backdrop-blur-sm">
                           {{ emprendimiento.categoria }}
                         </span>
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold" 
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold"
                               [ngClass]="emprendimiento.estado ? 'bg-gradient-to-r from-green-500/80 to-green-400/80 text-white shadow-md backdrop-blur-sm' : 'bg-gradient-to-r from-red-500/80 to-red-400/80 text-white shadow-md backdrop-blur-sm'">
                           {{ emprendimiento.estado ? 'Activo' : 'Inactivo' }}
                         </span>
                       </div>
-                      
+
                       <!-- Estadísticas rápidas -->
                       <div class="text-right">
                         <div class="flex flex-col gap-1">
@@ -170,7 +170,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                         </div>
                       </div>
                     </div>
-                    
+
                     <!-- Información principal -->
                     <div class="text-center">
                       <h2 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg mb-3">
@@ -183,7 +183,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                         {{ emprendimiento.descripcion }}
                       </p>
                     </div>
-                    
+
                     <!-- Información de contacto y ubicación -->
                     <div class="space-y-3">
                       <div class="flex flex-wrap gap-4 justify-center text-white/90">
@@ -207,10 +207,10 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                           <span class="text-sm font-medium">{{ emprendimiento.email }}</span>
                         </div>
                       </div>
-                      
+
                       <!-- Botón de gestión principal -->
                       <div class="flex justify-center pt-4">
-                        <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimiento.id]" 
+                        <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimiento.id]"
                            class="group flex items-center justify-center px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-400 dark:from-blue-500 dark:to-blue-400 text-white font-bold text-lg shadow-2xl hover:from-orange-600 hover:to-orange-500 dark:hover:from-blue-600 dark:hover:to-blue-500 transition-all duration-300 active:scale-95 transform hover:scale-105">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -236,7 +236,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
     :host {
       display: block;
     }
-    
+
     @keyframes fade-in {
       from {
         opacity: 0;
@@ -247,12 +247,12 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
         transform: translateY(0);
       }
     }
-    
+
     .animate-fade-in {
       animation: fade-in 0.6s ease-out forwards;
       opacity: 0;
     }
-    
+
     .line-clamp-2 {
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -264,17 +264,17 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
 export class MisEmprendimientosComponent implements OnInit {
   private emprendimientoAdminService = inject(EmprendimientoAdminService);
   private authService = inject(AuthService);
-  
+
   emprendimientos: Emprendimiento[] = [];
   loading = true;
   error = '';
   isDarkMode = false;
-  
+
   ngOnInit(): void {
     this.loadEmprendimientos();
     this.initDarkMode();
   }
-  
+
   private initDarkMode(): void {
     const savedMode = localStorage.getItem('darkMode');
     if (savedMode) {
@@ -284,7 +284,7 @@ export class MisEmprendimientosComponent implements OnInit {
     }
     this.applyDarkMode();
   }
-  
+
   private applyDarkMode(): void {
     if (this.isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -292,11 +292,11 @@ export class MisEmprendimientosComponent implements OnInit {
       document.documentElement.classList.remove('dark');
     }
   }
-  
+
   loadEmprendimientos(): void {
     this.loading = true;
     this.error = '';
-    
+
     this.emprendimientoAdminService.getMisEmprendimientos().subscribe({
       next: (data) => {
         this.emprendimientos = data;
@@ -309,7 +309,7 @@ export class MisEmprendimientosComponent implements OnInit {
       }
     });
   }
-  
+
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
@@ -320,13 +320,13 @@ export class MisEmprendimientosComponent implements OnInit {
       }
     });
   }
-  
+
   toggleDarkMode(): void {
     this.isDarkMode = !this.isDarkMode;
     localStorage.setItem('darkMode', this.isDarkMode.toString());
     this.applyDarkMode();
   }
-  
+
   // Método para determinar las clases del grid según la cantidad de emprendimientos
   // Método mejorado para determinar las clases del grid según la cantidad de emprendimientos
 // Método mejorado para determinar las clases del grid según la cantidad de emprendimientos
@@ -339,7 +339,7 @@ getGridClasses(): string {
     return 'grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto';
   }
 }
-  
+
   // Métodos helper para el template
   getMainImage(emprendimiento: Emprendimiento): string | null {
     if (emprendimiento.sliders_principales?.length) {
@@ -347,11 +347,11 @@ getGridClasses(): string {
     }
     return null;
   }
-  
+
   getServiciosCount(emprendimiento: Emprendimiento): number {
     return emprendimiento.servicios?.length || 0;
   }
-  
+
   getAdministradoresCount(emprendimiento: Emprendimiento): number {
     return emprendimiento.administradores?.length || 0;
   }

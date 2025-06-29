@@ -13,7 +13,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
   template: `
     <!-- Loading State -->
     <div *ngIf="loading" class="min-h-screen relative">
-      <div class="absolute inset-0 bg-[url('https://media-cdn.tripadvisor.com/media/photo-s/08/e7/29/52/capachica-peninsula.jpg')] bg-cover bg-center bg-no-repeat">
+      <div class="absolute inset-0 bg-[url('https://consultasenlinea.mincetur.gob.pe/fichaInventario/foto.aspx?cod=471157')] bg-cover bg-center bg-no-repeat">
         <div class="absolute inset-0 bg-gradient-to-br from-slate-950/98 via-slate-900/96 to-slate-950/98 backdrop-blur-sm"></div>
       </div>
       <div class="relative flex justify-center items-center py-20">
@@ -26,7 +26,7 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
 
     <!-- Error State -->
     <div *ngIf="error" class="min-h-screen relative">
-      <div class="absolute inset-0 bg-[url('https://media-cdn.tripadvisor.com/media/photo-s/08/e7/29/52/capachica-peninsula.jpg')] bg-cover bg-center bg-no-repeat">
+      <div class="absolute inset-0 bg-[url('https://consultasenlinea.mincetur.gob.pe/fichaInventario/foto.aspx?cod=471157')] bg-cover bg-center bg-no-repeat">
         <div class="absolute inset-0 bg-gradient-to-br from-slate-950/98 via-slate-900/96 to-slate-950/98 backdrop-blur-sm"></div>
       </div>
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -43,14 +43,14 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                 <p>{{ error }}</p>
               </div>
               <div class="mt-4 flex gap-3">
-                <button (click)="reloadEmprendimiento()" 
+                <button (click)="reloadEmprendimiento()"
                         class="inline-flex items-center px-4 py-2 rounded-full bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-all duration-300">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                   Reintentar
                 </button>
-                <button (click)="goBack()" 
+                <button (click)="goBack()"
                         class="inline-flex items-center px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -75,7 +75,7 @@ export class EmprendimientoLayoutComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private emprendimientoService = inject(EmprendimientoAdminService);
-  
+
   emprendimiento?: Emprendimiento;
   emprendimientoId?: number;
   loading = true;
@@ -86,11 +86,11 @@ export class EmprendimientoLayoutComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       console.log('Layout - ID recibido:', id); // Debug
-      
+
       if (id && !isNaN(+id)) {
         const numericId = +id;
         this.emprendimientoId = numericId;
-        
+
         // Solo cargar si es un ID diferente o no tenemos datos
         if (numericId !== this.emprendimiento?.id || !this.emprendimiento) {
           this.loadEmprendimiento(numericId);
@@ -107,7 +107,7 @@ export class EmprendimientoLayoutComponent implements OnInit {
     console.log('Layout - Cargando emprendimiento con ID:', id); // Debug
     this.loading = true;
     this.error = '';
-    
+
     this.emprendimientoService.getEmprendimiento(id).subscribe({
       next: (data) => {
         console.log('Layout - Emprendimiento cargado:', data); // Debug

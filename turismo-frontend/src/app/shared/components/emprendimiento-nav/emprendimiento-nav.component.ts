@@ -10,49 +10,50 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="min-h-screen relative">
-      <!-- Background Pattern Mejorado -->
-      <div class="absolute inset-0 bg-[url('https://media-cdn.tripadvisor.com/media/photo-s/08/e7/29/52/capachica-peninsula.jpg')] bg-cover bg-center bg-no-repeat">
-        <div class="absolute inset-0 bg-gradient-to-br from-slate-950/98 via-slate-900/96 to-slate-950/98 backdrop-blur-sm 
-                    dark:from-slate-950/99 dark:via-slate-900/98 dark:to-slate-950/99"></div>
+<div class="min-h-screen relative">
+      <!-- Background Pattern Equilibrado -->
+      <div class="absolute inset-0 bg-[url('https://consultasenlinea.mincetur.gob.pe/fichaInventario/foto.aspx?cod=471157')] bg-cover bg-center bg-no-repeat">
+        <!-- Overlay equilibrado para ambos modos -->
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-800/85 via-slate-700/80 to-slate-800/85
+                    dark:from-slate-950/92 dark:via-slate-900/88 dark:to-slate-950/92"></div>
       </div>
 
       <!-- Content -->
       <div class="relative min-h-screen">
-        <!-- Barra Superior con Glassmorphism Mejorado -->
-        <header class="backdrop-blur-xl bg-white/8 dark:bg-slate-900/40 border-b border-white/10 dark:border-slate-700/40 sticky top-0 z-50 shadow-2xl">
+        <!-- Header equilibrado -->
+        <header class="backdrop-blur-md bg-slate-600/20 dark:bg-slate-900/50 border-b border-slate-500/30 dark:border-slate-700/40 sticky top-0 z-50 shadow-xl">
           <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
             <!-- Información del Emprendimiento -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">
               <div class="flex items-center gap-3">
-                <!-- Imagen del emprendimiento con mejor diseño -->
-                <div class="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 dark:from-slate-800/50 dark:to-slate-900/70 flex-shrink-0 ring-1 ring-white/10 dark:ring-slate-700/50 shadow-lg">
+                <!-- Imagen del emprendimiento -->
+                <div class="w-12 h-12 rounded-xl overflow-hidden bg-slate-600/25 dark:bg-slate-800/60 flex-shrink-0 ring-1 ring-slate-500/30 dark:ring-slate-700/50 shadow-lg">
                   <ng-container *ngIf="getMainImage(emprendimiento) as mainImage; else noImageTemplate">
-                    <img [src]="mainImage" 
-                         [alt]="emprendimiento?.nombre" 
+                    <img [src]="mainImage"
+                         [alt]="emprendimiento?.nombre"
                          class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                   </ng-container>
                   <ng-template #noImageTemplate>
-                    <div class="w-full h-full bg-gradient-to-br from-slate-800/80 to-slate-900/90 dark:from-slate-900/90 dark:to-black/80 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-full h-full bg-slate-700/80 dark:bg-slate-900/90 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-300 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                     </div>
                   </ng-template>
                 </div>
-                
+
                 <div class="space-y-1">
                   <h1 class="text-xl lg:text-2xl font-bold bg-gradient-to-r from-orange-400 via-orange-300 to-amber-300 dark:from-orange-400 dark:via-amber-300 dark:to-yellow-300 bg-clip-text text-transparent drop-shadow-sm">
                     {{ emprendimiento?.nombre || 'Cargando...' }}
                   </h1>
-                  <p class="text-sm text-slate-300 dark:text-slate-400 font-medium">
+                  <p class="text-sm text-slate-100 dark:text-slate-400 font-medium">
                     {{ emprendimiento?.tipo_servicio }} • {{ emprendimiento?.categoria }}
                   </p>
                   <div class="flex items-center gap-3">
                     <div class="flex items-center gap-2">
-                      <span class="w-2.5 h-2.5 rounded-full shadow-sm" 
+                      <span class="w-2.5 h-2.5 rounded-full shadow-sm"
                             [ngClass]="emprendimiento?.estado ? 'bg-emerald-400 shadow-emerald-400/50' : 'bg-red-400 shadow-red-400/50'"></span>
-                      <span class="text-xs text-slate-300 dark:text-slate-400 font-medium">
+                      <span class="text-xs text-slate-100 dark:text-slate-400 font-medium">
                         {{ emprendimiento?.estado ? 'Activo' : 'Inactivo' }}
                       </span>
                     </div>
@@ -60,18 +61,18 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                 </div>
               </div>
 
-              <!-- Botones de acción mejorados -->
+              <!-- Botones de acción optimizados -->
               <div class="flex items-center space-x-3">
-                <a routerLink="/mis-emprendimientos" 
-                   class="group flex items-center px-5 py-2.5 rounded-xl bg-white/10 dark:bg-slate-800/60 text-white hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60">
+                <a routerLink="/mis-emprendimientos"
+                   class="group flex items-center px-5 py-2.5 rounded-xl bg-slate-600/25 dark:bg-slate-800/70 text-white hover:bg-slate-600/35 dark:hover:bg-slate-700/80 transition-all duration-300 shadow-lg hover:shadow-xl border border-slate-500/30 dark:border-slate-700/50 hover:border-slate-500/40 dark:hover:border-slate-600/60">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 group-hover:scale-110 group-hover:-translate-x-0.5 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
                   <span class="font-medium">Volver</span>
                 </a>
-                
+
                 <button (click)="toggleDarkMode()"
-                        class="group p-3 rounded-xl bg-white/10 dark:bg-slate-800/60 text-slate-200 dark:text-slate-300 shadow-lg hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60 hover:shadow-xl"
+                        class="group p-3 rounded-xl bg-slate-600/25 dark:bg-slate-800/70 text-slate-100 dark:text-slate-300 shadow-lg hover:bg-slate-600/35 dark:hover:bg-slate-700/80 transition-all duration-300 border border-slate-500/30 dark:border-slate-700/50 hover:border-slate-500/40 dark:hover:border-slate-600/60 hover:shadow-xl"
                         [attr.aria-label]="isDarkMode ? 'Modo Día' : 'Modo Noche'">
                   <ng-container *ngIf="isDarkMode; else sunIcon">
                     <svg class="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,9 +88,9 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                     </svg>
                   </ng-template>
                 </button>
-                
-                <button (click)="logout()" 
-                        class="group flex items-center px-5 py-2.5 rounded-xl bg-red-600/20 dark:bg-red-900/40 text-red-100 hover:bg-red-600/30 dark:hover:bg-red-800/60 transition-all duration-300 shadow-lg hover:shadow-xl border border-red-500/20 dark:border-red-800/40 hover:border-red-500/30 dark:hover:border-red-700/60">
+
+                <button (click)="logout()"
+                        class="group flex items-center px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl border border-red-500 hover:border-red-600">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
@@ -100,16 +101,16 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
 
             <!-- Navegación mejorada -->
             <nav class="flex flex-wrap gap-2">
-              <a *ngFor="let item of navigationItems" 
+              <a *ngFor="let item of navigationItems"
                  [routerLink]="item.route"
                  routerLinkActive="bg-gradient-to-r from-orange-500 to-orange-400 dark:from-orange-600 dark:to-orange-500 text-white shadow-lg ring-2 ring-orange-400/50 dark:ring-orange-500/50"
                  [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                 class="group flex items-center px-4 py-3 rounded-xl bg-white/8 dark:bg-slate-800/50 text-slate-200 dark:text-slate-300 font-medium hover:bg-white/15 dark:hover:bg-slate-700/70 transition-all duration-300 active:scale-95 shadow-md hover:shadow-lg border border-white/10 dark:border-slate-700/40 hover:border-white/20 dark:hover:border-slate-600/50">
+                 class="group flex items-center px-4 py-3 rounded-xl bg-slate-600/20 dark:bg-slate-800/60 text-slate-50 dark:text-slate-300 font-medium hover:bg-slate-600/30 dark:hover:bg-slate-700/70 transition-all duration-300 active:scale-95 shadow-md hover:shadow-lg border border-slate-500/30 dark:border-slate-700/40 hover:border-slate-500/40 dark:hover:border-slate-600/50">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon" />
                 </svg>
                 <span class="text-sm">{{ item.label }}</span>
-                <span *ngIf="item.badge" 
+                <span *ngIf="item.badge"
                       class="ml-3 px-2.5 py-1 text-xs bg-red-500 dark:bg-red-600 text-white rounded-full shadow-md animate-pulse">
                   {{ item.badge }}
                 </span>
@@ -117,10 +118,10 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
             </nav>
           </div>
         </header>
-        
-        <!-- Contenido de la página con mejor espaciado -->
+
+        <!-- Contenido principal con mejor balance -->
         <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div class="backdrop-blur-sm bg-white/5 dark:bg-slate-900/20 rounded-2xl border border-white/10 dark:border-slate-700/30 shadow-2xl min-h-[calc(100vh-12rem)]">
+          <div class="backdrop-blur-sm bg-slate-700/15 dark:bg-slate-900/35 rounded-2xl border border-slate-500/25 dark:border-slate-700/35 shadow-2xl min-h-[calc(100vh-12rem)]">
             <div class="p-6 sm:p-8">
               <ng-content></ng-content>
             </div>
@@ -133,17 +134,17 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
     :host {
       display: block;
     }
-    
+
     /* Mejoras para transiciones suaves */
     * {
       transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     }
-    
+
     /* Mejora para el scroll suave */
     html {
       scroll-behavior: smooth;
     }
-    
+
     /* Animación personalizada para badges */
     @keyframes pulse {
       0%, 100% { opacity: 1; }
@@ -153,12 +154,12 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
 })
 export class EmprendimientoNavComponent implements OnInit {
   @Input() emprendimiento?: Emprendimiento;
-  
+
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private emprendimientoService = inject(EmprendimientoAdminService);
-  
+
   isDarkMode = false;
   navigationItems: Array<{
     label: string;
