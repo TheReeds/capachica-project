@@ -310,12 +310,11 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   }
   
   // Para verificar si la ruta actual es parte de un submenú
-  isSubmenuActive(item: MenuItem): boolean {
-    if (!item.children) return false;
-    
-    const currentPath = window.location.pathname;
-    return item.children.some(child => currentPath.includes(child.path));
-  }
+  isSubmenuActive(item: any): boolean {
+  return item.children?.some((child: any) => this.router.url === child.path);
+}
+
+
   
   // Para manejar los submenús - permite múltiples submenús abiertos
   toggleSubmenu(id: string): void {
