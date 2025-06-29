@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EmprendimientoAdminService } from '../../../core/services/emprendimiento-admin.service';
 import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-admin.model';
@@ -31,14 +31,23 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <a [routerLink]="['nuevo']"
-             class="group flex items-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold shadow-lg hover:from-orange-600 hover:to-orange-500 transition-all duration-300 hover:shadow-xl">
+          <!-- Botón principal con navegación programática -->
+          <button (click)="navigateToNewService()"
+            class="group flex items-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold shadow-lg hover:from-orange-600 hover:to-orange-500 transition-all duration-300 hover:shadow-xl">
             <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
             <span>Nuevo Servicio</span>
-          </a>
-          <button (click)="refreshData()" 
+          </button>
+
+          <!-- Botón de debug temporal (eliminar después) -->
+          <button (click)="debugRoutes()"
+                  class="px-3 py-2 bg-blue-500 text-white rounded text-sm">
+            Debug
+          </button>
+
+          <!-- Tu botón de actualizar actual -->
+          <button (click)="refreshData()"
                   [disabled]="loading"
                   class="group flex items-center px-4 py-2.5 rounded-xl bg-white/10 dark:bg-slate-800/60 text-white hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60 disabled:opacity-50">
             <svg *ngIf="!loading" class="h-5 w-5 mr-2 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +81,7 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
                 class="block w-full pl-10 pr-3 py-3 border border-slate-600/50 rounded-xl bg-white/10 dark:bg-slate-800/30 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300">
             </div>
           </div>
-          
+
           <div class="space-y-2">
             <label for="estado" class="block text-sm font-medium text-slate-300">
               Estado
@@ -87,7 +96,7 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
               <option value="false" class="bg-slate-800 text-white">Inactivos</option>
             </select>
           </div>
-          
+
           <div class="flex items-end">
             <button
               (click)="clearFilters()"
@@ -107,7 +116,7 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
           <div>
             <h3 class="text-red-200 font-semibold">Error al cargar los servicios</h3>
             <p class="text-red-300 text-sm">{{ error }}</p>
-            <button (click)="loadServicios()" 
+            <button (click)="loadServicios()"
                     class="mt-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-all duration-300 text-sm font-medium">
               Reintentar
             </button>
@@ -124,25 +133,25 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
         <p class="text-slate-300 dark:text-slate-400 mb-6">
           Comienza creando tu primer servicio para este emprendimiento.
         </p>
-        <a [routerLink]="['nuevo']"
+        <button (click)="navigateToNewService()"
            class="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all duration-300 shadow-lg hover:shadow-xl">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
           </svg>
           Crear primer servicio
-        </a>
+        </button>
       </div>
 
       <!-- Services Grid glassmorphism -->
       <div *ngIf="!loading && !error && filteredServicios.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let servicio of filteredServicios" 
+        <div *ngFor="let servicio of filteredServicios"
              class="backdrop-blur-sm bg-white/10 dark:bg-slate-800/40 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/15 dark:hover:bg-slate-700/50 transition-all duration-300 group">
-          
+
           <!-- Service Image -->
           <div class="relative h-48 overflow-hidden">
             <ng-container *ngIf="getServiceImage(servicio) as imageUrl; else noImageTemplate">
-              <img [src]="imageUrl" 
-                   [alt]="servicio.nombre" 
+              <img [src]="imageUrl"
+                   [alt]="servicio.nombre"
                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             </ng-container>
             <ng-template #noImageTemplate>
@@ -152,7 +161,7 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
                 </svg>
               </div>
             </ng-template>
-            
+
             <!-- Status Badge -->
             <div class="absolute top-4 right-4">
               <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border"
@@ -183,7 +192,7 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
                 {{ servicio.descripcion }}
               </p>
             </div>
-            
+
             <!-- Price -->
             <div class="mb-4 p-3 bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-600/30 rounded-xl">
               <div class="flex items-baseline gap-2">
@@ -207,14 +216,14 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
 
             <!-- Action Buttons -->
             <div class="flex gap-3">
-              <a [routerLink]="['/admin-emprendedores/emprendimiento', emprendimientoId, 'servicio', servicio.id]"
+              <button (click)="navigateToEditService(servicio.id!)"
                  class="flex-1 flex items-center justify-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all duration-300 shadow-lg hover:shadow-xl group">
                 <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>
                 Editar
-              </a>
-              
+              </button>
+
               <button (click)="toggleServicioEstado(servicio)"
                       [disabled]="servicio.updating"
                       class="flex items-center justify-center px-4 py-2.5 rounded-xl border border-white/20 dark:border-slate-600/50 text-slate-300 bg-white/10 dark:bg-slate-800/30 hover:bg-white/20 dark:hover:bg-slate-700/50 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
@@ -231,7 +240,7 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
                   {{ servicio.updating ? 'Actualizando...' : (servicio.estado ? 'Desactivar' : 'Activar') }}
                 </span>
               </button>
-              
+
               <button (click)="deleteServicio(servicio)"
                       [disabled]="servicio.deleting"
                       class="flex items-center justify-center p-2.5 rounded-xl text-red-300 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 hover:border-red-400/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group">
@@ -248,7 +257,7 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
       </div>
 
       <!-- No Results glassmorphism -->
-      <div *ngIf="!loading && !error && servicios.length > 0 && filteredServicios.length === 0" 
+      <div *ngIf="!loading && !error && servicios.length > 0 && filteredServicios.length === 0"
            class="text-center py-16">
         <svg class="mx-auto h-16 w-16 text-slate-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -268,19 +277,19 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
     :host {
       display: block;
     }
-    
+
     /* Mejoras para transiciones suaves */
     * {
       transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     }
-    
+
     .line-clamp-2 {
       overflow: hidden;
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
     }
-    
+
     .line-clamp-3 {
       overflow: hidden;
       display: -webkit-box;
@@ -292,6 +301,7 @@ import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-ad
 export class ServiciosListComponent implements OnInit {
   private emprendimientoAdminService = inject(EmprendimientoAdminService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   emprendimientoId!: number;
   emprendimiento?: Emprendimiento;
@@ -309,7 +319,7 @@ export class ServiciosListComponent implements OnInit {
     this.route.parent?.paramMap.subscribe(params => {
       const id = params.get('id');
       console.log('Servicios - ID recibido:', id); // Debug
-      
+
       if (id && !isNaN(+id)) {
         this.emprendimientoId = +id;
         this.loadData();
@@ -394,11 +404,44 @@ export class ServiciosListComponent implements OnInit {
     return null;
   }
 
+  // Método para navegar a crear nuevo servicio
+  navigateToNewService(): void {
+    console.log('Navegando a nuevo servicio con ID:', this.emprendimientoId);
+    this.router.navigate(['/admin-emprendedores/emprendimiento', this.emprendimientoId, 'servicio', 'nuevo']);
+  }
+
+  // Método para navegar a editar servicio
+  navigateToEditService(servicioId: number): void {
+    console.log('Navegando a editar servicio:', servicioId, 'del emprendimiento:', this.emprendimientoId);
+    this.router.navigate(['/admin-emprendedores/emprendimiento', this.emprendimientoId, 'servicio', servicioId]);
+  }
+
+  // Método de debug para ver las rutas
+  debugRoutes(): void {
+    console.log('=== DEBUG ROUTING ===');
+    console.log('Emprendimiento ID:', this.emprendimientoId);
+    console.log('URL actual:', this.router.url);
+    console.log('Route params:', this.route.params);
+    console.log('Parent route params:', this.route.parent?.params);
+
+    // Intentar diferentes rutas posibles
+    const possibleRoutes = [
+      `/admin-emprendedores/emprendimiento/${this.emprendimientoId}/servicio/nuevo`,
+      `/admin-emprendedores/emprendimiento/${this.emprendimientoId}/servicios/nuevo`,
+      `/emprendimiento/${this.emprendimientoId}/servicio/nuevo`,
+      `/emprendimiento/${this.emprendimientoId}/servicios/nuevo`
+    ];
+
+    console.log('Rutas posibles a probar:', possibleRoutes);
+    console.log('=====================');
+  }
+
+
   async toggleServicioEstado(servicio: Servicio & { updating?: boolean }): Promise<void> {
     if (servicio.updating || !servicio.id) return;
 
-    const confirmMessage = servicio.estado 
-      ? '¿Estás seguro de que quieres desactivar este servicio?' 
+    const confirmMessage = servicio.estado
+      ? '¿Estás seguro de que quieres desactivar este servicio?'
       : '¿Estás seguro de que quieres activar este servicio?';
 
     if (!confirm(confirmMessage)) return;
@@ -435,18 +478,18 @@ export class ServiciosListComponent implements OnInit {
     if (servicio.deleting || !servicio.id) return;
 
     const confirmMessage = `¿Estás seguro de que quieres eliminar el servicio "${servicio.nombre}"?\n\nEsta acción no se puede deshacer.`;
-    
+
     if (!confirm(confirmMessage)) return;
 
     servicio.deleting = true;
 
     try {
       await this.emprendimientoAdminService.deleteServicio(servicio.id).toPromise();
-      
+
       // Remover el servicio de la lista
       this.servicios = this.servicios.filter(s => s.id !== servicio.id);
       this.applyFilters();
-      
+
       // Mostrar mensaje de éxito
       alert('Servicio eliminado correctamente');
     } catch (err: any) {
