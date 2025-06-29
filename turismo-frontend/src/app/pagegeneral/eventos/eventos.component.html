@@ -269,7 +269,7 @@ background-size: cover; background-position: center; background-repeat: no-repea
     <div class="flex flex-col lg:flex-row gap-10 items-start">
       <!-- Imagen -->
       <div class="flex-shrink-0 w-full lg:w-1/2">
-        <img [src]="eventoCercano.sliders[0]?.url_completa"
+        <img [src]="eventoCercano.sliders[0].url_completa"
           class="w-full h-[300px] rounded-2xl object-cover shadow-lg border border-gray-300 dark:border-gray-600"
           alt="Imagen del evento" />
       </div>
@@ -492,7 +492,7 @@ background-size: cover; background-position: center; background-repeat: no-repea
       <div class="relative h-[420px] group">
         <!-- Fondo imagen con zoom -->
         <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-          [style.backgroundImage]="'url(' + evento.sliders[0]?.url_completa + ')'"></div>
+          [style.backgroundImage]="'url(' + evento.sliders[0].url_completa + ')'"></div>
 
         <!-- Degradado oscuro -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>

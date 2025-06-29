@@ -11,30 +11,45 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
   imports: [CommonModule, RouterModule],
   template: `
     <div class="min-h-screen relative">
-      <!-- Background Pattern Mejorado -->
-      <div class="absolute inset-0 bg-[url('https://media-cdn.tripadvisor.com/media/photo-s/08/e7/29/52/capachica-peninsula.jpg')] bg-cover bg-center bg-no-repeat">
-        <div class="absolute inset-0 bg-gradient-to-br from-slate-950/98 via-slate-900/96 to-slate-950/98 backdrop-blur-sm 
-                    dark:from-slate-950/99 dark:via-slate-900/98 dark:to-slate-950/99"></div>
+      <!-- Background Pattern Mejorado con Overlay Adaptativo -->
+      <div class="absolute inset-0 bg-[url('https://fotografias.antena3.com/clipping/cmsimages02/2022/07/05/D7383660-EF95-40BD-B0FF-CE76C4212FE0/lluvia-estrellas_98.jpg?crop=5000,2813,x0,y596&width=1900&height=1069&optimize=low&format=webply')] bg-cover bg-center bg-no-repeat">
+        <!-- Overlay adaptativo según el modo -->
+        <div class="absolute inset-0 bg-gradient-to-br 
+                    from-orange-950/96 via-orange-900/94 to-amber-950/96 backdrop-blur-sm
+                    dark:from-blue-950/98 dark:via-slate-950/96 dark:to-indigo-950/98 dark:backdrop-blur-sm
+                    transition-all duration-500"></div>
       </div>
 
       <!-- Content -->
       <div class="relative min-h-screen">
-        <!-- Barra Superior con Glassmorphism Mejorado -->
-        <header class="backdrop-blur-xl bg-white/8 dark:bg-slate-900/40 border-b border-white/10 dark:border-slate-700/40 sticky top-0 z-50 shadow-2xl">
+        <!-- Barra Superior con Glassmorphism Mejorado y Colores Adaptativos -->
+        <header class="backdrop-blur-xl 
+                       bg-orange-50/20 border-b border-orange-200/30 shadow-orange-900/20
+                       dark:bg-blue-950/40 dark:border-b dark:border-blue-800/40 dark:shadow-blue-900/40
+                       sticky top-0 z-50 shadow-2xl transition-all duration-500">
           <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
             <!-- Información del Emprendimiento -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">
               <div class="flex items-center gap-3">
                 <!-- Imagen del emprendimiento con mejor diseño -->
-                <div class="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 dark:from-slate-800/50 dark:to-slate-900/70 flex-shrink-0 ring-1 ring-white/10 dark:ring-slate-700/50 shadow-lg">
+                <div class="w-12 h-12 rounded-xl overflow-hidden 
+                           bg-gradient-to-br from-orange-100/20 to-orange-200/10 
+                           dark:from-blue-800/50 dark:to-blue-900/70 
+                           flex-shrink-0 ring-1 
+                           ring-orange-300/30 dark:ring-blue-700/50 
+                           shadow-lg shadow-orange-900/20 dark:shadow-blue-900/30
+                           transition-all duration-300">
                   <ng-container *ngIf="getMainImage(emprendimiento) as mainImage; else noImageTemplate">
                     <img [src]="mainImage" 
                          [alt]="emprendimiento?.nombre" 
                          class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                   </ng-container>
                   <ng-template #noImageTemplate>
-                    <div class="w-full h-full bg-gradient-to-br from-slate-800/80 to-slate-900/90 dark:from-slate-900/90 dark:to-black/80 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-full h-full 
+                               bg-gradient-to-br from-orange-800/80 to-orange-900/90 
+                               dark:from-blue-900/90 dark:to-blue-950/80 
+                               flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-300 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                     </div>
@@ -42,17 +57,24 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                 </div>
                 
                 <div class="space-y-1">
-                  <h1 class="text-xl lg:text-2xl font-bold bg-gradient-to-r from-orange-400 via-orange-300 to-amber-300 dark:from-orange-400 dark:via-amber-300 dark:to-yellow-300 bg-clip-text text-transparent drop-shadow-sm">
+                  <h1 class="text-xl lg:text-2xl font-bold 
+                            bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 
+                            dark:from-blue-400 dark:via-cyan-400 dark:to-blue-300 
+                            bg-clip-text text-transparent drop-shadow-sm">
                     {{ emprendimiento?.nombre || 'Cargando...' }}
                   </h1>
-                  <p class="text-sm text-slate-300 dark:text-slate-400 font-medium">
+                  <p class="text-sm font-medium
+                           text-black dark:text-blue-300">
                     {{ emprendimiento?.tipo_servicio }} • {{ emprendimiento?.categoria }}
                   </p>
                   <div class="flex items-center gap-3">
                     <div class="flex items-center gap-2">
                       <span class="w-2.5 h-2.5 rounded-full shadow-sm" 
-                            [ngClass]="emprendimiento?.estado ? 'bg-emerald-400 shadow-emerald-400/50' : 'bg-red-400 shadow-red-400/50'"></span>
-                      <span class="text-xs text-slate-300 dark:text-slate-400 font-medium">
+                            [ngClass]="emprendimiento?.estado ? 
+                              'bg-emerald-500 shadow-emerald-400/50 dark:bg-emerald-400 dark:shadow-emerald-400/50' : 
+                              'bg-red-500 shadow-red-400/50 dark:bg-red-400 dark:shadow-red-400/50'"></span>
+                      <span class="text-xs font-medium
+                                 text-black dark:text-blue-300">
                         {{ emprendimiento?.estado ? 'Activo' : 'Inactivo' }}
                       </span>
                     </div>
@@ -60,10 +82,16 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                 </div>
               </div>
 
-              <!-- Botones de acción mejorados -->
+              <!-- Botones de acción mejorados con colores adaptativos -->
               <div class="flex items-center space-x-3">
                 <a routerLink="/mis-emprendimientos" 
-                   class="group flex items-center px-5 py-2.5 rounded-xl bg-white/10 dark:bg-slate-800/60 text-white hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60">
+                   class="group flex items-center px-5 py-2.5 rounded-xl 
+                          bg-orange-100/20 text-black hover:bg-orange-100/30 
+                          dark:bg-blue-800/60 dark:text-blue-100 dark:hover:bg-blue-700/80 
+                          border border-orange-200/30 hover:border-orange-200/50
+                          dark:border-blue-700/50 dark:hover:border-blue-600/60
+                          shadow-lg hover:shadow-xl shadow-orange-900/20 dark:shadow-blue-900/30
+                          transition-all duration-300">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 group-hover:scale-110 group-hover:-translate-x-0.5 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
@@ -71,7 +99,13 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                 </a>
                 
                 <button (click)="toggleDarkMode()"
-                        class="group p-3 rounded-xl bg-white/10 dark:bg-slate-800/60 text-slate-200 dark:text-slate-300 shadow-lg hover:bg-white/20 dark:hover:bg-slate-700/80 transition-all duration-300 border border-white/10 dark:border-slate-700/50 hover:border-white/20 dark:hover:border-slate-600/60 hover:shadow-xl"
+                        class="group p-3 rounded-xl 
+                               bg-orange-100/20 text-black hover:bg-orange-100/30
+                               dark:bg-blue-800/60 dark:text-blue-300 dark:hover:bg-blue-700/80
+                               border border-orange-200/30 hover:border-orange-200/50
+                               dark:border-blue-700/50 dark:hover:border-blue-600/60
+                               shadow-lg hover:shadow-xl shadow-orange-900/20 dark:shadow-blue-900/30
+                               transition-all duration-300"
                         [attr.aria-label]="isDarkMode ? 'Modo Día' : 'Modo Noche'">
                   <ng-container *ngIf="isDarkMode; else sunIcon">
                     <svg class="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +123,13 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
                 </button>
                 
                 <button (click)="logout()" 
-                        class="group flex items-center px-5 py-2.5 rounded-xl bg-red-600/20 dark:bg-red-900/40 text-red-100 hover:bg-red-600/30 dark:hover:bg-red-800/60 transition-all duration-300 shadow-lg hover:shadow-xl border border-red-500/20 dark:border-red-800/40 hover:border-red-500/30 dark:hover:border-red-700/60">
+                        class="group flex items-center px-5 py-2.5 rounded-xl 
+                               bg-red-600/30 text-red-100 hover:bg-red-600/40
+                               dark:bg-red-900/50 dark:text-red-100 dark:hover:bg-red-800/70
+                               border border-red-500/30 hover:border-red-500/50
+                               dark:border-red-800/40 dark:hover:border-red-700/60
+                               shadow-lg hover:shadow-xl shadow-red-900/30
+                               transition-all duration-300">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
@@ -98,19 +138,24 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
               </div>
             </div>
 
-            <!-- Navegación mejorada -->
+            <!-- Navegación mejorada con colores adaptativos -->
             <nav class="flex flex-wrap gap-2">
               <a *ngFor="let item of navigationItems" 
                  [routerLink]="item.route"
-                 routerLinkActive="bg-gradient-to-r from-orange-500 to-orange-400 dark:from-orange-600 dark:to-orange-500 text-white shadow-lg ring-2 ring-orange-400/50 dark:ring-orange-500/50"
+                 routerLinkActive="nav-link-active"
                  [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                 class="group flex items-center px-4 py-3 rounded-xl bg-white/8 dark:bg-slate-800/50 text-slate-200 dark:text-slate-300 font-medium hover:bg-white/15 dark:hover:bg-slate-700/70 transition-all duration-300 active:scale-95 shadow-md hover:shadow-lg border border-white/10 dark:border-slate-700/40 hover:border-white/20 dark:hover:border-slate-600/50">
+                 class="nav-link group flex items-center px-4 py-3 rounded-xl 
+                        font-medium shadow-md hover:shadow-lg 
+                        transition-all duration-300 active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon" />
                 </svg>
                 <span class="text-sm">{{ item.label }}</span>
                 <span *ngIf="item.badge" 
-                      class="ml-3 px-2.5 py-1 text-xs bg-red-500 dark:bg-red-600 text-white rounded-full shadow-md animate-pulse">
+                      class="ml-3 px-2.5 py-1 text-xs 
+                             bg-red-500 text-black 
+                             dark:bg-red-600 dark:text-black 
+                             rounded-full shadow-md animate-pulse">
                   {{ item.badge }}
                 </span>
               </a>
@@ -118,10 +163,13 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
           </div>
         </header>
         
-        <!-- Contenido de la página con mejor espaciado -->
+        <!-- Contenido de la página con mejor espaciado y colores adaptativos -->
         <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div class="backdrop-blur-sm bg-white/5 dark:bg-slate-900/20 rounded-2xl border border-white/10 dark:border-slate-700/30 shadow-2xl min-h-[calc(100vh-12rem)]">
-            <div class="p-6 sm:p-8">
+          <div class="backdrop-blur-sm 
+                     bg-white/15 border border-orange-200/20 shadow-orange-900/20
+                     dark:bg-blue-950/20 dark:border dark:border-blue-800/30 dark:shadow-blue-900/30
+                     rounded-2xl shadow-2xl min-h-[calc(100vh-12rem)] transition-all duration-500">
+            <div class="p-6 sm:p-8 text-black-100 dark:text-blue-100">
               <ng-content></ng-content>
             </div>
           </div>
@@ -132,6 +180,34 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
   styles: [`
     :host {
       display: block;
+    }
+    
+    /* Estilos para los enlaces de navegación */
+    .nav-link {
+      @apply bg-orange-50/15 text-black hover:bg-orange-50/25
+             border border-orange-200/20 hover:border-orange-200/40
+             shadow-orange-900/20;
+    }
+    
+    /* Modo oscuro para enlaces normales */
+    :host-context(.dark) .nav-link {
+      @apply bg-blue-800/50 text-blue-200 hover:bg-blue-700/70
+             border-blue-700/40 hover:border-blue-600/50
+             shadow-blue-900/30;
+    }
+    
+    /* Estado activo para modo claro */
+    .nav-link-active {
+      @apply bg-gradient-to-r from-orange-500 to-orange-400 
+             text-white shadow-lg ring-2 ring-orange-400/50
+             border-orange-400 hover:border-orange-300;
+    }
+    
+    /* Estado activo para modo oscuro */
+    :host-context(.dark) .nav-link-active {
+      @apply bg-gradient-to-r from-blue-600 to-blue-500 
+             text-white shadow-lg ring-2 ring-blue-500/50
+             border-blue-500 hover:border-blue-400;
     }
     
     /* Mejoras para transiciones suaves */
@@ -148,6 +224,18 @@ import { Emprendimiento } from '../../../core/models/emprendimiento-admin.model'
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.8; }
+    }
+    
+    /* Mejoras adicionales para el tema */
+    .dark {
+      color-scheme: dark;
+    }
+    
+    /* Transiciones suaves entre modos */
+    .transition-theme {
+      transition: background-color 0.5s ease-in-out, 
+                  border-color 0.5s ease-in-out, 
+                  color 0.5s ease-in-out;
     }
   `]
 })
