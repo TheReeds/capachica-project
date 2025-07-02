@@ -47,12 +47,12 @@ export const ADMIN_EMPRENDEDORES_ROUTES: Routes = [
         title: 'Servicios del Emprendimiento'
       },
       {
-        path: 'servicio/nuevo',
+        path: 'servicios/nuevo',
         loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
         title: 'Nuevo Servicio'
       },
       {
-        path: 'servicio/:servicioId',
+        path: 'servicios/:servicioId',
         loadComponent: () => import('./servicios-form/servicio-form.component').then(c => c.ServicioFormComponent),
         title: 'Editar Servicio'
       },
