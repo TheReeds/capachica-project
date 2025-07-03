@@ -1,518 +1,52 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TurismoService } from '../../../../core/services/turismo.service';
 import { UbicacionMapComponent } from '../../../../shared/components/ubicacion-map/ubicacion-map.component';
 import { ServicioDetalle } from '../servicios.component';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CarritoService, CarritoItem } from '../../../../core/services/carrito.service';
+import { TimePickerComponent } from '../components/time-picker/time-picker.component';
+
 
 @Component({
   selector: 'app-servicio-detalle',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, UbicacionMapComponent],
-  template: `
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
-
-      <!-- Loading State -->
-      <div *ngIf="cargando()" class="container mx-auto px-4 py-20">
-        <div class="text-center">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-          <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando servicio...</p>
-        </div>
-      </div>
-
-      <!-- Error State -->
-      <div *ngIf="error()" class="container mx-auto px-4 py-20">
-        <div class="text-center">
-          <svg class="w-24 h-24 mx-auto text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-9-5.5a9 9 0 1118 0"></path>
-          </svg>
-          <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Servicio no encontrado</h2>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">El servicio que buscas no existe o ha sido eliminado.</p>
-          <button
-            (click)="volverAServicios()"
-            class="bg-amber-500 hover:bg-amber-600 text-white py-2 px-6 rounded-lg transition-colors duration-200"
-          >
-            Volver a Servicios
-          </button>
-        </div>
-      </div>
-
-      <!-- Contenido del Servicio -->
-      <div *ngIf="!cargando() && !error() && servicio()" class="container mx-auto px-4 py-8">
-
-        <!-- Breadcrumb -->
-        <nav class="flex mb-8" aria-label="Breadcrumb">
-          <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-              <a routerLink="/home" class="inline-flex items-center text-gray-700 hover:text-amber-600 dark:text-gray-400 dark:hover:text-amber-400">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                </svg>
-                Inicio
-              </a>
-            </li>
-            <li>
-              <div class="flex items-center">
-                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <a routerLink="/servicios" class="ml-1 text-gray-700 hover:text-amber-600 dark:text-gray-400 dark:hover:text-amber-400 md:ml-2">Servicios</a>
-              </div>
-            </li>
-            <li aria-current="page">
-              <div class="flex items-center">
-                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <span class="ml-1 text-gray-500 md:ml-2 dark:text-gray-400">{{ servicio()?.nombre }}</span>
-              </div>
-            </li>
-          </ol>
-        </nav>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-          <!-- Contenido Principal -->
-          <div class="lg:col-span-2">
-
-            <!-- Galería de Imágenes -->
-            <div class="mb-8">
-              <div class="relative h-96 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700">
-                <img
-                  [src]="imagenActual"
-                  [alt]="servicio()?.nombre"
-                  class="w-full h-full object-cover"
-                  onerror="this.src='/assets/general/placeholder-service.jpg'"
-                >
-
-                <!-- Navegación de galería -->
-                <div *ngIf="servicio()?.sliders && servicio()!.sliders!.length > 1" class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-                  <div class="flex space-x-2 bg-black/50 rounded-full px-3 py-2">
-                    <button
-                      *ngFor="let slider of servicio()?.sliders; let i = index"
-                      (click)="cambiarImagen(i)"
-                      [class]="imagenIndex() === i ? 'bg-white' : 'bg-white/50'"
-                      class="w-3 h-3 rounded-full transition-all duration-200"
-                    ></button>
-                  </div>
-                </div>
-
-                <!-- Botones de navegación -->
-                <button
-                  *ngIf="servicio()?.sliders && servicio()!.sliders!.length > 1"
-                  (click)="imagenAnterior()"
-                  class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors duration-200"
-                >
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                  </svg>
-                </button>
-
-                <button
-                  *ngIf="servicio()?.sliders && servicio()!.sliders!.length > 1"
-                  (click)="imagenSiguiente()"
-                  class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors duration-200"
-                >
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- Información del Servicio -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-              <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
-                <div class="mb-4 md:mb-0">
-                  <div class="flex items-center mb-2">
-                    <span *ngIf="servicio()?.categorias?.[0]"
-                          class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-3 py-1 rounded-full text-sm font-medium mr-3">
-                      {{ servicio()?.categorias?.[0]?.nombre }}
-                    </span>
-                    <span *ngIf="servicio()?.estado"
-                          class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">
-                      Disponible
-                    </span>
-                  </div>
-                  <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-                    {{ servicio()?.nombre }}
-                  </h1>
-                </div>
-
-                <div *ngIf="servicio()?.precio_referencial" class="text-right">
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Precio referencial</p>
-                  <p class="text-3xl md:text-4xl font-bold text-amber-600">
-                    S/. {{ servicio()?.precio_referencial }}
-                  </p>
-                </div>
-              </div>
-
-              <p *ngIf="servicio()?.descripcion" class="text-gray-600 dark:text-gray-400 text-lg leading-relaxed mb-6">
-                {{ servicio()?.descripcion }}
-              </p>
-
-              <!-- Información adicional -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div *ngIf="servicio()?.capacidad">
-                  <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    Capacidad
-                  </h3>
-                  <p class="text-gray-600 dark:text-gray-400">{{ servicio()?.capacidad }} personas</p>
-                </div>
-
-                <div *ngIf="servicio()?.ubicacion_referencia">
-                  <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    </svg>
-                    Ubicación
-                  </h3>
-                  <p class="text-gray-600 dark:text-gray-400">{{ servicio()?.ubicacion_referencia }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Horarios de Disponibilidad -->
-            <div *ngIf="servicio()?.horarios && servicio()!.horarios!.length > 0"
-                 class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-              <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
-                <svg class="w-6 h-6 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Horarios de Disponibilidad
-              </h2>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div *ngFor="let horario of obtenerHorariosAgrupados()"
-                     [class]="horario.activo ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600'"
-                     class="border rounded-lg p-4">
-                  <div class="flex justify-between items-center">
-                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 capitalize">
-                      {{ formatearDiaCompleto(horario.dia_semana) }}
-                    </h3>
-                    <span [class]="horario.activo ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200' : 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-200'"
-                          class="px-2 py-1 rounded-full text-xs font-medium">
-                      {{ horario.activo ? 'Disponible' : 'No disponible' }}
-                    </span>
-                  </div>
-                  <p *ngIf="horario.activo" class="text-gray-600 dark:text-gray-400 mt-2">
-                    {{ formatearHora(horario.hora_inicio) }} - {{ formatearHora(horario.hora_fin) }}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Verificador de Disponibilidad -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-              <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
-                <svg class="w-6 h-6 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Verificar Disponibilidad
-              </h2>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Fecha
-                  </label>
-                  <input
-                    type="date"
-                    [(ngModel)]="fechaConsulta"
-                    [min]="fechaMinima"
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                  >
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Hora de inicio
-                  </label>
-                  <input
-                    type="time"
-                    [(ngModel)]="horaInicio"
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                  >
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Hora de fin
-                  </label>
-                  <input
-                    type="time"
-                    [(ngModel)]="horaFin"
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                  >
-                </div>
-              </div>
-
-              <button
-                (click)="verificarDisponibilidad()"
-                [disabled]="!fechaConsulta || !horaInicio || !horaFin || verificandoDisponibilidad()"
-                class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-2 px-6 rounded-lg transition-colors duration-200 font-medium"
-              >
-                <span *ngIf="!verificandoDisponibilidad()">Verificar Disponibilidad</span>
-                <span *ngIf="verificandoDisponibilidad()" class="flex items-center">
-                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Verificando...
-                </span>
-              </button>
-
-              <!-- Resultado de disponibilidad -->
-              <div *ngIf="resultadoDisponibilidad !== null" class="mt-4 p-4 rounded-lg"
-                   [class]="resultadoDisponibilidad ? 'bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800'">
-                <div class="flex items-center">
-                  <svg *ngIf="resultadoDisponibilidad" class="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <svg *ngIf="!resultadoDisponibilidad" class="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <span [class]="resultadoDisponibilidad ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'"
-                        class="font-medium">
-                    {{ resultadoDisponibilidad ? '¡Servicio disponible!' : 'Servicio no disponible' }}
-                  </span>
-                </div>
-                <p [class]="resultadoDisponibilidad ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'"
-                   class="mt-1 text-sm">
-                  {{ resultadoDisponibilidad ? 'Puedes agregar este servicio a tu carrito para la fecha y horario seleccionados.' : 'El servicio no está disponible en la fecha y horario seleccionados. Intenta con otro horario.' }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Mapa de Ubicación -->
-            <div *ngIf="servicio()?.latitud && servicio()?.longitud"
-                 class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-              <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
-                <svg class="w-6 h-6 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                Ubicación del Servicio
-              </h2>
-
-              <div class="h-64">
-                <app-ubicacion-map
-                  [latitud]="servicio()?.latitud"
-                  [longitud]="servicio()?.longitud"
-                  [readOnly]="true"
-                ></app-ubicacion-map>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sidebar -->
-          <div class="lg:col-span-1">
-
-            <!-- Información del Emprendedor -->
-            <div *ngIf="servicio()?.emprendedor" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 sticky top-4">
-              <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-                Emprendedor
-              </h3>
-
-              <div class="space-y-4">
-                <div>
-                  <h4 class="font-semibold text-gray-800 dark:text-gray-200">{{ servicio()?.emprendedor?.nombre }}</h4>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.tipo_servicio }}</p>
-                </div>
-
-                <div *ngIf="servicio()?.emprendedor?.telefono" class="flex items-center">
-                  <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                  </svg>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.telefono }}</span>
-                </div>
-
-                <div *ngIf="servicio()?.emprendedor?.email" class="flex items-center">
-                  <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                  </svg>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.email }}</span>
-                </div>
-
-                <div *ngIf="servicio()?.emprendedor?.ubicacion" class="flex items-start">
-                  <svg class="w-4 h-4 text-gray-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  </svg>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.ubicacion }}</span>
-                </div>
-
-                <div *ngIf="servicio()?.emprendedor?.precio_rango" class="flex items-center">
-                  <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                  </svg>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">{{ servicio()?.emprendedor?.precio_rango }}</span>
-                </div>
-
-                <!-- Mensajes del carrito -->
-                <div *ngIf="mensajeCarrito()" class="mb-4 p-3 rounded-lg"
-                    [class]="tipoMensajeCarrito() === 'success' ? 'bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800'">
-                <div class="flex items-center">
-                    <svg *ngIf="tipoMensajeCarrito() === 'success'" class="w-5 h-5 text-green-600 dark:text-green-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <svg *ngIf="tipoMensajeCarrito() === 'error'" class="w-5 h-5 text-red-600 dark:text-red-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
-                    </svg>
-                    <span [class]="tipoMensajeCarrito() === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'"
-                        class="text-sm font-medium">
-                    {{ mensajeCarrito() }}
-                    </span>
-                </div>
-                </div>
-
-                <!-- Botones de acción -->
-                <div class="pt-4 space-y-3">
-                <!-- Botón principal: Agregar al carrito -->
-                <button
-                    *ngIf="estaAutenticado() && resultadoDisponibilidad === true"
-                    (click)="agregarAlCarrito()"
-                    [disabled]="agregandoAlCarrito()"
-                    class="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-amber-400 disabled:cursor-not-allowed text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center"
-                >
-                    <span *ngIf="!agregandoAlCarrito()" class="flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0v0M17 21v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6"></path>
-                    </svg>
-                    Agregar al Carrito
-                    </span>
-                    <span *ngIf="agregandoAlCarrito()" class="flex items-center">
-                    <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Agregando...
-                    </span>
-                </button>
-
-                <!-- Botón: Verificar disponibilidad primero -->
-                <button
-                    *ngIf="estaAutenticado() && resultadoDisponibilidad !== true && (fechaConsulta || horaInicio || horaFin)"
-                    disabled
-                    class="w-full bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400 py-3 px-4 rounded-lg font-medium cursor-not-allowed"
-                >
-                    Verifica disponibilidad primero
-                </button>
-
-                <!-- Botón: Seleccionar fecha y hora -->
-                <button
-                    *ngIf="estaAutenticado() && !fechaConsulta && !horaInicio && !horaFin"
-                    disabled
-                    class="w-full bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400 py-3 px-4 rounded-lg font-medium cursor-not-allowed"
-                >
-                    Selecciona fecha y hora
-                </button>
-
-                <!-- Botón: Iniciar sesión -->
-                <button
-                    *ngIf="!estaAutenticado()"
-                    (click)="irAlLogin()"
-                    class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center"
-                >
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                    </svg>
-                    Iniciar Sesión para Reservar
-                </button>
-
-                <!-- Botón: Ver carrito (solo si está autenticado y tiene items) -->
-                <button
-                    *ngIf="estaAutenticado() && getTotalItemsCarrito() > 0"
-                    (click)="irAlCarrito()"
-                    class="w-full bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 py-2 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center"
-                >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0v0M17 21v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6"></path>
-                    </svg>
-                    Ver Mi Carrito ({{ getTotalItemsCarrito() }})
-                </button>
-
-                <!-- Botón: WhatsApp -->
-                <button
-                    *ngIf="servicio()?.emprendedor?.telefono"
-                    (click)="contactarWhatsApp()"
-                    class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center"
-                >
-                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.089z"/>
-                    </svg>
-                    Contactar por WhatsApp
-                </button>
-
-                <!-- Botón: Volver a servicios -->
-                <button
-                    (click)="volverAServicios()"
-                    class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg transition-colors duration-200 font-medium"
-                >
-                    ← Volver a Servicios
-                </button>
-                </div>
-
-            <!-- Servicios Relacionados -->
-            <div *ngIf="serviciosRelacionados().length > 0" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                </svg>
-                Servicios Relacionados
-              </h3>
-
-              <div class="space-y-4">
-                <div *ngFor="let servicioRel of serviciosRelacionados().slice(0, 3)"
-                     (click)="verOtroServicio(servicioRel.id)"
-                     class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200">
-                  <h4 class="font-medium text-gray-800 dark:text-gray-200 text-sm">{{ servicioRel.nombre }}</h4>
-                  <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ servicioRel.emprendedor?.nombre }}</p>
-                  <p *ngIf="servicioRel.precio_referencial" class="text-xs text-amber-600 font-semibold mt-1">
-                    S/. {{ servicioRel.precio_referencial }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    :host {
-      display: block;
-    }
-
-    .line-clamp-1 {
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-
-    .line-clamp-2 {
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
-  `]
+  imports: [CommonModule, RouterModule, FormsModule, UbicacionMapComponent,TimePickerComponent],
+  templateUrl: './servicio-detalle.component.html',
+  styleUrls: ['./servicio-detalle.component.css'],
+  animations: [
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ]),
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('400ms ease-in', style({ opacity: 1 }))
+      ])
+    ]),
+    trigger('scaleIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.9)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+      ])
+    ])
+  ]
 })
-export class ServicioDetalleComponent implements OnInit {
+export class ServicioDetalleComponent implements OnInit, OnDestroy {
   private turismoService = inject(TurismoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
   private carritoService = inject(CarritoService);
+  private destroy$ = new Subject<void>();
 
   // Signals
   servicio = signal<ServicioDetalle | null>(null);
@@ -526,32 +60,44 @@ export class ServicioDetalleComponent implements OnInit {
   tipoMensajeCarrito = signal<'success' | 'error' | null>(null);
 
   // Estados para verificación de disponibilidad
+  mostrarCalendario = false;
   fechaConsulta = '';
   horaInicio = '';
   horaFin = '';
   resultadoDisponibilidad: boolean | null = null;
   fechaMinima = '';
+  fechaSeleccionada: Date | null = null;
 
-  // Método para obtener imagen actual (reemplaza el computed)
-  get imagenActual(): string {
-    const serv = this.servicio();
-    if (serv?.sliders && serv.sliders.length > 0) {
-      return serv.sliders[this.imagenIndex()].url_completa;
-    }
-    return '/assets/general/placeholder-service.jpg';
-  }
+  // Variables para el calendario
+  fechaActual = new Date();
+  mesActual = this.fechaActual.toLocaleString('es-ES', { month: 'long' });
+  anioActual = this.fechaActual.getFullYear();
+  diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  diasCalendario: Date[] = [];
 
   ngOnInit() {
     this.fechaMinima = new Date().toISOString().split('T')[0];
+    this.actualizarCalendario();
 
-    this.route.params.subscribe(params => {
-      const id = +params['id'];
-      if (id) {
-        this.cargarServicio(id);
-      }
-    });
+    this.route.params
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        const id = +params['id'];
+        if (id) {
+          this.cargarServicio(id);
+        }
+      });
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Carga los datos del servicio desde el API
+   * @param id ID del servicio a cargar
+   */
   private async cargarServicio(id: number) {
     this.cargando.set(true);
     this.error.set(false);
@@ -576,6 +122,11 @@ export class ServicioDetalleComponent implements OnInit {
     }
   }
 
+  /**
+   * Transforma los datos del servicio desde el API al modelo interno
+   * @param servicio Datos del servicio desde el API
+   * @returns Objeto ServicioDetalle transformado
+   */
   private transformarServicio(servicio: any): ServicioDetalle {
     return {
       id: servicio.id || 0,
@@ -621,6 +172,10 @@ export class ServicioDetalleComponent implements OnInit {
     };
   }
 
+  /**
+   * Carga servicios relacionados basados en la categoría principal
+   * @param servicio Servicio del cual cargar relacionados
+   */
   private async cargarServiciosRelacionados(servicio: ServicioDetalle) {
     try {
       if (servicio.categorias && servicio.categorias.length > 0) {
@@ -629,7 +184,6 @@ export class ServicioDetalleComponent implements OnInit {
         ).toPromise();
 
         if (serviciosCategoria) {
-          // Filtrar el servicio actual y tomar máximo 5
           const relacionados = serviciosCategoria
             .filter(s => s.id !== servicio.id)
             .slice(0, 5)
@@ -642,14 +196,222 @@ export class ServicioDetalleComponent implements OnInit {
     }
   }
 
+  /**
+   * Actualiza el calendario con los días del mes actual y adyacentes
+   */
+  actualizarCalendario() {
+  const fecha = new Date(this.fechaActual);
+  this.mesActual = fecha.toLocaleDateString('es-ES', { month: 'long' });
+  this.anioActual = fecha.getFullYear();  // Usar getFullYear() en lugar de getUTCFullYear()
+
+  // Primer y último día del mes actual (sin UTC)
+  const primerDiaMes = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
+  const ultimoDiaMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
+
+  // Días de la semana (0=domingo, 1=lunes, etc.)
+  const primerDiaSemana = primerDiaMes.getDay(); 
+  const ultimoDiaSemana = ultimoDiaMes.getDay();
+
+  const diasMostrar: Date[] = [];
+
+  // 1. Agregar días del mes anterior (para completar la primera semana)
+  if (primerDiaSemana !== 0) { // Si el primer día no es domingo
+    const ultimoDiaMesAnterior = new Date(fecha.getFullYear(), fecha.getMonth(), 0).getDate();
+    for (let i = primerDiaSemana - 1; i >= 0; i--) {
+      diasMostrar.push(new Date(fecha.getFullYear(), fecha.getMonth() - 1, ultimoDiaMesAnterior - i));
+    }
+  }
+
+  // 2. Agregar días del mes actual
+  for (let i = 1; i <= ultimoDiaMes.getDate(); i++) {
+    diasMostrar.push(new Date(fecha.getFullYear(), fecha.getMonth(), i));
+  }
+
+  // 3. Agregar días del mes siguiente (para completar la última semana)
+  const diasRestantes = 6 - ultimoDiaSemana;
+  for (let i = 1; i <= diasRestantes; i++) {
+    diasMostrar.push(new Date(fecha.getFullYear(), fecha.getMonth() + 1, i));
+  }
+
+  this.diasCalendario = diasMostrar;
+}
+
+  /**
+   * Navega al mes anterior en el calendario
+   */
+  mesAnterior() {
+    this.fechaActual = new Date(
+      this.fechaActual.getFullYear(),
+      this.fechaActual.getMonth() - 1,
+      1
+    );
+    this.actualizarCalendario();
+  }
+
+  /**
+   * Navega al mes siguiente en el calendario
+   */
+  mesSiguiente() {
+    this.fechaActual = new Date(
+      this.fechaActual.getFullYear(),
+      this.fechaActual.getMonth() + 1,
+      1
+    );
+    this.actualizarCalendario();
+  }
+
+  /**
+   * Determina las clases CSS para un día del calendario
+   * @param dia Fecha a evaluar
+   * @returns Cadena de clases CSS
+   */
+  getClaseDia(dia: Date): string {
+    const hoyUTC = new Date();
+    hoyUTC.setUTCHours(0, 0, 0, 0);
+    const esHoy = dia.toDateString() === hoyUTC.toDateString();
+    const esMesActual = dia.getMonth() === this.fechaActual.getMonth();
+    const esPasado = dia < hoyUTC && !esHoy;
+    const esSeleccionado = this.fechaSeleccionada?.toDateString() === dia.toDateString();
+    const esDisponible = this.diaDisponible(dia);
+    const diaUTC = new Date(Date.UTC(dia.getFullYear(), dia.getMonth(), dia.getDate()));
+    
+    let clases = 'cursor-pointer p-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-110 ';
+    
+    if (esPasado) {
+      clases += 'text-gray-300 cursor-not-allowed hover:scale-100';
+    } else if (esSeleccionado) {
+      clases += 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg';
+    } else if (esHoy) {
+      clases += 'bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200';
+    } else if (esMesActual && esDisponible) {
+      clases += 'text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30';
+    } else if (esMesActual && !esDisponible) {
+      clases += 'text-gray-400 line-through cursor-not-allowed';
+    } else {
+      clases += 'text-gray-400 hover:text-gray-600';
+    }
+    
+    return clases;
+  }
+
+  /**
+   * Verifica si un día está disponible según los horarios del servicio
+   * @param dia Fecha a verificar
+   * @returns true si el día está disponible
+   */
+  diaDisponible(dia: Date): boolean {
+  if (!this.servicio()?.horarios) return false;
+
+  const diaSemana = dia.getDay(); // <-- Usar getDay() local
+  const diasMap: {[key: number]: string} = {
+    0: 'domingo', 1: 'lunes', 2: 'martes', 3: 'miercoles',
+    4: 'jueves', 5: 'viernes', 6: 'sabado'
+  };
+
+  const diaNombre = diasMap[diaSemana];
+  return this.servicio()!.horarios!.some(h => 
+    h.dia_semana.toLowerCase() === diaNombre && h.activo
+  );
+}
+getDiaSeleccionadoFormateado(): string {
+  if (!this.fechaSeleccionada) return '';
+
+  const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const diaSemana = this.fechaSeleccionada.getDay(); // <-- Local
+  const fechaFormateada = this.fechaSeleccionada.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  return `${dias[diaSemana]}, ${fechaFormateada}`;
+}  /**
+   * Selecciona una fecha en el calendario
+   * @param dia Fecha seleccionada
+   */
+  seleccionarFecha(dia: Date) {
+  // Usar fecha local (sin UTC)
+  const diaLocal = new Date(dia.getFullYear(), dia.getMonth(), dia.getDate());
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  if (diaLocal < hoy && diaLocal.toDateString() !== hoy.toDateString()) {
+    return; // No permitir fechas pasadas
+  }
+
+  if (!this.diaDisponible(diaLocal)) {
+    return; // No permitir días no disponibles
+  }
+
+  this.fechaSeleccionada = diaLocal;
+  this.fechaConsulta = diaLocal.toISOString().split('T')[0]; // Guardar como ISO para el backend
+  this.mostrarCalendario = false;
+  this.resultadoDisponibilidad = null;
+
+  console.log('Fecha seleccionada (local):', diaLocal);
+  console.log('Día de la semana (local):', diaLocal.getDay()); // 0=domingo, 6=sábado
+}
+
+  /**
+   * Alterna la visibilidad del calendario
+   */
+  toggleCalendario() {
+    this.mostrarCalendario = !this.mostrarCalendario;
+    if (this.mostrarCalendario) {
+      this.actualizarCalendario();
+    }
+  }
+
+  /**
+   * Genera horas disponibles para selección
+   * @param horaMinima Hora mínima a partir de la cual generar opciones
+   * @returns Array de horas disponibles formateadas
+   */
+  generarHorasDisponibles(horaMinima?: string): string[] {
+    const horas: string[] = [];
+    for (let i = 8; i <= 20; i++) {
+      for (let j = 0; j < 60; j += 30) {
+        const hora = `${i.toString().padStart(2, '0')}:${j.toString().padStart(2, '0')}`;
+        if (!horaMinima || hora > horaMinima) {
+          horas.push(hora);
+        }
+      }
+    }
+    return horas;
+  }
+
+  /**
+   * Verifica la disponibilidad del servicio para la fecha y hora seleccionadas
+   */
   async verificarDisponibilidad() {
     if (!this.fechaConsulta || !this.horaInicio || !this.horaFin || !this.servicio()) {
       return;
     }
 
     this.verificandoDisponibilidad.set(true);
+    this.resultadoDisponibilidad = null;
 
     try {
+      // Verificar contra horarios del servicio
+      const diaSemana = new Date(this.fechaConsulta).getDay();
+      const diasMap: {[key: number]: string} = {
+        0: 'domingo', 1: 'lunes', 2: 'martes', 3: 'miercoles', 
+        4: 'jueves', 5: 'viernes', 6: 'sabado'
+      };
+      
+      const diaNombre = diasMap[diaSemana];
+      const horarioDia = this.servicio()?.horarios?.find(h => 
+        h.dia_semana.toLowerCase() === diaNombre && h.activo
+      );
+
+      if (!horarioDia) {
+        this.resultadoDisponibilidad = false;
+        return;
+      }
+
+      // Verificar contra reservas existentes
       const resultado = await this.turismoService.verificarDisponibilidadServicio(
         this.servicio()!.id,
         this.fechaConsulta,
@@ -666,11 +428,28 @@ export class ServicioDetalleComponent implements OnInit {
     }
   }
 
-  // Métodos para galería de imágenes
+  /**
+   * Obtiene la URL de la imagen actual a mostrar
+   */
+  get imagenActual(): string {
+    const serv = this.servicio();
+    if (serv?.sliders && serv.sliders.length > 0) {
+      return serv.sliders[this.imagenIndex()].url_completa;
+    }
+    return '/assets/general/placeholder-service.jpg';
+  }
+
+  /**
+   * Cambia a una imagen específica de la galería
+   * @param index Índice de la imagen a mostrar
+   */
   cambiarImagen(index: number) {
     this.imagenIndex.set(index);
   }
 
+  /**
+   * Navega a la imagen anterior en la galería
+   */
   imagenAnterior() {
     const serv = this.servicio();
     if (serv?.sliders && serv.sliders.length > 0) {
@@ -680,6 +459,9 @@ export class ServicioDetalleComponent implements OnInit {
     }
   }
 
+  /**
+   * Navega a la siguiente imagen en la galería
+   */
   imagenSiguiente() {
     const serv = this.servicio();
     if (serv?.sliders && serv.sliders.length > 0) {
@@ -689,51 +471,55 @@ export class ServicioDetalleComponent implements OnInit {
     }
   }
 
-  // Métodos de navegación
-  volverAServicios() {
-    this.router.navigate(['/servicios']);
-  }
-
-  verOtroServicio(servicioId: number) {
-    this.router.navigate(['/servicios', servicioId]);
-  }
-
-  contactarWhatsApp() {
-    const servicio = this.servicio();
-    if (servicio?.emprendedor?.telefono) {
-      const telefono = servicio.emprendedor.telefono.replace(/\D/g, '');
-      const mensaje = `Hola, estoy interesado en el servicio "${servicio.nombre}". ¿Podrías darme más información?`;
-      const url = `https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`;
-      window.open(url, '_blank');
-    }
-  }
-
-  // Métodos utilitarios
+  /**
+   * Agrupa y ordena los horarios del servicio por día
+   * @returns Array de horarios agrupados y ordenados
+   */
   obtenerHorariosAgrupados() {
     const servicio = this.servicio();
     if (!servicio?.horarios) return [];
 
     const diasOrden = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
-    const horariosAgrupados = new Map();
+    const horariosAgrupados = new Map<string, any>();
 
-    // Agrupar horarios por día
-    servicio.horarios.forEach(horario => {
-      if (!horariosAgrupados.has(horario.dia_semana)) {
-        horariosAgrupados.set(horario.dia_semana, horario);
-      }
-    });
+    servicio.horarios
+      .sort((a, b) => diasOrden.indexOf(a.dia_semana) - diasOrden.indexOf(b.dia_semana))
+      .forEach(horario => {
+        if (!horariosAgrupados.has(horario.dia_semana)) {
+          horariosAgrupados.set(horario.dia_semana, {
+            ...horario,
+            formateado: this.formatearRangoHorario(horario.hora_inicio, horario.hora_fin)
+          });
+        }
+      });
 
-    // Ordenar por días de la semana y agregar días faltantes
     return diasOrden.map(dia => {
       return horariosAgrupados.get(dia) || {
         dia_semana: dia,
         hora_inicio: '',
         hora_fin: '',
-        activo: false
+        activo: false,
+        formateado: 'Cerrado'
       };
     });
   }
 
+  /**
+   * Formatea un rango de horas
+   * @param inicio Hora de inicio
+   * @param fin Hora de fin
+   * @returns Rango de horas formateado
+   */
+  formatearRangoHorario(inicio: string, fin: string): string {
+    if (!inicio || !fin) return '';
+    return `${this.formatearHora(inicio)} - ${this.formatearHora(fin)}`;
+  }
+
+  /**
+   * Formatea un nombre de día completo
+   * @param dia Nombre del día a formatear
+   * @returns Nombre del día formateado
+   */
   formatearDiaCompleto(dia: string): string {
     const dias: {[key: string]: string} = {
       'lunes': 'Lunes',
@@ -747,35 +533,85 @@ export class ServicioDetalleComponent implements OnInit {
     return dias[dia.toLowerCase()] || dia;
   }
 
+  /**
+   * Formatea una hora de 24h a 12h
+   * @param hora Hora a formatear
+   * @returns Hora formateada en formato 12h
+   */
   formatearHora(hora: string): string {
     if (!hora) return '';
 
-    // Convertir de formato 24h a 12h
-    const [horas, minutos] = hora.split(':');
-    const hora24 = parseInt(horas);
-    const hora12 = hora24 === 0 ? 12 : hora24 > 12 ? hora24 - 12 : hora24;
-    const periodo = hora24 >= 12 ? 'PM' : 'AM';
-
-    return `${hora12}:${minutos} ${periodo}`;
+    try {
+      const [horasStr, minutosStr] = hora.split(':');
+      const horas = parseInt(horasStr, 10);
+      const minutos = minutosStr ? parseInt(minutosStr, 10) : 0;
+      
+      const periodo = horas >= 12 ? 'PM' : 'AM';
+      const horas12 = horas % 12 || 12;
+      
+      return `${horas12}:${minutos.toString().padStart(2, '0')} ${periodo}`;
+    } catch (error) {
+      console.error('Error al formatear hora:', error);
+      return hora;
+    }
   }
+
+  /**
+   * Formatea una fecha completa
+   * @param fecha Fecha a formatear
+   * @returns Fecha formateada
+   */
+  formatearFecha(fecha: string): string {
+    if (!fecha) return '';
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-ES', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+
+  /**
+   * Limpia el formulario de reserva
+   */
+  limpiarFormulario() {
+    this.fechaConsulta = '';
+    this.horaInicio = '';
+    this.horaFin = '';
+    this.fechaSeleccionada = null;
+    this.resultadoDisponibilidad = null;
+    this.mostrarCalendario = false;
+  }
+
+  /**
+   * Verifica si el usuario está autenticado
+   * @returns true si el usuario está autenticado
+   */
   estaAutenticado(): boolean {
     return this.authService.isLoggedIn();
   }
 
   /**
-   * Redirige al login con parámetro de retorno
+   * Navega a la página de login con parámetros de redirección
    */
   irAlLogin() {
     const currentUrl = this.router.url;
     this.router.navigate(['/login'], {
-      queryParams: { redirect: currentUrl }
+      queryParams: { 
+        redirect: currentUrl,
+        servicio: this.servicio()?.id 
+      },
+      state: { 
+        mostrarMensaje: true 
+      }
     });
   }
 
   /**
-   * Agrega el servicio al carrito
+   * Agrega el servicio al carrito de compras
    */
-  async agregarAlCarrito() {
+ async agregarAlCarrito() {
     if (!this.estaAutenticado()) {
       this.irAlLogin();
       return;
@@ -796,20 +632,25 @@ export class ServicioDetalleComponent implements OnInit {
         servicio_id: servicio.id,
         emprendedor_id: servicio.emprendedor_id,
         fecha_inicio: this.fechaConsulta,
-        fecha_fin: this.fechaConsulta, // Mismo día por ahora
+        fecha_fin: this.fechaConsulta,
         hora_inicio: this.horaInicio + ':00',
         hora_fin: this.horaFin + ':00',
         duracion_minutos: duracionMinutos,
         cantidad: 1,
-        notas_cliente: `Servicio: ${servicio.nombre}`
+        notas_cliente: `Servicio: ${servicio.nombre}`,
+        ...(this.imagenActual && { imagen_url: this.imagenActual }),
+        ...(servicio.nombre && { nombre_servicio: servicio.nombre })
       };
 
-      await this.carritoService.agregarAlCarrito(item).toPromise();
+      const respuesta = await this.carritoService.agregarAlCarrito(item).toPromise();
 
-      this.mostrarMensajeExito('¡Servicio agregado al carrito exitosamente!');
-
-      // Limpiar formulario después de agregar
-      this.limpiarFormularioDisponibilidad();
+      if (respuesta?.exito) {
+        this.mostrarMensajeExito('¡Servicio agregado al carrito exitosamente!');
+        this.limpiarFormulario();
+        // El servicio debería emitir la actualización automáticamente
+      } else {
+        throw new Error(respuesta?.mensaje || 'Error desconocido al agregar al carrito');
+      }
 
     } catch (error: any) {
       console.error('Error al agregar al carrito:', error);
@@ -817,37 +658,29 @@ export class ServicioDetalleComponent implements OnInit {
     } finally {
       this.agregandoAlCarrito.set(false);
     }
-  }
+}
 
   /**
-   * Va directamente al carrito
-   */
-  irAlCarrito() {
-    this.router.navigate(['/carrito']);
-  }
-
-  /**
-   * Valida que los datos necesarios estén completos
+   * Valida los datos del formulario de reserva
+   * @returns true si los datos son válidos
    */
   private validarDatosCarrito(): boolean {
+    const errores: string[] = [];
+
     if (!this.fechaConsulta) {
-      this.mostrarMensajeError('Selecciona una fecha para la reserva');
-      return false;
+      errores.push('Selecciona una fecha para la reserva');
     }
 
     if (!this.horaInicio) {
-      this.mostrarMensajeError('Selecciona una hora de inicio');
-      return false;
+      errores.push('Selecciona una hora de inicio');
     }
 
     if (!this.horaFin) {
-      this.mostrarMensajeError('Selecciona una hora de fin');
-      return false;
+      errores.push('Selecciona una hora de fin');
     }
 
     if (this.resultadoDisponibilidad !== true) {
-      this.mostrarMensajeError('Primero verifica la disponibilidad del servicio');
-      return false;
+      errores.push('Primero verifica la disponibilidad del servicio');
     }
 
     const fechaSeleccionada = new Date(this.fechaConsulta);
@@ -855,12 +688,15 @@ export class ServicioDetalleComponent implements OnInit {
     hoy.setHours(0, 0, 0, 0);
 
     if (fechaSeleccionada < hoy) {
-      this.mostrarMensajeError('La fecha no puede ser anterior a hoy');
-      return false;
+      errores.push('La fecha no puede ser anterior a hoy');
     }
 
     if (!this.validarHorarios()) {
-      this.mostrarMensajeError('La hora de fin debe ser posterior a la hora de inicio');
+      errores.push('La hora de fin debe ser posterior a la hora de inicio');
+    }
+
+    if (errores.length > 0) {
+      this.mostrarMensajeError(errores.join('<br>'));
       return false;
     }
 
@@ -868,51 +704,65 @@ export class ServicioDetalleComponent implements OnInit {
   }
 
   /**
-   * Valida que los horarios sean lógicos
+   * Valida que la hora de fin sea posterior a la de inicio
+   * @returns true si los horarios son válidos
    */
   private validarHorarios(): boolean {
-    const inicio = new Date(`1970-01-01T${this.horaInicio}:00`);
-    const fin = new Date(`1970-01-01T${this.horaFin}:00`);
-    return fin > inicio;
+    try {
+      const inicio = new Date(`1970-01-01T${this.horaInicio}:00`);
+      const fin = new Date(`1970-01-01T${this.horaFin}:00`);
+      return fin > inicio;
+    } catch (error) {
+      console.error('Error al validar horarios:', error);
+      return false;
+    }
   }
 
   /**
-   * Calcula la duración en minutos
+   * Calcula la duración en minutos entre hora de inicio y fin
+   * @returns Duración en minutos
    */
   calcularDuracionMinutos(): number {
     if (!this.horaInicio || !this.horaFin) return 0;
 
-    const inicio = new Date(`1970-01-01T${this.horaInicio}:00`);
-    const fin = new Date(`1970-01-01T${this.horaFin}:00`);
-    return Math.round((fin.getTime() - inicio.getTime()) / (1000 * 60));
+    try {
+      const inicio = new Date(`1970-01-01T${this.horaInicio}:00`);
+      const fin = new Date(`1970-01-01T${this.horaFin}:00`);
+      return Math.round((fin.getTime() - inicio.getTime()) / (1000 * 60));
+    } catch (error) {
+      console.error('Error al calcular duración:', error);
+      return 0;
+    }
   }
 
   /**
-   * Limpia el formulario de disponibilidad
-   */
-  private limpiarFormularioDisponibilidad() {
-    this.fechaConsulta = '';
-    this.horaInicio = '';
-    this.horaFin = '';
-    this.resultadoDisponibilidad = null;
-  }
-
-  /**
-   * Muestra mensaje de éxito
+   * Muestra un mensaje de éxito
+   * @param mensaje Mensaje a mostrar
    */
   private mostrarMensajeExito(mensaje: string) {
     this.mensajeCarrito.set(mensaje);
     this.tipoMensajeCarrito.set('success');
-    setTimeout(() => this.limpiarMensajesCarrito(), 5000);
+    
+    setTimeout(() => {
+      if (this.tipoMensajeCarrito() === 'success') {
+        this.limpiarMensajesCarrito();
+      }
+    }, 5000);
   }
 
   /**
-   * Muestra mensaje de error
+   * Muestra un mensaje de error
+   * @param mensaje Mensaje a mostrar
    */
   private mostrarMensajeError(mensaje: string) {
     this.mensajeCarrito.set(mensaje);
     this.tipoMensajeCarrito.set('error');
-    setTimeout(() => this.limpiarMensajesCarrito(), 5000);
+    
+    setTimeout(() => {
+      if (this.tipoMensajeCarrito() === 'error') {
+        this.limpiarMensajesCarrito();
+      }
+    }, 8000);
   }
 
   /**
@@ -924,9 +774,69 @@ export class ServicioDetalleComponent implements OnInit {
   }
 
   /**
+   * Navega a la página del carrito
+   */
+  irAlCarrito() {
+    this.router.navigate(['/carrito'], {
+      queryParams: { 
+        source: 'servicio_detalle',
+        servicio_id: this.servicio()?.id 
+      }
+    });
+  }
+
+  /**
    * Obtiene el número total de items en el carrito
+   * @returns Número total de items
    */
   getTotalItemsCarrito(): number {
     return this.carritoService.getTotalItems();
+  }
+
+  /**
+   * Navega de vuelta a la lista de servicios
+   */
+  volverAServicios() {
+    this.router.navigate(['/servicios']);
+  }
+
+  /**
+   * Navega a la página de otro servicio
+   * @param servicioId ID del servicio a ver
+   */
+  verOtroServicio(servicioId: number) {
+    this.router.navigate(['/servicios', servicioId]);
+  }
+
+  /**
+   * Inicia una conversación por WhatsApp con el emprendedor
+   */
+  contactarWhatsApp() {
+    const servicio = this.servicio();
+    if (servicio?.emprendedor?.telefono) {
+      const telefono = servicio.emprendedor.telefono.replace(/\D/g, '');
+      const nombreServicio = encodeURIComponent(servicio.nombre);
+      const mensaje = `Hola, estoy interesado en el servicio "${nombreServicio}" que vi en su catálogo. ¿Podría darme más información?`;
+      const url = `https://wa.me/51${telefono}?text=${mensaje}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
+
+  /**
+   * Verifica si el dispositivo es móvil
+   * @returns true si es un dispositivo móvil
+   */
+  esMobile(): boolean {
+    return window.innerWidth < 768;
+  }
+
+  /**
+   * Función trackBy para optimizar rendimiento de ngFor
+   * @param index Índice del elemento
+   * @param servicio Objeto servicio
+   * @returns ID único del servicio
+   */
+  trackByServicioId(index: number, servicio: ServicioDetalle): number {
+    return servicio.id;
   }
 }

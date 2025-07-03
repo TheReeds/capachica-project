@@ -1,20 +1,20 @@
-  import { Component, OnInit, signal, computed, inject } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { RouterModule, Router } from '@angular/router';
-  import { FormsModule } from '@angular/forms';
-  import { EmprendimientosService } from './emprendimientos.service';
-  import {
-    Emprendimiento,
-    FiltrosEmprendimientos,
-    Asociacion,
-    PaginatedEmprendimientos
-  } from './emprendimiento.model';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { EmprendimientosService } from './emprendimientos.service';
+import {
+  Emprendimiento,
+  FiltrosEmprendimientos,
+  Asociacion,
+  PaginatedEmprendimientos
+} from './emprendimiento.model';
 
-  @Component({
-    selector: 'app-emprendimientos',
-    standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule],
-    template: `
+@Component({
+  selector: 'app-emprendimientos',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule],
+  template: `
             <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
               <!-- Hero Section -->
               <section class="relative text-white py-20"
@@ -781,11 +781,15 @@
   </div>
 
   <!-- Modal de Emprendimiento -->
-  <div *ngIf="emprendimientoModal()"
-      class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-start justify-center p-4 z-50 pt-8"
-      (click)="cerrarModal()">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-5xl w-full max-h-[85vh] overflow-auto shadow-2xl modal-content mt-8"
-        (click)="$event.stopPropagation()">
+<div 
+  *ngIf="emprendimientoModal()"
+  class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 mt-16"
+  (click)="cerrarModal()"
+>
+  <div 
+    class="modal-scroll bg-white dark:bg-gray-800 rounded-2xl max-w-5xl w-full max-h-[80vh] overflow-auto shadow-2xl"
+    (click)="$event.stopPropagation()"
+  >
 
       <!-- Header del modal -->
       <div class="relative">
@@ -869,6 +873,9 @@
                 <span class="text-gray-700 dark:text-gray-300">{{ emprendimientoModal()!.horario_atencion }}</span>
               </div>
             </div>
+            <div *ngIf="horarioTabla.length" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+</div>
+
           </div>
 
           <!-- Información adicional -->
@@ -972,7 +979,33 @@
           </div>
         </div>
       </div>
+<div *ngIf="emprendimientoModal()!.sliders_secundarios && emprendimientoModal()!.sliders_secundarios.length > 0"
+                  class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
 
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Galería</h2>
+
+                <!-- Grid limpio y espacioso -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div *ngFor="let slider of emprendimientoModal()!.sliders_secundarios" class="relative group">
+                    <!-- Imagen grande y limpia -->
+                    <img
+                      [src]="slider.url_completa"
+                      [alt]="slider.nombre"
+                      class="w-full h-64 object-cover rounded-lg shadow-md"
+                      onerror="this.src='/assets/general/placeholder-gallery.jpg'"
+                    >
+
+                    <!-- Texto limpio en la parte inferior con línea -->
+                    <div *ngIf="slider.descripcion" class="absolute bottom-0 left-0 right-0 text-white p-2">
+                      <div class="inline-block">
+                        <h5 class="text-xl font-semibold mb-1" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">{{ slider.descripcion.titulo }}</h5>
+                        <div class="w-full h-0.5 bg-white mb-1"></div>
+                      </div>
+                      <p class="opacity-90" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11px;">{{ slider.descripcion.descripcion }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
   <!-- Botones de acción del modal - Movido más abajo -->
   <div class="px-6 pb-6">
     <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -1005,9 +1038,22 @@
     </div>
   </div>
     `,
-    styles: [`
+  styles: [`
       /* Estilos CSS para el componente de Emprendimientos */
-
+        .modal-scroll::-webkit-scrollbar {
+          width: 8px;              
+        }
+        .modal-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .modal-scroll::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 4px;
+        }
+        .modal-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
         .line-clamp-1 {
           overflow: hidden;
           display: -webkit-box;
@@ -1845,423 +1891,476 @@
           }
         }
     `]
-  })
-  export class EmprendimientosComponent implements OnInit {
-    private emprendimientosService = inject(EmprendimientosService);
-    private router = inject(Router);
+})
+export class EmprendimientosComponent implements OnInit {
+  private emprendimientosService = inject(EmprendimientosService);
+  private router = inject(Router);
 
-    // Signals
-    emprendimientos = signal<Emprendimiento[]>([]);
-    emprendimientosOriginales = signal<Emprendimiento[]>([]);
-    asociaciones = signal<Asociacion[]>([]);
-    asociacionSeleccionada = signal<Asociacion | null>(null);
-    cargando = signal<boolean>(false);
-    vistaGrid = signal<boolean>(true);
-    paginacionDatos = signal<PaginatedEmprendimientos | null>(null);
-    emprendimientoModal = signal<Emprendimiento | null>(null);
+  // Signals
+  emprendimientos = signal<Emprendimiento[]>([]);
+  emprendimientosOriginales = signal<Emprendimiento[]>([]);
+  asociaciones = signal<Asociacion[]>([]);
+  asociacionSeleccionada = signal<Asociacion | null>(null);
+  cargando = signal<boolean>(false);
+  vistaGrid = signal<boolean>(true);
+  paginacionDatos = signal<PaginatedEmprendimientos | null>(null);
+  emprendimientoModal = signal<Emprendimiento | null>(null);
 
-    // 🔧 CORRECCIÓN: Mejor manejo de filtros con tipos correctos
-    filtros = signal<FiltrosEmprendimientos>({});
-    paginaActual = 1;
-    elementosPorPagina = 12;
+  // 🔧 CORRECCIÓN: Mejor manejo de filtros con tipos correctos
+  filtros = signal<FiltrosEmprendimientos>({});
+  paginaActual = 1;
+  elementosPorPagina = 12;
 
-    // 🔧 CORRECCIÓN: Lógica de filtros mejorada
-    emprendimientosFiltrados = computed(() => {
-      const filtrosActuales = this.filtros();
-      let resultado = [...this.emprendimientosOriginales()];
+  // 🔧 CORRECCIÓN: Lógica de filtros mejorada
+  emprendimientosFiltrados = computed(() => {
+    const filtrosActuales = this.filtros();
+    let resultado = [...this.emprendimientosOriginales()];
 
-      // Filtro por asociación con lógica clara
-      if (filtrosActuales.asociacion !== undefined) {
-        if (filtrosActuales.asociacion === 0) {
-          // Mostrar solo independientes
-          resultado = resultado.filter(emp => !emp.asociacion_id);
-        } else if (filtrosActuales.asociacion > 0) {
-          // Mostrar solo de asociación específica
-          resultado = resultado.filter(emp => emp.asociacion_id === filtrosActuales.asociacion);
-        }
+    // Filtro por asociación con lógica clara
+    if (filtrosActuales.asociacion !== undefined) {
+      if (filtrosActuales.asociacion === 0) {
+        // Mostrar solo independientes
+        resultado = resultado.filter(emp => !emp.asociacion_id);
+      } else if (filtrosActuales.asociacion > 0) {
+        // Mostrar solo de asociación específica
+        resultado = resultado.filter(emp => emp.asociacion_id === filtrosActuales.asociacion);
       }
-      // Si filtros.asociacion es undefined, se muestran todos
+    }
+    // Si filtros.asociacion es undefined, se muestran todos
 
-      // Filtro de búsqueda
-      if (filtrosActuales.busqueda?.trim()) {
-        const busqueda = filtrosActuales.busqueda.toLowerCase().trim();
-        resultado = resultado.filter(emp =>
-          emp.nombre.toLowerCase().includes(busqueda) ||
-          emp.descripcion.toLowerCase().includes(busqueda) ||
-          emp.categoria.toLowerCase().includes(busqueda) ||
-          emp.tipo_servicio.toLowerCase().includes(busqueda) ||
-          emp.ubicacion.toLowerCase().includes(busqueda) ||
-          emp.asociacion?.nombre.toLowerCase().includes(busqueda)
-        );
-      }
-
-      // 🆕 NUEVO: Filtro por categoría
-      if (filtrosActuales.categoria) {
-        resultado = resultado.filter(emp => emp.categoria === filtrosActuales.categoria);
-      }
-
-      // 🆕 NUEVO: Filtro por tipo de servicio
-      if (filtrosActuales.tipo_servicio) {
-        resultado = resultado.filter(emp => emp.tipo_servicio === filtrosActuales.tipo_servicio);
-      }
-
-      // 🆕 NUEVO: Filtro por facilidades de discapacidad
-      if (filtrosActuales.facilidades_discapacidad !== undefined) {
-        resultado = resultado.filter(emp => emp.facilidades_discapacidad === filtrosActuales.facilidades_discapacidad);
-      }
-
-      // 🆕 NUEVO: Filtro por métodos de pago
-      if (filtrosActuales.metodos_pago && filtrosActuales.metodos_pago.length > 0) {
-        resultado = resultado.filter(emp => {
-          const metodosPago = this.procesarMetodosPago(emp.metodos_pago);
-          return filtrosActuales.metodos_pago!.some(metodo =>
-            metodosPago.includes(metodo)
-          );
-        });
-      }
-
-      // 🆕 NUEVO: Filtro por rango de precios
-      if (filtrosActuales.precio_rango?.min !== undefined || filtrosActuales.precio_rango?.max !== undefined) {
-        resultado = resultado.filter(emp => {
-          const rango = this.formatearPrecioRango(emp.precio_rango || '');
-          if (!rango) return false;
-
-          const { min: minFiltro, max: maxFiltro } = filtrosActuales.precio_rango!;
-
-          if (minFiltro !== undefined && rango.max < minFiltro) return false;
-          if (maxFiltro !== undefined && rango.min > maxFiltro) return false;
-
-          return true;
-        });
-      }
-
-      return resultado;
-    });
-
-    // 🔧 CORRECCIÓN: Computed mejorado para estadísticas
-    estadisticasAsociaciones = computed(() => {
-      const emprendimientos = this.emprendimientosOriginales();
-      const asociaciones = this.asociaciones();
-      const filtrosActuales = this.filtros();
-
-      return asociaciones.map(asociacion => {
-        // Contar emprendimientos de esta asociación
-        const emprendimientosAsociacion = emprendimientos.filter(emp => emp.asociacion_id === asociacion.id);
-
-        // Aplicar filtros adicionales para mostrar cantidad filtrada
-        let emprendimientosFiltrados = emprendimientosAsociacion;
-
-        if (filtrosActuales.busqueda?.trim()) {
-          const busqueda = filtrosActuales.busqueda.toLowerCase().trim();
-          emprendimientosFiltrados = emprendimientosFiltrados.filter(emp =>
-            emp.nombre.toLowerCase().includes(busqueda) ||
-            emp.descripcion.toLowerCase().includes(busqueda) ||
-            emp.categoria.toLowerCase().includes(busqueda) ||
-            emp.tipo_servicio.toLowerCase().includes(busqueda) ||
-            emp.ubicacion.toLowerCase().includes(busqueda)
-          );
-        }
-
-        return {
-          ...asociacion,
-          cantidadEmprendimientos: emprendimientosAsociacion.length,
-          cantidadFiltrados: emprendimientosFiltrados.length,
-          emprendimientos: emprendimientosAsociacion
-        };
-      });
-    });
-
-    // 🔧 CORRECCIÓN: Computed mejorado para independientes
-    emprendimientosIndependientes = computed(() => {
-      const independientes = this.emprendimientosOriginales().filter(emp => !emp.asociacion_id);
-      const filtrosActuales = this.filtros();
-
-      if (!filtrosActuales.busqueda?.trim()) {
-        return independientes;
-      }
-
+    // Filtro de búsqueda
+    if (filtrosActuales.busqueda?.trim()) {
       const busqueda = filtrosActuales.busqueda.toLowerCase().trim();
-      return independientes.filter(emp =>
+      resultado = resultado.filter(emp =>
         emp.nombre.toLowerCase().includes(busqueda) ||
         emp.descripcion.toLowerCase().includes(busqueda) ||
         emp.categoria.toLowerCase().includes(busqueda) ||
         emp.tipo_servicio.toLowerCase().includes(busqueda) ||
-        emp.ubicacion.toLowerCase().includes(busqueda)
-      );
-    });
-
-    // 🆕 NUEVO: Estado del filtro actual
-    estadoFiltroActual = computed(() => {
-      const filtrosActuales = this.filtros();
-
-      if (filtrosActuales.asociacion === 0) {
-        return 'independientes';
-      } else if (filtrosActuales.asociacion && filtrosActuales.asociacion > 0) {
-        return 'asociacion';
-      } else {
-        return 'todos';
-      }
-    });
-
-    // 🔧 CORRECCIÓN: Computed para acceso a propiedades de filtros en el template
-    filtroActual = computed(() => this.filtros());
-
-    ngOnInit() {
-      this.cargarDatosIniciales();
-    }
-
-    private async cargarDatosIniciales() {
-      this.cargando.set(true);
-
-      try {
-        const [emprendimientosResponse, asociacionesResponse] = await Promise.all([
-          this.emprendimientosService.getEmprendimientos(this.paginaActual, this.elementosPorPagina).toPromise(),
-          this.emprendimientosService.getAsociaciones(1, 100).toPromise()
-        ]);
-
-        if (emprendimientosResponse) {
-          this.emprendimientosOriginales.set(emprendimientosResponse.data);
-          this.emprendimientos.set(emprendimientosResponse.data);
-          this.paginacionDatos.set(emprendimientosResponse);
-        }
-
-        if (asociacionesResponse) {
-          this.asociaciones.set(asociacionesResponse.data);
-        }
-
-      } catch (error) {
-        console.error('Error al cargar datos iniciales:', error);
-      } finally {
-        this.cargando.set(false);
-      }
-    }
-
-    // 🔧 CORRECCIÓN: Método de búsqueda mejorado
-    onBusquedaChange(valor: string) {
-      this.filtros.update(filtros => ({
-        ...filtros,
-        busqueda: valor
-      }));
-    }
-
-    // 🔧 CORRECCIÓN: Métodos de selección de asociación mejorados
-    seleccionarAsociacion(asociacion: Asociacion | null) {
-      this.asociacionSeleccionada.set(asociacion);
-      this.filtros.update(filtros => ({
-        ...filtros,
-        asociacion: asociacion?.id
-      }));
-    }
-
-    seleccionarIndependientes() {
-      this.asociacionSeleccionada.set(null);
-      this.filtros.update(filtros => ({
-        ...filtros,
-        asociacion: 0
-      }));
-    }
-
-    // 🆕 NUEVO: Mostrar todos los emprendimientos
-    mostrarTodos() {
-      this.asociacionSeleccionada.set(null);
-      this.filtros.update(filtros => ({
-        ...filtros,
-        asociacion: undefined
-      }));
-    }
-
-    // 🆕 NUEVO: Métodos para filtros adicionales
-    filtrarPorCategoria(categoria: string) {
-      this.filtros.update(filtros => ({
-        ...filtros,
-        categoria: categoria
-      }));
-    }
-
-    filtrarPorTipoServicio(tipoServicio: string) {
-      this.filtros.update(filtros => ({
-        ...filtros,
-        tipo_servicio: tipoServicio
-      }));
-    }
-
-    filtrarPorFacilidadesDiscapacidad(facilidades: boolean) {
-      this.filtros.update(filtros => ({
-        ...filtros,
-        facilidades_discapacidad: facilidades
-      }));
-    }
-
-    filtrarPorMetodosPago(metodos: string[]) {
-      this.filtros.update(filtros => ({
-        ...filtros,
-        metodos_pago: metodos
-      }));
-    }
-
-    filtrarPorRangoPrecios(rango: { min?: number; max?: number }) {
-      this.filtros.update(filtros => ({
-        ...filtros,
-        precio_rango: rango
-      }));
-    }
-
-    // 🔧 CORRECCIÓN: Limpiar filtros mejorado
-    limpiarFiltros() {
-      this.filtros.set({});
-      this.asociacionSeleccionada.set(null);
-      console.log('Filtros limpiados. Mostrando todos los emprendimientos.');
-    }
-
-    // 🔧 CORRECCIÓN: Verificación de filtros activos mejorada
-    tieneFiltrosActivos(): boolean {
-      const filtrosActuales = this.filtros();
-      return Boolean(
-        filtrosActuales.asociacion !== undefined ||
-        filtrosActuales.busqueda?.trim() ||
-        filtrosActuales.categoria ||
-        filtrosActuales.tipo_servicio ||
-        filtrosActuales.facilidades_discapacidad !== undefined ||
-        (filtrosActuales.metodos_pago && filtrosActuales.metodos_pago.length > 0) ||
-        filtrosActuales.precio_rango?.min !== undefined ||
-        filtrosActuales.precio_rango?.max !== undefined
+        emp.ubicacion.toLowerCase().includes(busqueda) ||
+        emp.asociacion?.nombre.toLowerCase().includes(busqueda)
       );
     }
 
-    // 🆕 NUEVO: Obtener descripción de filtros activos
-    obtenerDescripcionFiltros(): string {
-      const filtrosActuales = this.filtros();
-      const descripciones: string[] = [];
+    // 🆕 NUEVO: Filtro por categoría
+    if (filtrosActuales.categoria) {
+      resultado = resultado.filter(emp => emp.categoria === filtrosActuales.categoria);
+    }
 
-      if (filtrosActuales.asociacion === 0) {
-        descripciones.push('Independientes');
-      } else if (filtrosActuales.asociacion && filtrosActuales.asociacion > 0) {
-        const asociacion = this.asociaciones().find(a => a.id === filtrosActuales.asociacion);
-        if (asociacion) {
-          descripciones.push(`Asociación: ${asociacion.nombre}`);
-        }
-      }
+    // 🆕 NUEVO: Filtro por tipo de servicio
+    if (filtrosActuales.tipo_servicio) {
+      resultado = resultado.filter(emp => emp.tipo_servicio === filtrosActuales.tipo_servicio);
+    }
+
+    // 🆕 NUEVO: Filtro por facilidades de discapacidad
+    if (filtrosActuales.facilidades_discapacidad !== undefined) {
+      resultado = resultado.filter(emp => emp.facilidades_discapacidad === filtrosActuales.facilidades_discapacidad);
+    }
+
+    // 🆕 NUEVO: Filtro por métodos de pago
+    if (filtrosActuales.metodos_pago && filtrosActuales.metodos_pago.length > 0) {
+      resultado = resultado.filter(emp => {
+        const metodosPago = this.procesarMetodosPago(emp.metodos_pago);
+        return filtrosActuales.metodos_pago!.some(metodo =>
+          metodosPago.includes(metodo)
+        );
+      });
+    }
+
+    // 🆕 NUEVO: Filtro por rango de precios
+    if (filtrosActuales.precio_rango?.min !== undefined || filtrosActuales.precio_rango?.max !== undefined) {
+      resultado = resultado.filter(emp => {
+        const rango = this.formatearPrecioRango(emp.precio_rango || '');
+        if (!rango) return false;
+
+        const { min: minFiltro, max: maxFiltro } = filtrosActuales.precio_rango!;
+
+        if (minFiltro !== undefined && rango.max < minFiltro) return false;
+        if (maxFiltro !== undefined && rango.min > maxFiltro) return false;
+
+        return true;
+      });
+    }
+    return resultado;
+  });
+// dentro de tu componente .ts
+
+// orden para días de la semana
+// dentro de tu componente .ts
+
+// orden para días de la semana
+private diasSemana = [
+  'Lunes', 'Martes', 'Miércoles', 'Jueves',
+  'Viernes', 'Sábado', 'Domingo'
+];
+
+get horarioTabla(): { dia: string, apertura: string, cierre: string }[] {
+  const raw = this.emprendimientoModal()?.horario_atencion as string;
+  if (!raw) return [];
+
+  // separa parte de días / horas
+  const [diasPart, horasPart] = raw.split(':').map(s => s.trim());
+  const [apertura, cierre] = horasPart?.split('-').map(s => s.trim()) ?? ['', ''];
+
+  // 1) “Todos los días” o “Lunes a Domingo”
+  if (/todos los días/i.test(diasPart) || /lunes a domingo/i.test(diasPart)) {
+    return this.diasSemana.map(d => ({ dia: d, apertura, cierre }));
+  }
+
+  // 2) rango específico “Lunes a Sábado”, “Miércoles a Viernes”, etc.
+  const rangoMatch = diasPart.match(/^(?<inicio>\w+)\s*a\s*(?<fin>\w+)$/i);
+  if (rangoMatch?.groups) {
+    const inicio = this.capitalize(rangoMatch.groups['inicio']);
+    const fin    = this.capitalize(rangoMatch.groups['fin']);
+    const i = this.diasSemana.indexOf(inicio);
+    const f = this.diasSemana.indexOf(fin);
+    if (i !== -1 && f !== -1) {
+      // si i <= f, tomamos slice(i, f+1), si no (pierde-fin antes de inicios) unimos dos slices
+      const dias = i <= f
+        ? this.diasSemana.slice(i, f + 1)
+        : [...this.diasSemana.slice(i), ...this.diasSemana.slice(0, f + 1)];
+      return dias.map(d => ({ dia: d, apertura, cierre }));
+    }
+  }
+
+  // 3) lista puntual “Lunes, Miércoles y Viernes”
+  const diasBrutos = diasPart
+    .replace(/\sy\s/g, ',')
+    .split(',')
+    .map(d => this.capitalize(d.trim()));
+  const diasValidos = diasBrutos.filter(d => this.diasSemana.includes(d));
+  return diasValidos.map(dia => ({ dia, apertura, cierre }));
+}
+
+// Helper para normalizar mayúsculas iniciales
+private capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+
+  // 🔧 CORRECCIÓN: Computed mejorado para estadísticas
+  estadisticasAsociaciones = computed(() => {
+    const emprendimientos = this.emprendimientosOriginales();
+    const asociaciones = this.asociaciones();
+    const filtrosActuales = this.filtros();
+
+    return asociaciones.map(asociacion => {
+      // Contar emprendimientos de esta asociación
+      const emprendimientosAsociacion = emprendimientos.filter(emp => emp.asociacion_id === asociacion.id);
+
+      // Aplicar filtros adicionales para mostrar cantidad filtrada
+      let emprendimientosFiltrados = emprendimientosAsociacion;
 
       if (filtrosActuales.busqueda?.trim()) {
-        descripciones.push(`Búsqueda: "${filtrosActuales.busqueda}"`);
+        const busqueda = filtrosActuales.busqueda.toLowerCase().trim();
+        emprendimientosFiltrados = emprendimientosFiltrados.filter(emp =>
+          emp.nombre.toLowerCase().includes(busqueda) ||
+          emp.descripcion.toLowerCase().includes(busqueda) ||
+          emp.categoria.toLowerCase().includes(busqueda) ||
+          emp.tipo_servicio.toLowerCase().includes(busqueda) ||
+          emp.ubicacion.toLowerCase().includes(busqueda)
+        );
       }
 
-      if (filtrosActuales.categoria) {
-        descripciones.push(`Categoría: ${filtrosActuales.categoria}`);
-      }
-
-      if (filtrosActuales.tipo_servicio) {
-        descripciones.push(`Tipo: ${filtrosActuales.tipo_servicio}`);
-      }
-
-      return descripciones.join(', ');
-    }
-
-    // Resto de métodos existentes...
-    private async cargarEmprendimientos() {
-      this.cargando.set(true);
-
-      try {
-        const response = await this.emprendimientosService.getEmprendimientos(
-          this.paginaActual,
-          this.elementosPorPagina
-        ).toPromise();
-
-        if (response) {
-          this.emprendimientos.set(response.data);
-          this.emprendimientosOriginales.set(response.data);
-          this.paginacionDatos.set(response);
-        }
-      } catch (error) {
-        console.error('Error al cargar emprendimientos:', error);
-      } finally {
-        this.cargando.set(false);
-      }
-    }
-
-    async cambiarPagina(pagina: number) {
-      if (pagina < 1 || (this.paginacionDatos() && pagina > this.paginacionDatos()!.last_page)) {
-        return;
-      }
-
-      this.paginaActual = pagina;
-      await this.cargarEmprendimientos();
-    }
-
-    obtenerPaginasVisibles(): number[] {
-      const paginacion = this.paginacionDatos();
-      if (!paginacion) return [];
-
-      const paginaActual = paginacion.current_page;
-      const totalPaginas = paginacion.last_page;
-      const paginas: number[] = [];
-
-      const inicio = Math.max(1, paginaActual - 2);
-      const fin = Math.min(totalPaginas, inicio + 4);
-
-      for (let i = inicio; i <= fin; i++) {
-        paginas.push(i);
-      }
-
-      return paginas;
-    }
-
-    verDetalle(emprendimientoId: number) {
-      this.router.navigate(['/emprendimientos', emprendimientoId]);
-    }
-
-    abrirModal(emprendimiento: Emprendimiento) {
-      this.emprendimientoModal.set({ ...emprendimiento });
-    }
-
-    cerrarModal() {
-      this.emprendimientoModal.set(null);
-    }
-
-    contarEmprendimientosPorAsociacion(asociacionId: number): number {
-      return this.emprendimientosOriginales().filter(emp => emp.asociacion_id === asociacionId).length;
-    }
-
-    contarEmprendimientosIndependientes(): number {
-      return this.emprendimientosOriginales().filter(emp => !emp.asociacion_id).length;
-    }
-
-    obtenerNombreAsociacion(asociacionId: number): string {
-      if (asociacionId === 0) return 'Independientes';
-      const asociacion = this.asociaciones().find(asoc => asoc.id === asociacionId);
-      return asociacion?.nombre || '';
-    }
-
-    obtenerCalificacion(emprendimientoId: number): number {
-      return this.calificaciones().get(emprendimientoId) || 0;
-    }
-
-    obtenerImagenPrincipal(emprendimiento: Emprendimiento): string {
-      return this.emprendimientosService.obtenerImagenPrincipal(emprendimiento);
-    }
-
-    procesarMetodosPago(metodos: any): string[] {
-      return this.emprendimientosService.procesarMetodosPago(metodos);
-    }
-
-    procesarIdiomasHablados(idiomas: any): string[] {
-      return this.emprendimientosService.procesarIdiomasHablados(idiomas);
-    }
-
-    estaAbierto(horario: string): boolean {
-      return this.emprendimientosService.estaAbierto(horario);
-    }
-
-    formatearPrecioRango(rango: string): { min: number; max: number } | null {
-      return this.emprendimientosService.formatearPrecioRango(rango);
-    }
-
-    calificaciones = computed(() => {
-      const calificacionesMap = new Map<number, number>();
-      this.emprendimientosFiltrados().forEach(emp => {
-        const calificacion = this.emprendimientosService.calcularCalificacionPromedio(emp);
-        calificacionesMap.set(emp.id, calificacion);
-      });
-      return calificacionesMap;
+      return {
+        ...asociacion,
+        cantidadEmprendimientos: emprendimientosAsociacion.length,
+        cantidadFiltrados: emprendimientosFiltrados.length,
+        emprendimientos: emprendimientosAsociacion
+      };
     });
+  });
+
+  // 🔧 CORRECCIÓN: Computed mejorado para independientes
+  emprendimientosIndependientes = computed(() => {
+    const independientes = this.emprendimientosOriginales().filter(emp => !emp.asociacion_id);
+    const filtrosActuales = this.filtros();
+
+    if (!filtrosActuales.busqueda?.trim()) {
+      return independientes;
+    }
+
+    const busqueda = filtrosActuales.busqueda.toLowerCase().trim();
+    return independientes.filter(emp =>
+      emp.nombre.toLowerCase().includes(busqueda) ||
+      emp.descripcion.toLowerCase().includes(busqueda) ||
+      emp.categoria.toLowerCase().includes(busqueda) ||
+      emp.tipo_servicio.toLowerCase().includes(busqueda) ||
+      emp.ubicacion.toLowerCase().includes(busqueda)
+    );
+  });
+
+  // 🆕 NUEVO: Estado del filtro actual
+  estadoFiltroActual = computed(() => {
+    const filtrosActuales = this.filtros();
+
+    if (filtrosActuales.asociacion === 0) {
+      return 'independientes';
+    } else if (filtrosActuales.asociacion && filtrosActuales.asociacion > 0) {
+      return 'asociacion';
+    } else {
+      return 'todos';
+    }
+  });
+
+  // 🔧 CORRECCIÓN: Computed para acceso a propiedades de filtros en el template
+  filtroActual = computed(() => this.filtros());
+
+  ngOnInit() {
+    this.cargarDatosIniciales();
   }
+
+  private async cargarDatosIniciales() {
+    this.cargando.set(true);
+
+    try {
+      const [emprendimientosResponse, asociacionesResponse] = await Promise.all([
+        this.emprendimientosService.getEmprendimientos(this.paginaActual, this.elementosPorPagina).toPromise(),
+        this.emprendimientosService.getAsociaciones(1, 100).toPromise()
+      ]);
+
+      if (emprendimientosResponse) {
+        this.emprendimientosOriginales.set(emprendimientosResponse.data);
+        this.emprendimientos.set(emprendimientosResponse.data);
+        this.paginacionDatos.set(emprendimientosResponse);
+      }
+
+      if (asociacionesResponse) {
+        this.asociaciones.set(asociacionesResponse.data);
+      }
+
+    } catch (error) {
+      console.error('Error al cargar datos iniciales:', error);
+    } finally {
+      this.cargando.set(false);
+    }
+  }
+
+  // 🔧 CORRECCIÓN: Método de búsqueda mejorado
+  onBusquedaChange(valor: string) {
+    this.filtros.update(filtros => ({
+      ...filtros,
+      busqueda: valor
+    }));
+  }
+
+  // 🔧 CORRECCIÓN: Métodos de selección de asociación mejorados
+  seleccionarAsociacion(asociacion: Asociacion | null) {
+    this.asociacionSeleccionada.set(asociacion);
+    this.filtros.update(filtros => ({
+      ...filtros,
+      asociacion: asociacion?.id
+    }));
+  }
+
+  seleccionarIndependientes() {
+    this.asociacionSeleccionada.set(null);
+    this.filtros.update(filtros => ({
+      ...filtros,
+      asociacion: 0
+    }));
+  }
+
+  // 🆕 NUEVO: Mostrar todos los emprendimientos
+  mostrarTodos() {
+    this.asociacionSeleccionada.set(null);
+    this.filtros.update(filtros => ({
+      ...filtros,
+      asociacion: undefined
+    }));
+  }
+
+  // 🆕 NUEVO: Métodos para filtros adicionales
+  filtrarPorCategoria(categoria: string) {
+    this.filtros.update(filtros => ({
+      ...filtros,
+      categoria: categoria
+    }));
+  }
+
+  filtrarPorTipoServicio(tipoServicio: string) {
+    this.filtros.update(filtros => ({
+      ...filtros,
+      tipo_servicio: tipoServicio
+    }));
+  }
+
+  filtrarPorFacilidadesDiscapacidad(facilidades: boolean) {
+    this.filtros.update(filtros => ({
+      ...filtros,
+      facilidades_discapacidad: facilidades
+    }));
+  }
+
+  filtrarPorMetodosPago(metodos: string[]) {
+    this.filtros.update(filtros => ({
+      ...filtros,
+      metodos_pago: metodos
+    }));
+  }
+
+  filtrarPorRangoPrecios(rango: { min?: number; max?: number }) {
+    this.filtros.update(filtros => ({
+      ...filtros,
+      precio_rango: rango
+    }));
+  }
+
+  // 🔧 CORRECCIÓN: Limpiar filtros mejorado
+  limpiarFiltros() {
+    this.filtros.set({});
+    this.asociacionSeleccionada.set(null);
+    console.log('Filtros limpiados. Mostrando todos los emprendimientos.');
+  }
+
+  // 🔧 CORRECCIÓN: Verificación de filtros activos mejorada
+  tieneFiltrosActivos(): boolean {
+    const filtrosActuales = this.filtros();
+    return Boolean(
+      filtrosActuales.asociacion !== undefined ||
+      filtrosActuales.busqueda?.trim() ||
+      filtrosActuales.categoria ||
+      filtrosActuales.tipo_servicio ||
+      filtrosActuales.facilidades_discapacidad !== undefined ||
+      (filtrosActuales.metodos_pago && filtrosActuales.metodos_pago.length > 0) ||
+      filtrosActuales.precio_rango?.min !== undefined ||
+      filtrosActuales.precio_rango?.max !== undefined
+    );
+  }
+
+  // 🆕 NUEVO: Obtener descripción de filtros activos
+  obtenerDescripcionFiltros(): string {
+    const filtrosActuales = this.filtros();
+    const descripciones: string[] = [];
+
+    if (filtrosActuales.asociacion === 0) {
+      descripciones.push('Independientes');
+    } else if (filtrosActuales.asociacion && filtrosActuales.asociacion > 0) {
+      const asociacion = this.asociaciones().find(a => a.id === filtrosActuales.asociacion);
+      if (asociacion) {
+        descripciones.push(`Asociación: ${asociacion.nombre}`);
+      }
+    }
+
+    if (filtrosActuales.busqueda?.trim()) {
+      descripciones.push(`Búsqueda: "${filtrosActuales.busqueda}"`);
+    }
+
+    if (filtrosActuales.categoria) {
+      descripciones.push(`Categoría: ${filtrosActuales.categoria}`);
+    }
+
+    if (filtrosActuales.tipo_servicio) {
+      descripciones.push(`Tipo: ${filtrosActuales.tipo_servicio}`);
+    }
+
+    return descripciones.join(', ');
+  }
+
+  // Resto de métodos existentes...
+  private async cargarEmprendimientos() {
+    this.cargando.set(true);
+
+    try {
+      const response = await this.emprendimientosService.getEmprendimientos(
+        this.paginaActual,
+        this.elementosPorPagina
+      ).toPromise();
+
+      if (response) {
+        this.emprendimientos.set(response.data);
+        this.emprendimientosOriginales.set(response.data);
+        this.paginacionDatos.set(response);
+      }
+    } catch (error) {
+      console.error('Error al cargar emprendimientos:', error);
+    } finally {
+      this.cargando.set(false);
+    }
+  }
+
+  async cambiarPagina(pagina: number) {
+    if (pagina < 1 || (this.paginacionDatos() && pagina > this.paginacionDatos()!.last_page)) {
+      return;
+    }
+
+    this.paginaActual = pagina;
+    await this.cargarEmprendimientos();
+  }
+
+  obtenerPaginasVisibles(): number[] {
+    const paginacion = this.paginacionDatos();
+    if (!paginacion) return [];
+
+    const paginaActual = paginacion.current_page;
+    const totalPaginas = paginacion.last_page;
+    const paginas: number[] = [];
+
+    const inicio = Math.max(1, paginaActual - 2);
+    const fin = Math.min(totalPaginas, inicio + 4);
+
+    for (let i = inicio; i <= fin; i++) {
+      paginas.push(i);
+    }
+
+    return paginas;
+  }
+
+  verDetalle(emprendimientoId: number) {
+    this.router.navigate(['/emprendimientos', emprendimientoId]);
+  }
+
+  abrirModal(emprendimiento: Emprendimiento) {
+    this.emprendimientoModal.set({ ...emprendimiento });
+  }
+
+  cerrarModal() {
+    this.emprendimientoModal.set(null);
+  }
+
+  contarEmprendimientosPorAsociacion(asociacionId: number): number {
+    return this.emprendimientosOriginales().filter(emp => emp.asociacion_id === asociacionId).length;
+  }
+
+  contarEmprendimientosIndependientes(): number {
+    return this.emprendimientosOriginales().filter(emp => !emp.asociacion_id).length;
+  }
+
+  obtenerNombreAsociacion(asociacionId: number): string {
+    if (asociacionId === 0) return 'Independientes';
+    const asociacion = this.asociaciones().find(asoc => asoc.id === asociacionId);
+    return asociacion?.nombre || '';
+  }
+
+  obtenerCalificacion(emprendimientoId: number): number {
+    return this.calificaciones().get(emprendimientoId) || 0;
+  }
+
+  obtenerImagenPrincipal(emprendimiento: Emprendimiento): string {
+    return this.emprendimientosService.obtenerImagenPrincipal(emprendimiento);
+  }
+
+  procesarMetodosPago(metodos: any): string[] {
+    return this.emprendimientosService.procesarMetodosPago(metodos);
+  }
+
+  procesarIdiomasHablados(idiomas: any): string[] {
+    return this.emprendimientosService.procesarIdiomasHablados(idiomas);
+  }
+
+  estaAbierto(horario: string): boolean {
+    return this.emprendimientosService.estaAbierto(horario);
+  }
+
+  formatearPrecioRango(rango: string): { min: number; max: number } | null {
+    return this.emprendimientosService.formatearPrecioRango(rango);
+  }
+
+  calificaciones = computed(() => {
+    const calificacionesMap = new Map<number, number>();
+    this.emprendimientosFiltrados().forEach(emp => {
+      const calificacion = this.emprendimientosService.calcularCalificacionPromedio(emp);
+      calificacionesMap.set(emp.id, calificacion);
+    });
+    return calificacionesMap;
+  });
+}
