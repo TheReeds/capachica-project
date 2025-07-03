@@ -1,219 +1,382 @@
+/* Estilos globales */
 * {
-    box-sizing: border-box;
-  }
+  box-sizing: border-box;
+}
 
-  body {
-    font-size: 14px;
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
-
-  .v71_49 {
-    width: 100%;
-    height: 4692px;
-    background: rgba(255,244,236,1);
+  to {
     opacity: 1;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    overflow: hidden;
+    transform: translateY(0);
   }
+}
 
-  .v71_50, .v71_51, .v71_52, .v71_53, .v71_54 {
-    color: rgba(0,0,0,1);
-    font-family: 'Myanmar Sans Pro', sans-serif;
-    font-weight: regular;
-    font-size: 20px;
-    text-align: left;
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
   }
-
-  .v71_50 {
-    position: absolute;
-    top: 40px;
-    left: 110px;
-  }
-
-  .v71_51 {
-    position: absolute;
-    top: 47px;
-    left: 607px;
-  }
-
-  .v71_52 {
-    position: absolute;
-    top: 45px;
-    left: 762px;
-  }
-
-  .v71_53 {
-    position: absolute;
-    top: 45px;
-    left: 980px;
-  }
-
-  .v71_54 {
-    position: absolute;
-    top: 47px;
-    left: 433px;
-  }
-
-  .v71_55, .v71_57, .v71_58, .v71_60, .v71_61, .v71_62, .v71_63, .v71_64 {
-    width: 100px;
-    height: 100px;
-    background: #ccc;
-    text-align: center;
-    line-height: 100px;
-    color: white;
-    font-size: 16px;
-    font-family: 'Montserrat', sans-serif;
-  }
-
-  .v71_55 {
-    background: rgba(193,68,14,1);
-    position: absolute;
-    top: 15px;
-    left: 3px;
-  }
-
-  .v71_57 {
-    background: #aaa;
-    position: absolute;
-    top: 40px;
-    left: 276px;
-  }
-
-  .v71_58 {
-    background: #aaa;
-    position: absolute;
-    top: 37px;
-    left: 401px;
-  }
-
-  .v71_60 {
-    background: #aaa;
-    position: absolute;
-    top: 40px;
-    left: 729px;
-  }
-
-  .v71_61 {
-    background: #aaa;
-    position: absolute;
-    top: 45px;
-    left: 945px;
-  }
-
-  .v71_62, .v71_63 {
-    background: #eee;
-    opacity: 0.5;
-    position: absolute;
-    top: 282px;
-    left: 1387px;
-  }
-
-  .v71_64 {
-    background: rgba(193,68,14,1);
+  to {
     opacity: 1;
-    position: absolute;
-    top: 4452px;
-    left: 0px;
+    transform: translateX(0);
   }
+}
 
-  .v71_65, .v71_67, .v71_70, .v71_71 {
-    text-align: center;
-    font-family: 'Otomanopee One', sans-serif;
-    font-size: 16px;
-    color: white;
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
   }
-
-  .v71_65 {
-    position: absolute;
-    top: 4470px;
-    left: 20px;
+  50% {
+    transform: scale(1.05);
   }
-
-  .v71_67 {
-    position: absolute;
-    top: 545px;
-    left: 244px;
-  }
-
-  .v71_70 {
-    position: absolute;
-    top: 808px;
-    left: 78px;
-  }
-
-.cal-day{
-  background-color: #000;
-}
-/* Fondo general del calendario */
-::ng-deep .mwl-calendar-month-view {
-  background-color: #000 !important;
-  border: none !important;
-  padding: 0 !important;
 }
 
-/* Fondo negro para cada celda del grid */
-::ng-deep .mwl-calendar-month-view .cal-cell {
-  background-color: #000 !important;
-  border: 1px solid #111 !important;
+/* Clases de utilidad */
+.animate-fade-in {
+  animation: fadeInUp 1s ease-out;
 }
 
-/* Estilo base de cada día */
-::ng-deep .mwl-calendar-month-view .cal-day {
-  background-color: #000 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  height: 48px !important;
+.animate-slide-in {
+  animation: slideInRight 0.6s ease-out;
 }
 
-/* Día del mes (número) */
-::ng-deep .mwl-calendar-month-view .cal-day .cal-date {
-  background-color: #000 !important;
-  color: #fff !important;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: 0.5rem;
-  margin: 0 auto;
-  transition: background-color 0.3s ease;
+.animate-pulse {
+  animation: pulse 2s infinite;
 }
 
-/* Día actual */
-::ng-deep .mwl-calendar-month-view .cal-day.cal-today .cal-date {
-  background-color: #f97316 !important; /* naranja */
-  color: #fff !important;
+/* Texto con límite de líneas */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Hover sobre días */
-::ng-deep .mwl-calendar-month-view .cal-day:hover .cal-date {
-  background-color: #222 !important;
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Días fuera del mes (opacidad reducida) */
-::ng-deep .mwl-calendar-month-view .cal-day:not(.cal-in-month) {
-  opacity: 0.4;
+/* Efectos de hover */
+.hover-lift {
+  transition: all 0.3s ease;
 }
 
-/* Cabecera (L, M, M...) */
-::ng-deep .mwl-calendar-month-view .cal-header {
-  background-color: #000 !important;
-  color: #fff !important;
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradientes personalizados */
+.gradient-orange {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.gradient-orange-light {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+}
+
+/* Backdrop blur personalizado */
+.backdrop-blur-custom {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Sombras personalizadas */
+.shadow-orange {
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.3);
+}
+
+.shadow-orange-lg {
+  box-shadow: 0 20px 60px rgba(249, 115, 22, 0.4);
+}
+
+/* Estilos para el calendario */
+:host ::ng-deep .cal-month-view {
+  background-color: transparent;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+:host ::ng-deep .cal-month-view .cal-header {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-bottom: 1px solid #d1d5db;
+  padding: 1rem;
   font-weight: 600;
-  font-size: 13px;
-  text-transform: uppercase;
-  border-bottom: 1px solid #111 !important;
 }
 
-/* Bordes de tabla más oscuros */
-::ng-deep .mwl-calendar-month-view table,
-::ng-deep .mwl-calendar-month-view td,
-::ng-deep .mwl-calendar-month-view th {
-  border-color: #111 !important;
+:host ::ng-deep .cal-month-view .cal-day-cell {
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem;
+  min-height: 80px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+:host ::ng-deep .cal-month-view .cal-day-cell:hover {
+  background-color: #fef3c7;
+  transform: scale(1.02);
+}
+
+:host ::ng-deep .cal-month-view .cal-day-cell.cal-today {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+  font-weight: bold;
+}
+
+:host ::ng-deep .cal-month-view .cal-day-cell.cal-today:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+}
+
+:host ::ng-deep .cal-month-view .cal-day-cell.cal-in-month {
+  background-color: white;
+  color: #374151;
+}
+
+:host ::ng-deep .cal-month-view .cal-day-cell.cal-out-month {
+  background-color: #f9fafb;
+  color: #9ca3af;
+}
+
+:host ::ng-deep .cal-month-view .cal-day-cell.cal-has-events {
+  background-color: #fef3c7;
+}
+
+:host ::ng-deep .cal-month-view .cal-day-cell.cal-has-events::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #f97316;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+/* Dark mode para el calendario */
+:host ::ng-deep .dark .cal-month-view .cal-header {
+  background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+  border-bottom: 1px solid #6b7280;
+  color: white;
+}
+
+:host ::ng-deep .dark .cal-month-view .cal-day-cell {
+  border-right: 1px solid #4b5563;
+  border-bottom: 1px solid #4b5563;
+  background-color: #1f2937;
+  color: white;
+}
+
+:host ::ng-deep .dark .cal-month-view .cal-day-cell:hover {
+  background-color: #92400e;
+}
+
+:host ::ng-deep .dark .cal-month-view .cal-day-cell.cal-out-month {
+  background-color: #111827;
+  color: #6b7280;
+}
+
+:host ::ng-deep .dark .cal-month-view .cal-day-cell.cal-has-events {
+  background-color: #92400e;
+}
+
+/* Estilos para el modal */
+.modal-overlay {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+}
+
+/* Efectos de transición para las tarjetas */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* Efectos de entrada escalonados */
+.stagger-animation {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.stagger-animation:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation:nth-child(2) { animation-delay: 0.2s; }
+.stagger-animation:nth-child(3) { animation-delay: 0.3s; }
+.stagger-animation:nth-child(4) { animation-delay: 0.4s; }
+.stagger-animation:nth-child(5) { animation-delay: 0.5s; }
+.stagger-animation:nth-child(6) { animation-delay: 0.6s; }
+
+/* Efectos de botones */
+.btn-primary {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid #f97316;
+  color: #f97316;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #f97316;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+}
+
+/* Efectos de loading */
+.loading-spinner {
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #f97316;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Parallax effect */
+.parallax-bg {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .parallax-bg {
+    background-attachment: scroll;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.125rem;
+  }
+  
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus states */
+button:focus,
+input:focus,
+select:focus {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .card-hover {
+    border: 2px solid #000;
+  }
+  
+  .btn-primary {
+    border: 2px solid #000;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-friendly {
+    background: white !important;
+    color: black !important;
+  }
 }

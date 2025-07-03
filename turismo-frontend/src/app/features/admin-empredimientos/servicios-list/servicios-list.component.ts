@@ -428,7 +428,7 @@ export class ServiciosListComponent implements OnInit {
       }
     } catch (err: any) {
       console.error('Error al actualizar servicio:', err);
-      alert(err.error?.message || 'Error al actualizar el servicio');
+      this.notificationService.error(err.error?.message || 'Error al actualizar el servicio');
     } finally {
       servicio.updating = false;
     }

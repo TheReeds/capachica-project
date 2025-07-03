@@ -8,10 +8,11 @@ export interface Emprendedor {
   nombre: string;
   tipo_servicio: string;
   descripcion: string;
-  // ... otros campos
+  telefono?: string;
+  email?: string;
+  ubicacion?: string;
 }
 
-// Nuevas interfaces para sliders
 export interface Slider {
   id: number;
   url: string;
@@ -24,8 +25,7 @@ export interface Slider {
   created_at: string;
   updated_at: string;
   url_completa: string;
-  // Agregado:
-    descripcion?: {
+  descripcion?: {
     id: number;
     slider_id: number;
     titulo: string;
@@ -37,32 +37,31 @@ export interface Evento {
   id: number;
   nombre: string;
   descripcion: string;
-  fecha: string; // Formato: YYYY-MM-DD
-  hora?: string; // Formato: HH:mm
+  fecha: string;
+  hora?: string;
   ubicacion?: string;
   mapaUrl?: string;
   tipo?: string;
   tipo_evento: string;
   fecha_inicio: string;
-    fecha_fin: string;
+  fecha_fin: string;
   hora_inicio: string;
-    hora_fin: string;
+  hora_fin: string;
   duracion_horas: string;
   imagen: string;
   destacado?: boolean;
   precio?: number;
-  precioIncluye?: string; // Añade esta línea
+  precioIncluye?: string;
   organizador?: string;
   ticketUrl?: string;
   duracion?: string;
   restricciones?: string;
-  // Nuevos campos agregados:
-    sliders_principales: Slider[];
-  sliders: Slider[];  
+  que_llevar?: string;
+  idioma_principal?: string;
+  sliders_principales: Slider[];
+  sliders: Slider[];
   emprendedor: Emprendedor;
 }
-
-
 
 interface ApiResponse {
   success: boolean;
@@ -86,18 +85,6 @@ export interface FiltrosEventos {
   };
 }
 
-export interface SliderEmprendimiento {
-  id: number;
-  url: string;
-  url_completa: string;
-  nombre: string;
-  es_principal: boolean;
-  tipo_entidad: string;
-  entidad_id: number;
-  orden: number;
-  activo: boolean;
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -105,55 +92,38 @@ export class EventosService {
   private http = inject(HttpClient);
   private readonly API_URL = environment.apiUrl;
 
-  obtenerEvento(id: number) {
+  obtenerEvento(id: number): Observable<any> {
     return this.http.get<any>(`${this.API_URL}/eventos/${id}`);
   }
-  obtenerEventos() {
-    return this.http.get<any>(`${this.API_URL}/eventos`);
+
+  obtenerEventos(): Observable<Evento[]> {
+    return this.http.get<ApiResponse>(`${this.API_URL}/eventos`).pipe(
+      map(response => response.success ? response.data.data : [])
+    );
   }
 
-
-  private apiUrl = 'http://127.0.0.1:8000/api/eventos';
-
-
-
   getEventos(): Observable<Evento[]> {
-    return new Observable<Evento[]>(observer => {
-      this.http.get<ApiResponse>(this.apiUrl).subscribe({
-        next: (response) => {
-          if (response.success) {
-            observer.next(response.data.data);
-            observer.complete();
-          } else {
-            observer.error('Error en la respuesta de la API');
-          }
-        },
-        error: (err) => observer.error(err)
-      });
-    });
+    return this.obtenerEventos();
   }
 
   getEventoById(id: number): Observable<Evento> {
-    return this.http.get<{ success: boolean; data: Evento }>(`${this.apiUrl}/${id}`)
+    return this.http.get<{ success: boolean; data: Evento }>(`${this.API_URL}/eventos/${id}`)
       .pipe(map(response => response.data));
   }
 
   getImagenUrl(imagenPath: string | undefined): string {
-  if (!imagenPath) {
-    return 'assets/images/eventos/default.jpg';
-  }
-  
-  // Si ya es una URL completa
-  if (imagenPath.startsWith('http')) {
-    return imagenPath;
-  }
-  
-  // Ruta local en assets
-  return `assets/images/eventos/${imagenPath}`;
-}
-getProximosEventos(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/proximosEventos`);
+    if (!imagenPath) {
+      return 'assets/images/eventos/default.jpg';
+    }
+    
+    if (imagenPath.startsWith('http')) {
+      return imagenPath;
+    }
+    
+    return `assets/images/eventos/${imagenPath}`;
   }
 
-  
+  getProximosEventos(): Observable<any> {
+    return this.http.get(`${this.API_URL}/eventos/proximos`);
+  }
 }

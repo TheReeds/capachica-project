@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   eventos: Evento[] = [];
   eventoMasCercano: Evento | null = null;
-  currentIndex: number = 1;
+  currentIndex: number = 0; // ✅ Cambio: Inicia en 0 en lugar de 1
 
   
   homes: Home[] = [];
@@ -110,41 +110,68 @@ sliders: any[] = []; // tu lista original completa de imágenes
   return Array(emptySlots).fill(0);
 }
 
-
+  // ✅ Mejora: Método mejorado con placeholder y validación
   getImagenesmuni(): any[] {
-    // Devuelve las imágenes secundarias si existen
-    console.log('llega a verse');
-    return this.municipalidad?.sliders_principales || [];
-
-
+    const imagenes = this.municipalidad?.sliders_principales || [];
+    
+    // Si no hay imágenes, retorna un array con placeholder
+    if (imagenes.length === 0) {
+      return [{
+        url_completa: '/assets/images/placeholder-hero.jpg',
+        nombre: 'Cargando...',
+        descripcion: 'Preparando contenido'
+      }];
+    }
+    
+    return imagenes;
   }
 
+  // ✅ Mejora: Validación antes de cambiar slides
   nextSlide() {
-    if (this.currentIndex < this.getImagenesmuni().length - 1) {
+    const imagenes = this.getImagenesmuni();
+    if (imagenes.length <= 1) return;
+    
+    if (this.currentIndex < imagenes.length - 1) {
       this.currentIndex++;
     } else {
       this.currentIndex = 0; // Vuelve al inicio
     }
   }
 
-  // Retroceder a la imagen anterior
+  // ✅ Mejora: Validación antes de retroceder
   prevSlide() {
+    const imagenes = this.getImagenesmuni();
+    if (imagenes.length <= 1) return;
+    
     if (this.currentIndex > 0) {
       this.currentIndex--;
     } else {
-      this.currentIndex = this.getImagenesmuni().length - 1; // Vuelve al final
+      this.currentIndex = imagenes.length - 1; // Vuelve al final
     }
   }
 
-  // Ir a una imagen específica
+  // ✅ Mejora: Validación del índice
   goToSlide(index: number) {
-    this.currentIndex = index;
+    const imagenes = this.getImagenesmuni();
+    if (index >= 0 && index < imagenes.length) {
+      this.currentIndex = index;
+    }
+  }
+  onImageLoad(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.classList.add('loaded');
   }
 
-  // Método para obtener la primera imagen del slider
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = '/assets/images/default-landscape.jpg';
+  }
+
+
+  // ✅ Mejora: Mejor manejo de imagen por defecto
   getSliderImage(evento: Evento): string {
-    const sliders_principales = evento.sliders.find(s => s.es_principal);  // Busca el slider principal
-    return sliders_principales ? sliders_principales.url_completa : '';  // Devuelve la URL completa del primer slider, o vacío si no existe
+    const sliders_principales = evento.sliders?.find(s => s.es_principal);
+    return sliders_principales?.url_completa || '/assets/images/placeholder-event.jpg';
   }
 
   eventoProximo: any;
@@ -175,15 +202,20 @@ sliders: any[] = []; // tu lista original completa de imágenes
   this.stopAutoSlide();
 }
 
+// ✅ Mejora: Control más inteligente del autoplay
 startAutoSlide(): void {
-  this.intervalId = setInterval(() => {
-    this.nextSlide();
-  }, 3000); // Cada 3 segundos
+  // Solo inicia autoplay si hay más de una imagen
+  if (this.getImagenesmuni().length > 1) {
+    this.intervalId = setInterval(() => {
+      this.nextSlide();
+    }, 4000); // Aumenté a 4 segundos para mejor UX
+  }
 }
 
 stopAutoSlide(): void {
   if (this.intervalId) {
     clearInterval(this.intervalId);
+    this.intervalId = null;
   }
 }
 
@@ -301,32 +333,32 @@ irAImagenAnterior() {
   }
 }
 
+  // ✅ Mejora: Inicialización más robusta
   ngOnInit() {
+    // Reiniciar autoplay cuando hay cambios
+    this.stopAutoSlide();
+    
     this.loadEmprendedores();
     this.loadReservas();
     this.loadCategorias();
-
-    this.startAutoSlide();
     this.cargarEventos();
-
     this.loadMunicipalidad();
-    
 
     this.homeService.getMunicipalidad().subscribe({
       next: (response) => {
-        this.municipalidad = response; // 👈 aquí el fix
+        this.municipalidad = response;
+        // ✅ Restart autoplay después de cargar imágenes
+        setTimeout(() => {
+          this.startAutoSlide();
+        }, 500);
       },
       error: (err) => console.error('Error cargando municipalidad', err)
     });
 
+    // ✅ Mejora: Tiempo de carga más realista
     setTimeout(() => {
-      this.cargando = false; // cduando termines de cargar los datos
-    }, 2000);
-
-
-
-
-
+      this.cargando = false;
+    }, 1500); // Reducido de 2000 a 1500ms
   }
 
 loadMunicipalidad() {
@@ -334,12 +366,19 @@ loadMunicipalidad() {
       next: (response) => {
         this.municipalidad = response; // Asumimos que municipalidad tiene los sliders
         this.filteredSliders = this.municipalidad?.sliders_secundarios?.filter(slider => slider.orden === 2) ?? [];
+        
+        // ✅ Validar que currentIndex esté dentro del rango
+        const imagenes = this.getImagenesmuni();
+        if (this.currentIndex >= imagenes.length) {
+          this.currentIndex = 0;
+        }
       },
       error: (err) => {
         console.error('Error cargando municipalidad', err);
       }
     });
   }
+  
   ngAfterViewInit(): void {
     setTimeout(() => {
       if (!this.swiperInitialized) {
