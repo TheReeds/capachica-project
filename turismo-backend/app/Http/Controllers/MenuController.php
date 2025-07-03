@@ -153,7 +153,7 @@ class MenuController extends Controller
                         'id' => 'reserva-list',
                         'title' => 'Gestion de Reservas',
                         'path' => '/admin/reservas',
-                        'permissions' => ['reserva_create'],
+                        'permissions' => ['reserva_update'],
                     ],
                     [
                         'id' => 'mis-reservas',
@@ -174,7 +174,7 @@ class MenuController extends Controller
                 'title' => 'Gestionar planes',
                 'icon' => 'chart',
                 'path' => '/admin/planes',
-                'permissions' => ['user_read'], 
+                'permissions' => ['plan_update'], 
             ],
             [
                 'id' => 'profile',

@@ -4,6 +4,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EmprendimientoAdminService } from '../../../core/services/emprendimiento-admin.service';
 import { Emprendimiento, Servicio } from '../../../core/models/emprendimiento-admin.model';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-servicios-list',
@@ -304,6 +305,8 @@ export class ServiciosListComponent implements OnInit {
   searchTerm = '';
   filtroEstado = '';
 
+  constructor(private notificationService: NotificationService) {}
+
   ngOnInit(): void {
     // Obtener el ID de la ruta padre
     this.route.parent?.paramMap.subscribe(params => {
@@ -421,7 +424,7 @@ export class ServiciosListComponent implements OnInit {
 
         // Mostrar mensaje de éxito
         const actionText = updatedServicio.estado ? 'activado' : 'desactivado';
-        alert(`Servicio ${actionText} correctamente`);
+        this.notificationService.success("Éxito",`Servicio ${actionText} correctamente`);
       }
     } catch (err: any) {
       console.error('Error al actualizar servicio:', err);
