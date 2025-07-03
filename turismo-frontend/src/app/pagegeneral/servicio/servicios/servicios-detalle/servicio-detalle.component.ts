@@ -47,29 +47,29 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
         <nav class="flex mb-8" aria-label="Breadcrumb">
           <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-              <a routerLink="/home" class="inline-flex items-center text-gray-700 hover:text-amber-600 dark:text-gray-400 dark:hover:text-amber-400">
+             <!-- <a routerLink="/home" class="inline-flex items-center text-gray-700 hover:text-amber-600 dark:text-gray-400 dark:hover:text-amber-400">
                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                 </svg>
                 Inicio
-              </a>
+              </a>  -->
             </li>
-            <li>
+           <!-- <li>
               <div class="flex items-center">
                 <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                 </svg>
                 <a routerLink="/servicios" class="ml-1 text-gray-700 hover:text-amber-600 dark:text-gray-400 dark:hover:text-amber-400 md:ml-2">Servicios</a>
               </div>
-            </li>
-            <li aria-current="page">
+            </li> -->
+            <!--  <li aria-current="page">
               <div class="flex items-center">
                 <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                 </svg>
                 <span class="ml-1 text-gray-500 md:ml-2 dark:text-gray-400">{{ servicio()?.nombre }}</span>
               </div>
-            </li>
+            </li> -->
           </ol>
         </nav>
 
@@ -79,12 +79,12 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
           <div class="lg:col-span-2">
 
             <!-- Galería de Imágenes -->
-            <div class="mb-8">
+            <div class="mt-8">
               <div class="relative h-96 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700">
                 <img
                   [src]="imagenActual"
                   [alt]="servicio()?.nombre"
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-cover "
                   onerror="this.src='/assets/general/placeholder-service.jpg'"
                 >
 
@@ -315,7 +315,7 @@ import { CarritoService, CarritoItem } from '../../../../core/services/carrito.s
           <div class="lg:col-span-1">
 
             <!-- Información del Emprendedor -->
-            <div *ngIf="servicio()?.emprendedor" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 sticky top-4">
+            <div *ngIf="servicio()?.emprendedor" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 sticky top-24">
               <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
