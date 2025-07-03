@@ -6,6 +6,7 @@ import { EmprendimientoAdminService } from '../../../core/services/emprendimient
 import { Emprendimiento, Servicio, Horario } from '../../../core/models/emprendimiento-admin.model';
 import { SliderUploadComponent, SliderImage } from '../../../shared/components/slider-upload/slider-upload.component';
 import { UbicacionMapComponent } from '../../../shared/components/ubicacion-map/ubicacion-map.component';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-servicio-form',
@@ -634,6 +635,9 @@ export class ServicioFormComponent implements OnInit {
   sliders: SliderImage[] = [];
   deletedSliders: number[] = [];
 
+  constructor(private notificationService: NotificationService) {}
+  
+
   // Mapeo de días de la semana
   private readonly diasSemana: Record<string, string> = {
     'lunes': 'lunes',
@@ -933,7 +937,7 @@ export class ServicioFormComponent implements OnInit {
     if (this.isEditMode && this.servicioId) {
       this.emprendimientoAdminService.updateServicio(this.servicioId, formData).subscribe({
         next: (data) => {
-          this.success = 'Servicio actualizado correctamente';
+          this.notificationService.success("Éxito", "Servicio actualizado correctamente");
           this.saving = false;
           setTimeout(() => this.navigateToServices(), 2000);
         },
@@ -946,7 +950,7 @@ export class ServicioFormComponent implements OnInit {
     } else {
       this.emprendimientoAdminService.createServicio(formData).subscribe({
         next: (data) => {
-          this.success = 'Servicio creado correctamente';
+          this.notificationService.success("Éxito", "Servicio creado correctamente");
           this.saving = false;
           setTimeout(() => this.navigateToServices(), 2000);
         },
@@ -972,6 +976,15 @@ export class ServicioFormComponent implements OnInit {
   private prepareFormData(): any {
     const formData = { ...this.servicioForm.value };
     
+    // Convertir horarios al formato correcto
+    if (formData.horarios && Array.isArray(formData.horarios)) {
+      formData.horarios = formData.horarios.map((horario: any) => ({
+        ...horario,
+        hora_inicio: this.convertTimeFormat(horario.hora_inicio),
+        hora_fin: this.convertTimeFormat(horario.hora_fin)
+      }));
+    }
+    
     // Procesar sliders
     formData.sliders = this.sliders.map(slider => ({
       ...slider,
@@ -980,8 +993,24 @@ export class ServicioFormComponent implements OnInit {
     
     // Agregar IDs de sliders eliminados
     formData.deleted_sliders = this.deletedSliders;
-    
+        
     return formData;
+  }
+
+  private convertTimeFormat(time: string): string {
+    if (!time) return '';
+    
+    // Si ya tiene formato HH:MM:SS, devolver como está
+    if (time.split(':').length === 3) {
+      return time;
+    }
+    
+    // Si tiene formato HH:MM, agregar :00
+    if (time.split(':').length === 2) {
+      return `${time}:00`;
+    }
+    
+    return time;
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

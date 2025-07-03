@@ -9,6 +9,7 @@ import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { ThemeService } from '../../../../core/services/theme.service';
 import { AdminHeaderComponent } from '../../../../shared/components/admin-header/admin-header.component';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-role-form',
@@ -299,6 +300,8 @@ export class RoleFormComponent implements OnInit {
   submitted = false;
   error = '';
   searchTerm = '';
+  
+  constructor(private notificationService: NotificationService) {}
 
   get isEditMode(): boolean {
     return this.roleId !== null;
@@ -545,7 +548,7 @@ export class RoleFormComponent implements OnInit {
       this.adminService.updateRole(this.roleId, this.roleForm.value).subscribe({
         next: () => {
           this.saving = false;
-          alert("Rol actualizado correctamente");
+          this.notificationService.success("Éxito", "Rol actualizado correctamente");
           this.router.navigate(['/admin/roles']);
         },
         error: (error) => {
