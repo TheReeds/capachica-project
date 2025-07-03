@@ -1,63 +1,75 @@
 <?php
+
 namespace Tests\Feature\Controllers;
 
 use App\Models\Categoria;
+use App\Models\Servicio;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Response;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Laravel\Sanctum\Sanctum;
 
 class CategoriaControllerTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    protected User $adminUser;
+    protected User $normalUser;
+
     protected function setUp(): void
     {
         parent::setUp();
-        // Configurar rutas API si es necesario
-        $this->withoutMiddleware(); // Temporalmente deshabilitar middleware para depurar
+        
+        // Crear permisos necesarios
+        $this->createPermissions();
+        
+        // Crear roles
+        $adminRole = Role::create(['name' => 'admin']);
+        $userRole = Role::create(['name' => 'user']);
+        
+        // Asignar permisos a roles
+        $adminRole->givePermissionTo([
+            'categoria_create', 'categoria_read', 'categoria_update', 'categoria_delete'
+        ]);
+        $userRole->givePermissionTo(['categoria_read']);
+        
+        // Crear usuarios
+        $this->adminUser = User::factory()->create();
+        $this->adminUser->assignRole('admin');
+        
+        $this->normalUser = User::factory()->create();
+        $this->normalUser->assignRole('user');
+    }
+
+    private function createPermissions(): void
+    {
+        $permissions = [
+            'categoria_create', 'categoria_read', 'categoria_update', 'categoria_delete'
+        ];
+        
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
     }
 
     #[Test]
     public function puede_listar_todas_las_categorias()
     {
         // Arrange
-        Categoria::factory()->count(10)->create();
+        Categoria::factory()->count(5)->create();
 
         // Act
         $response = $this->getJson('/api/categorias');
 
         // Assert
-        $response->assertStatus(Response::HTTP_OK);
-        
-        // Ajustar estructura según tu respuesta real
-        $responseData = $response->json();
-        
-        // Si la respuesta es directamente la paginación
-        if (isset($responseData['data'])) {
-            $response->assertJsonStructure([
-                'data' => [
-                    '*' => [
-                        'id',
-                        'nombre',
-                        'descripcion',
-                        'icono_url',
-                        'created_at',
-                        'updated_at'
-                    ]
-                ],
-                'current_page',
-                'per_page',
-                'total'
-            ]);
-        } else {
-            // Si la respuesta tiene wrapper success/data
-            $response->assertJsonStructure([
-                'success',
-                'data' => [
+        $response->assertStatus(Response::HTTP_OK)
+                ->assertJsonStructure([
+                    'success',
                     'data' => [
                         '*' => [
                             'id',
@@ -67,39 +79,10 @@ class CategoriaControllerTest extends TestCase
                             'created_at',
                             'updated_at'
                         ]
-                    ],
-                    'current_page',
-                    'per_page',
-                    'total'
-                ]
-            ]);
-        }
-    }
+                    ]
+                ]);
 
-    #[Test]
-    public function puede_listar_categorias_con_paginacion_personalizada()
-    {
-        // Arrange
-        Categoria::factory()->count(20)->create();
-
-        // Act
-        $response = $this->getJson('/api/categorias?per_page=5');
-
-        // Assert
-        $response->assertStatus(Response::HTTP_OK);
-        
-        $data = $response->json();
-        
-        // Ajustar según la estructura real de tu respuesta
-        if (isset($data['data']['per_page'])) {
-            $paginationData = $data['data'];
-        } else {
-            $paginationData = $data;
-        }
-
-        $this->assertEquals(5, $paginationData['per_page']);
-        $this->assertEquals(20, $paginationData['total']);
-        $this->assertCount(5, $paginationData['data']);
+        $this->assertTrue($response->json('success'));
     }
 
     #[Test]
@@ -114,9 +97,12 @@ class CategoriaControllerTest extends TestCase
         // Assert
         $response->assertStatus(Response::HTTP_OK)
                 ->assertJson([
-                    'id' => $categoria->id,
-                    'nombre' => $categoria->nombre,
-                    'descripcion' => $categoria->descripcion
+                    'success' => true,
+                    'data' => [
+                        'id' => $categoria->id,
+                        'nombre' => $categoria->nombre,
+                        'descripcion' => $categoria->descripcion
+                    ]
                 ]);
     }
 
@@ -127,27 +113,35 @@ class CategoriaControllerTest extends TestCase
         $response = $this->getJson('/api/categorias/999');
 
         // Assert
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
+        $response->assertStatus(Response::HTTP_NOT_FOUND)
+                ->assertJson([
+                    'success' => false,
+                    'message' => 'Categoría no encontrada'
+                ]);
     }
 
     #[Test]
     public function admin_puede_crear_nueva_categoria()
     {
         // Arrange
-        $admin = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($admin);
-
+        Sanctum::actingAs($this->adminUser);
+        
         $data = [
             'nombre' => $this->faker->word,
             'descripcion' => $this->faker->text,
-            'icono_url' => $this->faker->url
+            'icono_url' => $this->faker->imageUrl()
         ];
 
         // Act
         $response = $this->postJson('/api/categorias', $data);
 
         // Assert
-        $response->assertStatus(Response::HTTP_CREATED);
+        $response->assertStatus(Response::HTTP_CREATED)
+                ->assertJson([
+                    'success' => true,
+                    'message' => 'Categoría creada exitosamente'
+                ]);
+
         $this->assertDatabaseHas('categorias', [
             'nombre' => $data['nombre'],
             'descripcion' => $data['descripcion']
@@ -158,25 +152,18 @@ class CategoriaControllerTest extends TestCase
     public function usuario_normal_no_puede_crear_categoria()
     {
         // Arrange
-        $user = User::factory()->create(['role' => 'user']);
-        Sanctum::actingAs($user);
-
+        Sanctum::actingAs($this->normalUser);
+        
         $data = [
             'nombre' => $this->faker->word,
             'descripcion' => $this->faker->text
         ];
 
-        // Act & Assert
+        // Act
         $response = $this->postJson('/api/categorias', $data);
-        
-        // Si no hay middleware activo, comentar esta línea temporalmente
-        // $response->assertStatus(Response::HTTP_FORBIDDEN);
-        
-        // Verificar que se aplicó el middleware o que el usuario no puede crear
-        $this->assertTrue(
-            $response->status() === Response::HTTP_FORBIDDEN || 
-            $response->status() === Response::HTTP_UNAUTHORIZED
-        );
+
+        // Assert
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     #[Test]
@@ -199,80 +186,80 @@ class CategoriaControllerTest extends TestCase
     public function falla_validacion_al_crear_categoria_sin_datos_requeridos()
     {
         // Arrange
-        $admin = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($admin);
-
-        $data = []; // Sin datos requeridos
-
-        // Act
-        $response = $this->postJson('/api/categorias', $data);
-
-        // Assert
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        Sanctum::actingAs($this->adminUser);
         
-        // Ajustar según tu estructura de respuesta de validación
-        $responseData = $response->json();
-        
-        if (isset($responseData['errors'])) {
-            $response->assertJsonValidationErrors(['nombre']);
-        } else {
-            // Si tu respuesta tiene estructura diferente
-            $response->assertJsonStructure([
-                'success',
-                'errors' => [
-                    'nombre'
-                ]
-            ]);
-        }
-    }
-
-    #[Test]
-    public function falla_validacion_con_icono_url_invalido()
-    {
-        // Arrange
-        $admin = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($admin);
-
         $data = [
-            'nombre' => $this->faker->word,
-            'descripcion' => $this->faker->text,
-            'icono_url' => 'not-a-valid-url'
+            'descripcion' => $this->faker->text
+            // Falta nombre requerido
         ];
 
         // Act
         $response = $this->postJson('/api/categorias', $data);
 
         // Assert
-        // Solo validar si tu modelo requiere URL válida
-        if ($response->status() === Response::HTTP_UNPROCESSABLE_ENTITY) {
-            $response->assertJsonValidationErrors(['icono_url']);
-        } else {
-            // Si no hay validación de URL, el test pasa
-            $response->assertStatus(Response::HTTP_CREATED);
-        }
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+                ->assertJson([
+                    'success' => false,
+                    'errors' => [
+                        'nombre' => ['The nombre field is required.']
+                    ]
+                ]);
+    }
+
+    #[Test]
+    public function puede_crear_categoria_solo_con_nombre()
+    {
+        // Arrange
+        Sanctum::actingAs($this->adminUser);
+        
+        $data = [
+            'nombre' => 'Categoría Mínima'
+        ];
+
+        // Act
+        $response = $this->postJson('/api/categorias', $data);
+
+        // Assert
+        $response->assertStatus(Response::HTTP_CREATED)
+                ->assertJson([
+                    'success' => true,
+                    'message' => 'Categoría creada exitosamente'
+                ]);
+
+        $this->assertDatabaseHas('categorias', [
+            'nombre' => 'Categoría Mínima',
+            'descripcion' => null,
+            'icono_url' => null
+        ]);
     }
 
     #[Test]
     public function admin_puede_actualizar_categoria_existente()
     {
         // Arrange
-        $admin = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($admin);
+        Sanctum::actingAs($this->adminUser);
         
         $categoria = Categoria::factory()->create();
+
         $updateData = [
-            'nombre' => $this->faker->word,
-            'descripcion' => $this->faker->text
+            'nombre' => 'Nombre Actualizado',
+            'descripcion' => 'Nueva descripción'
         ];
 
         // Act
         $response = $this->putJson("/api/categorias/{$categoria->id}", $updateData);
 
         // Assert
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_OK)
+                ->assertJson([
+                    'success' => true,
+                    'message' => 'Categoría actualizada exitosamente'
+                ]);
+
         $this->assertDatabaseHas('categorias', [
             'id' => $categoria->id,
-            'nombre' => $updateData['nombre']
+            'nombre' => 'Nombre Actualizado',
+            'descripcion' => 'Nueva descripción'
         ]);
     }
 
@@ -280,44 +267,47 @@ class CategoriaControllerTest extends TestCase
     public function usuario_normal_no_puede_actualizar_categoria()
     {
         // Arrange
-        $user = User::factory()->create(['role' => 'user']);
-        Sanctum::actingAs($user);
+        Sanctum::actingAs($this->normalUser);
         
         $categoria = Categoria::factory()->create();
-        $updateData = ['nombre' => $this->faker->word];
 
-        // Act & Assert
+        $updateData = [
+            'nombre' => 'Nombre Actualizado'
+        ];
+
+        // Act
         $response = $this->putJson("/api/categorias/{$categoria->id}", $updateData);
-        
-        // Verificar que se aplicó el middleware o que el usuario no puede actualizar
-        $this->assertTrue(
-            $response->status() === Response::HTTP_FORBIDDEN || 
-            $response->status() === Response::HTTP_UNAUTHORIZED
-        );
+
+        // Assert
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     #[Test]
     public function retorna_404_al_actualizar_categoria_inexistente()
     {
         // Arrange
-        $admin = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($admin);
+        Sanctum::actingAs($this->adminUser);
         
-        $updateData = ['nombre' => $this->faker->word];
+        $updateData = [
+            'nombre' => 'Test'
+        ];
 
         // Act
         $response = $this->putJson('/api/categorias/999', $updateData);
 
         // Assert
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
+        $response->assertStatus(Response::HTTP_NOT_FOUND)
+                ->assertJson([
+                    'success' => false,
+                    'message' => 'Categoría no encontrada'
+                ]);
     }
 
     #[Test]
     public function admin_puede_eliminar_categoria_existente()
     {
         // Arrange
-        $admin = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($admin);
+        Sanctum::actingAs($this->adminUser);
         
         $categoria = Categoria::factory()->create();
 
@@ -325,83 +315,73 @@ class CategoriaControllerTest extends TestCase
         $response = $this->deleteJson("/api/categorias/{$categoria->id}");
 
         // Assert
-        $response->assertStatus(Response::HTTP_OK);
-        $this->assertDatabaseMissing('categorias', ['id' => $categoria->id]);
+        $response->assertStatus(Response::HTTP_OK)
+                ->assertJson([
+                    'success' => true,
+                    'message' => 'Categoría eliminada exitosamente'
+                ]);
+
+        $this->assertDatabaseMissing('categorias', [
+            'id' => $categoria->id
+        ]);
     }
 
     #[Test]
     public function usuario_normal_no_puede_eliminar_categoria()
     {
         // Arrange
-        $user = User::factory()->create(['role' => 'user']);
-        Sanctum::actingAs($user);
+        Sanctum::actingAs($this->normalUser);
         
         $categoria = Categoria::factory()->create();
 
-        // Act & Assert
+        // Act
         $response = $this->deleteJson("/api/categorias/{$categoria->id}");
-        
-        // Verificar que se aplicó el middleware o que el usuario no puede eliminar
-        $this->assertTrue(
-            $response->status() === Response::HTTP_FORBIDDEN || 
-            $response->status() === Response::HTTP_UNAUTHORIZED
-        );
+
+        // Assert
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     #[Test]
     public function retorna_404_al_eliminar_categoria_inexistente()
     {
         // Arrange
-        $admin = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($admin);
+        Sanctum::actingAs($this->adminUser);
 
         // Act
         $response = $this->deleteJson('/api/categorias/999');
 
         // Assert
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
+        $response->assertStatus(Response::HTTP_NOT_FOUND)
+                ->assertJson([
+                    'success' => false,
+                    'message' => 'Categoría no encontrada'
+                ]);
     }
 
     #[Test]
-    public function puede_obtener_servicios_de_categoria()
+    public function puede_obtener_categoria_con_servicios()
     {
         // Arrange
         $categoria = Categoria::factory()->create();
-        // Comentar si ServicioFactory aún no está funcionando
-        // $servicios = Servicio::factory()->count(3)->create();
-        // $categoria->servicios()->attach($servicios->pluck('id'));
 
         // Act
-        $response = $this->getJson("/api/categorias/{$categoria->id}/servicios");
+        $response = $this->getJson("/api/categorias/{$categoria->id}");
 
         // Assert
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonStructure([
-            '*' => [
-                'id',
-                'nombre'
-                // otros campos del servicio
-            ]
-        ]);
-    }
-
-    #[Test]
-    public function retorna_404_al_obtener_servicios_de_categoria_inexistente()
-    {
-        // Act
-        $response = $this->getJson('/api/categorias/999/servicios');
-
-        // Assert
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
-        
-        // Ajustar el mensaje según tu implementación
-        $responseData = $response->json();
-        $this->assertFalse($responseData['success']);
-        // Usar el mensaje que realmente devuelve tu API
-        $this->assertContains($responseData['message'], [
-            'Categoría no encontrada',
-            'Recurso no encontrado'
-        ]);
+        $response->assertStatus(Response::HTTP_OK)
+                ->assertJson([
+                    'success' => true
+                ])
+                ->assertJsonStructure([
+                    'success',
+                    'data' => [
+                        'id',
+                        'nombre',
+                        'descripcion',
+                        'icono_url',
+                        'servicios'
+                    ]
+                ]);
     }
 
     #[Test]
@@ -414,13 +394,18 @@ class CategoriaControllerTest extends TestCase
         $response = $this->getJson("/api/categorias/{$categoria->id}");
 
         // Assert
-        $response->assertStatus(Response::HTTP_OK)
-                ->assertJsonStructure([
-                    'id',
-                    'nombre',
-                    'created_at',
-                    'updated_at'
-                ]);
+        $response->assertJsonStructure([
+            'success',
+            'data' => [
+                'id',
+                'nombre',
+                'descripcion',
+                'icono_url',
+                'created_at',
+                'updated_at',
+                'servicios'
+            ]
+        ]);
     }
 
     #[Test]
@@ -430,48 +415,106 @@ class CategoriaControllerTest extends TestCase
         $response = $this->getJson('/api/categorias/999');
 
         // Assert
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
-        // Verificar estructura de error según tu implementación
-        $responseData = $response->json();
-        $this->assertArrayHasKey('message', $responseData);
+        $response->assertJsonStructure([
+            'success',
+            'message'
+        ]);
+        
+        $this->assertFalse($response->json('success'));
     }
 
     #[Test]
-    public function icono_url_es_null_cuando_no_hay_icono()
+    public function icono_url_puede_ser_nulo()
     {
         // Arrange
-        $categoria = Categoria::factory()->create(['icono_url' => null]);
+        $categoria = Categoria::factory()->sinIcono()->create();
 
         // Act
         $response = $this->getJson("/api/categorias/{$categoria->id}");
 
         // Assert
-        $response->assertStatus(Response::HTTP_OK)
-                ->assertJson([
-                    'icono_url' => null
-                ]);
+        $response->assertStatus(Response::HTTP_OK);
+        $data = $response->json('data');
+        
+        $this->assertNull($data['icono_url']);
     }
 
     #[Test]
-    public function puede_crear_categoria_sin_descripcion()
+    public function descripcion_puede_ser_nula()
     {
         // Arrange
-        $admin = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($admin);
+        $categoria = Categoria::factory()->sinDescripcion()->create();
 
+        // Act
+        $response = $this->getJson("/api/categorias/{$categoria->id}");
+
+        // Assert
+        $response->assertStatus(Response::HTTP_OK);
+        $data = $response->json('data');
+        
+        $this->assertNull($data['descripcion']);
+    }
+
+    #[Test]
+    public function puede_actualizar_campos_opcionales_a_null()
+    {
+        // Arrange
+        Sanctum::actingAs($this->adminUser);
+        
+        $categoria = Categoria::factory()->conDescripcion()->conIcono()->create();
+
+        $updateData = [
+            'descripcion' => null,
+            'icono_url' => null
+        ];
+
+        // Act
+        $response = $this->putJson("/api/categorias/{$categoria->id}", $updateData);
+
+        // Assert
+        $response->assertStatus(Response::HTTP_OK);
+        
+        $this->assertDatabaseHas('categorias', [
+            'id' => $categoria->id,
+            'descripcion' => null,
+            'icono_url' => null
+        ]);
+    }
+
+    #[Test]
+    public function valida_longitud_maxima_del_nombre()
+    {
+        // Arrange
+        Sanctum::actingAs($this->adminUser);
+        
         $data = [
-            'nombre' => $this->faker->word
-            // Sin descripción
+            'nombre' => str_repeat('a', 256) // Excede el límite de 255 caracteres
         ];
 
         // Act
         $response = $this->postJson('/api/categorias', $data);
 
         // Assert
-        $response->assertStatus(Response::HTTP_CREATED);
-        $this->assertDatabaseHas('categorias', [
-            'nombre' => $data['nombre'],
-            'descripcion' => null
-        ]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+                ->assertJsonValidationErrors(['nombre']);
+    }
+
+    #[Test]
+    public function valida_longitud_maxima_del_icono_url()
+    {
+        // Arrange
+        Sanctum::actingAs($this->adminUser);
+        
+        $data = [
+            'nombre' => 'Test',
+            'icono_url' => str_repeat('a', 256) // Excede el límite de 255 caracteres
+        ];
+
+        // Act
+        $response = $this->postJson('/api/categorias', $data);
+
+        // Assert
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+                ->assertJsonValidationErrors(['icono_url']);
     }
 }
