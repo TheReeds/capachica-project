@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,10 @@ import { Reserva, ReservaServicio } from '../../../../../core/services/turismo.s
 import { MisReservasService, MensajeChat } from '../../../../../core/services/mis-reservas.service';
 import { ThemeService } from '../../../../../core/services/theme.service';
 import { AdminHeaderComponent } from '../../../../../shared/components/admin-header/admin-header.component';
+import { ChatService } from '../../../../../core/services/chat.service';
+import { ChatComponent } from '../../../../../shared/components/chat/chat.component';
+import { Subscription, interval } from 'rxjs';
+
 
 interface EditandoHorario {
   servicioId: number;
@@ -19,7 +23,7 @@ interface EditandoHorario {
 @Component({
   selector: 'app-mis-reservas',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, AdminHeaderComponent],
+  imports: [CommonModule, RouterLink, FormsModule, AdminHeaderComponent, ChatComponent],
   template: `
     <app-admin-header 
       title="Mis reservas" 
@@ -463,35 +467,15 @@ interface EditandoHorario {
           </button>
         </div>
 
-        <!-- Mensajes -->
-        <div class="flex-1 p-4 overflow-y-auto space-y-3">
-          <div *ngFor="let mensaje of mensajesChat" 
-               [class]="mensaje.emisor === 'usuario' ? 'flex justify-end' : 'flex justify-start'">
-            <div [class]="mensaje.emisor === 'usuario' 
-                   ? 'bg-blue-600 text-white max-w-xs lg:max-w-md px-3 py-2 rounded-lg' 
-                   : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white max-w-xs lg:max-w-md px-3 py-2 rounded-lg'">
-              <p class="text-sm">{{mensaje.mensaje}}</p>
-              <p class="text-xs opacity-75 mt-1">
-                {{formatearHora(mensaje.created_at)}}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Input de mensaje -->
-        <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-          <div class="flex space-x-2">
-            <input type="text" [(ngModel)]="nuevoMensaje" 
-                   (keyup.enter)="enviarMensaje()"
-                   placeholder="Escribe tu mensaje..."
-                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm">
-            
-            <button (click)="enviarMensaje()" 
-                    [disabled]="!nuevoMensaje.trim() || enviandoMensaje"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
-              {{enviandoMensaje ? '...' : 'Enviar'}}
-            </button>
-          </div>
+        <!-- Chat Component -->
+        <div class="flex-1">
+          <app-chat 
+            *ngIf="reservaChat && reservaChat.id"
+            [reservaId]="reservaChat.id!"
+            [titulo]="'Chat con ' + emprendedorChat?.nombre"
+            [esAdmin]="false"
+            (mensajeEnviado)="onMensajeEnviado($event)">
+          </app-chat>
         </div>
       </div>
     </div>
@@ -501,6 +485,8 @@ export class MisReservasComponent implements OnInit {
   private misReservasService = inject(MisReservasService);
   private router = inject(Router);
   private themeService = inject(ThemeService);
+  private chatService = inject(ChatService);
+  @ViewChild('chatScroll') chatScroll!: ElementRef;
 
   // Datos principales
   reservas: Reserva[] = [];
@@ -535,9 +521,14 @@ export class MisReservasComponent implements OnInit {
   mostrarChat = false;
   reservaChat: Reserva | null = null;
   emprendedorChat: any = null;
-  mensajesChat: MensajeChat[] = [];
-  nuevoMensaje = '';
-  enviandoMensaje = false;
+  chatMessages: { [reservaId: number]: any[] } = {};
+  newMessage: string = '';
+  enviandoMensaje: { [reservaId: number]: boolean } = {};
+  chatLoading: { [reservaId: number]: boolean } = {};
+
+  activeChatReserva: number | null = null;
+  private chatSocketSub: Subscription | null = null;
+  private chatAutoRefreshSub: Subscription | null = null;
 
   ngOnInit() {
     this.cargarReservas();
@@ -829,48 +820,18 @@ export class MisReservasComponent implements OnInit {
     this.reservaChat = reserva;
     this.emprendedorChat = servicio.emprendedor;
     this.mostrarChat = true;
-    this.cargarMensajesChat(reserva.id!, servicio.emprendedor_id);
+    this.activeChatReserva = reserva.id!;
   }
 
   cerrarChat() {
     this.mostrarChat = false;
     this.reservaChat = null;
-    this.emprendedorChat = null;
-    this.mensajesChat = [];
-    this.nuevoMensaje = '';
+    this.activeChatReserva = null;
   }
 
-  cargarMensajesChat(reservaId: number, emprendedorId: number) {
-    this.misReservasService.getMensajesChat(reservaId, emprendedorId).subscribe({
-      next: (mensajes) => {
-        this.mensajesChat = mensajes;
-      },
-      error: (error) => {
-        console.error('Error al cargar mensajes:', error);
-      }
-    });
-  }
-
-  enviarMensaje() {
-    if (!this.nuevoMensaje.trim() || !this.reservaChat || !this.emprendedorChat) return;
-
-    this.enviandoMensaje = true;
-
-    this.misReservasService.enviarMensaje({
-      reserva_id: this.reservaChat.id!,
-      emprendedor_id: this.emprendedorChat.id,
-      mensaje: this.nuevoMensaje.trim()
-    }).subscribe({
-      next: (nuevoMensaje) => {
-        this.mensajesChat.push(nuevoMensaje);
-        this.nuevoMensaje = '';
-        this.enviandoMensaje = false;
-      },
-      error: (error) => {
-        console.error('Error al enviar mensaje:', error);
-        this.enviandoMensaje = false;
-      }
-    });
+  onMensajeEnviado(mensaje: any): void {
+    console.log('Mensaje enviado:', mensaje);
+    // Aquí puedes agregar lógica adicional si es necesario
   }
 
   // Navegación
@@ -888,6 +849,7 @@ export class MisReservasComponent implements OnInit {
   }
 
   formatearHora(fecha: string): string {
+    if (!fecha) return '';
     return new Date(fecha).toLocaleTimeString('es-PE', {
       hour: '2-digit',
       minute: '2-digit'
@@ -922,5 +884,30 @@ export class MisReservasComponent implements OnInit {
 
   isDarkMode(): boolean {
     return this.themeService.isDarkMode();
+  }
+
+  // Métodos legacy que ya no se usan pero se mantienen por compatibilidad
+  loadChatMessages(reservaId: number) {
+    // Este método ya no es necesario con el nuevo componente
+    console.log('loadChatMessages llamado pero no implementado');
+  }
+
+  listenToChat(reservaId: number) {
+    // Este método ya no es necesario con el nuevo componente
+    console.log('listenToChat llamado pero no implementado');
+  }
+
+  enviarMensaje() {
+    // Este método ya no es necesario con el nuevo componente
+    console.log('enviarMensaje llamado pero no implementado');
+  }
+
+  getChatMessages(reservaId: number) {
+    // Este método ya no es necesario con el nuevo componente
+    return [];
+  }
+
+  scrollToBottom() {
+    // Este método ya no es necesario con el nuevo componente
   }
 }

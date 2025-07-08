@@ -27,6 +27,10 @@ class MenuController extends Controller
         
         // Obtener todos los permisos del usuario (incluyendo los heredados a través de roles)
         $permissions = $user->getAllPermissions()->pluck('name')->toArray();
+
+        if ($user->hasRole('admin')) {
+            $permissions[] = 'admin';
+        }
         
         // Verificar si el usuario administra emprendimientos
         $administraEmprendimientos = $user->administraEmprendimientos();
@@ -183,7 +187,13 @@ class MenuController extends Controller
                 'path' => '/admin/profile',
                 'permissions' => ['user_read'], // Todos los usuarios pueden ver su perfil
             ],
-            
+            [
+                'id' => 'chat-history',
+                'title' => 'Historial de Chat',
+                'icon' => 'chat',
+                'path' => '/admin/chat-history',
+                'permissions' => ['admin'], // Usamos un permiso ficticio para que solo el admin lo vea
+            ],
         ];
         
     

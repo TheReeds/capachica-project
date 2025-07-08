@@ -75,6 +75,54 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     
     /**
+     * Verificar si el usuario es moderador de algún emprendimiento
+     */
+    public function esModerador()
+    {
+        return $this->emprendimientos()->wherePivot('rol', 'moderador')->exists();
+    }
+
+    /**
+     * Verificar si el usuario es emprendedor (administrador principal)
+     */
+    public function esEmprendedor()
+    {
+        return $this->emprendimientos()->wherePivot('rol', 'emprendedor')->exists();
+    }
+
+    /**
+     * Obtener emprendimientos donde el usuario es moderador
+     */
+    public function emprendimientosComoModerador()
+    {
+        return $this->emprendimientos()->wherePivot('rol', 'moderador');
+    }
+
+    /**
+     * Obtener emprendimientos donde el usuario es emprendedor
+     */
+    public function emprendimientosComoEmprendedor()
+    {
+        return $this->emprendimientos()->wherePivot('rol', 'emprendedor');
+    }
+
+    /**
+     * Verificar si el usuario puede interactuar en el chat de una reserva
+     */
+    public function puedeInteractuarEnChat($reserva_id): bool
+    {
+        $reserva = Reserva::find($reserva_id);
+        if (!$reserva) return false;
+
+        // Es el usuario que hizo la reserva
+        if ($reserva->usuario_id === $this->id) return true;
+
+        // Es administrador o moderador de algún emprendimiento involucrado
+        $emprendimientoIds = $reserva->servicios()->pluck('emprendedor_id')->unique();
+        return $this->emprendimientos()->whereIn('emprendedores.id', $emprendimientoIds)->exists();
+    }
+    
+    /**
      * NUEVAS RELACIONES PARA PLANES
      */
     

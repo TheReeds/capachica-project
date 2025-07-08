@@ -32,7 +32,11 @@
               "node_modules/leaflet/dist/leaflet.css"
             ],
 
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+            "pusher-js",
+            "laravel-echo"
+            ]   
           },
           "configurations": {
             "production": {
