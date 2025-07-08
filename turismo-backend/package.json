@@ -3,13 +3,18 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "backend": "php artisan serve",
+        "reverb": "php artisan reverb:start --host=127.0.0.1 --port=6001",
+        "dev:all": "concurrently -c \"#93c5fd,#34d399,#fdba74\" \"npm run backend\" \"npm run reverb\" \"npm run dev\" --names=backend,reverb,vite"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
         "axios": "^1.8.2",
         "concurrently": "^9.0.1",
+        "laravel-echo": "^2.1.6",
         "laravel-vite-plugin": "^1.2.0",
+        "pusher-js": "^8.4.0",
         "tailwindcss": "^4.0.0",
         "vite": "^6.2.4"
     }

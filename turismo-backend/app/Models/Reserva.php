@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Reserva extends Model
 {
@@ -82,5 +83,21 @@ class Reserva extends Model
         return $this->servicios->sum(function($servicio) {
             return ($servicio->precio ?? 0) * ($servicio->cantidad ?? 1);
         });
+    }
+
+    /**
+     * Relación: una reserva tiene una conversación
+     */
+    public function conversacion(): HasOne
+    {
+        return $this->hasOne(Conversacion::class);
+    }
+
+    /**
+     * Relación: una reserva tiene muchos mensajes (a través de la conversación)
+     */
+    public function mensajes(): HasMany
+    {
+        return $this->hasMany(Mensaje::class);
     }
 }

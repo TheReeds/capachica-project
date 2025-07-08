@@ -8,44 +8,45 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   const token = authService.getToken();
-  
-  // Excluir las solicitudes de login y registro de la lógica de intercepción
-  const isAuthRequest = 
-    req.url.includes('/login') || 
+
+  // Verifica si la ruta es de autenticación o broadcasting
+  const isAuthRequest =
+    req.url.includes('/login') ||
     req.url.includes('/register') ||
     req.url.includes('/forgot-password');
-  
-  if (token && !isAuthRequest) {
-    console.log(`AuthInterceptor: Añadiendo token a solicitud ${req.url}`);
-    
-    // Clonar la solicitud para agregar el encabezado de autorización
-    const authReq = req.clone({
+
+  const isBroadcasting = req.url.includes('/broadcasting/auth');
+
+  let modifiedReq = req.clone({
+    withCredentials: true // 🔥 clave para enviar cookies a Laravel Sanctum
+  });
+
+  // Si NO es solicitud de login/register y NO es broadcasting, añade Bearer
+  if (token && !isAuthRequest && !isBroadcasting) {
+    modifiedReq = modifiedReq.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,
-        'Accept': 'application/json'
+        Accept: 'application/json'
       }
     });
-    
-    // Procesar la respuesta y manejar errores de autenticación
-    return next(authReq).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          console.error('AuthInterceptor: Error 401 (No autorizado)', req.url);
-          
-          // Solo redirigir a login si estamos en una ruta protegida
-          if (window.location.pathname.startsWith('/dashboard') || 
-              window.location.pathname.startsWith('/admin') ||
-              window.location.pathname.startsWith('/profile')) {
-            console.log('AuthInterceptor: Redirigiendo a login desde ruta protegida...');
-            authService['clearAuthData'](); // Acceder al método privado
-            router.navigate(['/login']);
-          }
-        }
-        
-        return throwError(() => error);
-      })
-    );
   }
-  
-  return next(req);
+
+  return next(modifiedReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        console.error('AuthInterceptor: Error 401', req.url);
+
+        if (
+          window.location.pathname.startsWith('/dashboard') ||
+          window.location.pathname.startsWith('/admin') ||
+          window.location.pathname.startsWith('/profile')
+        ) {
+          authService['clearAuthData']();
+          router.navigate(['/login']);
+        }
+      }
+
+      return throwError(() => error);
+    })
+  );
 };

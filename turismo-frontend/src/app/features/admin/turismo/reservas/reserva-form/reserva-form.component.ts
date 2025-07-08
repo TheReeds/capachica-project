@@ -8,6 +8,7 @@ import { UsersService } from '../../../../../core/services/users.service';
 import { User } from '../../../../../core/models/user.model';
 import { ThemeService } from '../../../../../core/services/theme.service';
 import { AdminHeaderComponent } from '../../../../../shared/components/admin-header/admin-header.component';
+import { ChatService } from '../../../../../core/services/chat.service';
 
 @Component({
   selector: 'app-reserva-form',
@@ -571,6 +572,7 @@ export class ReservaFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private themeService = inject(ThemeService);
+  private chatService = inject(ChatService);
 
   // Signals
   loading = signal<boolean>(false);
@@ -886,11 +888,21 @@ export class ReservaFormComponent implements OnInit {
       : this.reservasService.createReserva(formData);
 
     operacion.subscribe({
-      next: () => {
-        this.isSubmitting.set(false);
-        const mensaje = this.isEditMode() ? 'Reserva actualizada correctamente' : 'Reserva creada correctamente';
-        alert(mensaje);
-        this.router.navigate(['/admin/reservas']);
+      next: (reserva: any) => {
+        if (!this.isEditMode() && reserva && reserva.id) {
+          // Crear conversación automáticamente después de crear la reserva
+          this.chatService.crearConversacion(reserva.id).subscribe({
+            next: () => {
+              this.finalizarCreacion();
+            },
+            error: () => {
+              // Si falla la creación de la conversación, igual continuar
+              this.finalizarCreacion();
+            }
+          });
+        } else {
+          this.finalizarCreacion();
+        }
       },
       error: (error) => {
         console.error('Error al guardar reserva:', error);
@@ -898,6 +910,13 @@ export class ReservaFormComponent implements OnInit {
         alert('Error al guardar la reserva. Por favor, intente nuevamente.');
       }
     });
+  }
+
+  finalizarCreacion() {
+    this.isSubmitting.set(false);
+    const mensaje = this.isEditMode() ? 'Reserva actualizada correctamente' : 'Reserva creada correctamente';
+    alert(mensaje);
+    this.router.navigate(['/admin/reservas']);
   }
 
   prepararDatos(): CreateReservaRequest | UpdateReservaRequest {

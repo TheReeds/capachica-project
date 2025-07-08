@@ -28,6 +28,16 @@ export const ADMIN_ROUTES: Routes = [
         title: 'Gestión de Permisos'
       },
       {
+        path: 'chat',
+        loadChildren: () => import('./chat-admin/chat-admin.routes').then(m => m.CHAT_ADMIN_ROUTES),
+        title: 'Administración del Chat'
+      },
+      {
+        path: 'chat-history',
+        loadComponent: () => import('./chat-admin/chat-admin.component').then(m => m.ChatAdminComponent),
+        title: 'Historial de Chat'
+      },
+      {
         path: 'categorias',
         loadChildren: () => import('./turismo/categorias/categorias.routes').then(m => m.CATEGORIAS_ROUTES),
         title: 'Gestión de Categorías'

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,9 @@ import {
   UpdateEstadoServicioRequest,
   ReservaServicio
 } from '../../../core/models/emprendimiento-admin.model';
+import { ChatService } from '../../../core/services/chat.service';
+import { ChatComponent } from '../../../shared/components/chat/chat.component';
+import { Subscription, interval } from 'rxjs'; 
 
 // Extendemos ReservaServicio para incluir la propiedad updating
 interface ReservaServicioWithUpdating extends ReservaServicio {
@@ -33,7 +36,7 @@ interface ChatMessage {
 @Component({
   selector: 'app-reservas-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ChatComponent],
   template: `
     <!-- Loading state glassmorphism -->
     <div *ngIf="loading && !reservasData" class="flex items-center justify-center h-64">
@@ -285,48 +288,13 @@ interface ChatMessage {
                 </button>
               </div>
 
-              <!-- Chat Messages -->
-              <div class="bg-white/5 dark:bg-slate-800/30 rounded-xl p-4 mb-4 max-h-64 overflow-y-auto border border-white/10 dark:border-slate-600/30">
-                <div *ngFor="let message of getChatMessages(reserva.id)" 
-                     class="mb-3 flex"
-                     [ngClass]="message.sender === 'emprendedor' ? 'justify-end' : 'justify-start'">
-                  <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-xl"
-                       [ngClass]="{
-                         'bg-orange-500/20 text-orange-100 border border-orange-400/30': message.sender === 'emprendedor',
-                         'bg-blue-500/20 text-blue-100 border border-blue-400/30': message.sender === 'cliente'
-                       }">
-                    <p class="text-sm">{{ message.message }}</p>
-                    <p class="text-xs opacity-70 mt-1">{{ message.timestamp | date:'short' }}</p>
-                  </div>
-                </div>
-                
-                <!-- Empty state -->
-                <div *ngIf="getChatMessages(reserva.id).length === 0" 
-                     class="text-center py-8 text-slate-400">
-                  <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                  </svg>
-                  <p class="text-sm">No hay mensajes aún</p>
-                  <p class="text-xs">Inicia una conversación con el cliente</p>
-                </div>
-              </div>
-
-              <!-- Chat Input -->
-              <div class="flex gap-3">
-                <input 
-                  type="text" 
-                  [(ngModel)]="newMessage"
-                  (keyup.enter)="sendMessage(reserva.id)"
-                  placeholder="Escribe un mensaje..."
-                  class="flex-1 px-4 py-3 border border-slate-600/50 rounded-xl bg-white/10 dark:bg-slate-800/30 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-300">
-                <button (click)="sendMessage(reserva.id)"
-                        [disabled]="!newMessage.trim()"
-                        class="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                  </svg>
-                </button>
-              </div>
+              <!-- Chat Component -->
+              <app-chat 
+                [reservaId]="reserva.id"
+                [titulo]="'Chat con ' + reserva.usuario.name"
+                [esAdmin]="false"
+                (mensajeEnviado)="onMensajeEnviado($event)">
+              </app-chat>
             </div>
           </div>
 
@@ -508,6 +476,8 @@ interface ChatMessage {
 export class ReservasListComponent implements OnInit {
   private emprendimientoAdminService = inject(EmprendimientoAdminService);
   private route = inject(ActivatedRoute);
+  private chatService = inject(ChatService);
+  @ViewChild('chatScroll') chatScroll!: ElementRef;
 
   emprendimientoId!: number;
   emprendimiento?: Emprendimiento;
@@ -516,10 +486,12 @@ export class ReservasListComponent implements OnInit {
   error = '';
   currentPage = 1;
 
-  // Chat functionality
+  // Chat
   activeChatReserva = 0;
   newMessage = '';
-  chatMessages: { [reservaId: number]: ChatMessage[] } = {};
+  chatMessages: { [reservaId: number]: any[] } = {};
+  chatLoading: { [reservaId: number]: boolean } = {};
+  enviandoMensaje: { [reservaId: number]: boolean } = {};
 
   filters = {
     estado: '',
@@ -528,6 +500,9 @@ export class ReservasListComponent implements OnInit {
     servicio_id: undefined as number | undefined,
     usuario_id: undefined as number | undefined
   };
+
+  private chatSocketSub: Subscription | null = null;
+  private chatAutoRefreshSub: Subscription | null = null;
 
   ngOnInit(): void {
     // Obtener el ID de la ruta padre
@@ -538,7 +513,6 @@ export class ReservasListComponent implements OnInit {
       if (id && !isNaN(+id)) {
         this.emprendimientoId = +id;
         this.loadData();
-        this.initializeMockChatData();
       } else {
         console.error('Reservas - ID inválido:', id);
         this.error = 'ID de emprendimiento inválido';
@@ -720,90 +694,16 @@ export class ReservasListComponent implements OnInit {
 
   // Chat functionality methods
   toggleChat(reservaId: number): void {
-    this.activeChatReserva = this.activeChatReserva === reservaId ? 0 : reservaId;
     if (this.activeChatReserva === reservaId) {
-      // Mark messages as read when opening chat
-      this.markMessagesAsRead(reservaId);
+      this.activeChatReserva = 0;
+    } else {
+      this.activeChatReserva = reservaId;
     }
   }
 
-  getChatMessages(reservaId: number): ChatMessage[] {
-    return this.chatMessages[reservaId] || [];
-  }
-
-  getUnreadMessagesCount(reservaId: number): number {
-    const messages = this.chatMessages[reservaId] || [];
-    return messages.filter(msg => !msg.read && msg.sender === 'cliente').length;
-  }
-
-  sendMessage(reservaId: number): void {
-    if (!this.newMessage.trim()) return;
-
-    if (!this.chatMessages[reservaId]) {
-      this.chatMessages[reservaId] = [];
-    }
-
-    const newMsg: ChatMessage = {
-      id: Date.now(),
-      sender: 'emprendedor',
-      message: this.newMessage.trim(),
-      timestamp: new Date(),
-      read: true
-    };
-
-    this.chatMessages[reservaId].push(newMsg);
-    this.newMessage = '';
-
-    // Simulate auto-response (remove this in real implementation)
-    setTimeout(() => {
-      const autoResponse: ChatMessage = {
-        id: Date.now() + 1,
-        sender: 'cliente',
-        message: 'Gracias por tu mensaje. Te responderé pronto.',
-        timestamp: new Date(),
-        read: false
-      };
-      this.chatMessages[reservaId].push(autoResponse);
-    }, 2000);
-  }
-
-  private markMessagesAsRead(reservaId: number): void {
-    if (this.chatMessages[reservaId]) {
-      this.chatMessages[reservaId].forEach(msg => {
-        if (msg.sender === 'cliente') {
-          msg.read = true;
-        }
-      });
-    }
-  }
-
-  private initializeMockChatData(): void {
-    // Mock data for demonstration - remove in real implementation
-    this.chatMessages = {
-      1: [
-        {
-          id: 1,
-          sender: 'cliente',
-          message: 'Hola, tengo una pregunta sobre mi reserva.',
-          timestamp: new Date(Date.now() - 3600000),
-          read: false
-        },
-        {
-          id: 2,
-          sender: 'emprendedor',
-          message: 'Hola! Claro, dime en qué te puedo ayudar.',
-          timestamp: new Date(Date.now() - 3300000),
-          read: true
-        },
-        {
-          id: 3,
-          sender: 'cliente',
-          message: '¿Puedo cambiar la hora de mi reserva?',
-          timestamp: new Date(Date.now() - 1800000),
-          read: false
-        }
-      ]
-    };
+  onMensajeEnviado(mensaje: any): void {
+    console.log('Mensaje enviado:', mensaje);
+    // Aquí puedes agregar lógica adicional si es necesario
   }
 
   // Track by functions for performance
@@ -813,5 +713,9 @@ export class ReservasListComponent implements OnInit {
 
   trackByServicioReserva(index: number, servicio: ReservaServicioWithUpdating): number {
     return servicio.id;
+  }
+
+  getUnreadMessagesCount(reservaId: number): number {
+    return 0;
   }
 }
